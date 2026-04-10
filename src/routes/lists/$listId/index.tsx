@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { useState } from "react";
-import { useList, useUpdateSlug, useUpdateName } from "@/hooks/useList";
+import { useList, useUpdateSlug, useUpdateName, useTogglePublic } from "@/hooks/useList";
 import { useItems, useAddItem, useToggleItem, useDeleteItem, useUpdateItem } from "@/hooks/useItems";
 import { ItemRow } from "@/components/items/ItemRow";
 
@@ -34,6 +34,7 @@ function ListDetailPage() {
   const updateItem = useUpdateItem(listId);
   const updateSlug = useUpdateSlug(listId);
   const updateName = useUpdateName(listId);
+  const togglePublic = useTogglePublic(listId);
 
   function handleAdd(e: React.FormEvent) {
     e.preventDefault();
@@ -143,6 +144,33 @@ function ListDetailPage() {
               )}
               {slugError && <p className="text-xs text-red-400 mt-1">{slugError}</p>}
             </div>
+
+            <button
+              onClick={() => togglePublic.mutate(!list?.public)}
+              data-testid="toggle-public-btn"
+              title={list?.public ? "Lista pública — clic para hacer privada" : "Lista privada — clic para hacer pública"}
+              className={`shrink-0 flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium transition active:scale-[0.96] ${
+                list?.public
+                  ? "bg-gray-900 text-white hover:bg-gray-700"
+                  : "bg-gray-100 text-gray-400 hover:bg-gray-200 hover:text-gray-600"
+              }`}
+            >
+              {list?.public ? (
+                <>
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 004 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Pública
+                </>
+              ) : (
+                <>
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                  Privada
+                </>
+              )}
+            </button>
 
             <button
               onClick={handleShare}
