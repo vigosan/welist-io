@@ -1,16 +1,19 @@
 import { useState } from "react";
 import type { Item } from "@/hooks/useItems";
+import { parseTags } from "@/lib/tags";
 
 interface Props {
   item: Item;
   onToggle: () => void;
   onDelete: () => void;
   onEdit: (text: string) => void;
+  onTagClick?: (tag: string) => void;
 }
 
-export function ItemRow({ item, onToggle, onDelete, onEdit }: Props) {
+export function ItemRow({ item, onToggle, onDelete, onEdit, onTagClick }: Props) {
   const [editing, setEditing] = useState(false);
   const [text, setText] = useState(item.text);
+  const { display, tags } = parseTags(item.text);
 
   function handleSubmit(e?: React.FormEvent) {
     e?.preventDefault();
@@ -58,15 +61,31 @@ export function ItemRow({ item, onToggle, onDelete, onEdit }: Props) {
             />
           </form>
         ) : (
-          <span
-            data-testid={`item-text-${item.id}`}
-            onDoubleClick={() => !item.done && setEditing(true)}
-            className={`text-sm font-medium cursor-default select-none ${
-              item.done ? "line-through text-gray-400" : "text-gray-800"
-            }`}
-          >
-            {item.text}
-          </span>
+          <>
+            <span
+              data-testid={`item-text-${item.id}`}
+              onDoubleClick={() => !item.done && setEditing(true)}
+              className={`text-sm font-medium cursor-default select-none ${
+                item.done ? "line-through text-gray-400" : "text-gray-800"
+              }`}
+            >
+              {display || item.text}
+            </span>
+            {tags.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mt-1">
+                {tags.map((tag) => (
+                  <button
+                    key={tag}
+                    data-testid={`item-tag-${item.id}-${tag}`}
+                    onClick={() => onTagClick?.(tag)}
+                    className="text-xs text-gray-400 hover:text-gray-600 transition"
+                  >
+                    #{tag}
+                  </button>
+                ))}
+              </div>
+            )}
+          </>
         )}
       </div>
 

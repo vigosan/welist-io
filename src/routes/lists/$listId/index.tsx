@@ -1,9 +1,10 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useList, useUpdateSlug, useUpdateName, useTogglePublic } from "@/hooks/useList";
 import { useItems, useAddItem, useToggleItem, useDeleteItem, useUpdateItem } from "@/hooks/useItems";
 import { ItemRow } from "@/components/items/ItemRow";
 import { usePullToRefresh } from "@/hooks/usePullToRefresh";
+import { parseTags } from "@/lib/tags";
 
 export const Route = createFileRoute("/lists/$listId/")({
   component: ListDetailPage,
@@ -19,6 +20,7 @@ function ListDetailPage() {
   const [slugError, setSlugError] = useState("");
   const [editingName, setEditingName] = useState(false);
   const [nameValue, setNameValue] = useState("");
+  const [activeTag, setActiveTag] = useState<string | null>(null);
 
   const { data: list, isLoading: listLoading, refetch: refetchList } = useList(listId);
 
@@ -75,6 +77,17 @@ function ListDetailPage() {
       },
     });
   }
+
+  const allTags = useMemo(() => {
+    const seen = new Set<string>();
+    items.forEach((i) => parseTags(i.text).tags.forEach((t) => seen.add(t)));
+    return [...seen].sort();
+  }, [items]);
+
+  const filteredItems = useMemo(
+    () => activeTag ? items.filter((i) => parseTags(i.text).tags.includes(activeTag)) : items,
+    [items, activeTag],
+  );
 
   const doneCount = items.filter((i) => i.done).length;
   const progress = items.length > 0 ? (doneCount / items.length) * 100 : 0;
@@ -224,6 +237,25 @@ function ListDetailPage() {
               />
             </div>
           )}
+
+          {!itemsLoading && allTags.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 mt-3">
+              {allTags.map((tag) => (
+                <button
+                  key={tag}
+                  data-testid={`tag-filter-${tag}`}
+                  onClick={() => setActiveTag(activeTag === tag ? null : tag)}
+                  className={`px-2.5 py-0.5 rounded-full text-xs font-medium transition ${
+                    activeTag === tag
+                      ? "bg-gray-900 text-white"
+                      : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+                  }`}
+                >
+                  #{tag}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Pull to refresh indicator */}
@@ -252,19 +284,20 @@ function ListDetailPage() {
                 </div>
               ))}
             </div>
-          ) : items.length === 0 ? (
+          ) : filteredItems.length === 0 ? (
             <p className="text-sm text-gray-400 text-center py-10">
-              Añade el primer elemento a tu lista.
+              {activeTag ? `No hay elementos con #${activeTag}.` : "Añade el primer elemento a tu lista."}
             </p>
           ) : (
             <div className="space-y-1">
-              {items.map((item) => (
+              {filteredItems.map((item) => (
                 <ItemRow
                   key={item.id}
                   item={item}
                   onToggle={() => toggleItem.mutate(item.id)}
                   onDelete={() => deleteItem.mutate(item.id)}
                   onEdit={(text) => updateItem.mutate({ id: item.id, text })}
+                  onTagClick={(tag) => setActiveTag(activeTag === tag ? null : tag)}
                 />
               ))}
             </div>
