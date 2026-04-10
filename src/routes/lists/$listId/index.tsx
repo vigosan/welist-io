@@ -19,14 +19,14 @@ function ListDetailPage() {
   const [editingName, setEditingName] = useState(false);
   const [nameValue, setNameValue] = useState("");
 
-  const { data: list } = useList(listId);
+  const { data: list, isLoading: listLoading } = useList(listId);
 
   useEffect(() => {
     if (list?.name) document.title = `${list.name} — Welist`;
     return () => { document.title = "Welist"; };
   }, [list?.name]);
 
-  const { data: items = [] } = useItems(listId);
+  const { data: items = [], isLoading: itemsLoading } = useItems(listId);
   const addItem = useAddItem(listId);
   const toggleItem = useToggleItem(listId);
   const deleteItem = useDeleteItem(listId);
@@ -86,7 +86,9 @@ function ListDetailPage() {
             ← Welist
           </Link>
           <div className="mt-4">
-          {editingName ? (
+          {listLoading ? (
+            <div className="h-7 w-3/4 rounded-lg bg-gray-200 animate-pulse" />
+          ) : editingName ? (
             <form onSubmit={(e) => {
               e.preventDefault();
               const trimmed = nameValue.trim();
@@ -114,6 +116,17 @@ function ListDetailPage() {
 
           {/* Meta row */}
           <div className="flex items-center gap-2 mt-2 flex-wrap">
+            {listLoading ? (
+              <>
+                <div className="h-3.5 w-28 rounded bg-gray-200 animate-pulse" />
+                <div className="h-3.5 w-24 rounded bg-gray-200 animate-pulse" />
+                <div className="ml-auto flex items-center gap-1.5">
+                  <div className="h-7 w-20 rounded-md bg-gray-200 animate-pulse" />
+                  <div className="h-7 w-7 rounded-md bg-gray-200 animate-pulse" />
+                </div>
+              </>
+            ) : (
+              <>
             {items.length > 0 && (
               <span className="text-xs text-gray-400 tabular-nums shrink-0">{doneCount} / {items.length} completados</span>
             )}
@@ -195,9 +208,11 @@ function ListDetailPage() {
                 </span>
               </button>
             </div>
+              </>
+            )}
           </div>
 
-          {progress > 0 && (
+          {!listLoading && progress > 0 && (
             <div className="mt-3 h-0.5 bg-gray-100 overflow-hidden rounded-full">
               <div
                 className="h-full bg-gray-900 rounded-full transition-all duration-700"
@@ -209,22 +224,34 @@ function ListDetailPage() {
 
         {/* Items — scrollable, fills remaining space */}
         <div className="flex-1 overflow-y-auto px-3 py-1">
-          {items.length === 0 && (
+          {itemsLoading ? (
+            <div className="space-y-1">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="flex items-center gap-3 px-3 py-3 rounded-lg bg-gray-50">
+                  <div className="shrink-0 w-10 h-10 flex items-center justify-center">
+                    <div className="w-5 h-5 rounded-full bg-gray-200 animate-pulse" />
+                  </div>
+                  <div className="flex-1 h-4 rounded-md bg-gray-200 animate-pulse" style={{ width: `${55 + (i * 13) % 35}%` }} />
+                </div>
+              ))}
+            </div>
+          ) : items.length === 0 ? (
             <p className="text-sm text-gray-400 text-center py-10">
               Añade el primer elemento a tu lista.
             </p>
+          ) : (
+            <div className="space-y-1">
+              {items.map((item) => (
+                <ItemRow
+                  key={item.id}
+                  item={item}
+                  onToggle={() => toggleItem.mutate(item.id)}
+                  onDelete={() => deleteItem.mutate(item.id)}
+                  onEdit={(text) => updateItem.mutate({ id: item.id, text })}
+                />
+              ))}
+            </div>
           )}
-          <div className="space-y-1">
-            {items.map((item) => (
-              <ItemRow
-                key={item.id}
-                item={item}
-                onToggle={() => toggleItem.mutate(item.id)}
-                onDelete={() => deleteItem.mutate(item.id)}
-                onEdit={(text) => updateItem.mutate({ id: item.id, text })}
-              />
-            ))}
-          </div>
         </div>
 
         {/* Footer — always visible at bottom */}
