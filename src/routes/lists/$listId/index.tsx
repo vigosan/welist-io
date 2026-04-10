@@ -78,11 +78,11 @@ function ListDetailPage() {
   const currentSlug = list?.slug ?? listId;
 
   return (
-    <div className="min-h-screen bg-white flex items-start justify-center px-6 py-12">
-      <div className="w-full max-w-sm space-y-6">
+    <div className="h-dvh bg-[#FAFAF8] flex flex-col sm:items-center sm:justify-center sm:p-6">
+      <div className="flex-1 sm:flex-none flex flex-col w-full sm:max-w-md bg-white sm:rounded-3xl sm:border sm:border-gray-100 overflow-hidden sm:max-h-[90dvh]">
 
         {/* Header */}
-        <div className="space-y-3">
+        <div className="px-5 pt-6 pb-4 shrink-0">
           {editingName ? (
             <form onSubmit={(e) => {
               e.preventDefault();
@@ -96,12 +96,12 @@ function ListDetailPage() {
                 onChange={(e) => setNameValue(e.target.value)}
                 onBlur={(e) => { const t = e.target.value.trim(); if (t && t !== list?.name) updateName.mutate(t); setEditingName(false); }}
                 data-testid="list-name-edit-input"
-                className="w-full text-2xl font-semibold text-gray-900 tracking-tight bg-transparent outline-none border-b border-gray-900 pb-0.5"
+                className="w-full text-xl font-bold text-gray-900 leading-tight bg-transparent outline-none border-b-2 border-gray-900"
               />
             </form>
           ) : (
             <h1
-              className="text-2xl font-semibold text-gray-900 tracking-tight text-pretty cursor-default"
+              className="text-xl font-bold text-gray-900 leading-tight text-pretty cursor-default"
               onDoubleClick={() => { setNameValue(list?.name ?? ""); setEditingName(true); }}
             >
               {list?.name ?? "…"}
@@ -109,9 +109,9 @@ function ListDetailPage() {
           )}
 
           {/* Meta row */}
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-2 mt-2 flex-wrap">
             {items.length > 0 && (
-              <span className="text-xs text-gray-400 tabular-nums">{doneCount} / {items.length}</span>
+              <span className="text-xs text-gray-400 tabular-nums shrink-0">{doneCount} / {items.length} completados</span>
             )}
             {items.length > 0 && <span className="text-gray-200 text-xs">·</span>}
 
@@ -125,7 +125,7 @@ function ListDetailPage() {
                     onChange={(e) => setSlugValue(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))}
                     placeholder="mi-lista"
                     data-testid="slug-input"
-                    className="text-xs text-gray-700 bg-white border border-gray-200 rounded-md px-2 py-1 outline-none focus:border-gray-400 w-36 transition"
+                    className="text-xs text-gray-700 bg-white border border-gray-200 rounded-md px-2 py-1 outline-none focus:border-gray-400 w-32 transition"
                   />
                   <button type="submit" disabled={!slugValue.trim() || updateSlug.isPending} className="text-xs text-gray-500 hover:text-gray-900 transition disabled:opacity-40 p-1">✓</button>
                   <button type="button" onClick={() => setEditingSlug(false)} className="text-xs text-gray-400 hover:text-gray-600 transition p-1">✕</button>
@@ -134,7 +134,7 @@ function ListDetailPage() {
                 <button
                   onClick={startEditingSlug}
                   data-testid="edit-slug-btn"
-                  className="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-700 transition truncate max-w-full"
+                  className="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600 transition truncate max-w-full"
                 >
                   <svg className="w-3 h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
@@ -194,63 +194,64 @@ function ListDetailPage() {
           </div>
 
           {progress > 0 && (
-            <div className="h-px bg-gray-100 overflow-hidden">
+            <div className="mt-3 h-0.5 bg-gray-100 overflow-hidden rounded-full">
               <div
-                className="h-full bg-gray-400 transition-all duration-700"
+                className="h-full bg-gray-900 rounded-full transition-all duration-700"
                 style={{ width: `${progress}%` }}
               />
             </div>
           )}
         </div>
 
-        {/* Items */}
-        <div className="space-y-0 max-h-[480px] overflow-y-auto -mx-1">
+        {/* Items — scrollable, fills remaining space */}
+        <div className="flex-1 overflow-y-auto px-3 py-1">
           {items.length === 0 && (
-            <p className="text-sm text-gray-400 py-4">
+            <p className="text-sm text-gray-400 text-center py-10">
               Añade el primer elemento a tu lista.
             </p>
           )}
-          {items.map((item) => (
-            <ItemRow
-              key={item.id}
-              item={item}
-              onToggle={() => toggleItem.mutate(item.id)}
-              onDelete={() => deleteItem.mutate(item.id)}
-              onEdit={(text) => updateItem.mutate({ id: item.id, text })}
-            />
-          ))}
+          <div className="space-y-1">
+            {items.map((item) => (
+              <ItemRow
+                key={item.id}
+                item={item}
+                onToggle={() => toggleItem.mutate(item.id)}
+                onDelete={() => deleteItem.mutate(item.id)}
+                onEdit={(text) => updateItem.mutate({ id: item.id, text })}
+              />
+            ))}
+          </div>
         </div>
 
-        {/* Add item */}
-        <form onSubmit={handleAdd} className="flex gap-2 p-1.5 border border-gray-200 rounded-2xl">
-          <input
-            value={newItem}
-            onChange={(e) => setNewItem(e.target.value)}
-            placeholder="Añadir elemento…"
-            data-testid="add-item-input"
-            className="flex-1 pl-3 text-sm text-gray-900 placeholder-gray-400 bg-transparent outline-none"
-          />
-          <button
-            type="submit"
-            disabled={!newItem.trim() || addItem.isPending}
-            data-testid="add-item-submit"
-            className="px-5 py-2.5 text-sm font-medium bg-gray-900 text-white rounded-xl hover:bg-black disabled:opacity-30 disabled:cursor-not-allowed transition active:scale-[0.96]"
-          >
-            Añadir
-          </button>
-        </form>
+        {/* Footer — always visible at bottom */}
+        <div className="shrink-0 px-4 pt-3 pb-6 space-y-3">
+          <form onSubmit={handleAdd} className="flex gap-2 p-1.5 bg-gray-50 border border-gray-200 rounded-2xl">
+            <input
+              value={newItem}
+              onChange={(e) => setNewItem(e.target.value)}
+              placeholder="Añadir elemento…"
+              data-testid="add-item-input"
+              className="flex-1 pl-3 text-sm text-gray-900 placeholder-gray-400 bg-transparent outline-none"
+            />
+            <button
+              type="submit"
+              disabled={!newItem.trim() || addItem.isPending}
+              data-testid="add-item-submit"
+              className="px-5 py-2.5 text-sm font-medium bg-gray-900 text-white rounded-xl hover:bg-black disabled:opacity-30 disabled:cursor-not-allowed transition active:scale-[0.96]"
+            >
+              Añadir
+            </button>
+          </form>
 
-        {/* Clone */}
-        <div className="pt-2 border-t border-gray-100">
           <button
             onClick={() => cloneList.mutate(listId, {
               onSuccess: (l) => navigate({ to: "/lists/$listId", params: { listId: l.id } }),
             })}
             disabled={cloneList.isPending}
             data-testid="clone-list-btn"
-            className="flex items-center gap-2 text-sm text-gray-400 hover:text-gray-900 transition"
+            className="flex items-center gap-2 text-xs text-gray-400 hover:text-gray-700 transition mx-auto"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
             </svg>
             {cloneList.isPending ? "Clonando…" : "Clonar esta lista"}
