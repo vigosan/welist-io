@@ -25,8 +25,8 @@ function ExplorePage() {
   }
 
   return (
-    <div className="min-h-dvh bg-[#FAFAF8] flex flex-col sm:items-center sm:justify-start sm:p-6">
-      <div className="flex flex-col w-full sm:max-w-md bg-white sm:rounded-3xl sm:border sm:border-gray-100 overflow-hidden">
+    <div className="h-dvh bg-[#FAFAF8] flex flex-col sm:items-center sm:p-6">
+      <div className="flex-1 flex flex-col w-full sm:max-w-md bg-white sm:rounded-3xl sm:border sm:border-gray-100 overflow-hidden">
 
         <div className="px-5 pt-6 pb-4 shrink-0">
           <Link to="/" className="text-sm text-gray-400 hover:text-gray-700 transition">
@@ -50,7 +50,7 @@ function ExplorePage() {
           </form>
         </div>
 
-        <div className="flex-1 px-3 pb-6">
+        <div className="flex-1 overflow-y-auto px-3 pb-6">
           {isLoading && (
             <p className="text-sm text-gray-400 text-center py-10">Cargando…</p>
           )}
