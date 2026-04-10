@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { useState } from "react";
-import { useList, useUpdateSlug, useUpdateName, useTogglePublic } from "@/hooks/useList";
+import { useList, useUpdateSlug, useUpdateName, useTogglePublic, useCloneList } from "@/hooks/useList";
 import { useItems, useAddItem, useToggleItem, useDeleteItem, useUpdateItem } from "@/hooks/useItems";
 import { ItemRow } from "@/components/items/ItemRow";
 
@@ -35,6 +35,7 @@ function ListDetailPage() {
   const updateSlug = useUpdateSlug(listId);
   const updateName = useUpdateName(listId);
   const togglePublic = useTogglePublic(listId);
+  const cloneList = useCloneList();
 
   function handleAdd(e: React.FormEvent) {
     e.preventDefault();
@@ -238,6 +239,23 @@ function ListDetailPage() {
               Añadir
             </button>
           </form>
+        </div>
+
+        {/* Clone */}
+        <div className="px-4 pb-5 border-t border-gray-100 pt-4">
+          <button
+            onClick={() => cloneList.mutate(listId, {
+              onSuccess: (l) => navigate({ to: "/lists/$listId", params: { listId: l.id } }),
+            })}
+            disabled={cloneList.isPending}
+            data-testid="clone-list-btn"
+            className="w-full py-2.5 text-sm text-gray-400 hover:text-gray-900 transition flex items-center justify-center gap-2"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+            </svg>
+            {cloneList.isPending ? "Clonando…" : "Clonar esta lista"}
+          </button>
         </div>
 
       </div>
