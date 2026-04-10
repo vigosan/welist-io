@@ -2,7 +2,7 @@
 
 # ─── Dev ──────────────────────────────────────────────────────────────────────
 
-dev: ## Start development server
+dev: ## Start development server (API + frontend)
 	npm run dev
 
 build: ## Build for production
