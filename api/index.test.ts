@@ -74,11 +74,12 @@ describe("GET /api/lists/:listId/items", () => {
       { id: "i1", listId: "abc", text: "Primero", done: false, position: 0 },
       { id: "i2", listId: "abc", text: "Segundo", done: true, position: 1 },
     ];
+    mockDb.query.lists.findFirst.mockResolvedValue({ id: "abc" });
     mockDb.query.items.findMany.mockResolvedValue(rows);
 
     const res = await app.request("/api/lists/abc/items");
     expect(res.status).toBe(200);
-    const body = await res.json() as Record<string, unknown>;
+    const body = await res.json() as Array<Record<string, unknown>>;
     expect(body).toHaveLength(2);
     expect(body[0].text).toBe("Primero");
   });
@@ -89,6 +90,7 @@ describe("POST /api/lists/:listId/items", () => {
 
   it("creates an item and returns 201", async () => {
     const item = { id: "i1", listId: "abc", text: "Nueva tarea", done: false, position: 0 };
+    mockDb.query.lists.findFirst.mockResolvedValue({ id: "abc" });
     mockDb.select.mockReturnValue({
       from: vi.fn().mockReturnValue({
         where: vi.fn().mockResolvedValue([{ pos: null }]),
@@ -124,6 +126,7 @@ describe("PATCH /api/lists/:listId/items/:itemId/toggle", () => {
 
   it("toggles done and returns updated item", async () => {
     const updated = { id: "i1", listId: "abc", text: "Tarea", done: true, position: 0 };
+    mockDb.query.lists.findFirst.mockResolvedValue({ id: "abc" });
     mockDb.update.mockReturnValue({
       set: vi.fn().mockReturnValue({
         where: vi.fn().mockReturnValue({ returning: vi.fn().mockResolvedValue([updated]) }),
@@ -152,6 +155,7 @@ describe("DELETE /api/lists/:listId/items/:itemId", () => {
   beforeEach(() => vi.clearAllMocks());
 
   it("deletes an item and returns 204", async () => {
+    mockDb.query.lists.findFirst.mockResolvedValue({ id: "abc" });
     mockDb.delete.mockReturnValue({
       where: vi.fn().mockResolvedValue(undefined),
     });
