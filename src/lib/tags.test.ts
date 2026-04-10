@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { parseTags, tagColor } from "./tags";
+import { parseTags, tagColor, getPartialTag } from "./tags";
 
 describe("parseTags", () => {
   it("returns empty tags and full text when no hashtags", () => {
@@ -30,6 +30,28 @@ describe("parseTags", () => {
   it("handles accented characters in tags", () => {
     const { tags } = parseTags("algo #montaña");
     expect(tags).toContain("montaña");
+  });
+});
+
+describe("getPartialTag", () => {
+  it("returns null when no # present", () => {
+    expect(getPartialTag("comprar leche")).toBeNull();
+  });
+
+  it("returns null when # is not at the end", () => {
+    expect(getPartialTag("#viajes y más texto")).toBeNull();
+  });
+
+  it("returns empty string for bare # at end", () => {
+    expect(getPartialTag("algo #")).toBe("");
+  });
+
+  it("returns the partial word after #", () => {
+    expect(getPartialTag("viaje a Roma #via")).toBe("via");
+  });
+
+  it("lowercases the partial", () => {
+    expect(getPartialTag("algo #URG")).toBe("urg");
   });
 });
 

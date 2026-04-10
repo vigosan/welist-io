@@ -17,6 +17,11 @@ export function tagColor(tag: string): string {
   return TAG_COLORS[sum % TAG_COLORS.length];
 }
 
+export function getPartialTag(value: string): string | null {
+  const match = value.match(/#([a-zA-ZÀ-ÿ\w-]*)$/);
+  return match ? match[1].toLowerCase() : null;
+}
+
 export function parseTags(text: string): { display: string; tags: string[] } {
   const tags: string[] = [];
   const display = text

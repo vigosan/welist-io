@@ -1,10 +1,10 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useList, useUpdateSlug, useUpdateName, useTogglePublic } from "@/hooks/useList";
 import { useItems, useAddItem, useToggleItem, useDeleteItem, useUpdateItem } from "@/hooks/useItems";
 import { ItemRow } from "@/components/items/ItemRow";
 import { usePullToRefresh } from "@/hooks/usePullToRefresh";
-import { parseTags, tagColor } from "@/lib/tags";
+import { parseTags, tagColor, getPartialTag } from "@/lib/tags";
 
 export const Route = createFileRoute("/lists/$listId/")({
   component: ListDetailPage,
@@ -21,6 +21,7 @@ function ListDetailPage() {
   const [editingName, setEditingName] = useState(false);
   const [nameValue, setNameValue] = useState("");
   const [activeTag, setActiveTag] = useState<string | null>(null);
+  const addInputRef = useRef<HTMLInputElement>(null);
 
   const { data: list, isLoading: listLoading, refetch: refetchList } = useList(listId);
 
@@ -83,6 +84,17 @@ function ListDetailPage() {
     items.forEach((i) => parseTags(i.text).tags.forEach((t) => seen.add(t)));
     return [...seen].sort();
   }, [items]);
+
+  const partialTag = useMemo(() => getPartialTag(newItem), [newItem]);
+  const tagSuggestions = useMemo(
+    () => partialTag !== null ? allTags.filter((t) => t.startsWith(partialTag)) : [],
+    [partialTag, allTags],
+  );
+
+  function completeTag(tag: string) {
+    setNewItem((prev) => prev.replace(/#([a-zA-ZÀ-ÿ\w-]*)$/, `#${tag} `));
+    addInputRef.current?.focus();
+  }
 
   const filteredItems = useMemo(
     () => activeTag ? items.filter((i) => parseTags(i.text).tags.includes(activeTag)) : items,
@@ -303,9 +315,24 @@ function ListDetailPage() {
         </div>
 
         {/* Footer — always visible at bottom */}
-        <div className="shrink-0 px-4 pt-3 pb-6 space-y-3">
+        <div className="shrink-0 px-4 pt-3 pb-6 space-y-2">
+          {tagSuggestions.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 px-1">
+              {tagSuggestions.map((tag) => (
+                <button
+                  key={tag}
+                  type="button"
+                  onClick={() => completeTag(tag)}
+                  className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium transition active:scale-[0.96] ${tagColor(tag)}`}
+                >
+                  #{tag}
+                </button>
+              ))}
+            </div>
+          )}
           <form onSubmit={handleAdd} className="flex gap-2 p-1.5 bg-gray-50 border border-gray-200 rounded-2xl">
             <input
+              ref={addInputRef}
               value={newItem}
               onChange={(e) => setNewItem(e.target.value)}
               placeholder="Añadir elemento…"
