@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
-import { eq, max, sql, and } from "drizzle-orm";
+import { eq, max, sql, and, or } from "drizzle-orm";
 import { db } from "../src/db/client";
 import { lists, items } from "../src/db/schema";
 
@@ -19,10 +19,39 @@ app.post(
 
 app.get("/lists/:listId", async (c) => {
   const listId = c.req.param("listId");
-  const list = await db.query.lists.findFirst({ where: eq(lists.id, listId) });
+  const list = await db.query.lists.findFirst({
+    where: or(eq(lists.id, listId), eq(lists.slug, listId)),
+  });
   if (!list) return c.json({ error: "Not found" }, 404);
   return c.json(list);
 });
+
+app.patch(
+  "/lists/:listId",
+  zValidator("json", z.object({
+    name: z.string().min(1).max(200).optional(),
+    slug: z.string().min(1).max(100).regex(/^[a-z0-9-]+$/).optional().nullable(),
+  })),
+  async (c) => {
+    const listId = c.req.param("listId");
+    const body = c.req.valid("json");
+    const patch: Record<string, unknown> = {};
+    if (body.name !== undefined) patch.name = body.name;
+    if ("slug" in body) patch.slug = body.slug ?? null;
+    try {
+      const [updated] = await db
+        .update(lists)
+        .set(patch)
+        .where(or(eq(lists.id, listId), eq(lists.slug, listId)))
+        .returning();
+      if (!updated) return c.json({ error: "Not found" }, 404);
+      return c.json(updated);
+    } catch (e: any) {
+      if (e?.code === "23505") return c.json({ error: "slug_taken" }, 409);
+      throw e;
+    }
+  },
+);
 
 app.get("/lists/:listId/items", async (c) => {
   const listId = c.req.param("listId");
