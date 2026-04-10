@@ -61,7 +61,7 @@ export function ItemRow({ item, onToggle, onDelete, onEdit, onTagClick }: Props)
             />
           </form>
         ) : (
-          <>
+          <div className="flex items-baseline gap-x-1.5 flex-wrap">
             <span
               data-testid={`item-text-${item.id}`}
               onDoubleClick={() => !item.done && setEditing(true)}
@@ -71,21 +71,17 @@ export function ItemRow({ item, onToggle, onDelete, onEdit, onTagClick }: Props)
             >
               {display || item.text}
             </span>
-            {tags.length > 0 && (
-              <div className="flex flex-wrap gap-1.5 mt-1">
-                {tags.map((tag) => (
-                  <button
-                    key={tag}
-                    data-testid={`item-tag-${item.id}-${tag}`}
-                    onClick={() => onTagClick?.(tag)}
-                    className="text-xs text-gray-400 hover:text-gray-600 transition"
-                  >
-                    #{tag}
-                  </button>
-                ))}
-              </div>
-            )}
-          </>
+            {tags.map((tag) => (
+              <button
+                key={tag}
+                data-testid={`item-tag-${item.id}-${tag}`}
+                onClick={() => onTagClick?.(tag)}
+                className="text-xs text-gray-400 hover:text-gray-600 shrink-0 transition"
+              >
+                #{tag}
+              </button>
+            ))}
+          </div>
         )}
       </div>
 
