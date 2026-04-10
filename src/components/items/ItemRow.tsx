@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type { Item } from "@/hooks/useItems";
 import { parseTags, tagColor } from "@/lib/tags";
 
@@ -13,12 +13,19 @@ interface Props {
 export function ItemRow({ item, onToggle, onDelete, onEdit, onTagClick }: Props) {
   const [editing, setEditing] = useState(false);
   const [text, setText] = useState(item.text);
+  const cancelled = useRef(false);
   const { display, tags } = parseTags(item.text);
 
   function handleSubmit(e?: React.FormEvent) {
     e?.preventDefault();
     const trimmed = text.trim();
     if (trimmed && trimmed !== item.text) onEdit(trimmed);
+    setEditing(false);
+  }
+
+  function handleCancel() {
+    cancelled.current = true;
+    setText(item.text);
     setEditing(false);
   }
 
@@ -55,7 +62,8 @@ export function ItemRow({ item, onToggle, onDelete, onEdit, onTagClick }: Props)
               autoFocus
               value={text}
               onChange={(e) => setText(e.target.value)}
-              onBlur={() => handleSubmit()}
+              onKeyDown={(e) => { if (e.key === "Escape") { e.preventDefault(); handleCancel(); } }}
+              onBlur={() => { if (!cancelled.current) handleSubmit(); cancelled.current = false; }}
               data-testid={`item-edit-input-${item.id}`}
               className="w-full text-sm font-medium text-gray-900 bg-transparent outline-none"
             />

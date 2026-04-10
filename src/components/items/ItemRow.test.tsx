@@ -50,6 +50,15 @@ describe("ItemRow", () => {
     expect(onTagClick).toHaveBeenCalledWith("viajes");
   });
 
+  it("cancels edit mode on Escape without calling onEdit", async () => {
+    const onEdit = vi.fn();
+    render(<ItemRow item={baseItem} onToggle={vi.fn()} onDelete={vi.fn()} onEdit={onEdit} />);
+    await userEvent.dblClick(screen.getByTestId("item-text-i1"));
+    await userEvent.keyboard("{Escape}");
+    expect(onEdit).not.toHaveBeenCalled();
+    expect(screen.getByTestId("item-text-i1")).toBeInTheDocument();
+  });
+
   it("enters edit mode on double click and calls onEdit on blur", async () => {
     const onEdit = vi.fn();
     render(<ItemRow item={baseItem} onToggle={vi.fn()} onDelete={vi.fn()} onEdit={onEdit} />);
