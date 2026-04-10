@@ -289,8 +289,10 @@ function ListDetailPage() {
                   key={tag}
                   data-testid={`tag-filter-${tag}`}
                   onClick={() => setActiveTag(activeTag === tag ? null : tag)}
-                  className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium transition ${tagColor(tag)} ${
-                    activeTag === tag ? "ring-2 ring-offset-1 ring-current" : ""
+                  className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium transition ${
+                    activeTag === tag
+                      ? "border-gray-900 bg-gray-900 text-white"
+                      : tagColor(tag)
                   }`}
                 >
                   #{tag}
