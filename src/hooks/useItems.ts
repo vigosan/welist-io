@@ -26,7 +26,18 @@ export function useToggleItem(listId: string) {
   return useMutation({
     mutationFn: (itemId: string) =>
       apiClient<Item>(`/api/lists/${listId}/items/${itemId}/toggle`, { method: "PATCH" }),
-    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.items(listId) }),
+    onMutate: async (itemId) => {
+      await qc.cancelQueries({ queryKey: queryKeys.items(listId) });
+      const previous = qc.getQueryData<Item[]>(queryKeys.items(listId));
+      qc.setQueryData<Item[]>(queryKeys.items(listId), (old) =>
+        old?.map((i) => i.id === itemId ? { ...i, done: !i.done } : i),
+      );
+      return { previous };
+    },
+    onError: (_err, _id, ctx) => {
+      qc.setQueryData(queryKeys.items(listId), ctx?.previous);
+    },
+    onSettled: () => qc.invalidateQueries({ queryKey: queryKeys.items(listId) }),
   });
 }
 
@@ -35,7 +46,18 @@ export function useUpdateItem(listId: string) {
   return useMutation({
     mutationFn: ({ id, text }: { id: string; text: string }) =>
       apiClient<Item>(`/api/lists/${listId}/items/${id}`, { method: "PATCH", body: JSON.stringify({ text }) }),
-    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.items(listId) }),
+    onMutate: async ({ id, text }) => {
+      await qc.cancelQueries({ queryKey: queryKeys.items(listId) });
+      const previous = qc.getQueryData<Item[]>(queryKeys.items(listId));
+      qc.setQueryData<Item[]>(queryKeys.items(listId), (old) =>
+        old?.map((i) => i.id === id ? { ...i, text } : i),
+      );
+      return { previous };
+    },
+    onError: (_err, _vars, ctx) => {
+      qc.setQueryData(queryKeys.items(listId), ctx?.previous);
+    },
+    onSettled: () => qc.invalidateQueries({ queryKey: queryKeys.items(listId) }),
   });
 }
 
@@ -44,6 +66,17 @@ export function useDeleteItem(listId: string) {
   return useMutation({
     mutationFn: (itemId: string) =>
       apiClient<void>(`/api/lists/${listId}/items/${itemId}`, { method: "DELETE" }),
-    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.items(listId) }),
+    onMutate: async (itemId) => {
+      await qc.cancelQueries({ queryKey: queryKeys.items(listId) });
+      const previous = qc.getQueryData<Item[]>(queryKeys.items(listId));
+      qc.setQueryData<Item[]>(queryKeys.items(listId), (old) =>
+        old?.filter((i) => i.id !== itemId),
+      );
+      return { previous };
+    },
+    onError: (_err, _id, ctx) => {
+      qc.setQueryData(queryKeys.items(listId), ctx?.previous);
+    },
+    onSettled: () => qc.invalidateQueries({ queryKey: queryKeys.items(listId) }),
   });
 }
