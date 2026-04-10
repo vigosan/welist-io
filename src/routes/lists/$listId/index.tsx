@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useList, useUpdateSlug, useUpdateName, useTogglePublic, useCloneList } from "@/hooks/useList";
 import { useItems, useAddItem, useToggleItem, useDeleteItem, useUpdateItem } from "@/hooks/useItems";
@@ -82,7 +82,11 @@ function ListDetailPage() {
       <div className="flex-1 flex flex-col w-full sm:max-w-md bg-white sm:rounded-3xl sm:border sm:border-gray-100 overflow-hidden">
 
         {/* Header */}
-        <div className="px-5 pt-6 pb-4 shrink-0">
+        <div className="px-5 pt-5 pb-4 shrink-0">
+          <Link to="/" className="text-xs text-gray-400 hover:text-gray-700 transition">
+            ← Welist
+          </Link>
+          <div className="mt-4">
           {editingName ? (
             <form onSubmit={(e) => {
               e.preventDefault();
@@ -107,6 +111,7 @@ function ListDetailPage() {
               {list?.name ?? "…"}
             </h1>
           )}
+          </div>
 
           {/* Meta row */}
           <div className="flex items-center gap-2 mt-2 flex-wrap">
