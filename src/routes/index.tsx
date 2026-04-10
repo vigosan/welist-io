@@ -27,20 +27,20 @@ function HomePage() {
           <p className="text-sm text-gray-400">Crea una lista y comparte el enlace con quien quieras.</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex gap-2">
+        <form onSubmit={handleSubmit} className="flex gap-2 p-1.5 border border-gray-200 rounded-2xl">
           <input
             autoFocus
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Nombre de la lista"
             data-testid="list-name-input"
-            className="flex-1 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-300 bg-white border border-gray-200 rounded-lg outline-none focus:border-gray-400 transition"
+            className="flex-1 pl-3 text-sm text-gray-900 placeholder-gray-400 bg-transparent outline-none"
           />
           <button
             type="submit"
             disabled={!name.trim() || createList.isPending}
             data-testid="create-list-btn"
-            className="px-4 py-2.5 text-sm font-medium bg-gray-900 text-white rounded-lg hover:bg-black disabled:opacity-30 disabled:cursor-not-allowed transition active:scale-[0.96]"
+            className="px-5 py-2.5 text-sm font-medium bg-gray-900 text-white rounded-xl hover:bg-black disabled:opacity-30 disabled:cursor-not-allowed transition active:scale-[0.96]"
           >
             {createList.isPending ? "…" : "Crear"}
           </button>

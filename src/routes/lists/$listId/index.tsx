@@ -222,19 +222,19 @@ function ListDetailPage() {
         </div>
 
         {/* Add item */}
-        <form onSubmit={handleAdd} className="flex gap-2">
+        <form onSubmit={handleAdd} className="flex gap-2 p-1.5 border border-gray-200 rounded-2xl">
           <input
             value={newItem}
             onChange={(e) => setNewItem(e.target.value)}
             placeholder="Añadir elemento…"
             data-testid="add-item-input"
-            className="flex-1 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-300 bg-white border border-gray-200 rounded-lg outline-none focus:border-gray-400 transition"
+            className="flex-1 pl-3 text-sm text-gray-900 placeholder-gray-400 bg-transparent outline-none"
           />
           <button
             type="submit"
             disabled={!newItem.trim() || addItem.isPending}
             data-testid="add-item-submit"
-            className="px-4 py-2.5 text-sm font-medium bg-gray-900 text-white rounded-lg hover:bg-black disabled:opacity-30 disabled:cursor-not-allowed transition active:scale-[0.96]"
+            className="px-5 py-2.5 text-sm font-medium bg-gray-900 text-white rounded-xl hover:bg-black disabled:opacity-30 disabled:cursor-not-allowed transition active:scale-[0.96]"
           >
             Añadir
           </button>

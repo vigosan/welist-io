@@ -35,17 +35,17 @@ function ExplorePage() {
           <h1 className="text-2xl font-semibold text-gray-900 tracking-tight">Explorar</h1>
         </div>
 
-        <form onSubmit={handleSearch} className="flex gap-2">
+        <form onSubmit={handleSearch} className="flex gap-2 p-1.5 border border-gray-200 rounded-2xl">
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Buscar listas…"
             data-testid="explore-search-input"
-            className="flex-1 px-3 py-2.5 text-sm text-gray-900 placeholder-gray-300 bg-white border border-gray-200 rounded-lg outline-none focus:border-gray-400 transition"
+            className="flex-1 pl-3 text-sm text-gray-900 placeholder-gray-400 bg-transparent outline-none"
           />
           <button
             type="submit"
-            className="px-4 py-2.5 text-sm font-medium bg-gray-900 text-white rounded-lg hover:bg-black transition active:scale-[0.96]"
+            className="px-5 py-2.5 text-sm font-medium bg-gray-900 text-white rounded-xl hover:bg-black transition active:scale-[0.96]"
           >
             Buscar
           </button>
