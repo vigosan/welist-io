@@ -1,8 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
-import { apiClient } from "@/lib/api-client";
-import type { List } from "@/db/schema";
+import { useCreateList } from "@/hooks/useList";
 
 export const Route = createFileRoute("/")({
   component: HomePage,
@@ -11,17 +9,14 @@ export const Route = createFileRoute("/")({
 function HomePage() {
   const navigate = useNavigate();
   const [name, setName] = useState("");
-
-  const createList = useMutation({
-    mutationFn: (listName: string) =>
-      apiClient<List>("/api/lists", { method: "POST", body: JSON.stringify({ name: listName }) }),
-    onSuccess: (list) => navigate({ to: "/lists/$listId", params: { listId: list.id } }),
-  });
+  const createList = useCreateList();
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const trimmed = name.trim();
-    if (trimmed) createList.mutate(trimmed);
+    if (trimmed) createList.mutate(trimmed, {
+      onSuccess: (list) => navigate({ to: "/lists/$listId", params: { listId: list.id } }),
+    });
   }
 
   return (

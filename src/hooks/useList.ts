@@ -1,22 +1,25 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiClient } from "@/lib/api-client";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { listsService } from "@/services/lists.service";
 import { queryKeys } from "@/lib/query-keys";
 import type { List } from "@/db/schema";
 
-export function useUpdateSlug(listId: string) {
-  const qc = useQueryClient();
+export function useList(listId: string) {
+  return useQuery({
+    queryKey: queryKeys.list(listId),
+    queryFn: () => listsService.get(listId),
+  });
+}
+
+export function useCreateList() {
   return useMutation({
-    mutationFn: (slug: string | null) =>
-      apiClient<List>(`/api/lists/${listId}`, { method: "PATCH", body: JSON.stringify({ slug }) }),
-    onSuccess: (updated) => qc.setQueryData(queryKeys.list(listId), updated),
+    mutationFn: (name: string) => listsService.create(name),
   });
 }
 
 export function useUpdateName(listId: string) {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (name: string) =>
-      apiClient<List>(`/api/lists/${listId}`, { method: "PATCH", body: JSON.stringify({ name }) }),
+    mutationFn: (name: string) => listsService.update(listId, { name }),
     onMutate: async (name) => {
       await qc.cancelQueries({ queryKey: queryKeys.list(listId) });
       const previous = qc.getQueryData<List>(queryKeys.list(listId));
@@ -29,5 +32,13 @@ export function useUpdateName(listId: string) {
     onSettled: (updated) => {
       if (updated) qc.setQueryData(queryKeys.list(listId), updated);
     },
+  });
+}
+
+export function useUpdateSlug(listId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (slug: string | null) => listsService.update(listId, { slug }),
+    onSuccess: (updated) => qc.setQueryData(queryKeys.list(listId), updated),
   });
 }

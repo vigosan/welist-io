@@ -1,12 +1,8 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { apiClient } from "@/lib/api-client";
-import { queryKeys } from "@/lib/query-keys";
+import { useList, useUpdateSlug, useUpdateName } from "@/hooks/useList";
 import { useItems, useAddItem, useToggleItem, useDeleteItem, useUpdateItem } from "@/hooks/useItems";
-import { useUpdateSlug, useUpdateName } from "@/hooks/useList";
 import { ItemRow } from "@/components/items/ItemRow";
-import type { List } from "@/db/schema";
 
 export const Route = createFileRoute("/lists/$listId/")({
   component: ListDetailPage,
@@ -23,10 +19,7 @@ function ListDetailPage() {
   const [editingName, setEditingName] = useState(false);
   const [nameValue, setNameValue] = useState("");
 
-  const { data: list } = useQuery({
-    queryKey: queryKeys.list(listId),
-    queryFn: () => apiClient<List>(`/api/lists/${listId}`),
-  });
+  const { data: list } = useList(listId);
 
   const { data: items = [] } = useItems(listId);
   const addItem = useAddItem(listId);
