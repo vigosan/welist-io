@@ -11,7 +11,7 @@
     "test": "vitest",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "db:push": "drizzle-kit push",
+    "db:migrate:prod": "DATABASE_URL=$DATABASE_URL_PROD drizzle-kit migrate",
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
