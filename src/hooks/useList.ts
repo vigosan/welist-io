@@ -14,6 +14,7 @@ export function useList(listId: string) {
         throw notFound();
       }
     },
+    refetchInterval: 3000,
   });
 }
 

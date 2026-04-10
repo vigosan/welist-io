@@ -9,6 +9,7 @@ export function useItems(listId: string) {
   return useQuery({
     queryKey: queryKeys.items(listId),
     queryFn: () => itemsService.list(listId),
+    refetchInterval: 3000,
   });
 }
 
