@@ -78,8 +78,8 @@ function ListDetailPage() {
   const currentSlug = list?.slug ?? listId;
 
   return (
-    <div className="h-dvh bg-[#FAFAF8] flex flex-col sm:items-center sm:justify-center sm:p-6">
-      <div className="flex-1 sm:flex-none flex flex-col w-full sm:max-w-md bg-white sm:rounded-3xl sm:border sm:border-gray-100 overflow-hidden sm:max-h-[90dvh]">
+    <div className="h-dvh bg-[#FAFAF8] flex flex-col sm:items-center sm:p-6">
+      <div className="flex-1 flex flex-col w-full sm:max-w-md bg-white sm:rounded-3xl sm:border sm:border-gray-100 overflow-hidden">
 
         {/* Header */}
         <div className="px-5 pt-6 pb-4 shrink-0">
