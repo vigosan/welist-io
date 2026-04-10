@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { useState } from "react";
 import { useList, useUpdateSlug, useUpdateName } from "@/hooks/useList";
 import { useItems, useAddItem, useToggleItem, useDeleteItem, useUpdateItem } from "@/hooks/useItems";
@@ -20,6 +21,11 @@ function ListDetailPage() {
   const [nameValue, setNameValue] = useState("");
 
   const { data: list } = useList(listId);
+
+  useEffect(() => {
+    if (list?.name) document.title = `${list.name} — Welist`;
+    return () => { document.title = "Welist"; };
+  }, [list?.name]);
 
   const { data: items = [] } = useItems(listId);
   const addItem = useAddItem(listId);

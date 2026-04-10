@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { notFound } from "@tanstack/react-router";
 import { listsService } from "@/services/lists.service";
 import { queryKeys } from "@/lib/query-keys";
 import type { List } from "@/db/schema";
@@ -6,7 +7,13 @@ import type { List } from "@/db/schema";
 export function useList(listId: string) {
   return useQuery({
     queryKey: queryKeys.list(listId),
-    queryFn: () => listsService.get(listId),
+    queryFn: async () => {
+      try {
+        return await listsService.get(listId);
+      } catch {
+        throw notFound();
+      }
+    },
   });
 }
 
