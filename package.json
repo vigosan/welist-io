@@ -11,10 +11,10 @@
     "preview": "vite preview",
     "test": "vitest",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "node scripts/db-migrate.mjs dev",
-    "db:migrate:prod": "node scripts/db-migrate.mjs prod",
-    "db:status": "node scripts/db-status.mjs dev",
-    "db:status:prod": "node scripts/db-status.mjs prod",
+    "db:migrate": "tsx scripts/db-migrate.ts dev",
+    "db:migrate:prod": "tsx scripts/db-migrate.ts prod",
+    "db:status": "tsx scripts/db-status.ts dev",
+    "db:status:prod": "tsx scripts/db-status.ts prod",
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
