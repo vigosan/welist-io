@@ -14,7 +14,8 @@ export function useList(listId: string) {
         throw notFound();
       }
     },
-    refetchInterval: 3000,
+    refetchInterval: 10_000,
+    refetchIntervalInBackground: false,
   });
 }
 
