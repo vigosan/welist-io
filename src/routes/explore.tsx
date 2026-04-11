@@ -1,11 +1,73 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { useExplore, useCloneList } from "@/hooks/useList";
+import { useExplore, useCloneList, useExploreItems } from "@/hooks/useList";
 import { UserMenu } from "@/components/UserMenu";
+import type { ExploreItem } from "@/services/lists.service";
 
 export const Route = createFileRoute("/explore")({
   component: ExplorePage,
 });
+
+function ExploreListCard({ list, onClone, clonePending }: {
+  list: ExploreItem;
+  onClone: (id: string) => void;
+  clonePending: boolean;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const { data: exploreItems, isLoading: itemsLoading } = useExploreItems(list.id, expanded);
+
+  return (
+    <div className="py-3 px-2 border-b border-gray-100 last:border-0">
+      <button
+        onClick={() => setExpanded((v) => !v)}
+        data-testid={`expand-btn-${list.id}`}
+        className="w-full text-left"
+      >
+        <div className="flex items-center gap-4">
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium text-gray-900 truncate">{list.name}</p>
+            {list.description && (
+              <p className="text-xs text-gray-400 truncate mt-0.5">{list.description}</p>
+            )}
+            <p className="text-xs text-gray-300 tabular-nums mt-0.5">
+              {list.itemCount} {list.itemCount === 1 ? "elemento" : "elementos"}
+            </p>
+          </div>
+          <span className="shrink-0 text-gray-300 text-xs">{expanded ? "▲" : "▼"}</span>
+        </div>
+      </button>
+
+      {expanded && (
+        <div className="mt-3 pl-1">
+          {itemsLoading && (
+            <p className="text-xs text-gray-400 py-2">Cargando…</p>
+          )}
+          {!itemsLoading && exploreItems && (
+            <ul className="space-y-1 mb-3">
+              {exploreItems.map((item) => (
+                <li key={item.id} className="flex items-center gap-2 text-xs text-gray-600">
+                  <span className={`w-3 h-3 rounded-sm border border-gray-300 shrink-0 ${item.done ? "bg-gray-300" : ""}`} />
+                  <span className={item.done ? "line-through text-gray-400" : ""}>{item.text}</span>
+                </li>
+              ))}
+              {exploreItems.length === 0 && (
+                <p className="text-xs text-gray-300">Sin elementos.</p>
+              )}
+            </ul>
+          )}
+          <button
+            onClick={() => onClone(list.id)}
+            disabled={clonePending}
+            data-testid={`clone-btn-${list.id}`}
+            className="px-3 py-1.5 text-xs font-medium border border-gray-200 text-gray-500 rounded-lg hover:border-gray-900 hover:text-gray-900 disabled:opacity-40 disabled:cursor-not-allowed transition active:scale-[0.96]"
+          >
+            Clonar
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
 
 function ExplorePage() {
   const navigate = useNavigate();
@@ -65,27 +127,14 @@ function ExplorePage() {
               {search ? "No hay listas con ese nombre." : "Aún no hay listas públicas."}
             </p>
           )}
-          <div className="divide-y divide-gray-100">
+          <div>
             {lists.map((list) => (
-              <div key={list.id} className="flex items-center gap-4 py-3 px-2">
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 truncate">{list.name}</p>
-                  {list.description && (
-                    <p className="text-xs text-gray-400 truncate mt-0.5">{list.description}</p>
-                  )}
-                  <p className="text-xs text-gray-300 tabular-nums mt-0.5">
-                    {list.itemCount} {list.itemCount === 1 ? "elemento" : "elementos"}
-                  </p>
-                </div>
-                <button
-                  onClick={() => handleClone(list.id)}
-                  disabled={cloneList.isPending}
-                  data-testid={`clone-btn-${list.id}`}
-                  className="shrink-0 px-3 py-1.5 text-xs font-medium border border-gray-200 text-gray-500 rounded-lg hover:border-gray-900 hover:text-gray-900 disabled:opacity-40 disabled:cursor-not-allowed transition active:scale-[0.96]"
-                >
-                  Clonar
-                </button>
-              </div>
+              <ExploreListCard
+                key={list.id}
+                list={list}
+                onClone={handleClone}
+                clonePending={cloneList.isPending}
+              />
             ))}
           </div>
 

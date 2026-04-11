@@ -432,3 +432,35 @@ describe("POST /api/lists/:listId/clone", () => {
     expect(res.status).toBe(404);
   });
 });
+
+describe("GET /api/explore/:listId/items", () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it("returns items of a public list", async () => {
+    const rows = [
+      { id: "i1", listId: "abc", text: "Tarea 1", done: false, position: 0 },
+    ];
+    mockDb.query.lists.findFirst.mockResolvedValue({ id: "abc", public: true });
+    mockDb.query.items.findMany.mockResolvedValue(rows);
+
+    const res = await app.request("/api/explore/abc/items");
+    expect(res.status).toBe(200);
+    const body = await res.json() as Array<Record<string, unknown>>;
+    expect(body).toHaveLength(1);
+    expect(body[0].text).toBe("Tarea 1");
+  });
+
+  it("returns 404 when list is not public", async () => {
+    mockDb.query.lists.findFirst.mockResolvedValue({ id: "abc", public: false });
+
+    const res = await app.request("/api/explore/abc/items");
+    expect(res.status).toBe(404);
+  });
+
+  it("returns 404 when list does not exist", async () => {
+    mockDb.query.lists.findFirst.mockResolvedValue(null);
+
+    const res = await app.request("/api/explore/nonexistent/items");
+    expect(res.status).toBe(404);
+  });
+});

@@ -240,6 +240,20 @@ app.get("/explore", async (c) => {
   return c.json({ items: rows, nextCursor });
 });
 
+app.get("/explore/:listId/items", async (c) => {
+  const listId = c.req.param("listId");
+  const list = await db.query.lists.findFirst({
+    where: listWhere(listId),
+    columns: { id: true, public: true },
+  });
+  if (!list || !list.public) return c.json({ error: "Not found" }, 404);
+  const rows = await db.query.items.findMany({
+    where: eq(items.listId, list.id),
+    orderBy: (t, { asc }) => [asc(t.position), asc(t.createdAt)],
+  });
+  return c.json(rows);
+});
+
 app.post("/lists/:listId/clone", async (c) => {
   const listId = c.req.param("listId");
   const source = await db.query.lists.findFirst({

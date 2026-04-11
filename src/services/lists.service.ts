@@ -1,5 +1,5 @@
 import { apiClient } from "@/lib/api-client";
-import type { List } from "@/db/schema";
+import type { List, Item } from "@/db/schema";
 
 export type ExploreItem = Pick<List, "id" | "name" | "slug" | "description" | "createdAt"> & { itemCount: number };
 
@@ -23,4 +23,7 @@ export const listsService = {
 
   clone: (listId: string) =>
     apiClient<List>(`/api/lists/${listId}/clone`, { method: "POST" }),
+
+  exploreItems: (listId: string) =>
+    apiClient<Item[]>(`/api/explore/${listId}/items`),
 };

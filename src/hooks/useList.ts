@@ -105,3 +105,11 @@ export function useCloneList() {
     mutationFn: (listId: string) => listsService.clone(listId),
   });
 }
+
+export function useExploreItems(listId: string, enabled: boolean) {
+  return useQuery({
+    queryKey: queryKeys.exploreItems(listId),
+    queryFn: () => listsService.exploreItems(listId),
+    enabled,
+  });
+}
