@@ -5,6 +5,10 @@ import type { Item } from "@/db/schema";
 
 export type { Item };
 
+interface MutationContext {
+  previous: Item[] | undefined;
+}
+
 export function useItems(listId: string) {
   return useQuery({
     queryKey: queryKeys.items(listId),
@@ -23,7 +27,7 @@ export function useAddItem(listId: string) {
 
 export function useToggleItem(listId: string) {
   const qc = useQueryClient();
-  return useMutation({
+  return useMutation<Item, Error, string, MutationContext>({
     mutationFn: (itemId: string) => itemsService.toggle(listId, itemId),
     onMutate: async (itemId) => {
       await qc.cancelQueries({ queryKey: queryKeys.items(listId) });
@@ -42,7 +46,7 @@ export function useToggleItem(listId: string) {
 
 export function useUpdateItem(listId: string) {
   const qc = useQueryClient();
-  return useMutation({
+  return useMutation<Item, Error, { id: string; text: string }, MutationContext>({
     mutationFn: ({ id, text }: { id: string; text: string }) => itemsService.update(listId, id, text),
     onMutate: async ({ id, text }) => {
       await qc.cancelQueries({ queryKey: queryKeys.items(listId) });
@@ -61,7 +65,7 @@ export function useUpdateItem(listId: string) {
 
 export function useDeleteItem(listId: string) {
   const qc = useQueryClient();
-  return useMutation({
+  return useMutation<void, Error, string, MutationContext>({
     mutationFn: (itemId: string) => itemsService.delete(listId, itemId),
     onMutate: async (itemId) => {
       await qc.cancelQueries({ queryKey: queryKeys.items(listId) });

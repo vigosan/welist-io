@@ -98,9 +98,11 @@ function ListDetailPage() {
         setEditingSlug(false);
         navigate({ to: "/lists/$listId", params: { listId: updated.slug ?? updated.id } });
       },
-      onError: async (err: any) => {
-        const body = await err?.response?.json?.().catch(() => ({}));
-        setSlugError(body?.error === "slug_taken" ? "Este slug ya está en uso" : "Error al guardar");
+      onError: async (err: unknown) => {
+        const res = err instanceof Error && "response" in err ? (err as Error & { response: Response }).response : null;
+        const body: unknown = await res?.json().catch(() => ({})) ?? {};
+        const isSlugTaken = typeof body === "object" && body !== null && (body as Record<string, unknown>).error === "slug_taken";
+        setSlugError(isSlugTaken ? "Este slug ya está en uso" : "Error al guardar");
       },
     });
   }

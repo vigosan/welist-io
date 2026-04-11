@@ -64,8 +64,10 @@ app.patch(
         .returning();
       if (!updated) return c.json({ error: "Not found" }, 404);
       return c.json(updated);
-    } catch (e: any) {
-      if (e?.code === "23505") return c.json({ error: "slug_taken" }, 409);
+    } catch (e: unknown) {
+      if (typeof e === "object" && e !== null && (e as Record<string, unknown>).code === "23505") {
+        return c.json({ error: "slug_taken" }, 409);
+      }
       throw e;
     }
   },
@@ -88,9 +90,12 @@ app.post(
     const listId = await resolveListId(c.req.param("listId"));
     if (!listId) return c.json({ error: "Not found" }, 404);
     const { text } = c.req.valid("json");
-    const [maxRow] = await db.select({ pos: max(items.position) }).from(items).where(eq(items.listId, listId));
-    const position = (maxRow?.pos ?? -1) + 1;
-    const [item] = await db.insert(items).values({ listId, text, position }).returning();
+    const item = await db.transaction(async (tx) => {
+      const [maxRow] = await tx.select({ pos: max(items.position) }).from(items).where(eq(items.listId, listId));
+      const position = (maxRow?.pos ?? -1) + 1;
+      const [created] = await tx.insert(items).values({ listId, text, position }).returning();
+      return created;
+    });
     return c.json(item, 201);
   },
 );

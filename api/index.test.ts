@@ -9,6 +9,7 @@ const mockDb = {
   update: vi.fn(),
   delete: vi.fn(),
   select: vi.fn(),
+  transaction: vi.fn(),
 };
 
 vi.mock("../src/db/client", () => ({ db: mockDb }));
@@ -86,7 +87,10 @@ describe("GET /api/lists/:listId/items", () => {
 });
 
 describe("POST /api/lists/:listId/items", () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockDb.transaction.mockImplementation((fn: (tx: typeof mockDb) => Promise<unknown>) => fn(mockDb));
+  });
 
   it("creates an item and returns 201", async () => {
     const item = { id: "i1", listId: "abc", text: "Nueva tarea", done: false, position: 0 };
@@ -109,6 +113,27 @@ describe("POST /api/lists/:listId/items", () => {
     expect(res.status).toBe(201);
     const body = await res.json() as Record<string, unknown>;
     expect(body.text).toBe("Nueva tarea");
+  });
+
+  it("uses a transaction to avoid race conditions on position", async () => {
+    const item = { id: "i1", listId: "abc", text: "Tarea", done: false, position: 0 };
+    mockDb.query.lists.findFirst.mockResolvedValue({ id: "abc" });
+    mockDb.select.mockReturnValue({
+      from: vi.fn().mockReturnValue({
+        where: vi.fn().mockResolvedValue([{ pos: null }]),
+      }),
+    });
+    mockDb.insert.mockReturnValue({
+      values: vi.fn().mockReturnValue({ returning: vi.fn().mockResolvedValue([item]) }),
+    });
+
+    await app.request("/api/lists/abc/items", {
+      method: "POST",
+      body: JSON.stringify({ text: "Tarea" }),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    expect(mockDb.transaction).toHaveBeenCalledTimes(1);
   });
 
   it("returns 400 when text is empty", async () => {
