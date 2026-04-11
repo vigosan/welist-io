@@ -5,6 +5,7 @@ export type ExploreItem = Pick<List, "id" | "name" | "slug" | "description" | "c
   itemCount: number;
   participantCount: number;
   completedCount: number;
+  ownerImage: string | null;
 };
 
 export const listsService = {

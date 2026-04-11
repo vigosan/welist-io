@@ -273,12 +273,14 @@ app.get("/explore", async (c) => {
       itemCount: count(items.id),
       participantCount: sql<number>`cast(count(distinct ${participations.id}) as int)`,
       completedCount: sql<number>`cast(count(distinct case when ${participations.completedAt} is not null then ${participations.id} end) as int)`,
+      ownerImage: users.image,
     })
     .from(lists)
     .leftJoin(items, eq(items.listId, lists.id))
     .leftJoin(participations, eq(participations.sourceListId, lists.id))
+    .leftJoin(users, eq(users.id, lists.ownerId))
     .where(where)
-    .groupBy(lists.id)
+    .groupBy(lists.id, users.image)
     .orderBy(lists.createdAt)
     .limit(EXPLORE_PAGE_SIZE);
 

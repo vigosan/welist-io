@@ -27,7 +27,10 @@ function ExploreListCard({ list, onAccept, onClone, acceptPending, clonePending 
         data-testid={`expand-btn-${list.id}`}
         className="w-full text-left"
       >
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
+          {list.ownerImage && (
+            <img src={list.ownerImage} alt="" className="w-7 h-7 rounded-full shrink-0" />
+          )}
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-gray-900 truncate">{list.name}</p>
             {list.description && (
