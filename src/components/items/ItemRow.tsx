@@ -96,7 +96,7 @@ export function ItemRow({ item, onToggle, onDelete, onEdit, onTagClick }: Props)
       <button
         onClick={onDelete}
         data-testid={`item-delete-${item.id}`}
-        aria-label="Eliminar"
+        aria-label={`Eliminar "${display || item.text}"`}
         className="shrink-0 p-3 -m-1 text-gray-300 hover:text-red-400 transition active:scale-[0.96] rounded-lg hover:bg-red-50"
       >
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

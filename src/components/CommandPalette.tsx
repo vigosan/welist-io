@@ -51,6 +51,8 @@ export function CommandPalette({ open, onClose, actions }: Props) {
 
   if (!open) return null;
 
+  const activeId = filtered[selectedIndex] ? `command-option-${filtered[selectedIndex].id}` : undefined;
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-start justify-center pt-[18vh] px-4"
@@ -58,19 +60,27 @@ export function CommandPalette({ open, onClose, actions }: Props) {
     >
       <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" aria-hidden />
       <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="Paleta de comandos"
         className="relative w-full max-w-sm bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden"
         onClick={(e) => e.stopPropagation()}
         onKeyDown={handleKeyDown}
       >
         <input
           ref={inputRef}
+          role="combobox"
+          aria-expanded={filtered.length > 0}
+          aria-haspopup="listbox"
+          aria-controls="command-palette-list"
+          aria-activedescendant={activeId}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Buscar acción…"
           data-testid="command-palette-input"
           className="w-full px-4 py-3.5 text-sm text-gray-900 placeholder-gray-400 outline-none border-b border-gray-100"
         />
-        <div className="max-h-72 overflow-y-auto py-1.5">
+        <div id="command-palette-list" role="listbox" aria-label="Acciones" className="max-h-72 overflow-y-auto py-1.5">
           {filtered.length === 0 ? (
             <p data-testid="command-empty" className="px-4 py-3 text-sm text-gray-400">
               Sin resultados.
@@ -79,6 +89,9 @@ export function CommandPalette({ open, onClose, actions }: Props) {
             filtered.map((action, i) => (
               <button
                 key={action.id}
+                id={`command-option-${action.id}`}
+                role="option"
+                aria-selected={i === selectedIndex}
                 data-testid={`command-action-${action.id}`}
                 onClick={() => { action.onSelect(); onClose(); }}
                 className={`w-full text-left px-4 py-2.5 text-sm transition ${
