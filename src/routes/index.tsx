@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useCreateList } from "@/hooks/useList";
+import { UserMenu } from "@/components/UserMenu";
 
 export const Route = createFileRoute("/")({
   component: HomePage,
@@ -22,9 +23,12 @@ function HomePage() {
   return (
     <div className="min-h-dvh bg-[#FAFAF8] flex items-center justify-center p-4">
       <div className="bg-white rounded-3xl border border-gray-100 w-full max-w-xl p-8 space-y-8">
-        <div className="space-y-1.5">
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Welist</h1>
-          <p className="text-sm text-gray-400">Crea una lista y comparte el enlace con quien quieras.</p>
+        <div className="flex items-center justify-between">
+          <div className="space-y-1.5">
+            <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Welist</h1>
+            <p className="text-sm text-gray-400">Crea una lista y comparte el enlace con quien quieras.</p>
+          </div>
+          <UserMenu />
         </div>
 
         <form onSubmit={handleSubmit} className="flex gap-2 p-1.5 bg-gray-50 border border-gray-200 rounded-2xl">

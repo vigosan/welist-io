@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useExplore, useCloneList } from "@/hooks/useList";
+import { UserMenu } from "@/components/UserMenu";
 
 export const Route = createFileRoute("/explore")({
   component: ExplorePage,
@@ -31,9 +32,12 @@ function ExplorePage() {
       <div className="flex-1 flex flex-col w-full sm:max-w-xl bg-white sm:rounded-3xl sm:border sm:border-gray-100 overflow-hidden">
 
         <div className="px-5 pt-6 pb-4 shrink-0">
-          <Link to="/" className="text-sm text-gray-400 hover:text-gray-700 transition">
-            ← Welist
-          </Link>
+          <div className="flex items-center justify-between">
+            <Link to="/" className="text-sm text-gray-400 hover:text-gray-700 transition">
+              ← Welist
+            </Link>
+            <UserMenu />
+          </div>
 
           <form onSubmit={handleSearch} className="mt-4 flex gap-2 p-1.5 bg-gray-50 border border-gray-200 rounded-2xl">
             <input
