@@ -1,11 +1,12 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { z } from "zod";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useItems, useAddItem, useToggleItem, useDeleteItem, useUpdateItem } from "@/hooks/useItems";
+import { useItems, useAddItem, useToggleItem, useDeleteItem, useUpdateItem, useBulkAddItems } from "@/hooks/useItems";
 import { useListHeader } from "@/hooks/useListHeader";
 import { useItemsFilter } from "@/hooks/useItemsFilter";
 import { useCommandPalette } from "@/hooks/useCommandPalette";
 import { ItemRow } from "@/components/items/ItemRow";
+import { BulkPastePreview } from "@/components/items/BulkPastePreview";
 import { CommandPalette } from "@/components/CommandPalette";
 import { usePullToRefresh } from "@/hooks/usePullToRefresh";
 import { tagColor } from "@/lib/tags";
@@ -26,7 +27,10 @@ function ListDetailPage() {
   const navigate = useNavigate({ from: Route.fullPath });
   const { status: statusFilter, tag: activeTag } = Route.useSearch();
   const [newItem, setNewItem] = useState("");
+  const [pendingBulk, setPendingBulk] = useState<string[] | null>(null);
   const addInputRef = useRef<HTMLInputElement>(null);
+
+  const BULK_LIMIT = 100;
 
   function setStatusFilter(s: "all" | "pending" | "done") {
     navigate({ search: (prev) => ({ ...prev, status: s === "all" ? undefined : s }), replace: true });
@@ -83,6 +87,7 @@ function ListDetailPage() {
   });
 
   const addItem = useAddItem(listId);
+  const bulkAddItems = useBulkAddItems(listId);
   const toggleItem = useToggleItem(listId);
   const deleteItem = useDeleteItem(listId);
   const updateItem = useUpdateItem(listId);
@@ -92,6 +97,20 @@ function ListDetailPage() {
     const trimmed = newItem.trim();
     if (!trimmed) return;
     addItem.mutate({ text: trimmed }, { onSuccess: () => setNewItem("") });
+  }
+
+  function handlePaste(e: React.ClipboardEvent<HTMLInputElement>) {
+    const text = e.clipboardData.getData("text");
+    const lines = text.split("\n").map((l) => l.trim()).filter(Boolean);
+    if (lines.length < 2) return;
+    e.preventDefault();
+    setPendingBulk(lines.slice(0, BULK_LIMIT));
+    setNewItem("");
+  }
+
+  function handleBulkConfirm() {
+    if (!pendingBulk) return;
+    bulkAddItems.mutate(pendingBulk, { onSuccess: () => setPendingBulk(null) });
   }
 
   const doneCount = items.filter((i) => i.done).length;
@@ -334,41 +353,54 @@ function ListDetailPage() {
 
         {/* Footer — always visible at bottom */}
         <div className="shrink-0 px-4 pt-3 pb-6 space-y-2">
-          {tagSuggestions.length > 0 && (
-            <div className="flex flex-wrap gap-1.5 px-1">
-              {tagSuggestions.map((tag) => (
-                <button
-                  key={tag}
-                  type="button"
-                  onClick={() => {
-                    setNewItem((prev) => prev.replace(/#([a-zA-ZÀ-ÿ\w-]*)$/, `#${tag} `));
-                    addInputRef.current?.focus();
-                  }}
-                  className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium transition active:scale-[0.96] ${tagColor(tag)}`}
-                >
-                  #{tag}
-                </button>
-              ))}
-            </div>
-          )}
-          <form onSubmit={handleAdd} className="flex gap-2 p-1.5 bg-gray-50 border border-gray-200 rounded-2xl">
-            <input
-              ref={addInputRef}
-              value={newItem}
-              onChange={(e) => setNewItem(e.target.value)}
-              placeholder="Añadir elemento…"
-              data-testid="add-item-input"
-              className="flex-1 pl-3 text-sm text-gray-900 placeholder-gray-400 bg-transparent outline-none"
+          {pendingBulk ? (
+            <BulkPastePreview
+              texts={pendingBulk}
+              isPending={bulkAddItems.isPending}
+              onChange={setPendingBulk}
+              onConfirm={handleBulkConfirm}
+              onCancel={() => setPendingBulk(null)}
             />
-            <button
-              type="submit"
-              disabled={!newItem.trim() || addItem.isPending}
-              data-testid="add-item-submit"
-              className="px-5 py-2.5 text-sm font-medium bg-gray-900 text-white rounded-xl hover:bg-black disabled:opacity-30 disabled:cursor-not-allowed transition active:scale-[0.96]"
-            >
-              Añadir
-            </button>
-          </form>
+          ) : (
+            <>
+              {tagSuggestions.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 px-1">
+                  {tagSuggestions.map((tag) => (
+                    <button
+                      key={tag}
+                      type="button"
+                      onClick={() => {
+                        setNewItem((prev) => prev.replace(/#([a-zA-ZÀ-ÿ\w-]*)$/, `#${tag} `));
+                        addInputRef.current?.focus();
+                      }}
+                      className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium transition active:scale-[0.96] ${tagColor(tag)}`}
+                    >
+                      #{tag}
+                    </button>
+                  ))}
+                </div>
+              )}
+              <form onSubmit={handleAdd} className="flex gap-2 p-1.5 bg-gray-50 border border-gray-200 rounded-2xl">
+                <input
+                  ref={addInputRef}
+                  value={newItem}
+                  onChange={(e) => setNewItem(e.target.value)}
+                  onPaste={handlePaste}
+                  placeholder="Añadir elemento…"
+                  data-testid="add-item-input"
+                  className="flex-1 pl-3 text-sm text-gray-900 placeholder-gray-400 bg-transparent outline-none"
+                />
+                <button
+                  type="submit"
+                  disabled={!newItem.trim() || addItem.isPending}
+                  data-testid="add-item-submit"
+                  className="px-5 py-2.5 text-sm font-medium bg-gray-900 text-white rounded-xl hover:bg-black disabled:opacity-30 disabled:cursor-not-allowed transition active:scale-[0.96]"
+                >
+                  Añadir
+                </button>
+              </form>
+            </>
+          )}
         </div>
 
       </div>

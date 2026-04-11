@@ -1,0 +1,73 @@
+const BULK_LIMIT = 100;
+
+interface Props {
+  texts: string[];
+  isPending: boolean;
+  onChange: (texts: string[]) => void;
+  onConfirm: () => void;
+  onCancel: () => void;
+}
+
+export function BulkPastePreview({ texts, isPending, onChange, onConfirm, onCancel }: Props) {
+  function remove(index: number) {
+    const next = texts.filter((_, i) => i !== index);
+    if (next.length === 0) { onCancel(); return; }
+    onChange(next);
+  }
+
+  return (
+    <div
+      data-testid="bulk-preview"
+      className="bg-white border border-gray-200 rounded-2xl overflow-hidden"
+    >
+      <div className="flex items-center justify-between px-3 pt-2.5 pb-1.5 border-b border-gray-100">
+        <span className="text-xs font-medium text-gray-500">
+          {texts.length} elemento{texts.length !== 1 ? "s" : ""} para añadir
+          {texts.length === BULK_LIMIT && <span className="ml-1 text-amber-500">(máx. {BULK_LIMIT})</span>}
+        </span>
+        <button
+          type="button"
+          onClick={onCancel}
+          data-testid="bulk-cancel"
+          className="text-xs text-gray-400 hover:text-gray-600 transition"
+        >
+          Cancelar
+        </button>
+      </div>
+
+      <ul className="max-h-48 overflow-y-auto py-1">
+        {texts.map((text, i) => (
+          <li
+            key={i}
+            className="flex items-center gap-2 px-3 py-1.5 group hover:bg-gray-50"
+          >
+            <span className="flex-1 text-sm text-gray-700 truncate">{text}</span>
+            <button
+              type="button"
+              onClick={() => remove(i)}
+              data-testid={`bulk-remove-${i}`}
+              aria-label={`Eliminar "${text}"`}
+              className="shrink-0 text-gray-300 hover:text-gray-500 transition opacity-0 group-hover:opacity-100 focus:opacity-100"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </li>
+        ))}
+      </ul>
+
+      <div className="px-3 py-2.5 border-t border-gray-100">
+        <button
+          type="button"
+          onClick={onConfirm}
+          disabled={isPending}
+          data-testid="bulk-confirm"
+          className="w-full py-2 text-sm font-medium bg-gray-900 text-white rounded-xl hover:bg-black disabled:opacity-40 disabled:cursor-not-allowed transition active:scale-[0.98]"
+        >
+          {isPending ? "Añadiendo…" : `Añadir ${texts.length} elemento${texts.length !== 1 ? "s" : ""}`}
+        </button>
+      </div>
+    </div>
+  );
+}

@@ -190,6 +190,75 @@ describe("DELETE /api/lists/:listId/items/:itemId", () => {
   });
 });
 
+describe("POST /api/lists/:listId/items/bulk", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockDb.transaction.mockImplementation((fn: (tx: typeof mockDb) => Promise<unknown>) => fn(mockDb));
+  });
+
+  it("creates multiple items and returns 201", async () => {
+    const created = [
+      { id: "i1", listId: "abc", text: "Leche", done: false, position: 0 },
+      { id: "i2", listId: "abc", text: "Huevos", done: false, position: 1 },
+    ];
+    mockDb.query.lists.findFirst.mockResolvedValue({ id: "abc" });
+    mockDb.select.mockReturnValue({
+      from: vi.fn().mockReturnValue({ where: vi.fn().mockResolvedValue([{ pos: null }]) }),
+    });
+    mockDb.insert.mockReturnValue({
+      values: vi.fn().mockReturnValue({ returning: vi.fn().mockResolvedValue(created) }),
+    });
+
+    const res = await app.request("/api/lists/abc/items/bulk", {
+      method: "POST",
+      body: JSON.stringify({ texts: ["Leche", "Huevos"] }),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    expect(res.status).toBe(201);
+    const body = await res.json() as unknown[];
+    expect(body).toHaveLength(2);
+  });
+
+  it("returns 400 when texts array is empty", async () => {
+    const res = await app.request("/api/lists/abc/items/bulk", {
+      method: "POST",
+      body: JSON.stringify({ texts: [] }),
+      headers: { "Content-Type": "application/json" },
+    });
+    expect(res.status).toBe(400);
+  });
+
+  it("returns 400 when texts exceeds 100 items", async () => {
+    const texts = Array.from({ length: 101 }, (_, i) => `Item ${i}`);
+    const res = await app.request("/api/lists/abc/items/bulk", {
+      method: "POST",
+      body: JSON.stringify({ texts }),
+      headers: { "Content-Type": "application/json" },
+    });
+    expect(res.status).toBe(400);
+  });
+
+  it("uses a transaction for atomicity", async () => {
+    const created = [{ id: "i1", listId: "abc", text: "Pan", done: false, position: 0 }];
+    mockDb.query.lists.findFirst.mockResolvedValue({ id: "abc" });
+    mockDb.select.mockReturnValue({
+      from: vi.fn().mockReturnValue({ where: vi.fn().mockResolvedValue([{ pos: 2 }]) }),
+    });
+    mockDb.insert.mockReturnValue({
+      values: vi.fn().mockReturnValue({ returning: vi.fn().mockResolvedValue(created) }),
+    });
+
+    await app.request("/api/lists/abc/items/bulk", {
+      method: "POST",
+      body: JSON.stringify({ texts: ["Pan"] }),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    expect(mockDb.transaction).toHaveBeenCalledTimes(1);
+  });
+});
+
 describe("GET /api/explore", () => {
   const chainMock = (rows: unknown[]) => ({
     from: vi.fn().mockReturnThis(),

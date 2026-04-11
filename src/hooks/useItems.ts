@@ -64,6 +64,14 @@ export function useUpdateItem(listId: string) {
   });
 }
 
+export function useBulkAddItems(listId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (texts: string[]) => itemsService.bulkAdd(listId, texts),
+    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.items(listId) }),
+  });
+}
+
 export function useDeleteItem(listId: string) {
   const qc = useQueryClient();
   return useMutation<void, Error, string, MutationContext>({

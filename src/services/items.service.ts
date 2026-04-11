@@ -16,4 +16,7 @@ export const itemsService = {
 
   delete: (listId: string, itemId: string) =>
     apiClient<void>(`/api/lists/${listId}/items/${itemId}`, { method: "DELETE" }),
+
+  bulkAdd: (listId: string, texts: string[]) =>
+    apiClient<Item[]>(`/api/lists/${listId}/items/bulk`, { method: "POST", body: JSON.stringify({ texts }) }),
 };

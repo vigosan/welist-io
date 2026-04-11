@@ -141,6 +141,28 @@ app.delete("/lists/:listId/items/:itemId", async (c) => {
 
 const EXPLORE_PAGE_SIZE = 20;
 
+const BULK_ITEM_LIMIT = 100;
+
+app.post(
+  "/lists/:listId/items/bulk",
+  zValidator("json", z.object({
+    texts: z.array(z.string().min(1).max(1000)).min(1).max(BULK_ITEM_LIMIT),
+  })),
+  async (c) => {
+    const listId = await resolveListId(c.req.param("listId"));
+    if (!listId) return c.json({ error: "Not found" }, 404);
+    const { texts } = c.req.valid("json");
+    const created = await db.transaction(async (tx) => {
+      const [maxRow] = await tx.select({ pos: max(items.position) }).from(items).where(eq(items.listId, listId));
+      const basePosition = (maxRow?.pos ?? -1) + 1;
+      return tx.insert(items).values(
+        texts.map((text, i) => ({ listId, text, position: basePosition + i })),
+      ).returning();
+    });
+    return c.json(created, 201);
+  },
+);
+
 app.get("/explore", async (c) => {
   const q = c.req.query("q")?.trim();
   const cursor = c.req.query("cursor");
