@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useCreateList } from "@/hooks/useList";
 import { UserMenu } from "@/components/UserMenu";
+import { useSession } from "@hono/auth-js/react";
 
 export const Route = createFileRoute("/")({
   component: HomePage,
@@ -11,6 +12,7 @@ function HomePage() {
   const navigate = useNavigate();
   const [name, setName] = useState("");
   const createList = useCreateList();
+  const { data: session } = useSession();
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -55,6 +57,18 @@ function HomePage() {
           <span className="text-xs text-gray-300">o</span>
           <div className="flex-1 h-px bg-gray-100" />
         </div>
+
+        {session?.user && (
+          <Link
+            to="/my-lists"
+            className="flex items-center gap-2 text-sm text-gray-400 hover:text-gray-900 transition"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+            </svg>
+            Mis listas
+          </Link>
+        )}
 
         <Link
           to="/explore"

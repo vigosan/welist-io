@@ -133,6 +133,13 @@ export function useExploreItems(listId: string, enabled: boolean) {
   });
 }
 
+export function useMyLists() {
+  return useQuery({
+    queryKey: queryKeys.myLists(),
+    queryFn: () => listsService.myLists(),
+  });
+}
+
 export function useAcceptChallenge() {
   return useMutation({
     mutationFn: (listId: string) => listsService.accept(listId),

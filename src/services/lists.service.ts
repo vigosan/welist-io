@@ -34,4 +34,7 @@ export const listsService = {
 
   accept: (listId: string) =>
     apiClient<List>(`/api/lists/${listId}/accept`, { method: "POST" }),
+
+  myLists: () =>
+    apiClient<List[]>("/api/my-lists"),
 };
