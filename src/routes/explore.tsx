@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { useExplore, useCloneList, useExploreItems } from "@/hooks/useList";
+import { useExplore, useCloneList, useExploreItems, useAcceptChallenge } from "@/hooks/useList";
+import { useSession, signIn } from "@hono/auth-js/react";
 import { UserMenu } from "@/components/UserMenu";
 import type { ExploreItem } from "@/services/lists.service";
 
@@ -8,12 +9,15 @@ export const Route = createFileRoute("/explore")({
   component: ExplorePage,
 });
 
-function ExploreListCard({ list, onClone, clonePending }: {
+function ExploreListCard({ list, onAccept, onClone, acceptPending, clonePending }: {
   list: ExploreItem;
+  onAccept: (id: string) => void;
   onClone: (id: string) => void;
+  acceptPending: boolean;
   clonePending: boolean;
 }) {
   const [expanded, setExpanded] = useState(false);
+  const { data: session } = useSession();
   const { data: exploreItems, isLoading: itemsLoading } = useExploreItems(list.id, expanded);
 
   return (
@@ -29,9 +33,17 @@ function ExploreListCard({ list, onClone, clonePending }: {
             {list.description && (
               <p className="text-xs text-gray-400 truncate mt-0.5">{list.description}</p>
             )}
-            <p className="text-xs text-gray-300 tabular-nums mt-0.5">
-              {list.itemCount} {list.itemCount === 1 ? "elemento" : "elementos"}
-            </p>
+            <div className="flex items-center gap-3 mt-0.5">
+              <p className="text-xs text-gray-300 tabular-nums">
+                {list.itemCount} {list.itemCount === 1 ? "elemento" : "elementos"}
+              </p>
+              {list.participantCount > 0 && (
+                <p className="text-xs text-gray-400 tabular-nums">
+                  {list.participantCount} {list.participantCount === 1 ? "participante" : "participantes"}
+                  {list.completedCount > 0 && ` · ${list.completedCount} completado${list.completedCount !== 1 ? "s" : ""}`}
+                </p>
+              )}
+            </div>
           </div>
           <span className="shrink-0 text-gray-300 text-xs">{expanded ? "▲" : "▼"}</span>
         </div>
@@ -55,14 +67,30 @@ function ExploreListCard({ list, onClone, clonePending }: {
               )}
             </ul>
           )}
-          <button
-            onClick={() => onClone(list.id)}
-            disabled={clonePending}
-            data-testid={`clone-btn-${list.id}`}
-            className="px-3 py-1.5 text-xs font-medium border border-gray-200 text-gray-500 rounded-lg hover:border-gray-900 hover:text-gray-900 disabled:opacity-40 disabled:cursor-not-allowed transition active:scale-[0.96]"
-          >
-            Clonar
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => {
+                if (session?.user) {
+                  onAccept(list.id);
+                } else {
+                  signIn("google");
+                }
+              }}
+              disabled={acceptPending}
+              data-testid={`accept-btn-${list.id}`}
+              className="px-3 py-1.5 text-xs font-medium bg-gray-900 text-white rounded-lg hover:bg-black disabled:opacity-40 disabled:cursor-not-allowed transition active:scale-[0.96]"
+            >
+              {session?.user ? "Aceptar el reto" : "Iniciar sesión para aceptar"}
+            </button>
+            <button
+              onClick={() => onClone(list.id)}
+              disabled={clonePending}
+              data-testid={`clone-btn-${list.id}`}
+              className="px-3 py-1.5 text-xs font-medium border border-gray-200 text-gray-500 rounded-lg hover:border-gray-900 hover:text-gray-900 disabled:opacity-40 disabled:cursor-not-allowed transition active:scale-[0.96]"
+            >
+              Clonar
+            </button>
+          </div>
         </div>
       )}
     </div>
@@ -75,12 +103,19 @@ function ExplorePage() {
   const [search, setSearch] = useState("");
   const { data, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage } = useExplore(search || undefined);
   const cloneList = useCloneList();
+  const acceptChallenge = useAcceptChallenge();
 
   const lists = data?.pages.flatMap((p) => p.items) ?? [];
 
   function handleSearch(e: React.FormEvent) {
     e.preventDefault();
     setSearch(q.trim());
+  }
+
+  function handleAccept(listId: string) {
+    acceptChallenge.mutate(listId, {
+      onSuccess: (list) => navigate({ to: "/lists/$listId", params: { listId: list.id } }),
+    });
   }
 
   function handleClone(listId: string) {
@@ -132,7 +167,9 @@ function ExplorePage() {
               <ExploreListCard
                 key={list.id}
                 list={list}
+                onAccept={handleAccept}
                 onClone={handleClone}
+                acceptPending={acceptChallenge.isPending}
                 clonePending={cloneList.isPending}
               />
             ))}

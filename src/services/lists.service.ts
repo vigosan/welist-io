@@ -1,7 +1,11 @@
 import { apiClient } from "@/lib/api-client";
 import type { List, Item } from "@/db/schema";
 
-export type ExploreItem = Pick<List, "id" | "name" | "slug" | "description" | "createdAt"> & { itemCount: number };
+export type ExploreItem = Pick<List, "id" | "name" | "slug" | "description" | "createdAt"> & {
+  itemCount: number;
+  participantCount: number;
+  completedCount: number;
+};
 
 export const listsService = {
   get: (listId: string) =>
@@ -26,4 +30,7 @@ export const listsService = {
 
   exploreItems: (listId: string) =>
     apiClient<Item[]>(`/api/explore/${listId}/items`),
+
+  accept: (listId: string) =>
+    apiClient<List>(`/api/lists/${listId}/accept`, { method: "POST" }),
 };

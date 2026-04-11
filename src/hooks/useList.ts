@@ -113,3 +113,9 @@ export function useExploreItems(listId: string, enabled: boolean) {
     enabled,
   });
 }
+
+export function useAcceptChallenge() {
+  return useMutation({
+    mutationFn: (listId: string) => listsService.accept(listId),
+  });
+}
