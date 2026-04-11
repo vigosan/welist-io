@@ -1,0 +1,1 @@
+ALTER TABLE "lists" ADD COLUMN "collaborative" boolean DEFAULT false NOT NULL;

@@ -7,6 +7,7 @@ export const lists = pgTable("lists", {
   slug: text("slug").unique(),
   description: text("description"),
   public: boolean("public").notNull().default(false),
+  collaborative: boolean("collaborative").notNull().default(false),
   ownerId: text("owner_id").references(() => users.id),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 }, (t) => [
