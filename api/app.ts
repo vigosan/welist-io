@@ -3,9 +3,9 @@ import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
 import { eq, max, sql, and, or, ilike, count, gt } from "drizzle-orm";
 import { db } from "../src/db/client.js";
-import { lists, items } from "../src/db/schema/index.js";
+import { lists, items, participations } from "../src/db/schema/index.js";
 import { rateLimit } from "./rate-limit.js";
-import { authHandler, initAuthConfig, getAuthUser } from "@hono/auth-js";
+import { authHandler, initAuthConfig, getAuthUser, verifyAuth } from "@hono/auth-js";
 import Google from "@auth/core/providers/google";
 import type { AuthUser } from "@hono/auth-js";
 
@@ -225,9 +225,19 @@ app.get("/explore", async (c) => {
   const where = cursor ? and(baseWhere, gt(lists.createdAt, new Date(cursor))) : baseWhere;
 
   const rows = await db
-    .select({ id: lists.id, name: lists.name, slug: lists.slug, description: lists.description, createdAt: lists.createdAt, itemCount: count(items.id) })
+    .select({
+      id: lists.id,
+      name: lists.name,
+      slug: lists.slug,
+      description: lists.description,
+      createdAt: lists.createdAt,
+      itemCount: count(items.id),
+      participantCount: sql<number>`cast(count(distinct ${participations.id}) as int)`,
+      completedCount: sql<number>`cast(count(distinct case when ${participations.completedAt} is not null then ${participations.id} end) as int)`,
+    })
     .from(lists)
     .leftJoin(items, eq(items.listId, lists.id))
+    .leftJoin(participations, eq(participations.sourceListId, lists.id))
     .where(where)
     .groupBy(lists.id)
     .orderBy(lists.createdAt)
@@ -278,6 +288,42 @@ app.post("/lists/:listId/clone", async (c) => {
       })),
     );
   }
+
+  return c.json(newList, 201);
+});
+
+app.post("/lists/:listId/accept", async (c) => {
+  const authUser = await getOptionalUser(c);
+  const userId = authUser?.session?.user?.id;
+  if (!userId) return c.json({ error: "Unauthorized" }, 401);
+
+  const listId = c.req.param("listId");
+  const source = await db.query.lists.findFirst({ where: listWhere(listId) });
+  if (!source) return c.json({ error: "Not found" }, 404);
+
+  const sourceItems = await db.query.items.findMany({
+    where: eq(items.listId, source.id),
+    orderBy: (t, { asc }) => [asc(t.position), asc(t.createdAt)],
+  });
+
+  const [newList] = await db.insert(lists).values({ name: source.name, ownerId: userId }).returning();
+
+  if (sourceItems.length > 0) {
+    await db.insert(items).values(
+      sourceItems.map((item, i) => ({
+        listId: newList.id,
+        text: item.text,
+        done: false,
+        position: i,
+      })),
+    );
+  }
+
+  await db.insert(participations).values({
+    sourceListId: source.id,
+    userListId: newList.id,
+    userId,
+  });
 
   return c.json(newList, 201);
 });

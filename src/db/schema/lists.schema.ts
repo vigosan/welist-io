@@ -27,5 +27,22 @@ export const items = pgTable(
   (t) => [index("items_list_position_idx").on(t.listId, t.position)],
 );
 
+export const participations = pgTable(
+  "participations",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    sourceListId: uuid("source_list_id").notNull().references(() => lists.id),
+    userListId: uuid("user_list_id").notNull().references(() => lists.id, { onDelete: "cascade" }),
+    userId: text("user_id").notNull().references(() => users.id),
+    completedAt: timestamp("completed_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (t) => [
+    index("participations_source_idx").on(t.sourceListId),
+    index("participations_user_idx").on(t.userId),
+  ],
+);
+
 export type List = typeof lists.$inferSelect;
 export type Item = typeof items.$inferSelect;
+export type Participation = typeof participations.$inferSelect;

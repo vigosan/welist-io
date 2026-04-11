@@ -4,6 +4,7 @@ const mockDb = {
   query: {
     lists: { findFirst: vi.fn() },
     items: { findMany: vi.fn() },
+    participations: { findFirst: vi.fn() },
   },
   insert: vi.fn(),
   update: vi.fn(),
@@ -462,5 +463,14 @@ describe("GET /api/explore/:listId/items", () => {
 
     const res = await app.request("/api/explore/nonexistent/items");
     expect(res.status).toBe(404);
+  });
+});
+
+describe("POST /api/lists/:listId/accept", () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it("returns 401 when not authenticated", async () => {
+    const res = await app.request("/api/lists/abc/accept", { method: "POST" });
+    expect(res.status).toBe(401);
   });
 });
