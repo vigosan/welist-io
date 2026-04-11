@@ -7,10 +7,11 @@ interface Options {
   itemsLoading: boolean;
   statusFilter: "all" | "pending" | "done" | undefined;
   activeTag: string | undefined;
+  searchQuery: string;
   newItemText: string;
 }
 
-export function useItemsFilter({ items, itemsLoading, statusFilter, activeTag, newItemText }: Options) {
+export function useItemsFilter({ items, itemsLoading, statusFilter, activeTag, searchQuery, newItemText }: Options) {
   const sortedIdsRef = useRef<string[] | null>(null);
 
   const stableItems = useMemo(() => {
@@ -40,12 +41,15 @@ export function useItemsFilter({ items, itemsLoading, statusFilter, activeTag, n
     [partialTag, allTags],
   );
 
+  const normalizedSearch = searchQuery.trim().toLowerCase();
+
   const filteredItems = useMemo(
     () =>
       stableItems
         .filter((i) => !statusFilter || statusFilter === "all" || (statusFilter === "pending" ? !i.done : i.done))
-        .filter((i) => !activeTag || parseTags(i.text).tags.includes(activeTag)),
-    [stableItems, statusFilter, activeTag],
+        .filter((i) => !activeTag || parseTags(i.text).tags.includes(activeTag))
+        .filter((i) => !normalizedSearch || i.text.toLowerCase().includes(normalizedSearch)),
+    [stableItems, statusFilter, activeTag, normalizedSearch],
   );
 
   function resetOrder() {

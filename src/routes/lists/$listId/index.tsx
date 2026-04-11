@@ -28,9 +28,22 @@ function ListDetailPage() {
   const { status: statusFilter, tag: activeTag } = Route.useSearch();
   const [newItem, setNewItem] = useState("");
   const [pendingBulk, setPendingBulk] = useState<string[] | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchActive, setSearchActive] = useState(false);
   const addInputRef = useRef<HTMLInputElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   const BULK_LIMIT = 100;
+
+  function openSearch() {
+    setSearchActive(true);
+    setTimeout(() => searchInputRef.current?.focus(), 0);
+  }
+
+  function closeSearch() {
+    setSearchActive(false);
+    setSearchQuery("");
+  }
 
   function setStatusFilter(s: "all" | "pending" | "done") {
     navigate({ search: (prev) => ({ ...prev, status: s === "all" ? undefined : s }), replace: true });
@@ -64,6 +77,7 @@ function ListDetailPage() {
     itemsLoading,
     statusFilter,
     activeTag,
+    searchQuery,
     newItemText: newItem,
   });
 
@@ -85,6 +99,7 @@ function ListDetailPage() {
     setNameValue,
     setEditingName,
     togglePublicMutate: (v) => togglePublic.mutate(v),
+    onSearch: openSearch,
   });
 
   const addItem = useAddItem(listId);
@@ -361,6 +376,41 @@ function ListDetailPage() {
           />
         </div>
 
+        {/* Search bar */}
+        {searchActive && (
+          <div className="shrink-0 px-3 pb-2">
+            <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl">
+              <svg className="w-3.5 h-3.5 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <input
+                ref={searchInputRef}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Escape") closeSearch(); }}
+                placeholder="Buscar en esta lista…"
+                data-testid="search-input"
+                className="flex-1 text-sm text-gray-900 placeholder-gray-400 bg-transparent outline-none"
+              />
+              {searchQuery && (
+                <span className="text-xs text-gray-400 tabular-nums shrink-0">
+                  {filteredItems.length} resultado{filteredItems.length !== 1 ? "s" : ""}
+                </span>
+              )}
+              <button
+                type="button"
+                onClick={closeSearch}
+                data-testid="search-close"
+                className="text-gray-300 hover:text-gray-500 transition"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Items — scrollable, fills remaining space */}
         <div ref={pullRef} className="flex-1 overflow-y-auto overscroll-none px-3 py-1">
           {itemsLoading ? (
@@ -376,9 +426,11 @@ function ListDetailPage() {
             </div>
           ) : filteredItems.length === 0 ? (
             <p className="text-sm text-gray-400 text-center py-10">
-              {activeTag || (statusFilter && statusFilter !== "all")
-                ? "No hay elementos con ese filtro."
-                : "Añade el primer elemento a tu lista."}
+              {searchQuery
+                ? `Sin resultados para "${searchQuery}".`
+                : activeTag || (statusFilter && statusFilter !== "all")
+                  ? "No hay elementos con ese filtro."
+                  : "Añade el primer elemento a tu lista."}
             </p>
           ) : (
             <div className="space-y-1">

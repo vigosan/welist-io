@@ -14,11 +14,12 @@ interface Options {
   setNameValue: (v: string) => void;
   setEditingName: (v: boolean) => void;
   togglePublicMutate: (v: boolean) => void;
+  onSearch: () => void;
 }
 
 export function useCommandPalette({
   list, allTags, activeTag, addInputRef, handleShare,
-  setActiveTag, setStatusFilter, setNameValue, setEditingName, togglePublicMutate,
+  setActiveTag, setStatusFilter, setNameValue, setEditingName, togglePublicMutate, onSearch,
 }: Options) {
   const [paletteOpen, setPaletteOpen] = useState(false);
 
@@ -28,13 +29,18 @@ export function useCommandPalette({
         e.preventDefault();
         setPaletteOpen((o) => !o);
       }
+      if ((e.metaKey || e.ctrlKey) && e.key === "f") {
+        e.preventDefault();
+        onSearch();
+      }
     }
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
-  }, []);
+  }, [onSearch]);
 
   const paletteActions: Action[] = useMemo(
     () => [
+      { id: "search", label: "Buscar elementos", onSelect: onSearch },
       { id: "add-item", label: "Añadir elemento", onSelect: () => addInputRef.current?.focus() },
       { id: "share", label: "Copiar enlace", onSelect: handleShare },
       {
@@ -58,7 +64,7 @@ export function useCommandPalette({
       ...(activeTag ? [{ id: "clear-filter", label: "Limpiar filtro de tags", onSelect: () => setActiveTag(null) }] : []),
       { id: "confetti", label: "Probar confetti", onSelect: fireConfetti },
     ],
-    [list?.public, list?.name, allTags, activeTag, handleShare, addInputRef, setActiveTag, setStatusFilter, setNameValue, setEditingName, togglePublicMutate],
+    [list?.public, list?.name, allTags, activeTag, handleShare, addInputRef, setActiveTag, setStatusFilter, setNameValue, setEditingName, togglePublicMutate, onSearch],
   );
 
   return { paletteOpen, setPaletteOpen, paletteActions };
