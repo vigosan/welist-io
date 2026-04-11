@@ -21,7 +21,7 @@ function HomePage() {
 
   return (
     <div className="min-h-dvh bg-[#FAFAF8] flex items-center justify-center p-4">
-      <div className="bg-white rounded-3xl border border-gray-100 w-full max-w-sm p-8 space-y-8">
+      <div className="bg-white rounded-3xl border border-gray-100 w-full max-w-xl p-8 space-y-8">
         <div className="space-y-1.5">
           <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Welist</h1>
           <p className="text-sm text-gray-400">Crea una lista y comparte el enlace con quien quieras.</p>

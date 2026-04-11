@@ -141,7 +141,7 @@ function ListDetailPage() {
   return (
     <>
     <div className="h-dvh bg-[#FAFAF8] flex flex-col sm:items-center sm:p-6">
-      <div className="flex-1 flex flex-col w-full sm:max-w-md bg-white sm:rounded-3xl sm:border sm:border-gray-100 overflow-hidden">
+      <div className="flex-1 flex flex-col w-full sm:max-w-xl bg-white sm:rounded-3xl sm:border sm:border-gray-100 overflow-hidden">
 
         {/* Header */}
         <div className="px-5 pt-5 pb-4 shrink-0">
