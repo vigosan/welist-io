@@ -31,6 +31,11 @@ app.use(
 
 app.use("/auth/*", authHandler());
 
+app.get("/me", async (c) => {
+  const authUser = await getOptionalUser(c);
+  return c.json(authUser?.session?.user ?? null);
+});
+
 
 async function getOptionalUser(c: Parameters<typeof getAuthUser>[0]): Promise<AuthUser | null> {
   try {
