@@ -73,6 +73,24 @@ export function useBulkAddItems(listId: string) {
   });
 }
 
+export function useBulkDeleteItems(listId: string) {
+  const qc = useQueryClient();
+  return useMutation<void, Error, string[], MutationContext>({
+    mutationFn: (ids: string[]) => itemsService.bulkDelete(listId, ids),
+    onMutate: async (ids) => {
+      await qc.cancelQueries({ queryKey: queryKeys.items(listId) });
+      const previous = qc.getQueryData<Item[]>(queryKeys.items(listId));
+      qc.setQueryData<Item[]>(queryKeys.items(listId), (old) =>
+        old?.filter((i) => !ids.includes(i.id)),
+      );
+      return { previous };
+    },
+    onError: (_err, _ids, ctx) => {
+      qc.setQueryData(queryKeys.items(listId), ctx?.previous);
+    },
+  });
+}
+
 export function useDeleteItem(listId: string) {
   const qc = useQueryClient();
   return useMutation<void, Error, string, MutationContext>({
@@ -88,6 +106,5 @@ export function useDeleteItem(listId: string) {
     onError: (_err, _id, ctx) => {
       qc.setQueryData(queryKeys.items(listId), ctx?.previous);
     },
-    onSettled: () => qc.invalidateQueries({ queryKey: queryKeys.items(listId) }),
   });
 }

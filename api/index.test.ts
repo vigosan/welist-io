@@ -514,6 +514,32 @@ describe("GET /api/explore/:listId/items", () => {
   });
 });
 
+describe("DELETE /api/lists/:listId/items (bulk)", () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it("deletes multiple items and returns 204", async () => {
+    mockDb.query.lists.findFirst.mockResolvedValue({ id: "abc", ownerId: null, collaborative: false });
+    mockDb.delete.mockReturnValue({ where: vi.fn().mockResolvedValue(undefined) });
+
+    const res = await app.request("/api/lists/abc/items", {
+      method: "DELETE",
+      body: JSON.stringify({ ids: ["00000000-0000-0000-0000-000000000001", "00000000-0000-0000-0000-000000000002"] }),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    expect(res.status).toBe(204);
+  });
+
+  it("returns 400 when ids is empty", async () => {
+    const res = await app.request("/api/lists/abc/items", {
+      method: "DELETE",
+      body: JSON.stringify({ ids: [] }),
+      headers: { "Content-Type": "application/json" },
+    });
+    expect(res.status).toBe(400);
+  });
+});
+
 describe("POST /api/lists/:listId/accept", () => {
   beforeEach(() => vi.clearAllMocks());
 
