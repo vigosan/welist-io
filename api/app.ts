@@ -30,6 +30,14 @@ app.use(
 
 app.use("/auth/*", authHandler());
 
+app.get("/debug-env", (c) => {
+  return c.json({
+    hasSecret: !!(c.env?.AUTH_SECRET ?? process.env.AUTH_SECRET),
+    hasClientId: !!(c.env?.GOOGLE_CLIENT_ID ?? process.env.GOOGLE_CLIENT_ID),
+    authUrl: c.env?.AUTH_URL ?? process.env.AUTH_URL ?? null,
+  });
+});
+
 async function getOptionalUser(c: Parameters<typeof getAuthUser>[0]): Promise<AuthUser | null> {
   try {
     return await getAuthUser(c);
