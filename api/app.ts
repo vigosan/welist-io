@@ -170,7 +170,7 @@ app.post(
     if (!list) return c.json({ error: "Not found" }, 404);
     const authUser = await getOptionalUser(c);
     const userId = authUser?.session?.user?.id ?? null;
-    if (!canModifyList(list, userId)) return c.json({ error: "Forbidden" }, 403);
+    if (!canModifyList(list, userId)) return c.json({ error: "Forbidden", debug: { userId, ownerId: list.ownerId, collaborative: list.collaborative } }, 403);
     const { text } = c.req.valid("json");
     const [maxRow] = await db.select({ pos: max(items.position) }).from(items).where(eq(items.listId, list.id));
     const position = (maxRow?.pos ?? -1) + 1;
