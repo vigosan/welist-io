@@ -21,8 +21,10 @@ export function useList(listId: string) {
 }
 
 export function useCreateList() {
+  const qc = useQueryClient();
   return useMutation({
     mutationFn: (name: string) => listsService.create(name),
+    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.myLists() }),
   });
 }
 
