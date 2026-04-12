@@ -139,16 +139,13 @@ app.patch(
     if (!list) return c.json({ error: "Not found" }, 404);
     const authUser = getOptionalUser(c);
     const userId = authUser?.session?.user?.id ?? null;
-    if (!canModifyList(list, userId)) return c.json({ error: "Forbidden", debug: { userId, ownerId: list.ownerId, collaborative: list.collaborative } }, 403);
+    if (list.ownerId !== null && list.ownerId !== userId) return c.json({ error: "Forbidden" }, 403);
     const patch: Record<string, unknown> = {};
     if (body.name !== undefined) patch.name = body.name;
     if ("slug" in body) patch.slug = body.slug ?? null;
     if ("description" in body) patch.description = body.description ?? null;
     if (body.public !== undefined) patch.public = body.public;
-    if (body.collaborative !== undefined) {
-      if (list.ownerId !== null && list.ownerId !== userId) return c.json({ error: "Forbidden" }, 403);
-      patch.collaborative = body.collaborative;
-    }
+    if (body.collaborative !== undefined) patch.collaborative = body.collaborative;
     try {
       const [updated] = await db
         .update(lists)

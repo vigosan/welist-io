@@ -299,6 +299,18 @@ describe("Collaborative lists", () => {
 
     expect(res.status).toBe(403);
   });
+
+  it("non-owner cannot change list settings on collaborative list (403)", async () => {
+    mockDb.query.lists.findFirst.mockResolvedValue({ id: "abc", ownerId: "owner-id", collaborative: true });
+
+    const res = await app.request("/api/lists/abc", {
+      method: "PATCH",
+      body: JSON.stringify({ name: "Hacked" }),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    expect(res.status).toBe(403);
+  });
 });
 
 describe("POST /api/lists/:listId/items/bulk", () => {
