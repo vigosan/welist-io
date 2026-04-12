@@ -160,7 +160,7 @@ function ListDetailPage() {
               <button
                 type="button"
                 onClick={() => { setCoverUrlValue(list.coverUrl ?? ""); setEditingCoverUrl(true); }}
-                className="absolute bottom-2 right-2 flex items-center gap-1 px-2 py-1 bg-black/40 hover:bg-black/60 text-white text-xs rounded-lg backdrop-blur-sm transition"
+                className="cursor-pointer absolute bottom-2 right-2 flex items-center gap-1 px-2 py-1 bg-black/40 hover:bg-black/60 text-white text-xs rounded-lg backdrop-blur-sm transition"
               >
                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
@@ -173,7 +173,7 @@ function ListDetailPage() {
 
         {/* Header */}
         <div className="px-5 pt-5 pb-4 shrink-0">
-          <Link to="/" className="text-xs text-gray-400 hover:text-gray-700 transition">
+          <Link to="/" className="cursor-pointer text-xs text-gray-400 hover:text-gray-700 transition">
             ← Welist
           </Link>
           <div className="mt-4">
@@ -239,7 +239,7 @@ function ListDetailPage() {
                     type="button"
                     onClick={() => { setDescriptionValue(list?.description ?? ""); setEditingDescription(true); }}
                     data-testid="description-btn"
-                    className="w-full text-left text-sm leading-relaxed transition"
+                    className="cursor-pointer w-full text-left text-sm leading-relaxed transition"
                   >
                     {list?.description
                       ? <span className="text-gray-500">{list.description}</span>
@@ -276,15 +276,15 @@ function ListDetailPage() {
                     data-testid="cover-url-input"
                     className="flex-1 text-xs text-gray-700 bg-white border border-gray-200 rounded-md px-2 py-1 outline-none focus:border-gray-400 transition"
                   />
-                  <button type="submit" disabled={updateCoverUrl.isPending} className="text-xs text-gray-500 hover:text-gray-900 transition disabled:opacity-40 p-1">✓</button>
-                  <button type="button" onClick={() => setEditingCoverUrl(false)} className="text-xs text-gray-400 hover:text-gray-600 transition p-1">✕</button>
+                  <button type="submit" disabled={updateCoverUrl.isPending} className="cursor-pointer text-xs text-gray-500 hover:text-gray-900 transition disabled:opacity-40 p-1">✓</button>
+                  <button type="button" onClick={() => setEditingCoverUrl(false)} className="cursor-pointer text-xs text-gray-400 hover:text-gray-600 transition p-1">✕</button>
                 </form>
               ) : (
                 <button
                   type="button"
                   onClick={() => { setCoverUrlValue(list?.coverUrl ?? ""); setEditingCoverUrl(true); }}
                   data-testid="cover-url-btn"
-                  className="text-xs text-gray-300 hover:text-gray-500 transition"
+                  className="cursor-pointer text-xs text-gray-300 hover:text-gray-500 transition"
                 >
                   {list?.coverUrl ? "Cambiar imagen de portada" : "Añadir imagen de portada…"}
                 </button>
@@ -322,14 +322,14 @@ function ListDetailPage() {
                     data-testid="slug-input"
                     className="text-xs text-gray-700 bg-white border border-gray-200 rounded-md px-2 py-1 outline-none focus:border-gray-400 w-32 transition"
                   />
-                  <button type="submit" disabled={!slugValue.trim() || updateSlug.isPending} className="text-xs text-gray-500 hover:text-gray-900 transition disabled:opacity-40 p-1">✓</button>
-                  <button type="button" onClick={() => setEditingSlug(false)} className="text-xs text-gray-400 hover:text-gray-600 transition p-1">✕</button>
+                  <button type="submit" disabled={!slugValue.trim() || updateSlug.isPending} className="cursor-pointer text-xs text-gray-500 hover:text-gray-900 transition disabled:opacity-40 p-1">✓</button>
+                  <button type="button" onClick={() => setEditingSlug(false)} className="cursor-pointer text-xs text-gray-400 hover:text-gray-600 transition p-1">✕</button>
                 </form>
               ) : isOwner ? (
                 <button
                   onClick={startEditingSlug}
                   data-testid="edit-slug-btn"
-                  className="flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600 transition truncate max-w-full"
+                  className="cursor-pointer flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600 transition truncate max-w-full"
                 >
                   <svg className="w-3 h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
@@ -348,7 +348,7 @@ function ListDetailPage() {
                   onClick={() => togglePublic.mutate(!list?.public)}
                   data-testid="toggle-public-btn"
                   title={list?.public ? "Lista pública — clic para hacer privada" : "Lista privada — clic para hacer pública"}
-                  className={`h-7 flex items-center gap-1 px-2 rounded-md text-xs font-medium border transition active:scale-[0.96] ${
+                  className={`cursor-pointer h-7 flex items-center gap-1 px-2 rounded-md text-xs font-medium border transition active:scale-[0.96] ${
                     list?.public
                       ? "border-gray-900 bg-gray-900 text-white"
                       : "border-gray-200 text-gray-400 hover:border-gray-400 hover:text-gray-600"
@@ -377,7 +377,7 @@ function ListDetailPage() {
                   onClick={() => toggleCollaborative.mutate(!list?.collaborative)}
                   data-testid="toggle-collaborative-btn"
                   title={list?.collaborative ? "Colaborativa — clic para desactivar" : "Solo tú — clic para permitir edición a cualquiera con el link"}
-                  className={`h-7 flex items-center gap-1 px-2 rounded-md text-xs font-medium border transition active:scale-[0.96] ${
+                  className={`cursor-pointer h-7 flex items-center gap-1 px-2 rounded-md text-xs font-medium border transition active:scale-[0.96] ${
                     list?.collaborative
                       ? "border-gray-900 bg-gray-900 text-white"
                       : "border-gray-200 text-gray-400 hover:border-gray-400 hover:text-gray-600"
@@ -396,7 +396,7 @@ function ListDetailPage() {
                   data-testid="search-btn"
                   aria-label="Buscar en la lista"
                   title="Buscar (⌘S)"
-                  className="h-7 w-7 flex items-center justify-center rounded-md border border-gray-200 text-gray-400 hover:border-gray-400 hover:text-gray-700 transition active:scale-[0.96]"
+                  className="cursor-pointer h-7 w-7 flex items-center justify-center rounded-md border border-gray-200 text-gray-400 hover:border-gray-400 hover:text-gray-700 transition active:scale-[0.96]"
                 >
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -410,7 +410,7 @@ function ListDetailPage() {
                 data-testid="share-btn"
                 aria-label={copied ? "Enlace copiado" : "Compartir enlace"}
                 title={copied ? "¡Copiado!" : "Compartir enlace"}
-                className="relative h-7 w-7 flex items-center justify-center rounded-md border border-gray-200 text-gray-400 hover:border-gray-400 hover:text-gray-700 transition active:scale-[0.96] overflow-hidden"
+                className="cursor-pointer relative h-7 w-7 flex items-center justify-center rounded-md border border-gray-200 text-gray-400 hover:border-gray-400 hover:text-gray-700 transition active:scale-[0.96] overflow-hidden"
               >
                 <span className={`absolute inset-0 flex items-center justify-center transition-[opacity,transform] duration-150 ease-[cubic-bezier(0.2,0,0,1)] ${copied ? "opacity-0 scale-75" : "opacity-100 scale-100"}`}>
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -444,7 +444,7 @@ function ListDetailPage() {
                   key={s}
                   data-testid={`status-filter-${s}`}
                   onClick={() => setStatusFilter(statusFilter === s ? "all" : s)}
-                  className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium transition ${
+                  className={`cursor-pointer inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium transition ${
                     statusFilter === s
                       ? "border-gray-900 bg-gray-900 text-white"
                       : "border-gray-200 text-gray-500 bg-white hover:bg-gray-50 hover:text-gray-700"
@@ -458,7 +458,7 @@ function ListDetailPage() {
                   key={tag}
                   data-testid={`tag-filter-${tag}`}
                   onClick={() => setActiveTag(activeTag === tag ? null : tag)}
-                  className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium transition ${
+                  className={`cursor-pointer inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium transition ${
                     activeTag === tag
                       ? "border-gray-900 bg-gray-900 text-white"
                       : tagColor(tag)
@@ -509,7 +509,7 @@ function ListDetailPage() {
                 type="button"
                 onClick={closeSearch}
                 data-testid="search-close"
-                className="text-gray-300 hover:text-gray-500 transition"
+                className="cursor-pointer text-gray-300 hover:text-gray-500 transition"
               >
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -580,7 +580,7 @@ function ListDetailPage() {
                           setNewItem((prev) => prev.replace(/#([a-zA-ZÀ-ÿ\w-]*)$/, `#${tag} `));
                           addInputRef.current?.focus();
                         }}
-                        className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium transition active:scale-[0.96] ${tagColor(tag)}`}
+                        className={`cursor-pointer inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium transition active:scale-[0.96] ${tagColor(tag)}`}
                       >
                         #{tag}
                       </button>
@@ -601,7 +601,7 @@ function ListDetailPage() {
                     type="submit"
                     disabled={!newItem.trim() || addItem.isPending}
                     data-testid="add-item-submit"
-                    className="px-5 py-2.5 text-sm font-medium bg-gray-900 text-white rounded-xl hover:bg-black disabled:opacity-30 disabled:cursor-not-allowed transition active:scale-[0.96]"
+                    className="cursor-pointer px-5 py-2.5 text-sm font-medium bg-gray-900 text-white rounded-xl hover:bg-black disabled:opacity-30 disabled:cursor-not-allowed transition active:scale-[0.96]"
                   >
                     Añadir
                   </button>

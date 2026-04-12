@@ -26,7 +26,7 @@ function MyListCard({ list }: { list: List }) {
           <Link
             to="/lists/$listId"
             params={{ listId: list.slug ?? list.id }}
-            className="block w-full py-2 text-xs font-medium text-center bg-gray-900 text-white rounded-xl hover:bg-black transition active:scale-[0.97]"
+            className="cursor-pointer block w-full py-2 text-xs font-medium text-center bg-gray-900 text-white rounded-xl hover:bg-black transition active:scale-[0.97]"
           >
             Ver lista
           </Link>

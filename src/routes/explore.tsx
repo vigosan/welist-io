@@ -62,7 +62,7 @@ function ExploreListCard({ list, onAccept, acceptPending }: {
           <button
             onClick={() => setExpanded((v) => !v)}
             data-testid={`expand-btn-${list.id}`}
-            className="ml-auto text-xs text-gray-400 hover:text-gray-600 transition"
+            className="cursor-pointer ml-auto text-xs text-gray-400 hover:text-gray-600 transition"
           >
             {expanded ? "Ocultar" : "Ver lista"}
           </button>
@@ -105,7 +105,7 @@ function ExploreListCard({ list, onAccept, acceptPending }: {
             }}
             disabled={acceptPending}
             data-testid={`accept-btn-${list.id}`}
-            className="w-full py-2 text-xs font-medium bg-gray-900 text-white rounded-xl hover:bg-black disabled:opacity-40 disabled:cursor-not-allowed transition active:scale-[0.97]"
+            className="cursor-pointer w-full py-2 text-xs font-medium bg-gray-900 text-white rounded-xl hover:bg-black disabled:opacity-40 disabled:cursor-not-allowed transition active:scale-[0.97]"
           >
             {session?.user ? "Aceptar el reto" : "Iniciar sesión para retar"}
           </button>
@@ -151,7 +151,7 @@ return (
             />
             <button
               type="submit"
-              className="px-5 py-2.5 text-sm font-medium bg-gray-900 text-white rounded-xl hover:bg-black transition-[background-color] duration-150 active:scale-[0.96]"
+              className="cursor-pointer px-5 py-2.5 text-sm font-medium bg-gray-900 text-white rounded-xl hover:bg-black transition-[background-color] duration-150 active:scale-[0.96]"
             >
               Buscar
             </button>
@@ -184,7 +184,7 @@ return (
                 onClick={() => fetchNextPage()}
                 disabled={isFetchingNextPage}
                 data-testid="load-more-btn"
-                className="px-4 py-2 text-sm text-gray-500 border border-gray-200 rounded-lg hover:border-gray-400 hover:text-gray-700 disabled:opacity-40 transition"
+                className="cursor-pointer px-4 py-2 text-sm text-gray-500 border border-gray-200 rounded-lg hover:border-gray-400 hover:text-gray-700 disabled:opacity-40 transition"
               >
                 {isFetchingNextPage ? "Cargando…" : "Cargar más"}
               </button>
