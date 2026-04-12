@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMyLists } from "@/hooks/useList";
+import { useState } from "react";
+import { useMyLists, useDeleteList } from "@/hooks/useList";
 import { AppNav } from "@/components/AppNav";
 import type { List } from "@/db/schema/lists.schema";
 
@@ -8,8 +9,11 @@ export const Route = createFileRoute("/my-lists")({
 });
 
 function MyListCard({ list }: { list: List }) {
+  const [confirming, setConfirming] = useState(false);
+  const deleteList = useDeleteList();
+
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+    <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden" data-testid="my-list-card">
       {list.coverUrl && (
         <img src={list.coverUrl} alt="" className="w-full h-32 object-cover" />
       )}
@@ -23,13 +27,48 @@ function MyListCard({ list }: { list: List }) {
         </div>
 
         <div className="pt-1 border-t border-gray-50">
-          <Link
-            to="/lists/$listId"
-            params={{ listId: list.slug ?? list.id }}
-            className="cursor-pointer block w-full py-2 text-xs font-medium text-center bg-gray-900 text-white rounded-xl hover:bg-black transition active:scale-[0.97]"
-          >
-            Ver lista
-          </Link>
+          {confirming ? (
+            <div className="flex items-center gap-2">
+              <span className="flex-1 text-xs text-gray-500">¿Borrar lista?</span>
+              <button
+                data-testid="delete-cancel-btn"
+                onClick={() => setConfirming(false)}
+                className="cursor-pointer px-3 py-1.5 text-xs text-gray-500 border border-gray-200 rounded-lg hover:border-gray-400 hover:text-gray-700 transition active:scale-[0.96]"
+              >
+                No
+              </button>
+              <button
+                data-testid="delete-confirm-btn"
+                onClick={() => deleteList.mutate(list.id)}
+                disabled={deleteList.isPending}
+                className="cursor-pointer px-3 py-1.5 text-xs font-medium text-white bg-gray-900 rounded-lg hover:bg-black disabled:opacity-50 transition active:scale-[0.96]"
+              >
+                Borrar
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <Link
+                to="/lists/$listId"
+                params={{ listId: list.slug ?? list.id }}
+                className="cursor-pointer flex-1 py-2 text-xs font-medium text-center bg-gray-900 text-white rounded-xl hover:bg-black transition active:scale-[0.97]"
+              >
+                Ver lista
+              </Link>
+              <button
+                data-testid="delete-list-btn"
+                onClick={() => setConfirming(true)}
+                className="cursor-pointer h-8 w-8 flex items-center justify-center rounded-xl border border-gray-200 text-gray-400 hover:border-gray-400 hover:text-gray-700 transition active:scale-[0.96]"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="3 6 5 6 21 6" />
+                  <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                  <path d="M10 11v6M14 11v6" />
+                  <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                </svg>
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>
