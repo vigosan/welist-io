@@ -3,9 +3,9 @@ import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
 import { eq, max, sql, and, or, ilike, count, gt, inArray } from "drizzle-orm";
 import { db } from "../src/db/client.js";
-import { lists, items, participations, users, accounts, sessions, verificationTokens } from "../src/db/schema/index.js";
+import { lists, items, participations, users } from "../src/db/schema/index.js";
 import { rateLimit } from "./rate-limit.js";
-import { authHandler, initAuthConfig, getAuthUser, verifyAuth } from "@hono/auth-js";
+import { authHandler, initAuthConfig, getAuthUser } from "@hono/auth-js";
 import Google from "@auth/core/providers/google";
 import type { AuthUser } from "@hono/auth-js";
 
@@ -52,45 +52,24 @@ app.use(
 
 app.use("/auth/*", authHandler());
 
-app.get("/me", async (c) => {
-  const authUser = await getOptionalUser(c);
+app.use("*", async (c, next) => {
+  try {
+    const authUser = await getAuthUser(c);
+    c.set("authUser" as never, authUser);
+  } catch {
+    c.set("authUser" as never, null);
+  }
+  await next();
+});
+
+function getOptionalUser(c: { get: (key: string) => unknown }): AuthUser | null {
+  return (c.get("authUser") as AuthUser | null) ?? null;
+}
+
+app.get("/me", (c) => {
+  const authUser = getOptionalUser(c);
   return c.json(authUser?.session?.user ?? null);
 });
-
-app.get("/debug/:listId", async (c) => {
-  const authUser = await getOptionalUser(c);
-  const userId = authUser?.session?.user?.id ?? null;
-  const listId = c.req.param("listId");
-  const list = await resolveList(listId);
-  return c.json({
-    userId,
-    list,
-    canModify: list ? canModifyList(list, userId) : null,
-  });
-});
-
-app.post("/debug/:listId", async (c) => {
-  const authUser = await getOptionalUser(c);
-  const userId = authUser?.session?.user?.id ?? null;
-  const listId = c.req.param("listId");
-  const list = await resolveList(listId);
-  return c.json({
-    userId,
-    list,
-    canModify: list ? canModifyList(list, userId) : null,
-    method: "POST",
-  });
-});
-
-
-async function getOptionalUser(c: Parameters<typeof getAuthUser>[0]): Promise<AuthUser | null> {
-  try {
-    return await getAuthUser(c);
-  } catch (e) {
-    console.error("[getOptionalUser] error:", e);
-    return null;
-  }
-}
 
 function canModifyList(list: { ownerId: string | null; collaborative: boolean }, userId: string | null): boolean {
   return list.ownerId === null || list.ownerId === userId || list.collaborative;
@@ -117,7 +96,7 @@ app.post(
   zValidator("json", z.object({ name: z.string().min(1).max(200) })),
   async (c) => {
     const { name } = c.req.valid("json");
-    const authUser = await getOptionalUser(c);
+    const authUser = getOptionalUser(c);
     const ownerId = authUser?.session?.user?.id ?? null;
     const [list] = await db.insert(lists).values({ name, ownerId }).returning();
     return c.json(list, 201);
@@ -125,7 +104,7 @@ app.post(
 );
 
 app.get("/my-lists", async (c) => {
-  const authUser = await getOptionalUser(c);
+  const authUser = getOptionalUser(c);
   const userId = authUser?.session?.user?.id ?? null;
   if (!userId) return c.json({ error: "Unauthorized" }, 401);
   const rows = await db.query.lists.findMany({
@@ -158,7 +137,7 @@ app.patch(
     const body = c.req.valid("json");
     const list = await db.query.lists.findFirst({ where: listWhere(listId) });
     if (!list) return c.json({ error: "Not found" }, 404);
-    const authUser = await getOptionalUser(c);
+    const authUser = getOptionalUser(c);
     const userId = authUser?.session?.user?.id ?? null;
     if (!canModifyList(list, userId)) return c.json({ error: "Forbidden", debug: { userId, ownerId: list.ownerId, collaborative: list.collaborative } }, 403);
     const patch: Record<string, unknown> = {};
@@ -201,14 +180,11 @@ app.post(
   "/lists/:listId/items",
   zValidator("json", z.object({ text: z.string().min(1).max(1000) })),
   async (c) => {
-    console.log("[POST items] cookie:", c.req.header("cookie")?.slice(0, 80));
     const list = await resolveList(c.req.param("listId"));
-    console.log("[POST items] list:", JSON.stringify(list));
     if (!list) return c.json({ error: "Not found" }, 404);
-    const authUser = await getOptionalUser(c);
+    const authUser = getOptionalUser(c);
     const userId = authUser?.session?.user?.id ?? null;
-    console.log("[POST items] userId:", userId, "ownerId:", list.ownerId, "canModify:", canModifyList(list, userId));
-    if (!canModifyList(list, userId)) return c.json({ error: "Forbidden", debug: { userId, ownerId: list.ownerId, collaborative: list.collaborative } }, 403);
+    if (!canModifyList(list, userId)) return c.json({ error: "Forbidden" }, 403);
     const { text } = c.req.valid("json");
     const [maxRow] = await db.select({ pos: max(items.position) }).from(items).where(eq(items.listId, list.id));
     const position = (maxRow?.pos ?? -1) + 1;
@@ -223,7 +199,7 @@ app.patch(
   async (c) => {
     const list = await resolveList(c.req.param("listId"));
     if (!list) return c.json({ error: "Not found" }, 404);
-    const authUser = await getOptionalUser(c);
+    const authUser = getOptionalUser(c);
     const userId = authUser?.session?.user?.id ?? null;
     if (!canModifyList(list, userId)) return c.json({ error: "Forbidden" }, 403);
     const itemId = c.req.param("itemId");
@@ -241,7 +217,7 @@ app.patch(
 app.patch("/lists/:listId/items/:itemId/toggle", async (c) => {
   const list = await resolveList(c.req.param("listId"));
   if (!list) return c.json({ error: "Not found" }, 404);
-  const authUser = await getOptionalUser(c);
+  const authUser = getOptionalUser(c);
   const userId = authUser?.session?.user?.id ?? null;
   if (!canModifyList(list, userId)) return c.json({ error: "Forbidden" }, 403);
   const itemId = c.req.param("itemId");
@@ -272,7 +248,7 @@ app.patch("/lists/:listId/items/:itemId/toggle", async (c) => {
 app.delete("/lists/:listId/items/:itemId", async (c) => {
   const list = await resolveList(c.req.param("listId"));
   if (!list) return c.json({ error: "Not found" }, 404);
-  const authUser = await getOptionalUser(c);
+  const authUser = getOptionalUser(c);
   const userId = authUser?.session?.user?.id ?? null;
   if (!canModifyList(list, userId)) return c.json({ error: "Forbidden" }, 403);
   const itemId = c.req.param("itemId");
@@ -286,7 +262,7 @@ app.delete(
   async (c) => {
     const list = await resolveList(c.req.param("listId"));
     if (!list) return c.json({ error: "Not found" }, 404);
-    const authUser = await getOptionalUser(c);
+    const authUser = getOptionalUser(c);
     const userId = authUser?.session?.user?.id ?? null;
     if (!canModifyList(list, userId)) return c.json({ error: "Forbidden" }, 403);
     const { ids } = c.req.valid("json");
@@ -307,7 +283,7 @@ app.post(
   async (c) => {
     const list = await resolveList(c.req.param("listId"));
     if (!list) return c.json({ error: "Not found" }, 404);
-    const authUser = await getOptionalUser(c);
+    const authUser = getOptionalUser(c);
     const userId = authUser?.session?.user?.id ?? null;
     if (!canModifyList(list, userId)) return c.json({ error: "Forbidden" }, 403);
     const { texts } = c.req.valid("json");
@@ -398,7 +374,7 @@ app.post("/lists/:listId/clone", async (c) => {
 });
 
 app.post("/lists/:listId/accept", async (c) => {
-  const authUser = await getOptionalUser(c);
+  const authUser = getOptionalUser(c);
   const userId = authUser?.session?.user?.id;
   if (!userId) return c.json({ error: "Unauthorized" }, 401);
 
