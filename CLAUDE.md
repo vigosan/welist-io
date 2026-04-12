@@ -46,3 +46,41 @@ Schema lives in `src/db/schema/lists.schema.ts`. The `index.ts` re-export uses *
 
 ### Testing
 Tests use `app.request()` (Hono test helper) with a mocked `db` via `vi.mock('../src/db/client')`. The mock must be set up before importing `app`.
+
+## UI Style Guide
+
+**Palette — black & white only.**
+- Background: `bg-white` (pages) / `bg-[#FAFAF8]` (list detail wrapper)
+- Primary text: `text-gray-900`
+- Secondary text: `text-gray-500` / `text-gray-400`
+- Borders: `border-gray-100` (subtle) / `border-gray-200` (normal)
+- Active/selected state: `bg-gray-900 text-white border-gray-900`
+- Hover state: `hover:border-gray-400 hover:text-gray-900`
+- **Never use color for UI decoration** — no indigo, blue, violet, green, etc. in buttons, badges, or borders.
+
+**Buttons.**
+- Primary action: `bg-gray-900 text-white rounded-xl hover:bg-black`
+- Secondary/outline: `border border-gray-200 text-gray-500 rounded-xl hover:border-gray-900 hover:text-gray-900`
+- Icon button: `h-7 w-7 flex items-center justify-center rounded-md border border-gray-200 text-gray-400 hover:border-gray-400 hover:text-gray-700`
+- All interactive elements: `transition active:scale-[0.96]`
+
+**Inputs.**
+- Container: `flex gap-2 p-1.5 bg-gray-50 border border-gray-200 rounded-2xl focus-within:border-gray-400 transition-[border-color]`
+- Input field: `text-sm text-gray-900 placeholder-gray-400 bg-transparent outline-none`
+
+**Tags / filter chips.**
+- Default: `border-gray-200 text-gray-500 bg-white hover:bg-gray-50 hover:text-gray-700`
+- Active: `border-gray-900 bg-gray-900 text-white`
+
+**Search.**
+- Explore page: full search bar always visible at the top.
+- List detail: search icon button in the header meta row toggles the inline search bar (`openSearch()`).
+
+**Typography.**
+- Font: Inter (loaded from Google Fonts).
+- Headings: `font-bold tracking-tight text-gray-900`.
+- Body: `text-sm text-gray-600 leading-relaxed`.
+
+**Layout.**
+- Max content width: `max-w-xl` for content, `max-w-4xl` for nav.
+- Pages use `min-h-dvh flex flex-col` with `AppNav` at top and `<main>` filling remaining space.
