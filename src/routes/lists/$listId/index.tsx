@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { useSession } from "@hono/auth-js/react";
 import { z } from "zod";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useItems, useAddItem, useToggleItem, useDeleteItem, useUpdateItem, useBulkAddItems } from "@/hooks/useItems";
@@ -53,6 +54,7 @@ function ListDetailPage() {
   }
 
   const toggleCollaborative = useToggleCollaborative(listId);
+  const { data: session } = useSession();
 
   const {
     list, listLoading, refetchList,
@@ -71,6 +73,9 @@ function ListDetailPage() {
     if (list?.name) document.title = `${list.name} — Welist`;
     return () => { document.title = "Welist"; };
   }, [list?.name]);
+
+  const isOwner = !list ? false : (list.ownerId === null || list.ownerId === session?.user?.id);
+  const canWrite = isOwner || !!list?.collaborative;
 
   const { data: items = [], isLoading: itemsLoading, refetch: refetchItems } = useItems(listId);
 
@@ -173,7 +178,7 @@ function ListDetailPage() {
           ) : (
             <h1
               className="text-xl font-bold text-gray-900 leading-tight text-pretty cursor-default"
-              onDoubleClick={() => { setNameValue(list?.name ?? ""); setEditingName(true); }}
+              onDoubleClick={isOwner ? () => { setNameValue(list?.name ?? ""); setEditingName(true); } : undefined}
             >
               {list?.name ?? "…"}
             </h1>
@@ -181,45 +186,49 @@ function ListDetailPage() {
           </div>
 
           {/* Description */}
-          {!listLoading && (
+          {!listLoading && (isOwner || !!list?.description) && (
             <div className="mt-2">
-              {editingDescription ? (
-                <textarea
-                  autoFocus
-                  value={descriptionValue}
-                  onChange={(e) => setDescriptionValue(e.target.value)}
-                  onBlur={() => {
-                    const trimmed = descriptionValue.trim();
-                    updateDescription.mutate(trimmed || null);
-                    setEditingDescription(false);
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === "Escape") { setEditingDescription(false); }
-                    if (e.key === "Enter" && !e.shiftKey) {
-                      e.preventDefault();
+              {isOwner ? (
+                editingDescription ? (
+                  <textarea
+                    autoFocus
+                    value={descriptionValue}
+                    onChange={(e) => setDescriptionValue(e.target.value)}
+                    onBlur={() => {
                       const trimmed = descriptionValue.trim();
                       updateDescription.mutate(trimmed || null);
                       setEditingDescription(false);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Escape") { setEditingDescription(false); }
+                      if (e.key === "Enter" && !e.shiftKey) {
+                        e.preventDefault();
+                        const trimmed = descriptionValue.trim();
+                        updateDescription.mutate(trimmed || null);
+                        setEditingDescription(false);
+                      }
+                    }}
+                    placeholder="Añade una descripción…"
+                    maxLength={500}
+                    rows={2}
+                    data-testid="description-textarea"
+                    className="w-full text-sm text-gray-600 leading-relaxed bg-transparent outline-none resize-none border-b border-gray-200 focus:border-gray-400 transition placeholder-gray-300"
+                  />
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => { setDescriptionValue(list?.description ?? ""); setEditingDescription(true); }}
+                    data-testid="description-btn"
+                    className="w-full text-left text-sm leading-relaxed transition"
+                  >
+                    {list?.description
+                      ? <span className="text-gray-500">{list.description}</span>
+                      : <span className="text-gray-300 hover:text-gray-400">Añade una descripción…</span>
                     }
-                  }}
-                  placeholder="Añade una descripción…"
-                  maxLength={500}
-                  rows={2}
-                  data-testid="description-textarea"
-                  className="w-full text-sm text-gray-600 leading-relaxed bg-transparent outline-none resize-none border-b border-gray-200 focus:border-gray-400 transition placeholder-gray-300"
-                />
+                  </button>
+                )
               ) : (
-                <button
-                  type="button"
-                  onClick={() => { setDescriptionValue(list?.description ?? ""); setEditingDescription(true); }}
-                  data-testid="description-btn"
-                  className="w-full text-left text-sm leading-relaxed transition"
-                >
-                  {list?.description
-                    ? <span className="text-gray-500">{list.description}</span>
-                    : <span className="text-gray-300 hover:text-gray-400">Añade una descripción…</span>
-                  }
-                </button>
+                <span className="text-sm text-gray-500 leading-relaxed">{list?.description}</span>
               )}
             </div>
           )}
@@ -243,7 +252,7 @@ function ListDetailPage() {
             {items.length > 0 && <span className="text-gray-200 text-xs">·</span>}
 
             <div className="min-w-0">
-              {editingSlug ? (
+              {isOwner && editingSlug ? (
                 <form onSubmit={handleSlugSubmit} className="flex items-center gap-1.5">
                   <span className="text-xs text-gray-400 shrink-0">/lists/</span>
                   <input
@@ -257,7 +266,7 @@ function ListDetailPage() {
                   <button type="submit" disabled={!slugValue.trim() || updateSlug.isPending} className="text-xs text-gray-500 hover:text-gray-900 transition disabled:opacity-40 p-1">✓</button>
                   <button type="button" onClick={() => setEditingSlug(false)} className="text-xs text-gray-400 hover:text-gray-600 transition p-1">✕</button>
                 </form>
-              ) : (
+              ) : isOwner ? (
                 <button
                   onClick={startEditingSlug}
                   data-testid="edit-slug-btn"
@@ -268,53 +277,59 @@ function ListDetailPage() {
                   </svg>
                   <span className="truncate">/lists/{currentSlug.length > 20 ? `${currentSlug.slice(0, 8)}…` : currentSlug}</span>
                 </button>
+              ) : (
+                <span className="text-xs text-gray-400 truncate">/lists/{currentSlug.length > 20 ? `${currentSlug.slice(0, 8)}…` : currentSlug}</span>
               )}
               {slugError && <p className="text-xs text-red-400 mt-1">{slugError}</p>}
             </div>
 
             <div className="ml-auto flex items-center gap-1.5">
-              <button
-                onClick={() => togglePublic.mutate(!list?.public)}
-                data-testid="toggle-public-btn"
-                title={list?.public ? "Lista pública — clic para hacer privada" : "Lista privada — clic para hacer pública"}
-                className={`h-7 flex items-center gap-1 px-2 rounded-md text-xs font-medium border transition active:scale-[0.96] ${
-                  list?.public
-                    ? "border-gray-900 bg-gray-900 text-white"
-                    : "border-gray-200 text-gray-400 hover:border-gray-400 hover:text-gray-600"
-                }`}
-              >
-                {list?.public ? (
-                  <>
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 004 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    Pública
-                  </>
-                ) : (
-                  <>
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                    </svg>
-                    Privada
-                  </>
-                )}
-              </button>
+              {isOwner && (
+                <button
+                  onClick={() => togglePublic.mutate(!list?.public)}
+                  data-testid="toggle-public-btn"
+                  title={list?.public ? "Lista pública — clic para hacer privada" : "Lista privada — clic para hacer pública"}
+                  className={`h-7 flex items-center gap-1 px-2 rounded-md text-xs font-medium border transition active:scale-[0.96] ${
+                    list?.public
+                      ? "border-gray-900 bg-gray-900 text-white"
+                      : "border-gray-200 text-gray-400 hover:border-gray-400 hover:text-gray-600"
+                  }`}
+                >
+                  {list?.public ? (
+                    <>
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 004 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      Pública
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                      </svg>
+                      Privada
+                    </>
+                  )}
+                </button>
+              )}
 
-              <button
-                onClick={() => toggleCollaborative.mutate(!list?.collaborative)}
-                data-testid="toggle-collaborative-btn"
-                title={list?.collaborative ? "Colaborativa — clic para desactivar" : "Solo tú — clic para permitir edición a cualquiera con el link"}
-                className={`h-7 flex items-center gap-1 px-2 rounded-md text-xs font-medium border transition active:scale-[0.96] ${
-                  list?.collaborative
-                    ? "border-blue-600 bg-blue-600 text-white"
-                    : "border-gray-200 text-gray-400 hover:border-gray-400 hover:text-gray-600"
-                }`}
-              >
-                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-                {list?.collaborative ? "Colaborativa" : "Solo tú"}
-              </button>
+              {isOwner && (
+                <button
+                  onClick={() => toggleCollaborative.mutate(!list?.collaborative)}
+                  data-testid="toggle-collaborative-btn"
+                  title={list?.collaborative ? "Colaborativa — clic para desactivar" : "Solo tú — clic para permitir edición a cualquiera con el link"}
+                  className={`h-7 flex items-center gap-1 px-2 rounded-md text-xs font-medium border transition active:scale-[0.96] ${
+                    list?.collaborative
+                      ? "border-blue-600 bg-blue-600 text-white"
+                      : "border-gray-200 text-gray-400 hover:border-gray-400 hover:text-gray-600"
+                  }`}
+                >
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  {list?.collaborative ? "Colaborativa" : "Solo tú"}
+                </button>
+              )}
 
               <span aria-live="polite" className="sr-only">{copied ? "Enlace copiado" : ""}</span>
               <button
@@ -462,6 +477,7 @@ function ListDetailPage() {
                   onDelete={() => deleteItem.mutate(item.id)}
                   onEdit={(text) => updateItem.mutate({ id: item.id, text })}
                   onTagClick={(tag) => setActiveTag(activeTag === tag ? null : tag)}
+                  canWrite={canWrite}
                 />
               ))}
             </div>
@@ -469,56 +485,58 @@ function ListDetailPage() {
         </div>
 
         {/* Footer — always visible at bottom */}
-        <div className="shrink-0 px-4 pt-3 pb-6 space-y-2">
-          {pendingBulk ? (
-            <BulkPastePreview
-              texts={pendingBulk}
-              isPending={bulkAddItems.isPending}
-              onChange={setPendingBulk}
-              onConfirm={handleBulkConfirm}
-              onCancel={() => setPendingBulk(null)}
-            />
-          ) : (
-            <>
-              {tagSuggestions.length > 0 && (
-                <div className="flex flex-wrap gap-1.5 px-1">
-                  {tagSuggestions.map((tag) => (
-                    <button
-                      key={tag}
-                      type="button"
-                      onClick={() => {
-                        setNewItem((prev) => prev.replace(/#([a-zA-ZÀ-ÿ\w-]*)$/, `#${tag} `));
-                        addInputRef.current?.focus();
-                      }}
-                      className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium transition active:scale-[0.96] ${tagColor(tag)}`}
-                    >
-                      #{tag}
-                    </button>
-                  ))}
-                </div>
-              )}
-              <form onSubmit={handleAdd} className="flex gap-2 p-1.5 bg-gray-50 border border-gray-200 rounded-2xl">
-                <input
-                  ref={addInputRef}
-                  value={newItem}
-                  onChange={(e) => setNewItem(e.target.value)}
-                  onPaste={handlePaste}
-                  placeholder="Añadir elemento…"
-                  data-testid="add-item-input"
-                  className="flex-1 pl-3 text-sm text-gray-900 placeholder-gray-400 bg-transparent outline-none"
-                />
-                <button
-                  type="submit"
-                  disabled={!newItem.trim() || addItem.isPending}
-                  data-testid="add-item-submit"
-                  className="px-5 py-2.5 text-sm font-medium bg-gray-900 text-white rounded-xl hover:bg-black disabled:opacity-30 disabled:cursor-not-allowed transition active:scale-[0.96]"
-                >
-                  Añadir
-                </button>
-              </form>
-            </>
-          )}
-        </div>
+        {canWrite && (
+          <div className="shrink-0 px-4 pt-3 pb-6 space-y-2">
+            {pendingBulk ? (
+              <BulkPastePreview
+                texts={pendingBulk}
+                isPending={bulkAddItems.isPending}
+                onChange={setPendingBulk}
+                onConfirm={handleBulkConfirm}
+                onCancel={() => setPendingBulk(null)}
+              />
+            ) : (
+              <>
+                {tagSuggestions.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 px-1">
+                    {tagSuggestions.map((tag) => (
+                      <button
+                        key={tag}
+                        type="button"
+                        onClick={() => {
+                          setNewItem((prev) => prev.replace(/#([a-zA-ZÀ-ÿ\w-]*)$/, `#${tag} `));
+                          addInputRef.current?.focus();
+                        }}
+                        className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium transition active:scale-[0.96] ${tagColor(tag)}`}
+                      >
+                        #{tag}
+                      </button>
+                    ))}
+                  </div>
+                )}
+                <form onSubmit={handleAdd} className="flex gap-2 p-1.5 bg-gray-50 border border-gray-200 rounded-2xl">
+                  <input
+                    ref={addInputRef}
+                    value={newItem}
+                    onChange={(e) => setNewItem(e.target.value)}
+                    onPaste={handlePaste}
+                    placeholder="Añadir elemento…"
+                    data-testid="add-item-input"
+                    className="flex-1 pl-3 text-sm text-gray-900 placeholder-gray-400 bg-transparent outline-none"
+                  />
+                  <button
+                    type="submit"
+                    disabled={!newItem.trim() || addItem.isPending}
+                    data-testid="add-item-submit"
+                    className="px-5 py-2.5 text-sm font-medium bg-gray-900 text-white rounded-xl hover:bg-black disabled:opacity-30 disabled:cursor-not-allowed transition active:scale-[0.96]"
+                  >
+                    Añadir
+                  </button>
+                </form>
+              </>
+            )}
+          </div>
+        )}
 
       </div>
     </div>
