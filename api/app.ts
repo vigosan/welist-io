@@ -7,7 +7,6 @@ import { lists, items, participations, users, accounts, sessions, verificationTo
 import { rateLimit } from "./rate-limit.js";
 import { authHandler, initAuthConfig, getAuthUser, verifyAuth } from "@hono/auth-js";
 import Google from "@auth/core/providers/google";
-import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import type { AuthUser } from "@hono/auth-js";
 
 export const app = new Hono().basePath("/api");
@@ -19,7 +18,6 @@ app.use(
   initAuthConfig((c) => ({
     secret: c.env?.AUTH_SECRET ?? process.env.AUTH_SECRET ?? "",
     basePath: "/api/auth",
-    adapter: DrizzleAdapter(db, { usersTable: users, accountsTable: accounts, sessionsTable: sessions, verificationTokensTable: verificationTokens }),
     providers: [
       Google({
         clientId: c.env?.GOOGLE_CLIENT_ID ?? process.env.GOOGLE_CLIENT_ID ?? "",
@@ -28,12 +26,23 @@ app.use(
     ],
     session: { strategy: "jwt" },
     callbacks: {
+      async signIn({ user, account }) {
+        if (!user.email || !account) return true;
+        const existing = await db.query.users.findFirst({ where: eq(users.email, user.email), columns: { id: true } });
+        if (!existing) {
+          const [created] = await db.insert(users).values({ id: user.id!, name: user.name, email: user.email, image: user.image }).returning({ id: users.id });
+          user.id = created.id;
+        } else {
+          user.id = existing.id;
+        }
+        return true;
+      },
       jwt({ token, user }) {
         if (user?.id) token.sub = user.id;
         return token;
       },
-      session({ session, token, user }) {
-        if (session.user) session.user.id = token?.sub ?? user?.id ?? null;
+      session({ session, token }) {
+        if (session.user && token.sub) session.user.id = token.sub;
         return session;
       },
     },
