@@ -62,6 +62,7 @@ function ListDetailPage() {
     editingSlug, setEditingSlug, slugValue, setSlugValue, slugError,
     startEditingSlug, handleSlugSubmit, updateSlug,
     editingDescription, setEditingDescription, descriptionValue, setDescriptionValue, updateDescription,
+    editingCoverUrl, setEditingCoverUrl, coverUrlValue, setCoverUrlValue, updateCoverUrl,
     copied, handleShare,
     togglePublic,
   } = useListHeader({
@@ -151,6 +152,25 @@ function ListDetailPage() {
     <div className="h-dvh bg-[#FAFAF8] flex flex-col sm:items-center sm:p-6">
       <div className="flex-1 flex flex-col w-full sm:max-w-xl bg-white sm:rounded-3xl sm:border sm:border-gray-100 overflow-hidden">
 
+        {/* Cover image */}
+        {list?.coverUrl && (
+          <div className="relative shrink-0">
+            <img src={list.coverUrl} alt="" className="w-full h-40 object-cover" />
+            {isOwner && (
+              <button
+                type="button"
+                onClick={() => { setCoverUrlValue(list.coverUrl ?? ""); setEditingCoverUrl(true); }}
+                className="absolute bottom-2 right-2 flex items-center gap-1 px-2 py-1 bg-black/40 hover:bg-black/60 text-white text-xs rounded-lg backdrop-blur-sm transition"
+              >
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                </svg>
+                Cambiar
+              </button>
+            )}
+          </div>
+        )}
+
         {/* Header */}
         <div className="px-5 pt-5 pb-4 shrink-0">
           <Link to="/" className="text-xs text-gray-400 hover:text-gray-700 transition">
@@ -229,6 +249,45 @@ function ListDetailPage() {
                 )
               ) : (
                 <span className="text-sm text-gray-500 leading-relaxed">{list?.description}</span>
+              )}
+            </div>
+          )}
+
+          {/* Cover image */}
+          {!listLoading && isOwner && (
+            <div className="mt-2">
+              {editingCoverUrl ? (
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    const trimmed = coverUrlValue.trim();
+                    updateCoverUrl.mutate(trimmed || null);
+                    setEditingCoverUrl(false);
+                  }}
+                  className="flex items-center gap-1"
+                >
+                  <input
+                    autoFocus
+                    type="url"
+                    value={coverUrlValue}
+                    onChange={(e) => setCoverUrlValue(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === "Escape") setEditingCoverUrl(false); }}
+                    placeholder="https://…"
+                    data-testid="cover-url-input"
+                    className="flex-1 text-xs text-gray-700 bg-white border border-gray-200 rounded-md px-2 py-1 outline-none focus:border-gray-400 transition"
+                  />
+                  <button type="submit" disabled={updateCoverUrl.isPending} className="text-xs text-gray-500 hover:text-gray-900 transition disabled:opacity-40 p-1">✓</button>
+                  <button type="button" onClick={() => setEditingCoverUrl(false)} className="text-xs text-gray-400 hover:text-gray-600 transition p-1">✕</button>
+                </form>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => { setCoverUrlValue(list?.coverUrl ?? ""); setEditingCoverUrl(true); }}
+                  data-testid="cover-url-btn"
+                  className="text-xs text-gray-300 hover:text-gray-500 transition"
+                >
+                  {list?.coverUrl ? "Cambiar imagen de portada" : "Añadir imagen de portada…"}
+                </button>
               )}
             </div>
           )}
@@ -320,7 +379,7 @@ function ListDetailPage() {
                   title={list?.collaborative ? "Colaborativa — clic para desactivar" : "Solo tú — clic para permitir edición a cualquiera con el link"}
                   className={`h-7 flex items-center gap-1 px-2 rounded-md text-xs font-medium border transition active:scale-[0.96] ${
                     list?.collaborative
-                      ? "border-blue-600 bg-blue-600 text-white"
+                      ? "border-gray-900 bg-gray-900 text-white"
                       : "border-gray-200 text-gray-400 hover:border-gray-400 hover:text-gray-600"
                   }`}
                 >
@@ -328,6 +387,20 @@ function ListDetailPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
                   {list?.collaborative ? "Colaborativa" : "Solo tú"}
+                </button>
+              )}
+
+              {!searchActive && (
+                <button
+                  onClick={openSearch}
+                  data-testid="search-btn"
+                  aria-label="Buscar en la lista"
+                  title="Buscar (⌘S)"
+                  className="h-7 w-7 flex items-center justify-center rounded-md border border-gray-200 text-gray-400 hover:border-gray-400 hover:text-gray-700 transition active:scale-[0.96]"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
                 </button>
               )}
 

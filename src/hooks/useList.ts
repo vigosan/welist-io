@@ -66,6 +66,25 @@ export function useUpdateDescription(listId: string) {
   });
 }
 
+export function useUpdateCoverUrl(listId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (coverUrl: string | null) => listsService.update(listId, { coverUrl }),
+    onMutate: async (coverUrl) => {
+      await qc.cancelQueries({ queryKey: queryKeys.list(listId) });
+      const previous = qc.getQueryData<List>(queryKeys.list(listId));
+      qc.setQueryData<List>(queryKeys.list(listId), (old) => old ? { ...old, coverUrl } : old);
+      return { previous };
+    },
+    onError: (_err, _val, ctx) => {
+      qc.setQueryData(queryKeys.list(listId), ctx?.previous);
+    },
+    onSettled: (updated) => {
+      if (updated) qc.setQueryData(queryKeys.list(listId), updated);
+    },
+  });
+}
+
 export function useUpdateSlug(listId: string) {
   const qc = useQueryClient();
   return useMutation({

@@ -129,6 +129,7 @@ app.patch(
     name: z.string().min(1).max(200).optional(),
     slug: z.string().min(1).max(100).regex(/^[a-z0-9-]+$/).optional().nullable(),
     description: z.string().max(500).optional().nullable(),
+    coverUrl: z.string().url().max(2000).optional().nullable(),
     public: z.boolean().optional(),
     collaborative: z.boolean().optional(),
   })),
@@ -144,6 +145,7 @@ app.patch(
     if (body.name !== undefined) patch.name = body.name;
     if ("slug" in body) patch.slug = body.slug ?? null;
     if ("description" in body) patch.description = body.description ?? null;
+    if ("coverUrl" in body) patch.coverUrl = body.coverUrl ?? null;
     if (body.public !== undefined) patch.public = body.public;
     if (body.collaborative !== undefined) patch.collaborative = body.collaborative;
     try {
@@ -306,6 +308,7 @@ app.get("/explore", async (c) => {
       name: lists.name,
       slug: lists.slug,
       description: lists.description,
+      coverUrl: lists.coverUrl,
       createdAt: lists.createdAt,
       itemCount: count(items.id),
       participantCount: sql<number>`cast(count(distinct ${participations.id}) as int)`,

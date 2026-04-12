@@ -6,6 +6,7 @@ export const lists = pgTable("lists", {
   name: text("name").notNull(),
   slug: text("slug").unique(),
   description: text("description"),
+  coverUrl: text("cover_url"),
   public: boolean("public").notNull().default(false),
   collaborative: boolean("collaborative").notNull().default(false),
   ownerId: text("owner_id").references(() => users.id),

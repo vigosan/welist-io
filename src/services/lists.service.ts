@@ -1,7 +1,7 @@
 import { apiClient } from "@/lib/api-client";
 import type { List, Item } from "@/db/schema";
 
-export type ExploreItem = Pick<List, "id" | "name" | "slug" | "description" | "createdAt"> & {
+export type ExploreItem = Pick<List, "id" | "name" | "slug" | "description" | "coverUrl" | "createdAt"> & {
   itemCount: number;
   participantCount: number;
   completedCount: number;
@@ -15,7 +15,7 @@ export const listsService = {
   create: (name: string) =>
     apiClient<List>("/api/lists", { method: "POST", body: JSON.stringify({ name }) }),
 
-  update: (listId: string, patch: { name?: string; slug?: string | null; description?: string | null; public?: boolean; collaborative?: boolean }) =>
+  update: (listId: string, patch: { name?: string; slug?: string | null; description?: string | null; coverUrl?: string | null; public?: boolean; collaborative?: boolean }) =>
     apiClient<List>(`/api/lists/${listId}`, { method: "PATCH", body: JSON.stringify(patch) }),
 
   explore: (q?: string, cursor?: string) => {
