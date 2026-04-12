@@ -32,8 +32,8 @@ app.use(
         if (user?.id) token.sub = user.id;
         return token;
       },
-      session({ session, token }) {
-        if (session.user && token.sub) session.user.id = token.sub;
+      session({ session, token, user }) {
+        if (session.user) session.user.id = token?.sub ?? user?.id ?? null;
         return session;
       },
     },
