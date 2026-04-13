@@ -316,22 +316,25 @@ function ListDetailPage() {
           )}
 
           {/* Meta row */}
-          <div className="flex items-center gap-2 mt-2 flex-wrap">
+          <div className="flex items-center justify-between gap-2 mt-2">
             {listLoading ? (
               <>
-                <div className="h-3.5 w-28 rounded bg-gray-200 animate-pulse" />
-                <div className="h-3.5 w-24 rounded bg-gray-200 animate-pulse" />
-                <div className="ml-auto flex items-center gap-1.5">
+                <div className="flex items-center gap-2 flex-1 min-w-0">
+                  <div className="h-3.5 w-28 rounded bg-gray-200 animate-pulse" />
+                  <div className="h-3.5 w-24 rounded bg-gray-200 animate-pulse" />
+                </div>
+                <div className="flex items-center gap-1.5 shrink-0">
                   <div className="h-7 w-20 rounded-md bg-gray-200 animate-pulse" />
                   <div className="h-7 w-7 rounded-md bg-gray-200 animate-pulse" />
                 </div>
               </>
             ) : (
               <>
+            <div className="flex items-center gap-2 min-w-0 flex-1">
             {items.length > 0 && (
               <span className="text-xs text-gray-400 tabular-nums shrink-0">{doneCount} / {items.length} completados</span>
             )}
-            {items.length > 0 && <span className="text-gray-200 text-xs">·</span>}
+            {items.length > 0 && <span className="text-gray-200 text-xs shrink-0">·</span>}
 
             <div className="min-w-0">
               {isOwner && editingSlug ? (
@@ -364,8 +367,9 @@ function ListDetailPage() {
               )}
               {slugError && <p className="text-xs text-red-400 mt-1">{slugError}</p>}
             </div>
+            </div>
 
-            <div className="ml-auto flex items-center gap-1.5">
+            <div className="flex items-center gap-1.5 shrink-0">
               {isOwner && (
                 <button
                   onClick={() => togglePublic.mutate(!list?.public)}
