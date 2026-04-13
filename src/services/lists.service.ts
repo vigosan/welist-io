@@ -18,10 +18,11 @@ export const listsService = {
   update: (listId: string, patch: { name?: string; slug?: string | null; description?: string | null; coverUrl?: string | null; public?: boolean; collaborative?: boolean }) =>
     apiClient<List>(`/api/lists/${listId}`, { method: "PATCH", body: JSON.stringify(patch) }),
 
-  explore: (q?: string, cursor?: string) => {
+  explore: (q?: string, cursor?: string, sort?: string) => {
     const params = new URLSearchParams();
     if (q) params.set("q", q);
     if (cursor) params.set("cursor", cursor);
+    if (sort) params.set("sort", sort);
     const qs = params.toString();
     return apiClient<{ items: ExploreItem[]; nextCursor: string | null }>(`/api/explore${qs ? `?${qs}` : ""}`);
   },

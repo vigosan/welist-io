@@ -131,10 +131,10 @@ export function useToggleCollaborative(listId: string) {
   });
 }
 
-export function useExplore(q?: string) {
+export function useExplore(q?: string, sort?: string) {
   return useInfiniteQuery({
-    queryKey: queryKeys.explore(q),
-    queryFn: ({ pageParam }) => listsService.explore(q, pageParam),
+    queryKey: queryKeys.explore(q, sort),
+    queryFn: ({ pageParam }) => listsService.explore(q, pageParam, sort),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (last) => last.nextCursor ?? undefined,
   });

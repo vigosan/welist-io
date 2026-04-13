@@ -115,11 +115,19 @@ function ExploreListCard({ list, onAccept, acceptPending }: {
   );
 }
 
+type SortOption = "created_desc" | "created_asc";
+
+const SORT_OPTIONS: { value: SortOption; label: string }[] = [
+  { value: "created_desc", label: "Más nuevas" },
+  { value: "created_asc", label: "Más antiguas" },
+];
+
 function ExplorePage() {
   const navigate = useNavigate();
   const [q, setQ] = useState("");
   const [search, setSearch] = useState("");
-  const { data, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage } = useExplore(search || undefined);
+  const [sort, setSort] = useState<SortOption>("created_desc");
+  const { data, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage } = useExplore(search || undefined, sort);
   const acceptChallenge = useAcceptChallenge();
   const sentinelRef = useRef<HTMLDivElement>(null);
 
@@ -172,6 +180,22 @@ return (
               Buscar
             </button>
           </form>
+          <div className="flex gap-1.5 mt-3" data-testid="explore-sort-options">
+            {SORT_OPTIONS.map((opt) => (
+              <button
+                key={opt.value}
+                data-testid={`explore-sort-${opt.value}`}
+                onClick={() => setSort(opt.value)}
+                className={`cursor-pointer px-3 py-1.5 text-xs font-medium rounded-lg border transition active:scale-[0.96] ${
+                  sort === opt.value
+                    ? "bg-gray-900 text-white border-gray-900"
+                    : "border-gray-200 text-gray-500 bg-white hover:border-gray-400 hover:text-gray-700"
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
         </div>
 
         <div className="flex-1 overflow-y-auto px-4 pb-6">

@@ -342,9 +342,13 @@ app.post(
 app.get("/explore", async (c) => {
   const q = c.req.query("q")?.trim();
   const cursor = c.req.query("cursor");
+  const sort = c.req.query("sort") ?? "created_desc";
+  const isAsc = sort === "created_asc";
 
   const baseWhere = q ? and(eq(lists.public, true), ilike(lists.name, `%${q}%`)) : eq(lists.public, true);
-  const where = cursor ? and(baseWhere, gt(lists.createdAt, new Date(cursor))) : baseWhere;
+  const where = cursor
+    ? and(baseWhere, isAsc ? gt(lists.createdAt, new Date(cursor)) : lt(lists.createdAt, new Date(cursor)))
+    : baseWhere;
 
   const rows = await db
     .select({
@@ -365,7 +369,7 @@ app.get("/explore", async (c) => {
     .leftJoin(users, eq(users.id, lists.ownerId))
     .where(where)
     .groupBy(lists.id, users.image)
-    .orderBy(lists.createdAt)
+    .orderBy(isAsc ? lists.createdAt : desc(lists.createdAt))
     .limit(EXPLORE_PAGE_SIZE);
 
   const nextCursor = rows.length === EXPLORE_PAGE_SIZE
