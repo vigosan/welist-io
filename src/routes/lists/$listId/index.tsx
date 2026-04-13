@@ -33,6 +33,7 @@ function ListDetailPage() {
   const [pendingBulk, setPendingBulk] = useState<string[] | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchActive, setSearchActive] = useState(false);
+  const [descriptionExpanded, setDescriptionExpanded] = useState(false);
   const addInputRef = useRef<HTMLInputElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
@@ -235,20 +236,42 @@ function ListDetailPage() {
                     className="w-full text-sm text-gray-600 leading-relaxed bg-transparent outline-none resize-none border-b border-gray-200 focus:border-gray-400 transition placeholder-gray-300"
                   />
                 ) : (
-                  <button
-                    type="button"
-                    onClick={() => { setDescriptionValue(list?.description ?? ""); setEditingDescription(true); }}
-                    data-testid="description-btn"
-                    className="cursor-pointer w-full text-left text-sm leading-relaxed transition"
-                  >
-                    {list?.description
-                      ? <span className="text-gray-500">{list.description}</span>
-                      : <span className="text-gray-300 hover:text-gray-400">Añade una descripción…</span>
-                    }
-                  </button>
+                  <div>
+                    <button
+                      type="button"
+                      onClick={() => { setDescriptionValue(list?.description ?? ""); setEditingDescription(true); }}
+                      data-testid="description-btn"
+                      className="cursor-pointer w-full text-left text-sm leading-relaxed transition"
+                    >
+                      {list?.description
+                        ? <span className={`text-gray-500 ${descriptionExpanded ? "" : "line-clamp-2"}`}>{list.description}</span>
+                        : <span className="text-gray-300 hover:text-gray-400">Añade una descripción…</span>
+                      }
+                    </button>
+                    {list?.description && list.description.length > 80 && (
+                      <button
+                        type="button"
+                        onClick={() => setDescriptionExpanded((v) => !v)}
+                        className="cursor-pointer text-xs text-gray-400 hover:text-gray-600 transition mt-0.5"
+                      >
+                        {descriptionExpanded ? "ver menos" : "ver más"}
+                      </button>
+                    )}
+                  </div>
                 )
               ) : (
-                <span className="text-sm text-gray-500 leading-relaxed">{list?.description}</span>
+                <div>
+                  <span className={`text-sm text-gray-500 leading-relaxed ${descriptionExpanded ? "" : "line-clamp-2"}`}>{list?.description}</span>
+                  {list?.description && list.description.length > 80 && (
+                    <button
+                      type="button"
+                      onClick={() => setDescriptionExpanded((v) => !v)}
+                      className="cursor-pointer block text-xs text-gray-400 hover:text-gray-600 transition mt-0.5"
+                    >
+                      {descriptionExpanded ? "ver menos" : "ver más"}
+                    </button>
+                  )}
+                </div>
               )}
             </div>
           )}
