@@ -1,4 +1,5 @@
 import { BULK_ITEM_LIMIT as BULK_LIMIT } from "@/lib/constants";
+import { useTranslation } from "@/i18n/service";
 
 interface Props {
   texts: string[];
@@ -9,6 +10,8 @@ interface Props {
 }
 
 export function BulkPastePreview({ texts, isPending, onChange, onConfirm, onCancel }: Props) {
+  const { t } = useTranslation();
+
   function remove(index: number) {
     const next = texts.filter((_, i) => i !== index);
     if (next.length === 0) { onCancel(); return; }
@@ -22,8 +25,10 @@ export function BulkPastePreview({ texts, isPending, onChange, onConfirm, onCanc
     >
       <div className="flex items-center justify-between px-3 pt-2.5 pb-1.5 border-b border-gray-100">
         <span className="text-xs font-medium text-gray-500">
-          {texts.length} elemento{texts.length !== 1 ? "s" : ""} para añadir
-          {texts.length === BULK_LIMIT && <span className="ml-1 text-amber-500">(máx. {BULK_LIMIT})</span>}
+          {t("bulk.header", { count: texts.length })}
+          {texts.length === BULK_LIMIT && (
+            <span className="ml-1 text-gray-400">{t("bulk.maxWarning", { limit: BULK_LIMIT })}</span>
+          )}
         </span>
         <button
           type="button"
@@ -31,7 +36,7 @@ export function BulkPastePreview({ texts, isPending, onChange, onConfirm, onCanc
           data-testid="bulk-cancel"
           className="cursor-pointer text-xs text-gray-400 hover:text-gray-600 transition"
         >
-          Cancelar
+          {t("bulk.cancel")}
         </button>
       </div>
 
@@ -46,7 +51,7 @@ export function BulkPastePreview({ texts, isPending, onChange, onConfirm, onCanc
               type="button"
               onClick={() => remove(i)}
               data-testid={`bulk-remove-${i}`}
-              aria-label={`Eliminar "${text}"`}
+              aria-label={t("bulk.removeItem", { text })}
               className="cursor-pointer shrink-0 text-gray-300 hover:text-gray-500 transition opacity-0 group-hover:opacity-100 focus:opacity-100"
             >
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -65,7 +70,7 @@ export function BulkPastePreview({ texts, isPending, onChange, onConfirm, onCanc
           data-testid="bulk-confirm"
           className="cursor-pointer w-full py-2 text-sm font-medium bg-gray-900 text-white rounded-xl hover:bg-black disabled:opacity-40 disabled:cursor-not-allowed transition active:scale-[0.98]"
         >
-          {isPending ? "Añadiendo…" : `Añadir ${texts.length} elemento${texts.length !== 1 ? "s" : ""}`}
+          {isPending ? t("bulk.adding") : t("bulk.confirm", { count: texts.length })}
         </button>
       </div>
     </div>

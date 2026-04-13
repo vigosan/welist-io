@@ -1,5 +1,7 @@
 import { useState, useCallback } from "react";
 import { useList, useUpdateName, useUpdateSlug, useUpdateDescription, useUpdateCoverUrl, useTogglePublic } from "./useList";
+import { useTranslation } from "@/i18n/service";
+import type { ApiError } from "@/lib/api-client";
 
 interface Options {
   listId: string;
@@ -8,6 +10,7 @@ interface Options {
 
 export function useListHeader({ listId, onSlugUpdated }: Options) {
   const { data: list, isLoading: listLoading, refetch: refetchList } = useList(listId);
+  const { t } = useTranslation();
   const [editingName, setEditingName] = useState(false);
   const [nameValue, setNameValue] = useState("");
   const [editingSlug, setEditingSlug] = useState(false);
@@ -49,10 +52,10 @@ export function useListHeader({ listId, onSlugUpdated }: Options) {
         onSlugUpdated(updated);
       },
       onError: async (err: unknown) => {
-        const res = err instanceof Error && "response" in err ? (err as Error & { response: Response }).response : null;
+        const res = err instanceof Error && "response" in err ? (err as ApiError).response : null;
         const body: unknown = await res?.json().catch(() => ({})) ?? {};
-        const isSlugTaken = typeof body === "object" && body !== null && (body as Record<string, unknown>).error === "slug_taken";
-        setSlugError(isSlugTaken ? "Este slug ya está en uso" : "Error al guardar");
+        const isSlugTaken = typeof body === "object" && body !== null && "error" in body && (body as { error: unknown }).error === "slug_taken";
+        setSlugError(isSlugTaken ? t("slugError.taken") : t("slugError.saveFailed"));
       },
     });
   }

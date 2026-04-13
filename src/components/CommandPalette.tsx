@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "@/i18n/service";
 
 export interface Action {
   id: string;
@@ -16,6 +17,7 @@ export function CommandPalette({ open, onClose, actions }: Props) {
   const [query, setQuery] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
+  const { t } = useTranslation();
 
   const filtered = actions.filter((a) =>
     a.label.toLowerCase().includes(query.toLowerCase()),
@@ -62,7 +64,7 @@ export function CommandPalette({ open, onClose, actions }: Props) {
       <div
         role="dialog"
         aria-modal="true"
-        aria-label="Paleta de comandos"
+        aria-label={t("command.ariaLabel")}
         className="relative w-full max-w-sm bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden"
         onClick={(e) => e.stopPropagation()}
         onKeyDown={handleKeyDown}
@@ -76,14 +78,14 @@ export function CommandPalette({ open, onClose, actions }: Props) {
           aria-activedescendant={activeId}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Buscar acción…"
+          placeholder={t("command.searchPlaceholder")}
           data-testid="command-palette-input"
           className="w-full px-4 py-3.5 text-sm text-gray-900 placeholder-gray-400 outline-none border-b border-gray-100"
         />
-        <div id="command-palette-list" role="listbox" aria-label="Acciones" className="max-h-72 overflow-y-auto py-1.5">
+        <div id="command-palette-list" role="listbox" aria-label={t("command.actionsLabel")} className="max-h-72 overflow-y-auto py-1.5">
           {filtered.length === 0 ? (
             <p data-testid="command-empty" className="px-4 py-3 text-sm text-gray-400">
-              Sin resultados.
+              {t("command.noResults")}
             </p>
           ) : (
             filtered.map((action, i) => (
@@ -106,9 +108,9 @@ export function CommandPalette({ open, onClose, actions }: Props) {
           )}
         </div>
         <div className="px-4 py-2 border-t border-gray-100 flex items-center gap-3">
-          <span className="text-xs text-gray-300">↑↓ navegar</span>
-          <span className="text-xs text-gray-300">↵ seleccionar</span>
-          <span className="text-xs text-gray-300">esc cerrar</span>
+          <span className="text-xs text-gray-300">{t("command.navigate")}</span>
+          <span className="text-xs text-gray-300">{t("command.select")}</span>
+          <span className="text-xs text-gray-300">{t("command.close")}</span>
         </div>
       </div>
     </div>

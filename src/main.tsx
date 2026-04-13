@@ -4,6 +4,7 @@ import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SessionProvider } from "@hono/auth-js/react";
 import { routeTree } from "./routeTree.gen";
+import "./i18n";
 import "./index.css";
 
 const queryClient = new QueryClient({

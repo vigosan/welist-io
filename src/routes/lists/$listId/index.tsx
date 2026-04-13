@@ -14,6 +14,7 @@ import { usePullToRefresh } from "@/hooks/usePullToRefresh";
 import { tagColor } from "@/lib/tags";
 import { fireConfetti } from "@/lib/confetti";
 import { BULK_ITEM_LIMIT } from "@/lib/constants";
+import { useTranslation } from "@/i18n/service";
 
 const searchSchema = z.object({
   status: z.enum(["all", "pending", "done"]).optional().default("all"),
@@ -36,6 +37,7 @@ function ListDetailPage() {
   const [descriptionExpanded, setDescriptionExpanded] = useState(false);
   const addInputRef = useRef<HTMLInputElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const { t } = useTranslation();
 
   function openSearch() {
     setSearchActive(true);
@@ -153,7 +155,6 @@ function ListDetailPage() {
     <div className="h-dvh bg-[#FAFAF8] flex flex-col sm:items-center sm:p-6">
       <div className="flex-1 flex flex-col w-full sm:max-w-xl bg-white sm:rounded-3xl sm:border sm:border-gray-100 overflow-hidden">
 
-        {/* Cover image */}
         {list?.coverUrl && (
           <div className="relative shrink-0">
             <img src={list.coverUrl} alt="" className="w-full h-40 object-cover" />
@@ -166,16 +167,15 @@ function ListDetailPage() {
                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                 </svg>
-                Cambiar
+                {t("list.changeCoverBtn")}
               </button>
             )}
           </div>
         )}
 
-        {/* Header */}
         <div className="px-5 pt-5 pb-4 shrink-0">
           <Link to="/lists" className="cursor-pointer text-xs text-gray-400 hover:text-gray-700 transition">
-            ← Mis listas
+            {t("list.back")}
           </Link>
           <div className="mt-4">
           {listLoading ? (
@@ -206,7 +206,6 @@ function ListDetailPage() {
           )}
           </div>
 
-          {/* Description */}
           {!listLoading && (isOwner || !!list?.description) && (
             <div className="mt-2">
               {isOwner ? (
@@ -229,7 +228,7 @@ function ListDetailPage() {
                         setEditingDescription(false);
                       }
                     }}
-                    placeholder="Añade una descripción…"
+                    placeholder={t("list.addDescriptionPlaceholder")}
                     maxLength={500}
                     rows={2}
                     data-testid="description-textarea"
@@ -245,7 +244,7 @@ function ListDetailPage() {
                     >
                       {list?.description
                         ? <span className={`text-gray-500 ${descriptionExpanded ? "" : "line-clamp-2"}`}>{list.description}</span>
-                        : <span className="text-gray-300 hover:text-gray-400">Añade una descripción…</span>
+                        : <span className="text-gray-300 hover:text-gray-400">{t("list.addDescriptionPlaceholder")}</span>
                       }
                     </button>
                     {list?.description && list.description.length > 80 && (
@@ -254,7 +253,7 @@ function ListDetailPage() {
                         onClick={() => setDescriptionExpanded((v) => !v)}
                         className="cursor-pointer text-xs text-gray-400 hover:text-gray-600 transition mt-0.5"
                       >
-                        {descriptionExpanded ? "ver menos" : "ver más"}
+                        {descriptionExpanded ? t("list.expandLess") : t("list.expandMore")}
                       </button>
                     )}
                   </div>
@@ -268,7 +267,7 @@ function ListDetailPage() {
                       onClick={() => setDescriptionExpanded((v) => !v)}
                       className="cursor-pointer block text-xs text-gray-400 hover:text-gray-600 transition mt-0.5"
                     >
-                      {descriptionExpanded ? "ver menos" : "ver más"}
+                      {descriptionExpanded ? t("list.expandLess") : t("list.expandMore")}
                     </button>
                   )}
                 </div>
@@ -276,7 +275,6 @@ function ListDetailPage() {
             </div>
           )}
 
-          {/* Cover image */}
           {!listLoading && isOwner && (
             <div className="mt-2">
               {editingCoverUrl ? (
@@ -309,13 +307,12 @@ function ListDetailPage() {
                   data-testid="cover-url-btn"
                   className="cursor-pointer text-xs text-gray-300 hover:text-gray-500 transition"
                 >
-                  {list?.coverUrl ? "Cambiar imagen de portada" : "Añadir imagen de portada…"}
+                  {list?.coverUrl ? t("list.changeCover") : t("list.addCover")}
                 </button>
               )}
             </div>
           )}
 
-          {/* Meta row */}
           <div className="flex items-center justify-between gap-2 mt-2">
             {listLoading ? (
               <>
@@ -332,7 +329,9 @@ function ListDetailPage() {
               <>
             <div className="flex items-center gap-2 min-w-0 flex-1">
             {items.length > 0 && (
-              <span className="text-xs text-gray-400 tabular-nums shrink-0">{doneCount} / {items.length} completados</span>
+              <span className="text-xs text-gray-400 tabular-nums shrink-0">
+                {t("list.progress", { done: doneCount, total: items.length })}
+              </span>
             )}
             {items.length > 0 && <span className="text-gray-200 text-xs shrink-0">·</span>}
 
@@ -365,7 +364,7 @@ function ListDetailPage() {
               ) : (
                 <span className="text-xs text-gray-400 truncate">/lists/{currentSlug.length > 20 ? `${currentSlug.slice(0, 8)}…` : currentSlug}</span>
               )}
-              {slugError && <p className="text-xs text-red-400 mt-1">{slugError}</p>}
+              {slugError && <p className="text-xs text-gray-400 mt-1">{slugError}</p>}
             </div>
             </div>
 
@@ -374,7 +373,7 @@ function ListDetailPage() {
                 <button
                   onClick={() => togglePublic.mutate(!list?.public)}
                   data-testid="toggle-public-btn"
-                  title={list?.public ? "Lista pública — clic para hacer privada" : "Lista privada — clic para hacer pública"}
+                  title={list?.public ? t("list.publicTitle") : t("list.privateTitle")}
                   className={`cursor-pointer h-7 flex items-center gap-1 px-2 rounded-md text-xs font-medium border transition active:scale-[0.96] ${
                     list?.public
                       ? "border-gray-900 bg-gray-900 text-white"
@@ -386,14 +385,14 @@ function ListDetailPage() {
                       <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 004 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
-                      <span className="hidden sm:inline">Pública</span>
+                      <span className="hidden sm:inline">{t("list.public")}</span>
                     </>
                   ) : (
                     <>
                       <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                       </svg>
-                      <span className="hidden sm:inline">Privada</span>
+                      <span className="hidden sm:inline">{t("list.private")}</span>
                     </>
                   )}
                 </button>
@@ -403,7 +402,7 @@ function ListDetailPage() {
                 <button
                   onClick={() => toggleCollaborative.mutate(!list?.collaborative)}
                   data-testid="toggle-collaborative-btn"
-                  title={list?.collaborative ? "Colaborativa — clic para desactivar" : "Solo tú — clic para permitir edición a cualquiera con el link"}
+                  title={list?.collaborative ? t("list.collaborativeTitle") : t("list.soloYouTitle")}
                   className={`cursor-pointer h-7 flex items-center gap-1 px-2 rounded-md text-xs font-medium border transition active:scale-[0.96] ${
                     list?.collaborative
                       ? "border-gray-900 bg-gray-900 text-white"
@@ -413,7 +412,7 @@ function ListDetailPage() {
                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
-                  <span className="hidden sm:inline">{list?.collaborative ? "Colaborativa" : "Solo tú"}</span>
+                  <span className="hidden sm:inline">{list?.collaborative ? t("list.collaborative") : t("list.soloYou")}</span>
                 </button>
               )}
 
@@ -421,8 +420,8 @@ function ListDetailPage() {
                 <button
                   onClick={openSearch}
                   data-testid="search-btn"
-                  aria-label="Buscar en la lista"
-                  title="Buscar (⌘S)"
+                  aria-label={t("list.searchAriaLabel")}
+                  title={t("list.searchTitle")}
                   className="cursor-pointer h-7 w-7 flex items-center justify-center rounded-md border border-gray-200 text-gray-400 hover:border-gray-400 hover:text-gray-700 transition active:scale-[0.96]"
                 >
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -431,12 +430,12 @@ function ListDetailPage() {
                 </button>
               )}
 
-              <span aria-live="polite" className="sr-only">{copied ? "Enlace copiado" : ""}</span>
+              <span aria-live="polite" className="sr-only">{copied ? t("list.linkCopied") : ""}</span>
               <button
                 onClick={handleShare}
                 data-testid="share-btn"
-                aria-label={copied ? "Enlace copiado" : "Compartir enlace"}
-                title={copied ? "¡Copiado!" : "Compartir enlace"}
+                aria-label={copied ? t("list.linkCopied") : t("list.shareLink")}
+                title={copied ? t("list.copiedTooltip") : t("list.shareLink")}
                 className="cursor-pointer relative h-7 w-7 flex items-center justify-center rounded-md border border-gray-200 text-gray-400 hover:border-gray-400 hover:text-gray-700 transition active:scale-[0.96] overflow-hidden"
               >
                 <span className={`absolute inset-0 flex items-center justify-center transition-[opacity,transform] duration-150 ease-[cubic-bezier(0.2,0,0,1)] ${copied ? "opacity-0 scale-75" : "opacity-100 scale-100"}`}>
@@ -477,7 +476,7 @@ function ListDetailPage() {
                       : "border-gray-200 text-gray-500 bg-white hover:bg-gray-50 hover:text-gray-700"
                   }`}
                 >
-                  #{s === "pending" ? "pendientes" : "hechos"}
+                  {s === "pending" ? t("list.filterPending") : t("list.filterDone")}
                 </button>
               ))}
               {allTags.map((tag) => (
@@ -498,7 +497,6 @@ function ListDetailPage() {
           )}
         </div>
 
-        {/* Pull to refresh indicator */}
         <div
           className="shrink-0 flex items-end justify-center overflow-hidden"
           style={{
@@ -511,7 +509,6 @@ function ListDetailPage() {
           />
         </div>
 
-        {/* Search bar */}
         {searchActive && (
           <div className="shrink-0 px-3 pb-2">
             <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl">
@@ -523,13 +520,13 @@ function ListDetailPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={(e) => { if (e.key === "Escape") closeSearch(); }}
-                placeholder="Buscar en esta lista…"
+                placeholder={t("list.searchPlaceholder")}
                 data-testid="search-input"
                 className="flex-1 text-sm text-gray-900 placeholder-gray-400 bg-transparent outline-none"
               />
               {searchQuery && (
                 <span className="text-xs text-gray-400 tabular-nums shrink-0">
-                  {filteredItems.length} resultado{filteredItems.length !== 1 ? "s" : ""}
+                  {t("list.results", { count: filteredItems.length })}
                 </span>
               )}
               <button
@@ -546,7 +543,6 @@ function ListDetailPage() {
           </div>
         )}
 
-        {/* Items — scrollable, fills remaining space */}
         <div ref={pullRef} className="flex-1 overflow-y-auto overscroll-none px-3 py-1">
           {itemsLoading ? (
             <div className="space-y-1">
@@ -562,10 +558,10 @@ function ListDetailPage() {
           ) : filteredItems.length === 0 ? (
             <p className="text-sm text-gray-400 text-center py-10">
               {searchQuery
-                ? `Sin resultados para "${searchQuery}".`
+                ? t("list.noResults", { query: searchQuery })
                 : activeTag || (statusFilter && statusFilter !== "all")
-                  ? "No hay elementos con ese filtro."
-                  : "Añade el primer elemento a tu lista."}
+                  ? t("list.noItemsFilter")
+                  : t("list.addFirst")}
             </p>
           ) : (
             <div className="space-y-1">
@@ -584,7 +580,6 @@ function ListDetailPage() {
           )}
         </div>
 
-        {/* Footer — always visible at bottom */}
         {canWrite && (
           <div className="shrink-0 px-4 pt-3 pb-6 space-y-2">
             {pendingBulk ? (
@@ -620,7 +615,7 @@ function ListDetailPage() {
                     value={newItem}
                     onChange={(e) => setNewItem(e.target.value)}
                     onPaste={handlePaste}
-                    placeholder="Añadir elemento…"
+                    placeholder={t("list.addItemPlaceholder")}
                     data-testid="add-item-input"
                     className="flex-1 pl-3 text-sm text-gray-900 placeholder-gray-400 bg-transparent outline-none"
                   />
@@ -630,7 +625,7 @@ function ListDetailPage() {
                     data-testid="add-item-submit"
                     className="cursor-pointer px-5 py-2.5 text-sm font-medium bg-gray-900 text-white rounded-xl hover:bg-black disabled:opacity-30 disabled:cursor-not-allowed transition active:scale-[0.96]"
                   >
-                    Añadir
+                    {t("list.addItem")}
                   </button>
                 </form>
               </>

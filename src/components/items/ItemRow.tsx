@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import type { Item } from "@/hooks/useItems";
 import { parseTags, tagColor } from "@/lib/tags";
+import { useTranslation } from "@/i18n/service";
 
 interface Props {
   item: Item;
@@ -16,6 +17,7 @@ export function ItemRow({ item, onToggle, onDelete, onEdit, onTagClick, canWrite
   const [text, setText] = useState(item.text);
   const cancelled = useRef(false);
   const { display, tags } = parseTags(item.text);
+  const { t } = useTranslation();
 
   function handleSubmit(e?: React.FormEvent) {
     e?.preventDefault();
@@ -40,7 +42,7 @@ export function ItemRow({ item, onToggle, onDelete, onEdit, onTagClick, canWrite
       <button
         onClick={canWrite ? onToggle : undefined}
         data-testid={`item-checkbox-${item.id}`}
-        aria-label={item.done ? "Marcar como pendiente" : "Marcar como hecho"}
+        aria-label={item.done ? t("items.markPending") : t("items.markDone")}
         className={`shrink-0 w-10 h-10 rounded-full flex items-center justify-center transition-[transform] ${canWrite ? "cursor-pointer active:scale-[0.96]" : "cursor-default"}`}
       >
         <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-[background-color,border-color,box-shadow] ${
@@ -98,8 +100,8 @@ export function ItemRow({ item, onToggle, onDelete, onEdit, onTagClick, canWrite
         <button
           onClick={onDelete}
           data-testid={`item-delete-${item.id}`}
-          aria-label={`Eliminar "${display || item.text}"`}
-          className="cursor-pointer shrink-0 p-3 -m-1 text-gray-300 hover:text-red-400 transition active:scale-[0.96] rounded-lg hover:bg-red-50"
+          aria-label={t("items.delete", { text: display || item.text })}
+          className="cursor-pointer shrink-0 p-3 -m-1 text-gray-300 hover:text-gray-600 transition active:scale-[0.96] rounded-lg hover:bg-gray-100"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
