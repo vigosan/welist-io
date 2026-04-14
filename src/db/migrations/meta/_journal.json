@@ -64,6 +64,20 @@
       "when": 1775998014488,
       "tag": "0008_foamy_penance",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1776193028572,
+      "tag": "0009_gifted_arclight",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1776200000000,
+      "tag": "0010_delete_legacy_participations",
+      "breakpoints": true
     }
   ]
 }
