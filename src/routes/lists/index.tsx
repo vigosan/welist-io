@@ -130,13 +130,15 @@ function CreateListInline({ onClose }: { onClose: () => void }) {
 }
 
 type SortOption = "recent" | "created_desc" | "created_asc";
+type VisibilityFilter = "all" | "public" | "private";
 
 function MyListsPage() {
   const [q, setQ] = useState("");
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<SortOption>("recent");
+  const [visibility, setVisibility] = useState<VisibilityFilter>("all");
   const [creating, setCreating] = useState(false);
-  const { data, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage } = useMyLists(search || undefined, sort);
+  const { data, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage } = useMyLists(search || undefined, sort, visibility);
   const sentinelRef = useRef<HTMLDivElement>(null);
   const { t } = useTranslation();
 
@@ -144,6 +146,12 @@ function MyListsPage() {
     { value: "recent", label: t("myLists.sortRecent") },
     { value: "created_desc", label: t("myLists.sortNewest") },
     { value: "created_asc", label: t("myLists.sortOldest") },
+  ];
+
+  const VISIBILITY_OPTIONS: { value: VisibilityFilter; label: string }[] = [
+    { value: "all", label: t("myLists.filterAll") },
+    { value: "public", label: t("myLists.filterPublic") },
+    { value: "private", label: t("myLists.filterPrivate") },
   ];
 
   useEffect(() => {
@@ -215,6 +223,22 @@ function MyListsPage() {
                   sort === opt.value
                     ? "text-gray-900 border-gray-900"
                     : "text-gray-400 border-transparent hover:text-gray-600"
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+          <div className="flex gap-1.5 mt-2.5" data-testid="visibility-filter">
+            {VISIBILITY_OPTIONS.map((opt) => (
+              <button
+                key={opt.value}
+                data-testid={`visibility-${opt.value}`}
+                onClick={() => setVisibility(opt.value)}
+                className={`cursor-pointer px-3 py-1 text-xs font-medium rounded-lg border transition-colors duration-150 ${
+                  visibility === opt.value
+                    ? "border-gray-900 bg-gray-900 text-white"
+                    : "border-gray-200 text-gray-500 bg-white hover:bg-gray-50 hover:text-gray-700"
                 }`}
               >
                 {opt.label}

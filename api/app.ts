@@ -143,9 +143,15 @@ app.get("/my-lists", async (c) => {
   const cursor = c.req.query("cursor");
   const q = c.req.query("q")?.trim();
   const sort = c.req.query("sort") ?? "recent";
-  const baseWhere = q
-    ? and(eq(lists.ownerId, userId), ilike(lists.name, `%${q}%`))
-    : eq(lists.ownerId, userId);
+  const visibility = c.req.query("visibility");
+  const visibilityFilter = visibility === "public" ? eq(lists.public, true)
+    : visibility === "private" ? eq(lists.public, false)
+    : undefined;
+  const baseWhere = and(
+    eq(lists.ownerId, userId),
+    q ? ilike(lists.name, `%${q}%`) : undefined,
+    visibilityFilter,
+  );
 
   if (sort === "recent") {
     const activityExpr = sql<Date>`coalesce(max(${items.updatedAt}), ${lists.createdAt})`;

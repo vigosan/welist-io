@@ -144,10 +144,10 @@ export function useExploreItems(listId: string, enabled: boolean) {
   });
 }
 
-export function useMyLists(search?: string, sort?: string) {
+export function useMyLists(search?: string, sort?: string, visibility?: string) {
   return useInfiniteQuery({
-    queryKey: queryKeys.myLists(search, sort),
-    queryFn: ({ pageParam }) => listsService.myLists(pageParam, search, sort),
+    queryKey: queryKeys.myLists(search, sort, visibility),
+    queryFn: ({ pageParam }) => listsService.myLists(pageParam, search, sort, visibility),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (last) => last.nextCursor ?? undefined,
     staleTime: POLLING_INTERVAL_MS,
