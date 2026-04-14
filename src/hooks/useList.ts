@@ -127,6 +127,13 @@ export function useCloneList() {
   });
 }
 
+export function useExploreDetail(listId: string) {
+  return useQuery({
+    queryKey: queryKeys.exploreDetail(listId),
+    queryFn: () => listsService.exploreDetail(listId),
+  });
+}
+
 export function useExploreItems(listId: string, enabled: boolean) {
   return useQuery({
     queryKey: queryKeys.exploreItems(listId),

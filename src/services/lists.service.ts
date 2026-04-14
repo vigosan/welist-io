@@ -8,6 +8,19 @@ export type ExploreItem = Pick<List, "id" | "name" | "slug" | "description" | "c
   ownerImage: string | null;
 };
 
+export type ExploreDetail = {
+  id: string;
+  name: string;
+  slug: string | null;
+  description: string | null;
+  createdAt: string;
+  owner: { name: string | null; image: string | null } | null;
+  itemCount: number;
+  participantCount: number;
+  completedCount: number;
+  participants: Array<{ image: string | null; name: string | null }>;
+};
+
 export const listsService = {
   get: (listId: string) =>
     apiClient<List>(`/api/lists/${listId}`),
@@ -29,6 +42,9 @@ export const listsService = {
 
   clone: (listId: string) =>
     apiClient<List>(`/api/lists/${listId}/clone`, { method: "POST" }),
+
+  exploreDetail: (listId: string) =>
+    apiClient<ExploreDetail>(`/api/explore/${listId}`),
 
   exploreItems: (listId: string) =>
     apiClient<Item[]>(`/api/explore/${listId}/items`),
