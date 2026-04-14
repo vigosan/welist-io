@@ -25,7 +25,7 @@ function CreateForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex gap-2 p-1.5 bg-gray-50 border border-gray-200 rounded-2xl focus-within:border-gray-400 transition-[border-color] duration-150 w-full"
+      className="flex gap-2 p-1.5 bg-white border border-gray-200 rounded-2xl focus-within:border-gray-400 transition-[border-color] duration-150 w-full shadow-sm"
     >
       <input
         autoFocus
@@ -47,26 +47,50 @@ function CreateForm() {
   );
 }
 
+function HowItWorks() {
+  const { t } = useTranslation();
+
+  const steps = [
+    { number: "01", title: t("home.step1Title"), desc: t("home.step1Desc") },
+    { number: "02", title: t("home.step2Title"), desc: t("home.step2Desc") },
+    { number: "03", title: t("home.step3Title"), desc: t("home.step3Desc") },
+  ];
+
+  return (
+    <div className="w-full max-w-xl grid grid-cols-1 sm:grid-cols-3 gap-px bg-gray-100 border border-gray-100 rounded-2xl overflow-hidden">
+      {steps.map((step) => (
+        <div key={step.number} className="bg-[#FAFAF8] px-6 py-6 flex flex-col gap-2">
+          <span className="font-mono text-xs text-gray-400 tracking-widest">{step.number}</span>
+          <p className="text-sm font-semibold text-gray-900 leading-snug">{step.title}</p>
+          <p className="text-xs text-gray-500 leading-relaxed">{step.desc}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function HomePage() {
   const { t } = useTranslation();
 
   return (
-    <div className="min-h-dvh bg-white flex flex-col">
+    <div className="min-h-dvh bg-[#FAFAF8] flex flex-col">
       <AppNav />
 
-      <main className="flex-1 flex flex-col items-center justify-center text-center px-6 py-20">
-        <div className="max-w-lg w-full space-y-5">
-          <h1 className="text-5xl sm:text-[3.25rem] font-bold tracking-tight text-gray-900 leading-[1.1] text-balance">
+      <main className="flex-1 flex flex-col items-center justify-center text-center px-6 py-20 gap-16">
+        <div className="max-w-xl w-full flex flex-col items-center gap-6">
+          <h1 className="text-5xl sm:text-[3.5rem] font-bold tracking-tight text-gray-900 leading-[1.1] text-balance">
             {t("home.headline")}<br />
             <span className="text-gray-400">{t("home.headlineSub")}</span>
           </h1>
-          <p className="text-base text-gray-500 leading-relaxed text-pretty">
+          <p className="text-base text-gray-500 leading-relaxed text-pretty max-w-md">
             {t("home.tagline")}
           </p>
-          <div className="pt-2">
+          <div className="w-full pt-2">
             <CreateForm />
           </div>
         </div>
+
+        <HowItWorks />
       </main>
 
       <footer className="border-t border-gray-100 shrink-0 text-center">
