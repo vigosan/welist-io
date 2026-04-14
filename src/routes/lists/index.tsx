@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { useMyLists, useDeleteList } from "@/hooks/useList";
 import { AppNav } from "@/components/AppNav";
 import type { List } from "@/db/schema/lists.schema";
+import { useTranslation } from "@/i18n/service";
 
 export const Route = createFileRoute("/lists/")({
   component: MyListsPage,
@@ -11,17 +12,18 @@ export const Route = createFileRoute("/lists/")({
 function MyListCard({ list }: { list: List }) {
   const [confirming, setConfirming] = useState(false);
   const deleteList = useDeleteList();
+  const { t } = useTranslation();
 
   if (confirming) {
     return (
       <div className="flex items-center gap-2 bg-white rounded-2xl border border-gray-200 px-4 py-3" data-testid="my-list-card">
-        <span className="flex-1 text-sm text-gray-500 truncate">¿Borrar «{list.name}»?</span>
+        <span className="flex-1 text-sm text-gray-500 truncate">{t("myLists.deleteConfirm", { name: list.name })}</span>
         <button
           data-testid="delete-cancel-btn"
           onClick={() => setConfirming(false)}
           className="cursor-pointer px-3 py-1.5 text-xs text-gray-500 border border-gray-200 rounded-lg hover:border-gray-400 hover:text-gray-700 transition-[border-color,color,transform] duration-150 active:scale-[0.96]"
         >
-          No
+          {t("myLists.deleteNo")}
         </button>
         <button
           data-testid="delete-confirm-btn"
@@ -29,7 +31,7 @@ function MyListCard({ list }: { list: List }) {
           disabled={deleteList.isPending}
           className="cursor-pointer px-3 py-1.5 text-xs font-medium text-white bg-gray-900 rounded-lg hover:bg-black disabled:opacity-50 transition-[background-color,transform] duration-150 active:scale-[0.96]"
         >
-          Borrar
+          {t("myLists.deleteYes")}
         </button>
       </div>
     );
@@ -66,10 +68,10 @@ function MyListCard({ list }: { list: List }) {
 
         <div className="flex items-center gap-1.5">
           {list.public && (
-            <span className="text-xs font-medium text-gray-500 px-2 py-1 bg-gray-50 rounded-lg">Pública</span>
+            <span className="text-xs font-medium text-gray-500 px-2 py-1 bg-gray-50 rounded-lg">{t("myLists.public")}</span>
           )}
           {list.collaborative && (
-            <span className="text-xs font-medium text-gray-500 px-2 py-1 bg-gray-50 rounded-lg">Colaborativa</span>
+            <span className="text-xs font-medium text-gray-500 px-2 py-1 bg-gray-50 rounded-lg">{t("myLists.collaborative")}</span>
           )}
           <svg className="text-gray-200 w-4 h-4 shrink-0 ml-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M9 18l6-6-6-6" />
@@ -82,18 +84,19 @@ function MyListCard({ list }: { list: List }) {
 
 type SortOption = "recent" | "created_desc" | "created_asc";
 
-const SORT_OPTIONS: { value: SortOption; label: string }[] = [
-  { value: "recent", label: "Recientes" },
-  { value: "created_desc", label: "Más nuevas" },
-  { value: "created_asc", label: "Más antiguas" },
-];
-
 function MyListsPage() {
   const [q, setQ] = useState("");
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<SortOption>("recent");
   const { data, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage } = useMyLists(search || undefined, sort);
   const sentinelRef = useRef<HTMLDivElement>(null);
+  const { t } = useTranslation();
+
+  const SORT_OPTIONS: { value: SortOption; label: string }[] = [
+    { value: "recent", label: t("myLists.sortRecent") },
+    { value: "created_desc", label: t("myLists.sortNewest") },
+    { value: "created_asc", label: t("myLists.sortOldest") },
+  ];
 
   useEffect(() => {
     const el = sentinelRef.current;
@@ -127,7 +130,7 @@ function MyListsPage() {
             <input
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="Buscar mis listas…"
+              placeholder={t("myLists.searchPlaceholder")}
               data-testid="my-lists-search-input"
               className="flex-1 pl-3 text-sm text-gray-900 placeholder-gray-400 bg-transparent outline-none"
             />
@@ -135,7 +138,7 @@ function MyListsPage() {
               type="submit"
               className="cursor-pointer px-5 py-2.5 text-sm font-medium bg-gray-900 text-white rounded-xl hover:bg-black transition-[background-color] duration-150 active:scale-[0.96]"
             >
-              Buscar
+              {t("myLists.search")}
             </button>
           </form>
           <div className="flex gap-0 mt-3 border-b border-gray-100" data-testid="sort-options">
@@ -165,7 +168,7 @@ function MyListsPage() {
           )}
           {!isLoading && lists.length === 0 && (
             <p className="text-sm text-gray-400 py-10 text-center">
-              {search ? "No hay listas con ese nombre." : "Aún no tienes listas."}
+              {search ? t("myLists.noListsSearch") : t("myLists.noLists")}
             </p>
           )}
           {!isLoading && lists.length > 0 && (
@@ -178,7 +181,7 @@ function MyListsPage() {
 
           <div ref={sentinelRef} className="h-4" />
           {isFetchingNextPage && (
-            <p className="text-sm text-gray-400 text-center py-4">Cargando…</p>
+            <p className="text-sm text-gray-400 text-center py-4">{t("myLists.loading")}</p>
           )}
         </div>
       </div>
