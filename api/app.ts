@@ -381,6 +381,59 @@ app.get("/explore", async (c) => {
   return c.json({ items: rows, nextCursor });
 });
 
+app.get("/explore/:listId", async (c) => {
+  const listId = c.req.param("listId");
+  const list = await db.query.lists.findFirst({
+    where: listWhere(listId),
+    columns: { id: true, name: true, slug: true, description: true, public: true, createdAt: true, ownerId: true },
+  });
+  if (!list || !list.public) return c.json({ error: "Not found" }, 404);
+
+  const [stats] = await db
+    .select({
+      itemCount: count(items.id),
+      participantCount: sql<number>`cast(count(distinct ${participations.id}) as int)`,
+      completedCount: sql<number>`cast(count(distinct case when ${participations.completedAt} is not null then ${participations.id} end) as int)`,
+      ownerName: users.name,
+      ownerImage: users.image,
+    })
+    .from(lists)
+    .leftJoin(items, eq(items.listId, lists.id))
+    .leftJoin(participations, eq(participations.sourceListId, lists.id))
+    .leftJoin(users, eq(users.id, lists.ownerId))
+    .where(eq(lists.id, list.id))
+    .groupBy(lists.id, users.name, users.image);
+
+  const participantRows = await db
+    .select({ image: users.image, name: users.name })
+    .from(participations)
+    .leftJoin(users, eq(users.id, participations.userId))
+    .where(eq(participations.sourceListId, list.id))
+    .limit(6);
+
+  const totalParticipants = await db
+    .select({ count: sql<number>`cast(count(*) as int)` })
+    .from(participations)
+    .where(eq(participations.sourceListId, list.id));
+
+  const owner = stats?.ownerName || stats?.ownerImage
+    ? { name: stats.ownerName, image: stats.ownerImage }
+    : null;
+
+  return c.json({
+    id: list.id,
+    name: list.name,
+    slug: list.slug,
+    description: list.description,
+    createdAt: list.createdAt,
+    owner,
+    itemCount: stats?.itemCount ?? 0,
+    participantCount: totalParticipants[0]?.count ?? 0,
+    completedCount: stats?.completedCount ?? 0,
+    participants: participantRows,
+  });
+});
+
 app.get("/explore/:listId/items", async (c) => {
   const listId = c.req.param("listId");
   const list = await db.query.lists.findFirst({

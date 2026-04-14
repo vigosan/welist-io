@@ -430,6 +430,75 @@ describe("GET /api/explore", () => {
   });
 });
 
+describe("GET /api/explore/:listId", () => {
+  const publicList = { id: "l1", name: "Lista A", slug: null, description: "Desc", public: true, createdAt: new Date("2024-01-01"), ownerId: "u1" };
+
+  const statsChain = (row: unknown) => ({
+    from: vi.fn().mockReturnThis(),
+    leftJoin: vi.fn().mockReturnThis(),
+    where: vi.fn().mockReturnThis(),
+    groupBy: vi.fn().mockResolvedValue([row]),
+  });
+
+  const simpleChain = (rows: unknown[]) => ({
+    from: vi.fn().mockReturnThis(),
+    leftJoin: vi.fn().mockReturnThis(),
+    where: vi.fn().mockReturnThis(),
+    limit: vi.fn().mockResolvedValue(rows),
+  });
+
+  const countChain = (count: number) => ({
+    from: vi.fn().mockReturnThis(),
+    where: vi.fn().mockResolvedValue([{ count }]),
+  });
+
+  beforeEach(() => vi.clearAllMocks());
+
+  it("returns 200 with full detail for a public list", async () => {
+    mockDb.query.lists.findFirst.mockResolvedValue(publicList);
+    mockDb.select
+      .mockReturnValueOnce(statsChain({ itemCount: 3, participantCount: 5, completedCount: 2, ownerName: "Alice", ownerImage: "https://example.com/a.jpg" }))
+      .mockReturnValueOnce(simpleChain([{ image: "https://example.com/b.jpg", name: "Bob" }]))
+      .mockReturnValueOnce(countChain(5));
+
+    const res = await app.request("/api/explore/l1");
+    expect(res.status).toBe(200);
+    const body = await res.json() as Record<string, unknown>;
+    expect(body.id).toBe("l1");
+    expect(body.itemCount).toBe(3);
+    expect(body.participantCount).toBe(5);
+    expect(body.completedCount).toBe(2);
+    expect((body.owner as Record<string, unknown>)?.name).toBe("Alice");
+    expect(Array.isArray(body.participants)).toBe(true);
+  });
+
+  it("returns 404 for a non-public list", async () => {
+    mockDb.query.lists.findFirst.mockResolvedValue({ ...publicList, public: false });
+    const res = await app.request("/api/explore/l1");
+    expect(res.status).toBe(404);
+  });
+
+  it("returns 404 for a nonexistent list", async () => {
+    mockDb.query.lists.findFirst.mockResolvedValue(null);
+    const res = await app.request("/api/explore/nonexistent");
+    expect(res.status).toBe(404);
+  });
+
+  it("includes participant avatars limited to 6", async () => {
+    mockDb.query.lists.findFirst.mockResolvedValue(publicList);
+    const participants = Array.from({ length: 6 }, (_, i) => ({ image: `https://example.com/${i}.jpg`, name: `User ${i}` }));
+    mockDb.select
+      .mockReturnValueOnce(statsChain({ itemCount: 1, participantCount: 10, completedCount: 0, ownerName: null, ownerImage: null }))
+      .mockReturnValueOnce(simpleChain(participants))
+      .mockReturnValueOnce(countChain(10));
+
+    const res = await app.request("/api/explore/l1");
+    expect(res.status).toBe(200);
+    const body = await res.json() as Record<string, unknown>;
+    expect((body.participants as unknown[]).length).toBe(6);
+  });
+});
+
 describe("POST /api/lists/:listId/clone", () => {
   beforeEach(() => vi.clearAllMocks());
 
