@@ -34,7 +34,7 @@ export function BulkPastePreview({ texts, isPending, onChange, onConfirm, onCanc
           type="button"
           onClick={onCancel}
           data-testid="bulk-cancel"
-          className="cursor-pointer text-xs text-gray-400 hover:text-gray-600 transition"
+          className="cursor-pointer text-xs text-gray-400 hover:text-gray-600 transition-colors duration-150"
         >
           {t("bulk.cancel")}
         </button>
@@ -52,7 +52,7 @@ export function BulkPastePreview({ texts, isPending, onChange, onConfirm, onCanc
               onClick={() => remove(i)}
               data-testid={`bulk-remove-${i}`}
               aria-label={t("bulk.removeItem", { text })}
-              className="cursor-pointer shrink-0 text-gray-300 hover:text-gray-500 transition opacity-0 group-hover:opacity-100 focus:opacity-100"
+              className="cursor-pointer shrink-0 text-gray-300 hover:text-gray-500 transition-[color,opacity] duration-150 opacity-0 group-hover:opacity-100 focus:opacity-100"
             >
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -68,7 +68,7 @@ export function BulkPastePreview({ texts, isPending, onChange, onConfirm, onCanc
           onClick={onConfirm}
           disabled={isPending}
           data-testid="bulk-confirm"
-          className="cursor-pointer w-full py-2 text-sm font-medium bg-gray-900 text-white rounded-xl hover:bg-black disabled:opacity-40 disabled:cursor-not-allowed transition active:scale-[0.98]"
+          className="cursor-pointer w-full py-2 text-sm font-medium bg-gray-900 text-white rounded-xl hover:bg-black disabled:opacity-40 disabled:cursor-not-allowed transition-[background-color,transform] duration-150 active:scale-[0.96]"
         >
           {isPending ? t("bulk.adding") : t("bulk.confirm", { count: texts.length })}
         </button>

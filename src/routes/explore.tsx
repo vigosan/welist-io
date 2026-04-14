@@ -58,7 +58,7 @@ function ExploreListCard({ list, onAccept, acceptPending }: {
           <button
             onClick={() => setExpanded((v) => !v)}
             data-testid={`expand-btn-${list.id}`}
-            className="cursor-pointer ml-auto text-xs text-gray-400 hover:text-gray-600 transition"
+            className="cursor-pointer ml-auto text-xs text-gray-400 hover:text-gray-600 transition-colors duration-150"
           >
             {expanded ? t("explore.hideList") : t("explore.showList")}
           </button>
@@ -99,7 +99,7 @@ function ExploreListCard({ list, onAccept, acceptPending }: {
             }}
             disabled={acceptPending}
             data-testid={`accept-btn-${list.id}`}
-            className="cursor-pointer w-full py-2 text-xs font-medium bg-gray-900 text-white rounded-xl hover:bg-black disabled:opacity-40 disabled:cursor-not-allowed transition active:scale-[0.97]"
+            className="cursor-pointer w-full py-2 text-xs font-medium bg-gray-900 text-white rounded-xl hover:bg-black disabled:opacity-40 disabled:cursor-not-allowed transition-[background-color,transform] duration-150 active:scale-[0.96]"
           >
             {session?.user ? t("explore.acceptChallenge") : t("explore.signIn")}
           </button>

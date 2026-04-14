@@ -19,7 +19,7 @@ function MyListCard({ list }: { list: List }) {
         <button
           data-testid="delete-cancel-btn"
           onClick={() => setConfirming(false)}
-          className="cursor-pointer px-3 py-1.5 text-xs text-gray-500 border border-gray-200 rounded-lg hover:border-gray-400 hover:text-gray-700 transition active:scale-[0.96]"
+          className="cursor-pointer px-3 py-1.5 text-xs text-gray-500 border border-gray-200 rounded-lg hover:border-gray-400 hover:text-gray-700 transition-[border-color,color,transform] duration-150 active:scale-[0.96]"
         >
           No
         </button>
@@ -27,7 +27,7 @@ function MyListCard({ list }: { list: List }) {
           data-testid="delete-confirm-btn"
           onClick={() => deleteList.mutate(list.id)}
           disabled={deleteList.isPending}
-          className="cursor-pointer px-3 py-1.5 text-xs font-medium text-white bg-gray-900 rounded-lg hover:bg-black disabled:opacity-50 transition active:scale-[0.96]"
+          className="cursor-pointer px-3 py-1.5 text-xs font-medium text-white bg-gray-900 rounded-lg hover:bg-black disabled:opacity-50 transition-[background-color,transform] duration-150 active:scale-[0.96]"
         >
           Borrar
         </button>
@@ -39,7 +39,7 @@ function MyListCard({ list }: { list: List }) {
     <Link
       to="/lists/$listId"
       params={{ listId: list.slug ?? list.id }}
-      className="group bg-white rounded-2xl border border-gray-100 overflow-hidden hover:border-gray-300 transition active:scale-[0.99]"
+      className="group bg-white rounded-2xl border border-gray-100 overflow-hidden hover:border-gray-300 transition-[border-color,transform] duration-150 active:scale-[0.99]"
       data-testid="my-list-card"
     >
       <div className="p-4 flex flex-col gap-3">
@@ -53,7 +53,7 @@ function MyListCard({ list }: { list: List }) {
           <button
             data-testid="delete-list-btn"
             onClick={(e) => { e.preventDefault(); e.stopPropagation(); setConfirming(true); }}
-            className="cursor-pointer h-7 w-7 flex items-center justify-center rounded-lg text-gray-300 hover:text-gray-500 transition active:scale-[0.96] opacity-100 sm:opacity-0 sm:group-hover:opacity-100 shrink-0"
+            className="cursor-pointer h-7 w-7 flex items-center justify-center rounded-lg text-gray-300 hover:text-gray-500 transition-colors active:scale-[0.96] opacity-100 sm:opacity-0 sm:group-hover:opacity-100 shrink-0"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="3 6 5 6 21 6" />
@@ -144,7 +144,7 @@ function MyListsPage() {
                 key={opt.value}
                 data-testid={`sort-${opt.value}`}
                 onClick={() => setSort(opt.value)}
-                className={`cursor-pointer px-3 py-1.5 text-xs font-medium transition -mb-px border-b-2 ${
+                className={`cursor-pointer px-3 py-1.5 text-xs font-medium transition-colors duration-150 -mb-px border-b-2 ${
                   sort === opt.value
                     ? "text-gray-900 border-gray-900"
                     : "text-gray-400 border-transparent hover:text-gray-600"

@@ -96,7 +96,7 @@ export function CommandPalette({ open, onClose, actions }: Props) {
                 aria-selected={i === selectedIndex}
                 data-testid={`command-action-${action.id}`}
                 onClick={() => { action.onSelect(); onClose(); }}
-                className={`cursor-pointer w-full text-left px-4 py-2.5 text-sm transition ${
+                className={`cursor-pointer w-full text-left px-4 py-2.5 text-sm transition-[background-color,color] duration-100 ${
                   i === selectedIndex
                     ? "bg-gray-900 text-white"
                     : "text-gray-700 hover:bg-gray-50"

@@ -20,7 +20,7 @@ export function UserMenu() {
         <button
           onClick={() => signOut()}
           data-testid="sign-out-btn"
-          className="cursor-pointer text-xs text-gray-400 hover:text-gray-700 transition"
+          className="cursor-pointer text-xs text-gray-400 hover:text-gray-700 transition-colors duration-150"
         >
           Salir
         </button>
