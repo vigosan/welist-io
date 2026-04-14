@@ -4,9 +4,9 @@ const es = {
     myLists: "Mis listas",
   },
   home: {
-    headline: "La lista que creas",
-    headlineSub: "se convierte en el reto de otro.",
-    tagline: "Comparte cualquier lista públicamente. Otros la completan como un reto. Sigue el progreso, compite y descubre qué están haciendo otros.",
+    headline: "Crea. Comparte. Reta.",
+    headlineSub: "",
+    tagline: "Comparte lo que haces. Que otros lo intenten.",
     listNamePlaceholder: "Ponle un nombre a tu lista…",
     createList: "Crear lista",
     footer: "© {{year}} Welist",

@@ -6,9 +6,9 @@ const en: Translations = {
     myLists: "My lists",
   },
   home: {
-    headline: "The list you create",
-    headlineSub: "becomes someone else's challenge.",
-    tagline: "Share any list publicly. Others complete it as a challenge. Track progress, compete, discover what others are making.",
+    headline: "Create. Share. Challenge.",
+    headlineSub: "",
+    tagline: "Share what you do. Let others try.",
     listNamePlaceholder: "Name your list…",
     createList: "Create list",
     footer: "© {{year}} Welist",
