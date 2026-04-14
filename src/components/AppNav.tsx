@@ -9,16 +9,16 @@ export function AppNav() {
   const { language } = useLanguage();
 
   return (
-    <nav className="border-b border-gray-100 shrink-0">
-      <div className="flex items-center justify-between px-6 h-14 max-w-4xl mx-auto w-full">
-        <Link to="/" data-testid="nav-logo" className="cursor-pointer font-mono text-base font-bold text-gray-900 tracking-tight hover:text-gray-500 transition-colors duration-150">
+    <nav className="border-b border-gray-100 bg-white shrink-0">
+      <div className="flex items-center justify-between px-6 h-13 max-w-4xl mx-auto w-full">
+        <Link to="/" data-testid="nav-logo" className="cursor-pointer font-mono text-sm font-bold text-gray-900 tracking-tight hover:text-gray-400 transition-colors duration-150">
           welist
         </Link>
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-0.5">
           <Link
             to="/explore"
             data-testid="nav-explore"
-            className="cursor-pointer px-3 py-2 text-sm text-gray-400 hover:text-gray-900 rounded-lg transition-colors duration-150"
+            className="cursor-pointer px-3 py-1.5 text-sm font-medium text-gray-500 hover:text-gray-900 rounded-lg transition-colors duration-150"
           >
             {t("nav.explore")}
           </Link>
@@ -26,11 +26,12 @@ export function AppNav() {
             <Link
               to="/lists"
               data-testid="nav-my-lists"
-              className="cursor-pointer px-3 py-2 text-sm text-gray-400 hover:text-gray-900 rounded-lg transition-colors duration-150"
+              className="cursor-pointer px-3 py-1.5 text-sm font-medium text-gray-500 hover:text-gray-900 rounded-lg transition-colors duration-150"
             >
               {t("nav.myLists")}
             </Link>
           )}
+          <div className="w-px h-4 bg-gray-200 mx-2" />
           <button
             onClick={() => setLanguage(language === "es" ? "en" : "es")}
             data-testid="lang-switcher"
@@ -38,7 +39,7 @@ export function AppNav() {
           >
             {language === "es" ? "EN" : "ES"}
           </button>
-          <div className="ml-1">
+          <div className="ml-1.5">
             <UserMenu />
           </div>
         </div>
