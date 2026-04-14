@@ -14,6 +14,7 @@ export function useItems(listId: string) {
   return useQuery({
     queryKey: queryKeys.items(listId),
     queryFn: () => itemsService.list(listId),
+    staleTime: POLLING_INTERVAL_MS,
     refetchInterval: POLLING_INTERVAL_MS,
     refetchIntervalInBackground: false,
   });
