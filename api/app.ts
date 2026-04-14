@@ -79,6 +79,10 @@ function isUniqueViolation(e: unknown): boolean {
   return code === "23505";
 }
 
+function canViewList(list: { ownerId: string | null; public: boolean }, userId: string | null): boolean {
+  return list.public || (userId !== null && list.ownerId === userId);
+}
+
 function canModifyList(list: { ownerId: string | null; collaborative: boolean }, userId: string | null): boolean {
   return list.ownerId === null || list.ownerId === userId || list.collaborative;
 }
@@ -203,6 +207,7 @@ app.get("/lists/:listId", async (c) => {
   if (!list) return c.json({ error: "Not found" }, 404);
   const authUser = getOptionalUser(c);
   const userId = authUser?.session?.user?.id ?? null;
+  if (!canViewList(list, userId)) return c.json({ error: "Not found" }, 404);
   const participation = userId
     ? await getParticipation(list.id, userId)
     : null;
@@ -252,6 +257,7 @@ app.get("/lists/:listId/items", async (c) => {
   if (!list) return c.json({ error: "Not found" }, 404);
   const authUser = getOptionalUser(c);
   const userId = authUser?.session?.user?.id ?? null;
+  if (!canViewList(list, userId)) return c.json({ error: "Not found" }, 404);
   const isOwner = list.ownerId === null || list.ownerId === userId;
   const participation = userId && list.public && !isOwner
     ? await getParticipation(list.id, userId)

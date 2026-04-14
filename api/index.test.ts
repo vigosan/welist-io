@@ -53,7 +53,7 @@ describe("GET /api/lists/:listId", () => {
   beforeEach(() => vi.clearAllMocks());
 
   it("returns the list when found", async () => {
-    const list = { id: "abc-123", name: "Mi lista", createdAt: new Date().toISOString() };
+    const list = { id: "abc-123", name: "Mi lista", public: true, ownerId: null, createdAt: new Date().toISOString() };
     mockDb.query.lists.findFirst.mockResolvedValue(list);
 
     const res = await app.request("/api/lists/abc-123");
@@ -67,6 +67,18 @@ describe("GET /api/lists/:listId", () => {
     const res = await app.request("/api/lists/nonexistent");
     expect(res.status).toBe(404);
   });
+
+  it("returns 404 for private list when unauthenticated", async () => {
+    mockDb.query.lists.findFirst.mockResolvedValue({ id: "abc", ownerId: "u1", public: false, collaborative: false });
+    const res = await app.request("/api/lists/abc");
+    expect(res.status).toBe(404);
+  });
+
+  it("returns 404 for private anonymous list when unauthenticated", async () => {
+    mockDb.query.lists.findFirst.mockResolvedValue({ id: "abc", ownerId: null, public: false, collaborative: false });
+    const res = await app.request("/api/lists/abc");
+    expect(res.status).toBe(404);
+  });
 });
 
 describe("GET /api/lists/:listId/items", () => {
@@ -77,7 +89,7 @@ describe("GET /api/lists/:listId/items", () => {
       { id: "i1", listId: "abc", text: "Primero", done: false, position: 0 },
       { id: "i2", listId: "abc", text: "Segundo", done: true, position: 1 },
     ];
-    mockDb.query.lists.findFirst.mockResolvedValue({ id: "abc", ownerId: null, collaborative: false });
+    mockDb.query.lists.findFirst.mockResolvedValue({ id: "abc", ownerId: null, collaborative: false, public: true });
     mockDb.query.items.findMany.mockResolvedValue(rows);
 
     const res = await app.request("/api/lists/abc/items");
@@ -85,6 +97,12 @@ describe("GET /api/lists/:listId/items", () => {
     const body = await res.json() as Array<Record<string, unknown>>;
     expect(body).toHaveLength(2);
     expect(body[0].text).toBe("Primero");
+  });
+
+  it("returns 404 for private list when unauthenticated", async () => {
+    mockDb.query.lists.findFirst.mockResolvedValue({ id: "abc", ownerId: "u1", public: false, collaborative: false });
+    const res = await app.request("/api/lists/abc/items");
+    expect(res.status).toBe(404);
   });
 });
 
@@ -742,7 +760,7 @@ describe("GET /api/lists/:listId/items (participant item_progress)", () => {
     const rows = [
       { id: "i1", listId: "abc", text: "Tarea", done: true, position: 0 },
     ];
-    mockDb.query.lists.findFirst.mockResolvedValue({ id: "abc", ownerId: null, collaborative: false, public: false });
+    mockDb.query.lists.findFirst.mockResolvedValue({ id: "abc", ownerId: null, collaborative: false, public: true });
     mockDb.query.items.findMany.mockResolvedValue(rows);
 
     const res = await app.request("/api/lists/abc/items");
