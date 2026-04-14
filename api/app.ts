@@ -1,7 +1,7 @@
 import { Hono, type Context } from "hono";
 import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
-import { eq, max, sql, and, or, ilike, gt, lt, inArray, desc } from "drizzle-orm";
+import { eq, max, sql, and, or, ilike, gt, lt, inArray, desc, countDistinct } from "drizzle-orm";
 import { db } from "../src/db/client.js";
 import { lists, items, participations, users } from "../src/db/schema/index.js";
 import { rateLimit } from "./rate-limit.js";
@@ -408,10 +408,11 @@ app.get("/explore/:listId", async (c) => {
     .from(participations)
     .leftJoin(users, eq(users.id, participations.userId))
     .where(eq(participations.sourceListId, list.id))
+    .groupBy(participations.userId, users.image, users.name)
     .limit(6);
 
   const totalParticipants = await db
-    .select({ count: sql<number>`cast(count(*) as int)` })
+    .select({ count: countDistinct(participations.userId) })
     .from(participations)
     .where(eq(participations.sourceListId, list.id));
 
