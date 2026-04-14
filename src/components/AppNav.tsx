@@ -11,8 +11,8 @@ export function AppNav() {
   return (
     <nav className="border-b border-gray-100 shrink-0">
       <div className="flex items-center justify-between px-6 h-14 max-w-4xl mx-auto w-full">
-        <Link to="/" data-testid="nav-logo" className="cursor-pointer text-sm font-bold text-gray-900 tracking-tight hover:text-gray-600 transition-colors duration-150">
-          Welist
+        <Link to="/" data-testid="nav-logo" className="cursor-pointer font-mono text-base font-bold text-gray-900 tracking-tight hover:text-gray-500 transition-colors duration-150">
+          welist
         </Link>
         <div className="flex items-center gap-1">
           <Link
