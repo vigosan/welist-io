@@ -154,8 +154,18 @@ app.get("/my-lists", async (c) => {
   const visibilityFilter = visibility === "public" ? eq(lists.public, true)
     : visibility === "private" ? eq(lists.public, false)
     : undefined;
+  const participated = await db
+    .select({ sourceListId: participations.sourceListId })
+    .from(participations)
+    .where(eq(participations.userId, userId));
+  const participatedIds = participated
+    .map(p => p.sourceListId)
+    .filter((id): id is string => id !== null);
+  const ownerOrParticipant = participatedIds.length > 0
+    ? or(eq(lists.ownerId, userId), inArray(lists.id, participatedIds))
+    : eq(lists.ownerId, userId);
   const baseWhere = and(
-    eq(lists.ownerId, userId),
+    ownerOrParticipant,
     q ? ilike(lists.name, `%${q}%`) : undefined,
     visibilityFilter,
   );
@@ -211,6 +221,9 @@ app.get("/lists/:listId", async (c) => {
   const authUser = getOptionalUser(c);
   const userId = authUser?.session?.user?.id ?? null;
   if (!await canViewList(list, userId)) return c.json({ error: "Not found" }, 404);
+  if (userId && list.collaborative && list.ownerId !== userId) {
+    await db.insert(participations).values({ sourceListId: list.id, userId }).onConflictDoNothing();
+  }
   const participation = userId
     ? await getParticipation(list.id, userId)
     : null;
@@ -628,7 +641,13 @@ app.delete("/lists/:listId", async (c) => {
   if (!list) return c.json({ error: "Not found" }, 404);
   const authUser = getOptionalUser(c);
   const userId = authUser?.session?.user?.id ?? null;
-  if (!userId || list.ownerId !== userId) return c.json({ error: "Forbidden" }, 403);
+  if (!userId) return c.json({ error: "Forbidden" }, 403);
+  if (list.ownerId !== userId) {
+    const participation = await getParticipation(list.id, userId);
+    if (!participation) return c.json({ error: "Forbidden" }, 403);
+    await db.delete(participations).where(and(eq(participations.sourceListId, list.id), eq(participations.userId, userId)));
+    return c.body(null, 204);
+  }
   await db.delete(lists).where(eq(lists.id, list.id));
   return c.body(null, 204);
 });
