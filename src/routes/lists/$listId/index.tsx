@@ -463,35 +463,39 @@ function ListDetailPage() {
           )}
 
           {!itemsLoading && items.length > 0 && (
-            <div className="flex gap-1.5 mt-3 overflow-x-auto scrollbar-none -mx-5 px-5 pb-0.5">
-              {(["pending", "done"] as const).map((s) => (
-                <button
-                  key={s}
-                  data-testid={`status-filter-${s}`}
-                  onClick={() => setStatusFilter(statusFilter === s ? "all" : s)}
-                  className={`cursor-pointer shrink-0 inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium transition ${
-                    statusFilter === s
-                      ? "border-gray-900 bg-gray-900 text-white"
-                      : "border-gray-200 text-gray-500 bg-white hover:bg-gray-50 hover:text-gray-700"
-                  }`}
-                >
-                  {s === "pending" ? t("list.filterPending") : t("list.filterDone")}
-                </button>
-              ))}
-              {allTags.map((tag) => (
-                <button
-                  key={tag}
-                  data-testid={`tag-filter-${tag}`}
-                  onClick={() => setActiveTag(activeTag === tag ? null : tag)}
-                  className={`cursor-pointer shrink-0 inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium transition ${
-                    activeTag === tag
-                      ? "border-gray-900 bg-gray-900 text-white"
-                      : tagColor(tag)
-                  }`}
-                >
-                  #{tag}
-                </button>
-              ))}
+            <div className="relative mt-3 -mx-5">
+              <div className="flex gap-1.5 overflow-x-auto scrollbar-none px-5 pb-0.5">
+                {(["pending", "done"] as const).map((s) => (
+                  <button
+                    key={s}
+                    data-testid={`status-filter-${s}`}
+                    onClick={() => setStatusFilter(statusFilter === s ? "all" : s)}
+                    className={`cursor-pointer shrink-0 inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium transition ${
+                      statusFilter === s
+                        ? "border-gray-900 bg-gray-900 text-white"
+                        : "border-gray-200 text-gray-500 bg-white hover:bg-gray-50 hover:text-gray-700"
+                    }`}
+                  >
+                    {s === "pending" ? t("list.filterPending") : t("list.filterDone")}
+                  </button>
+                ))}
+                {allTags.length > 0 && <div className="w-px shrink-0 self-stretch bg-gray-200 mx-0.5" />}
+                {allTags.map((tag) => (
+                  <button
+                    key={tag}
+                    data-testid={`tag-filter-${tag}`}
+                    onClick={() => setActiveTag(activeTag === tag ? null : tag)}
+                    className={`cursor-pointer shrink-0 inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium transition ${
+                      activeTag === tag
+                        ? "border-gray-900 bg-gray-900 text-white"
+                        : tagColor(tag)
+                    }`}
+                  >
+                    #{tag}
+                  </button>
+                ))}
+              </div>
+              <div className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-white to-transparent" />
             </div>
           )}
         </div>
