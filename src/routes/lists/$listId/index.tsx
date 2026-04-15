@@ -573,10 +573,10 @@ function ListDetailPage() {
                   onEdit={(text) => updateItem.mutate({ id: item.id, text })}
                   onTagClick={(tag) => setActiveTag(activeTag === tag ? null : tag)}
                   canWrite={canWrite}
-                  onDragStart={isOwner ? handleDragStart(item.id) : undefined}
-                  onDragOver={isOwner ? handleDragOver(item.id) : undefined}
-                  onDrop={isOwner ? handleDrop(item.id) : undefined}
-                  onDragEnd={isOwner ? handleDragEnd : undefined}
+                  onDragStart={isOwner && !item.done ? handleDragStart(item.id) : undefined}
+                  onDragOver={isOwner && !item.done ? handleDragOver(item.id) : undefined}
+                  onDrop={isOwner && !item.done ? handleDrop(item.id) : undefined}
+                  onDragEnd={isOwner && !item.done ? handleDragEnd : undefined}
                   isDragOver={dragOverId === item.id}
                 />
               ))}
