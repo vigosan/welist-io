@@ -213,13 +213,13 @@ function MyListsPage() {
               </button>
             </div>
           )}
-          <div className="flex items-center gap-1.5 mt-3" data-testid="sort-options">
+          <div className="flex items-center gap-1.5 mt-3 overflow-x-auto no-scrollbar" data-testid="sort-options">
             {SORT_OPTIONS.map((opt) => (
               <button
                 key={opt.value}
                 data-testid={`sort-${opt.value}`}
                 onClick={() => setSort(opt.value)}
-                className={`cursor-pointer px-3 py-1 text-xs font-medium rounded-lg border transition-colors duration-150 ${
+                className={`cursor-pointer px-3 py-1 text-xs font-medium rounded-lg border transition-colors duration-150 whitespace-nowrap shrink-0 ${
                   sort === opt.value
                     ? "border-gray-900 bg-gray-900 text-white"
                     : "border-gray-200 text-gray-500 bg-white hover:bg-gray-50 hover:text-gray-700"
@@ -228,14 +228,14 @@ function MyListsPage() {
                 {opt.label}
               </button>
             ))}
-            <div className="w-px h-4 bg-gray-200 mx-0.5" />
-            <div className="flex gap-1.5" data-testid="visibility-filter">
+            <div className="w-px h-4 bg-gray-200 mx-0.5 shrink-0" />
+            <div className="flex gap-1.5 shrink-0" data-testid="visibility-filter">
               {VISIBILITY_OPTIONS.map((opt) => (
                 <button
                   key={opt.value}
                   data-testid={`visibility-${opt.value}`}
                   onClick={() => setVisibility(opt.value)}
-                  className={`cursor-pointer px-3 py-1 text-xs font-medium rounded-lg border transition-colors duration-150 ${
+                  className={`cursor-pointer px-3 py-1 text-xs font-medium rounded-lg border transition-colors duration-150 whitespace-nowrap shrink-0 ${
                     visibility === opt.value
                       ? "border-gray-900 bg-gray-900 text-white"
                       : "border-gray-200 text-gray-500 bg-white hover:bg-gray-50 hover:text-gray-700"
