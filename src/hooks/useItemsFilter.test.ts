@@ -89,4 +89,13 @@ describe("useItemsFilter", () => {
     act(() => { result.current.resetOrder(); });
     expect(result.current.stableItems).toBeDefined();
   });
+
+  it("setOrder reorders items immediately without waiting for server", () => {
+    const items = [PENDING, DONE, PLAIN];
+    const { result } = renderHook(() =>
+      useItemsFilter({ items, ...BASE_OPTS }),
+    );
+    act(() => { result.current.setOrder(["c", "a", "b"]); });
+    expect(result.current.stableItems.map((i) => i.id)).toEqual(["c", "a", "b"]);
+  });
 });

@@ -94,7 +94,7 @@ function ListDetailPage() {
 
   const { data: items = [], isLoading: itemsLoading, refetch: refetchItems } = useItems(listId);
 
-  const { allTags, tagSuggestions, filteredItems, resetOrder } = useItemsFilter({
+  const { allTags, tagSuggestions, filteredItems, resetOrder, setOrder } = useItemsFilter({
     items,
     itemsLoading,
     statusFilter,
@@ -160,6 +160,7 @@ function ListDetailPage() {
       if (fromIdx === -1 || toIdx === -1) return;
       ids.splice(fromIdx, 1);
       ids.splice(toIdx, 0, fromId);
+      setOrder(ids);
       reorderItems.mutate(ids);
       setDragOverId(null);
     };

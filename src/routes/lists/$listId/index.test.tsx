@@ -114,6 +114,7 @@ function setupMocks({
     tagSuggestions: [],
     filteredItems,
     resetOrder: vi.fn(),
+    setOrder: vi.fn(),
   });
 
   vi.mocked(usePullToRefresh).mockReturnValue({

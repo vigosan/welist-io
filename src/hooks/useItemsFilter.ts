@@ -1,4 +1,4 @@
-import { useMemo, useRef } from "react";
+import { useMemo, useRef, useState } from "react";
 import { parseTags, getPartialTag } from "@/lib/tags";
 import type { Item } from "@/db/schema";
 
@@ -12,21 +12,24 @@ interface Options {
 }
 
 export function useItemsFilter({ items, itemsLoading, statusFilter, activeTag, searchQuery, newItemText }: Options) {
-  const sortedIdsRef = useRef<string[] | null>(null);
+  const [sortedIds, setSortedIds] = useState<string[] | null>(null);
+  const initializedRef = useRef(false);
 
   const stableItems = useMemo(() => {
     if (itemsLoading) return items;
-    if (sortedIdsRef.current === null && items.length > 0) {
-      sortedIdsRef.current = [...items].sort((a, b) => Number(a.done) - Number(b.done)).map((i) => i.id);
+    let ids = sortedIds;
+    if (ids === null && items.length > 0 && !initializedRef.current) {
+      ids = [...items].sort((a, b) => Number(a.done) - Number(b.done)).map((i) => i.id);
+      initializedRef.current = true;
+      setSortedIds(ids);
     }
-    const sortedIds = sortedIdsRef.current;
-    if (!sortedIds) return items;
+    if (!ids) return items;
     const byId = new Map(items.map((i) => [i.id, i]));
-    const sortedSet = new Set(sortedIds);
-    const inOrder = sortedIds.flatMap((id) => (byId.has(id) ? [byId.get(id)!] : []));
+    const sortedSet = new Set(ids);
+    const inOrder = ids.flatMap((id) => (byId.has(id) ? [byId.get(id)!] : []));
     const newItems = items.filter((i) => !sortedSet.has(i.id));
     return [...inOrder, ...newItems];
-  }, [items, itemsLoading]);
+  }, [items, itemsLoading, sortedIds]);
 
   const allTags = useMemo(() => {
     const seen = new Set<string>();
@@ -53,8 +56,13 @@ export function useItemsFilter({ items, itemsLoading, statusFilter, activeTag, s
   );
 
   function resetOrder() {
-    sortedIdsRef.current = null;
+    initializedRef.current = false;
+    setSortedIds(null);
   }
 
-  return { stableItems, allTags, partialTag, tagSuggestions, filteredItems, resetOrder };
+  function setOrder(ids: string[]) {
+    setSortedIds(ids);
+  }
+
+  return { stableItems, allTags, partialTag, tagSuggestions, filteredItems, resetOrder, setOrder };
 }
