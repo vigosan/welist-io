@@ -95,7 +95,7 @@ function setupMocks({
   vi.mocked(useBulkAddItems).mockReturnValue({ mutate: bulkMutate, isPending: bulkIsPending } as never);
 
   vi.mocked(useListHeader).mockReturnValue({
-    list, listLoading: false, refetchList: vi.fn(),
+    list, listLoading: false, listError: false, refetchList: vi.fn(),
     editingName: false, setEditingName: vi.fn(), nameValue: list.name, setNameValue: vi.fn(),
     updateName: { mutate: vi.fn(), isPending: false } as never,
     editingSlug: false, setEditingSlug: vi.fn(), slugValue: "", setSlugValue: vi.fn(),

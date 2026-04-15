@@ -9,7 +9,7 @@ interface Options {
 }
 
 export function useListHeader({ listId, onSlugUpdated }: Options) {
-  const { data: list, isLoading: listLoading, refetch: refetchList } = useList(listId);
+  const { data: list, isLoading: listLoading, isError: listError, refetch: refetchList } = useList(listId);
   const { t } = useTranslation();
   const [editingName, setEditingName] = useState(false);
   const [nameValue, setNameValue] = useState("");
@@ -58,7 +58,7 @@ export function useListHeader({ listId, onSlugUpdated }: Options) {
   }
 
   return {
-    list, listLoading, refetchList,
+    list, listLoading, listError, refetchList,
     editingName, setEditingName, nameValue, setNameValue, updateName,
     editingSlug, setEditingSlug, slugValue, setSlugValue, slugError,
     startEditingSlug, handleSlugSubmit, updateSlug,

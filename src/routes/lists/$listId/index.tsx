@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link, notFound } from "@tanstack/react-router";
 import { useSession } from "@hono/auth-js/react";
 import { z } from "zod";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -60,7 +60,7 @@ function ListDetailPage() {
   const { data: session } = useSession();
 
   const {
-    list, listLoading, refetchList,
+    list, listLoading, listError, refetchList,
     editingName, setEditingName, nameValue, setNameValue, updateName,
     editingSlug, setEditingSlug, slugValue, setSlugValue, slugError,
     startEditingSlug, handleSlugSubmit, updateSlug,
@@ -76,6 +76,8 @@ function ListDetailPage() {
     if (list?.name) document.title = `${list.name} — Welist`;
     return () => { document.title = "Welist"; };
   }, [list?.name]);
+
+  if (listError) throw notFound();
 
   const isOwner = !list ? false : (list.ownerId === null || list.ownerId === session?.user?.id);
   const isParticipant = !!list?.participated && !isOwner && !!list?.public;
