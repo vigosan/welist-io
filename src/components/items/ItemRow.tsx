@@ -10,9 +10,14 @@ interface Props {
   onEdit: (text: string) => void;
   onTagClick?: (tag: string) => void;
   canWrite?: boolean;
+  onDragStart?: (e: React.DragEvent) => void;
+  onDragOver?: (e: React.DragEvent) => void;
+  onDrop?: (e: React.DragEvent) => void;
+  onDragEnd?: () => void;
+  isDragOver?: boolean;
 }
 
-export function ItemRow({ item, onToggle, onDelete, onEdit, onTagClick, canWrite = true }: Props) {
+export function ItemRow({ item, onToggle, onDelete, onEdit, onTagClick, canWrite = true, onDragStart, onDragOver, onDrop, onDragEnd, isDragOver }: Props) {
   const [editing, setEditing] = useState(false);
   const [text, setText] = useState(item.text);
   const cancelled = useRef(false);
@@ -35,10 +40,22 @@ export function ItemRow({ item, onToggle, onDelete, onEdit, onTagClick, canWrite
   return (
     <div
       data-testid={`item-row-${item.id}`}
+      draggable={canWrite && !!onDragStart}
+      onDragStart={onDragStart}
+      onDragOver={onDragOver}
+      onDrop={onDrop}
+      onDragEnd={onDragEnd}
       className={`flex items-center gap-3 px-3 py-3 rounded-lg transition-colors ${
-        item.done ? "bg-gray-100" : "bg-gray-50 hover:bg-gray-100"
+        isDragOver ? "bg-gray-200" : item.done ? "bg-gray-100" : "bg-gray-50 hover:bg-gray-100"
       }`}
     >
+      {canWrite && onDragStart && (
+        <span className="shrink-0 text-gray-300 cursor-grab active:cursor-grabbing touch-none select-none">
+          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8h16M4 16h16" />
+          </svg>
+        </span>
+      )}
       <button
         onClick={canWrite ? onToggle : undefined}
         data-testid={`item-checkbox-${item.id}`}

@@ -22,4 +22,7 @@ export const itemsService = {
 
   bulkDelete: (listId: string, ids: string[]) =>
     apiClient<void>(`/api/lists/${listId}/items`, { method: "DELETE", body: JSON.stringify({ ids }) }),
+
+  reorder: (listId: string, ids: string[]) =>
+    apiClient<void>(`/api/lists/${listId}/items/reorder`, { method: "PATCH", body: JSON.stringify({ ids }) }),
 };

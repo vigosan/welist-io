@@ -92,6 +92,27 @@ export function useBulkDeleteItems(listId: string) {
   });
 }
 
+export function useReorderItems(listId: string) {
+  const qc = useQueryClient();
+  return useMutation<void, Error, string[], { previous: Item[] | undefined }>({
+    mutationFn: (ids) => itemsService.reorder(listId, ids),
+    onMutate: async (ids) => {
+      await qc.cancelQueries({ queryKey: queryKeys.items(listId) });
+      const previous = qc.getQueryData<Item[]>(queryKeys.items(listId));
+      qc.setQueryData<Item[]>(queryKeys.items(listId), (old) => {
+        if (!old) return old;
+        const map = new Map(old.map((i) => [i.id, i]));
+        return ids.map((id, pos) => ({ ...map.get(id)!, position: pos }));
+      });
+      return { previous };
+    },
+    onError: (_err, _ids, ctx) => {
+      qc.setQueryData(queryKeys.items(listId), ctx?.previous);
+    },
+    onSettled: () => qc.invalidateQueries({ queryKey: queryKeys.items(listId) }),
+  });
+}
+
 export function useDeleteItem(listId: string) {
   const qc = useQueryClient();
   return useMutation<void, Error, string, MutationContext>({

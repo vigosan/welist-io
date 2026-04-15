@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate, Link, notFound } from "@tanstack/react-ro
 import { useSession } from "@hono/auth-js/react";
 import { z } from "zod";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useItems, useAddItem, useToggleItem, useDeleteItem, useUpdateItem, useBulkAddItems } from "@/hooks/useItems";
+import { useItems, useAddItem, useToggleItem, useDeleteItem, useUpdateItem, useBulkAddItems, useReorderItems } from "@/hooks/useItems";
 import { useToggleCollaborative } from "@/hooks/useList";
 import { useListHeader } from "@/hooks/useListHeader";
 import { useItemsFilter } from "@/hooks/useItemsFilter";
@@ -120,6 +120,46 @@ function ListDetailPage() {
   const toggleItem = useToggleItem(listId);
   const deleteItem = useDeleteItem(listId);
   const updateItem = useUpdateItem(listId);
+  const reorderItems = useReorderItems(listId);
+
+  const dragItemId = useRef<string | null>(null);
+  const [dragOverId, setDragOverId] = useState<string | null>(null);
+
+  function handleDragStart(id: string) {
+    return (e: React.DragEvent) => {
+      dragItemId.current = id;
+      e.dataTransfer.effectAllowed = "move";
+    };
+  }
+
+  function handleDragOver(id: string) {
+    return (e: React.DragEvent) => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = "move";
+      if (dragOverId !== id) setDragOverId(id);
+    };
+  }
+
+  function handleDrop(id: string) {
+    return (e: React.DragEvent) => {
+      e.preventDefault();
+      const fromId = dragItemId.current;
+      if (!fromId || fromId === id) return;
+      const ids = filteredItems.map((i) => i.id);
+      const fromIdx = ids.indexOf(fromId);
+      const toIdx = ids.indexOf(id);
+      if (fromIdx === -1 || toIdx === -1) return;
+      ids.splice(fromIdx, 1);
+      ids.splice(toIdx, 0, fromId);
+      reorderItems.mutate(ids);
+      setDragOverId(null);
+    };
+  }
+
+  function handleDragEnd() {
+    dragItemId.current = null;
+    setDragOverId(null);
+  }
 
   function handleAdd(e: React.FormEvent) {
     e.preventDefault();
@@ -536,6 +576,11 @@ function ListDetailPage() {
                   onEdit={(text) => updateItem.mutate({ id: item.id, text })}
                   onTagClick={(tag) => setActiveTag(activeTag === tag ? null : tag)}
                   canWrite={canWrite}
+                  onDragStart={isOwner ? handleDragStart(item.id) : undefined}
+                  onDragOver={isOwner ? handleDragOver(item.id) : undefined}
+                  onDrop={isOwner ? handleDrop(item.id) : undefined}
+                  onDragEnd={isOwner ? handleDragEnd : undefined}
+                  isDragOver={dragOverId === item.id}
                 />
               ))}
             </div>
