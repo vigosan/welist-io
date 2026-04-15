@@ -5,6 +5,9 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useItems, useAddItem, useToggleItem, useDeleteItem, useUpdateItem, useBulkAddItems, useReorderItems } from "@/hooks/useItems";
 import { useToggleCollaborative } from "@/hooks/useList";
 import { useListHeader } from "@/hooks/useListHeader";
+import { useListPrice, useSetPrice, useRemovePrice } from "@/hooks/useListPrice";
+import { useStripeAccountStatus } from "@/hooks/useStripeAccount";
+import { ListSettingsPanel } from "@/components/ListSettingsPanel";
 import { useItemsFilter } from "@/hooks/useItemsFilter";
 import { useCommandPalette } from "@/hooks/useCommandPalette";
 import { ItemRow } from "@/components/items/ItemRow";
@@ -35,6 +38,7 @@ function ListDetailPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchActive, setSearchActive] = useState(false);
   const [descriptionExpanded, setDescriptionExpanded] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const addInputRef = useRef<HTMLInputElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const { t } = useTranslation();
@@ -58,6 +62,11 @@ function ListDetailPage() {
 
   const toggleCollaborative = useToggleCollaborative(listId);
   const { data: session } = useSession();
+
+  const { data: listPrice } = useListPrice(listId, settingsOpen);
+  const setPrice = useSetPrice(listId);
+  const removePrice = useRemovePrice(listId);
+  const { data: stripeStatus } = useStripeAccountStatus(settingsOpen);
 
   const {
     list, listLoading, listError, refetchList,
@@ -371,53 +380,6 @@ function ListDetailPage() {
             </div>
 
             <div className="flex items-center gap-1.5 shrink-0">
-              {isOwner && (
-                <button
-                  onClick={() => togglePublic.mutate(!list?.public)}
-                  data-testid="toggle-public-btn"
-                  title={list?.public ? t("list.publicTitle") : t("list.privateTitle")}
-                  className={`cursor-pointer h-7 flex items-center gap-1 px-2 rounded-md text-xs font-medium border transition active:scale-[0.96] ${
-                    list?.public
-                      ? "border-gray-900 bg-gray-900 text-white"
-                      : "border-gray-200 text-gray-400 hover:border-gray-400 hover:text-gray-600"
-                  }`}
-                >
-                  {list?.public ? (
-                    <>
-                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 004 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      <span className="hidden sm:inline">{t("list.public")}</span>
-                    </>
-                  ) : (
-                    <>
-                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                      </svg>
-                      <span className="hidden sm:inline">{t("list.private")}</span>
-                    </>
-                  )}
-                </button>
-              )}
-
-              {isOwner && (
-                <button
-                  onClick={() => toggleCollaborative.mutate(!list?.collaborative)}
-                  data-testid="toggle-collaborative-btn"
-                  title={list?.collaborative ? t("list.collaborativeTitle") : t("list.soloYouTitle")}
-                  className={`cursor-pointer h-7 flex items-center gap-1 px-2 rounded-md text-xs font-medium border transition active:scale-[0.96] ${
-                    list?.collaborative
-                      ? "border-gray-900 bg-gray-900 text-white"
-                      : "border-gray-200 text-gray-400 hover:border-gray-400 hover:text-gray-600"
-                  }`}
-                >
-                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                  <span className="hidden sm:inline">{list?.collaborative ? t("list.collaborative") : t("list.soloYou")}</span>
-                </button>
-              )}
-
               {!searchActive && (
                 <button
                   onClick={openSearch}
@@ -451,10 +413,44 @@ function ListDetailPage() {
                   </svg>
                 </span>
               </button>
+
+              {isOwner && (
+                <button
+                  onClick={() => setSettingsOpen((v) => !v)}
+                  data-testid="settings-btn"
+                  aria-label={t("list.settings")}
+                  title={t("list.settings")}
+                  className={`cursor-pointer h-7 w-7 flex items-center justify-center rounded-md border transition active:scale-[0.96] ${
+                    settingsOpen
+                      ? "border-gray-900 bg-gray-900 text-white"
+                      : "border-gray-200 text-gray-400 hover:border-gray-400 hover:text-gray-700"
+                  }`}
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                </button>
+              )}
             </div>
               </>
             )}
           </div>
+
+          {!listLoading && isOwner && settingsOpen && (
+            <div className="mt-3">
+              <ListSettingsPanel
+                isPublic={!!list?.public}
+                isCollaborative={!!list?.collaborative}
+                priceInCents={listPrice?.priceInCents ?? null}
+                stripeConnected={!!stripeStatus?.onboardingComplete}
+                onTogglePublic={(v) => togglePublic.mutate(v)}
+                onToggleCollaborative={(v) => toggleCollaborative.mutate(v)}
+                onSetPrice={(cents) => setPrice.mutate(cents)}
+                onRemovePrice={() => removePrice.mutate()}
+              />
+            </div>
+          )}
 
           {!listLoading && progress > 0 && (
             <div className="mt-3 h-0.5 bg-gray-100 overflow-hidden rounded-full">
