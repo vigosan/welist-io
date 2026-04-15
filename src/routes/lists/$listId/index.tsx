@@ -3,7 +3,7 @@ import { useSession } from "@hono/auth-js/react";
 import { z } from "zod";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useItems, useAddItem, useToggleItem, useDeleteItem, useUpdateItem, useBulkAddItems, useReorderItems } from "@/hooks/useItems";
-import { useToggleCollaborative } from "@/hooks/useList";
+import { useToggleCollaborative, useCollaborators } from "@/hooks/useList";
 import { useListHeader } from "@/hooks/useListHeader";
 import { useListPrice, useSetPrice, useRemovePrice } from "@/hooks/useListPrice";
 import { useStripeAccountStatus } from "@/hooks/useStripeAccount";
@@ -91,6 +91,7 @@ function ListDetailPage() {
   const isOwner = !list ? false : (list.ownerId === null || list.ownerId === session?.user?.id);
   const isParticipant = !!list?.participated && !isOwner && !!list?.public;
   const canWrite = isOwner || (isParticipant && !!list?.collaborative) || (!list?.public && !!list?.collaborative);
+  const { data: collaborators = [] } = useCollaborators(listId, isOwner && !!list?.collaborative);
 
   const { data: items = [], isLoading: itemsLoading, refetch: refetchItems } = useItems(listId);
 
@@ -306,6 +307,39 @@ function ListDetailPage() {
                   )}
                 </div>
               )}
+            </div>
+          )}
+
+          {isOwner && list?.collaborative && collaborators.length > 0 && (
+            <div className="mt-3 flex items-center gap-2">
+              <div className="flex -space-x-1.5">
+                {collaborators.slice(0, 5).map((c) =>
+                  c.image ? (
+                    <img
+                      key={c.id}
+                      src={c.image}
+                      alt={c.name ?? ""}
+                      title={c.name ?? ""}
+                      className="w-6 h-6 rounded-full outline outline-2 outline-white"
+                    />
+                  ) : (
+                    <div
+                      key={c.id}
+                      title={c.name ?? ""}
+                      className="w-6 h-6 rounded-full bg-gray-200 outline outline-2 outline-white flex items-center justify-center"
+                    >
+                      <span className="text-[8px] text-gray-500 font-medium">
+                        {(c.name ?? "?")[0]?.toUpperCase()}
+                      </span>
+                    </div>
+                  )
+                )}
+              </div>
+              <span className="text-xs text-gray-400">
+                {collaborators.length === 1
+                  ? collaborators[0].name ?? "1 collaborator"
+                  : `${collaborators.length} collaborators`}
+              </span>
             </div>
           )}
 
