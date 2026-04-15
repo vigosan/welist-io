@@ -79,6 +79,13 @@ describe("GET /api/lists/:listId", () => {
     const res = await app.request("/api/lists/abc");
     expect(res.status).toBe(404);
   });
+
+  it("returns 200 for private collaborative list when unauthenticated", async () => {
+    mockDb.query.lists.findFirst.mockResolvedValue({ id: "abc", ownerId: "u1", public: false, collaborative: true });
+    mockDb.query.participations.findFirst.mockResolvedValue(null);
+    const res = await app.request("/api/lists/abc");
+    expect(res.status).toBe(200);
+  });
 });
 
 describe("GET /api/lists/:listId/items", () => {

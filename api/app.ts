@@ -79,8 +79,8 @@ function isUniqueViolation(e: unknown): boolean {
   return code === "23505";
 }
 
-function canViewList(list: { ownerId: string | null; public: boolean }, userId: string | null): boolean {
-  return list.public || (userId !== null && list.ownerId === userId);
+function canViewList(list: { ownerId: string | null; public: boolean; collaborative: boolean }, userId: string | null): boolean {
+  return list.public || list.collaborative || (userId !== null && list.ownerId === userId);
 }
 
 function canModifyList(list: { ownerId: string | null; collaborative: boolean }, userId: string | null): boolean {
