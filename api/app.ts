@@ -572,6 +572,7 @@ app.get("/explore/:listId", async (c) => {
     slug: list.slug,
     description: list.description,
     createdAt: list.createdAt,
+    ownerId: list.ownerId,
     owner,
     itemCount: stats?.itemCount ?? 0,
     participantCount: totalParticipants[0]?.count ?? 0,

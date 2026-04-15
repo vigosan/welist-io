@@ -22,6 +22,7 @@ export type ExploreDetail = {
   slug: string | null;
   description: string | null;
   createdAt: string;
+  ownerId: string | null;
   owner: { name: string | null; image: string | null } | null;
   itemCount: number;
   participantCount: number;
