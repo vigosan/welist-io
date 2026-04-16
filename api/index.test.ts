@@ -139,8 +139,8 @@ describe("POST /api/lists/:listId/items", () => {
     expect(body.text).toBe("Nueva tarea");
   });
 
-  it("assigns position 0 when list has no items", async () => {
-    const item = { id: "i1", listId: "abc", text: "Primero", done: false, position: 0 };
+  it("assigns position -1 when list has no items", async () => {
+    const item = { id: "i1", listId: "abc", text: "Primero", done: false, position: -1 };
     mockDb.query.lists.findFirst.mockResolvedValue({ id: "abc", ownerId: null, collaborative: false });
     mockDb.select.mockReturnValue({
       from: vi.fn().mockReturnValue({
@@ -156,7 +156,7 @@ describe("POST /api/lists/:listId/items", () => {
       headers: { "Content-Type": "application/json" },
     });
 
-    expect(valuesMock).toHaveBeenCalledWith(expect.objectContaining({ position: 0 }));
+    expect(valuesMock).toHaveBeenCalledWith(expect.objectContaining({ position: -1 }));
   });
 
   it("returns 400 when text is empty", async () => {

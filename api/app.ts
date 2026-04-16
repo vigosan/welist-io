@@ -1,7 +1,7 @@
 import { Hono, type Context } from "hono";
 import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
-import { eq, max, sql, and, or, ilike, gt, lt, inArray, desc, countDistinct } from "drizzle-orm";
+import { eq, max, min, sql, and, or, ilike, gt, lt, inArray, desc, countDistinct } from "drizzle-orm";
 import { db } from "../src/db/client.js";
 import { lists, items, participations, itemProgress, listActivity, users, stripeAccounts, listPrices, listPurchases } from "../src/db/schema/index.js";
 import { rateLimit } from "./rate-limit.js";
@@ -307,8 +307,8 @@ app.post(
     const userId = authUser?.session?.user?.id ?? null;
     if (!canModifyList(list, userId)) return c.json({ error: "Forbidden" }, 403);
     const { text } = c.req.valid("json");
-    const [maxRow] = await db.select({ pos: max(items.position) }).from(items).where(eq(items.listId, list.id));
-    const position = (maxRow?.pos ?? -1) + 1;
+    const [minRow] = await db.select({ pos: min(items.position) }).from(items).where(eq(items.listId, list.id));
+    const position = (minRow?.pos ?? 0) - 1;
     const [item] = await db.insert(items).values({ listId: list.id, text, position }).returning();
     if (list.public && list.collaborative && userId) {
       await logActivity(list.id, userId, "item_added", item.id, null, { text });
