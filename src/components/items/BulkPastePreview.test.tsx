@@ -71,4 +71,10 @@ describe("BulkPastePreview", () => {
     });
     expect(screen.getByText(/máx\. 100/)).toBeInTheDocument();
   });
+
+  it("renders correctly with duplicate texts", () => {
+    setup({ texts: ["Leche", "Leche", "Pan"] });
+    expect(screen.getAllByText("Leche")).toHaveLength(2);
+    expect(screen.getByText("Pan")).toBeInTheDocument();
+  });
 });

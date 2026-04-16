@@ -54,7 +54,8 @@ export function BulkPastePreview({
       <ul className="max-h-48 overflow-y-auto py-1">
         {texts.map((text, i) => (
           <li
-            key={text}
+            // biome-ignore lint/suspicious/noArrayIndexKey: texts may be duplicate strings; index combined with text is the only stable key
+            key={`${i}-${text}`}
             className="flex items-center gap-2 px-3 py-1.5 group hover:bg-gray-50"
           >
             <span className="flex-1 text-sm text-gray-700 truncate">
