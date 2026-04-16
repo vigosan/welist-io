@@ -40,6 +40,7 @@ function ListDetailPage() {
   const [searchActive, setSearchActive] = useState(false);
   const [descriptionExpanded, setDescriptionExpanded] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [participantsPanel, setParticipantsPanel] = useState<"challengers" | "collaborators" | null>(null);
   const addInputRef = useRef<HTMLInputElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const { t } = useTranslation();
@@ -374,40 +375,50 @@ function ListDetailPage() {
             {isOwner && challengers.length > 0 && (
               <>
                 <span className="text-gray-200 text-xs shrink-0">·</span>
-                <div className="flex items-center gap-1 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setParticipantsPanel((p) => p === "challengers" ? null : "challengers")}
+                  className="cursor-pointer flex items-center gap-1 shrink-0 hover:opacity-70 transition-opacity"
+                  aria-label={`${challengers.length} challengers`}
+                >
                   <div className="flex -space-x-1">
-                    {challengers.slice(0, 4).map((c) =>
+                    {challengers.slice(0, 5).map((c) =>
                       c.image ? (
-                        <img key={c.id} src={c.image} alt={c.name ?? ""} title={c.name ?? ""} className="w-4 h-4 rounded-full outline outline-1 outline-white" />
+                        <img key={c.id} src={c.image} alt={c.name ?? ""} className="w-4 h-4 rounded-full outline outline-1 outline-white" />
                       ) : (
-                        <div key={c.id} title={c.name ?? ""} className="w-4 h-4 rounded-full bg-gray-200 outline outline-1 outline-white flex items-center justify-center">
+                        <div key={c.id} className="w-4 h-4 rounded-full bg-gray-200 outline outline-1 outline-white flex items-center justify-center">
                           <span className="text-[6px] text-gray-500 font-medium">{(c.name ?? "?")[0]?.toUpperCase()}</span>
                         </div>
                       )
                     )}
                   </div>
                   <span className="text-xs text-gray-400 tabular-nums">{challengers.length}</span>
-                </div>
+                </button>
               </>
             )}
 
             {isOwner && collaborators.length > 0 && (
               <>
                 <span className="text-gray-200 text-xs shrink-0">·</span>
-                <div className="flex items-center gap-1 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setParticipantsPanel((p) => p === "collaborators" ? null : "collaborators")}
+                  className="cursor-pointer flex items-center gap-1 shrink-0 hover:opacity-70 transition-opacity"
+                  aria-label={`${collaborators.length} collaborators`}
+                >
                   <div className="flex -space-x-1">
-                    {collaborators.slice(0, 4).map((c) =>
+                    {collaborators.slice(0, 5).map((c) =>
                       c.image ? (
-                        <img key={c.id} src={c.image} alt={c.name ?? ""} title={c.name ?? ""} className="w-4 h-4 rounded-full outline outline-1 outline-white" />
+                        <img key={c.id} src={c.image} alt={c.name ?? ""} className="w-4 h-4 rounded-full outline outline-1 outline-white" />
                       ) : (
-                        <div key={c.id} title={c.name ?? ""} className="w-4 h-4 rounded-full bg-gray-200 outline outline-1 outline-white flex items-center justify-center">
+                        <div key={c.id} className="w-4 h-4 rounded-full bg-gray-200 outline outline-1 outline-white flex items-center justify-center">
                           <span className="text-[6px] text-gray-500 font-medium">{(c.name ?? "?")[0]?.toUpperCase()}</span>
                         </div>
                       )
                     )}
                   </div>
                   <span className="text-xs text-gray-400 tabular-nums">{collaborators.length}</span>
-                </div>
+                </button>
               </>
             )}
 
@@ -479,6 +490,53 @@ function ListDetailPage() {
               </>
             )}
           </div>
+
+          {!listLoading && isOwner && participantsPanel === "challengers" && challengers.length > 0 && (
+            <div className="mt-2 border border-gray-100 rounded-xl overflow-hidden">
+              <div className="px-3 py-2 border-b border-gray-100 flex items-center justify-between">
+                <span className="text-xs font-medium text-gray-500">{challengers.length} {challengers.length === 1 ? "challenger" : "challengers"}</span>
+              </div>
+              <ul className="divide-y divide-gray-50">
+                {challengers.map((c) => (
+                  <li key={c.id} className="flex items-center gap-3 px-3 py-2.5">
+                    {c.image ? (
+                      <img src={c.image} alt={c.name ?? ""} className="w-6 h-6 rounded-full shrink-0" />
+                    ) : (
+                      <div className="w-6 h-6 rounded-full bg-gray-200 shrink-0 flex items-center justify-center">
+                        <span className="text-[8px] text-gray-500 font-medium">{(c.name ?? "?")[0]?.toUpperCase()}</span>
+                      </div>
+                    )}
+                    <span className="text-xs text-gray-700 flex-1 truncate">{c.name ?? "—"}</span>
+                    <span className="text-xs text-gray-400 tabular-nums shrink-0">
+                      {c.completedAt ? "✓" : `${c.doneCount}/${c.totalItems}`}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {!listLoading && isOwner && participantsPanel === "collaborators" && collaborators.length > 0 && (
+            <div className="mt-2 border border-gray-100 rounded-xl overflow-hidden">
+              <div className="px-3 py-2 border-b border-gray-100">
+                <span className="text-xs font-medium text-gray-500">{collaborators.length} {collaborators.length === 1 ? "collaborator" : "collaborators"}</span>
+              </div>
+              <ul className="divide-y divide-gray-50">
+                {collaborators.map((c) => (
+                  <li key={c.id} className="flex items-center gap-3 px-3 py-2.5">
+                    {c.image ? (
+                      <img src={c.image} alt={c.name ?? ""} className="w-6 h-6 rounded-full shrink-0" />
+                    ) : (
+                      <div className="w-6 h-6 rounded-full bg-gray-200 shrink-0 flex items-center justify-center">
+                        <span className="text-[8px] text-gray-500 font-medium">{(c.name ?? "?")[0]?.toUpperCase()}</span>
+                      </div>
+                    )}
+                    <span className="text-xs text-gray-700 flex-1 truncate">{c.name ?? "—"}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           {!listLoading && isOwner && settingsOpen && (
             <div className="mt-3">

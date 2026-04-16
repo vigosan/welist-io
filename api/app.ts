@@ -682,13 +682,21 @@ app.get("/lists/:listId/collaborators", async (c) => {
   });
   if (!list) return c.json({ error: "Not found" }, 404);
   if (list.ownerId !== userId) return c.json({ error: "Forbidden" }, 403);
+  const totalItems = await db.$count(items, eq(items.listId, list.id));
   const rows = await db
-    .select({ id: users.id, name: users.name, image: users.image, userListId: participations.userListId })
+    .select({
+      id: users.id,
+      name: users.name,
+      image: users.image,
+      userListId: participations.userListId,
+      completedAt: participations.completedAt,
+      doneCount: sql<number>`cast(coalesce((select count(*) from ${itemProgress} where ${itemProgress.userId} = ${users.id} and ${itemProgress.itemId} in (select id from ${items} where ${items.listId} = ${list.id}) and ${itemProgress.done} = true), 0) as int)`,
+    })
     .from(participations)
     .innerJoin(users, eq(participations.userId, users.id))
     .where(eq(participations.sourceListId, list.id));
-  const collaborators = rows.filter((r) => r.userListId === null).map(({ userListId: _, ...rest }) => rest);
-  const challengers = rows.filter((r) => r.userListId !== null).map(({ userListId: _, ...rest }) => rest);
+  const collaborators = rows.filter((r) => r.userListId === null).map(({ userListId: _, completedAt: __, doneCount: ___, ...rest }) => rest);
+  const challengers = rows.filter((r) => r.userListId !== null).map(({ userListId: _, ...rest }) => ({ ...rest, totalItems }));
   return c.json({ collaborators, challengers });
 });
 

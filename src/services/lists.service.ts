@@ -78,7 +78,10 @@ export const listsService = {
     apiClient<void>(`/api/lists/${listId}/price`, { method: "DELETE" }),
 
   collaborators: (listId: string) =>
-    apiClient<{ collaborators: { id: string; name: string | null; image: string | null }[]; challengers: { id: string; name: string | null; image: string | null }[] }>(`/api/lists/${listId}/collaborators`),
+    apiClient<{
+      collaborators: { id: string; name: string | null; image: string | null }[];
+      challengers: { id: string; name: string | null; image: string | null; completedAt: string | null; doneCount: number; totalItems: number }[];
+    }>(`/api/lists/${listId}/collaborators`),
 
   myLists: (cursor?: string, q?: string, sort?: string, visibility?: string) => {
     const params = new URLSearchParams();
