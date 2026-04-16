@@ -23,7 +23,7 @@ function ExploreListCard({
   const { t } = useTranslation();
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+    <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 overflow-hidden">
       <div className="p-4 flex flex-col gap-3">
         <Link
           to="/explore/$listId"
@@ -31,11 +31,11 @@ function ExploreListCard({
           className="flex items-start justify-between gap-3 hover:opacity-80 transition-opacity duration-150"
         >
           <div className="flex-1 min-w-0">
-            <p className="font-semibold text-gray-900 leading-snug">
+            <p className="font-semibold text-gray-900 dark:text-gray-100 leading-snug">
               {list.name}
             </p>
             {list.description && (
-              <p className="text-sm text-gray-500 mt-0.5 leading-snug line-clamp-2">
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5 leading-snug line-clamp-2">
                 {list.description}
               </p>
             )}
@@ -50,7 +50,7 @@ function ExploreListCard({
         </Link>
 
         <div className="flex items-center gap-1.5">
-          <div className="flex items-center gap-1 px-2 py-1 bg-gray-50 rounded-lg">
+          <div className="flex items-center gap-1 px-2 py-1 bg-gray-50 dark:bg-gray-800 rounded-lg">
             <svg
               aria-hidden="true"
               className="w-3 h-3 text-gray-400"
@@ -65,11 +65,11 @@ function ExploreListCard({
                 d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
               />
             </svg>
-            <span className="text-xs font-medium text-gray-500 tabular-nums">
+            <span className="text-xs font-medium text-gray-500 dark:text-gray-400 tabular-nums">
               {list.itemCount}
             </span>
           </div>
-          <div className="flex items-center gap-1 px-2 py-1 bg-gray-50 rounded-lg">
+          <div className="flex items-center gap-1 px-2 py-1 bg-gray-50 dark:bg-gray-800 rounded-lg">
             <svg
               aria-hidden="true"
               className="w-3 h-3 text-gray-400"
@@ -84,11 +84,11 @@ function ExploreListCard({
                 d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"
               />
             </svg>
-            <span className="text-xs font-medium text-gray-500 tabular-nums">
+            <span className="text-xs font-medium text-gray-500 dark:text-gray-400 tabular-nums">
               {list.participantCount}
             </span>
           </div>
-          <div className="flex items-center gap-1 px-2 py-1 bg-gray-50 rounded-lg">
+          <div className="flex items-center gap-1 px-2 py-1 bg-gray-50 dark:bg-gray-800 rounded-lg">
             <svg
               aria-hidden="true"
               className="w-3 h-3 text-gray-400"
@@ -103,13 +103,13 @@ function ExploreListCard({
                 d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
-            <span className="text-xs font-medium text-gray-500 tabular-nums">
+            <span className="text-xs font-medium text-gray-500 dark:text-gray-400 tabular-nums">
               {list.completedCount}
             </span>
           </div>
         </div>
 
-        <div className="pt-1 border-t border-gray-50">
+        <div className="pt-1 border-t border-gray-50 dark:border-gray-800">
           <button
             type="button"
             onClick={() => {
@@ -183,14 +183,14 @@ function ExplorePage() {
   }
 
   return (
-    <div className="h-dvh bg-[#FAFAF8] flex flex-col">
+    <div className="h-dvh bg-[#FAFAF8] dark:bg-gray-950 flex flex-col">
       <AppNav />
 
       <div className="flex-1 flex flex-col w-full max-w-3xl mx-auto overflow-hidden">
         <div className="px-4 pt-6 pb-4 shrink-0">
           <form
             onSubmit={handleSearch}
-            className="flex gap-2 p-1.5 bg-gray-50 border border-gray-200 rounded-2xl focus-within:border-gray-400 transition-[border-color] duration-150"
+            className="flex gap-2 p-1.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl focus-within:border-gray-400 dark:focus-within:border-gray-500 transition-[border-color] duration-150"
           >
             <input
               value={q}
@@ -198,7 +198,7 @@ function ExplorePage() {
               placeholder={t("explore.searchPlaceholder")}
               aria-label={t("explore.searchAriaLabel")}
               data-testid="explore-search-input"
-              className="flex-1 pl-3 text-sm text-gray-900 placeholder-gray-400 bg-transparent outline-none"
+              className="flex-1 pl-3 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-600 bg-transparent outline-none"
             />
             <button
               type="submit"

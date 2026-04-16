@@ -62,17 +62,17 @@ function MyListCard({
     <Link
       to="/lists/$listId"
       params={{ listId: list.slug ?? list.id }}
-      className="group bg-white rounded-2xl border border-gray-100 overflow-hidden hover:border-gray-300 transition-[border-color,transform] duration-150 active:scale-[0.99]"
+      className="group bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 overflow-hidden hover:border-gray-300 dark:hover:border-gray-600 transition-[border-color,transform] duration-150 active:scale-[0.99]"
       data-testid="my-list-card"
     >
       <div className="p-4 flex flex-col gap-3">
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0">
-            <p className="font-semibold text-gray-900 leading-snug">
+            <p className="font-semibold text-gray-900 dark:text-gray-100 leading-snug">
               {list.name}
             </p>
             {list.description && (
-              <p className="text-sm text-gray-500 mt-0.5 leading-snug line-clamp-2">
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5 leading-snug line-clamp-2">
                 {list.description}
               </p>
             )}
@@ -130,9 +130,9 @@ function MyListCard({
         </div>
 
         {list.itemCount > 0 && (
-          <div className="h-1 bg-gray-100 rounded-full overflow-hidden">
+          <div className="h-1 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
             <div
-              className="h-full bg-gray-900 rounded-full transition-all duration-300"
+              className="h-full bg-gray-900 dark:bg-gray-100 rounded-full transition-all duration-300"
               style={{
                 width: `${Math.round((list.doneCount / list.itemCount) * 100)}%`,
               }}
@@ -142,17 +142,17 @@ function MyListCard({
 
         <div className="flex items-center gap-1.5">
           {list.public && (
-            <span className="text-xs font-medium text-gray-500 px-2 py-1 bg-gray-50 rounded-lg">
+            <span className="text-xs font-medium text-gray-500 dark:text-gray-400 px-2 py-1 bg-gray-50 dark:bg-gray-800 rounded-lg">
               {t("myLists.public")}
             </span>
           )}
           {list.collaborative && (
-            <span className="text-xs font-medium text-gray-500 px-2 py-1 bg-gray-50 rounded-lg">
+            <span className="text-xs font-medium text-gray-500 dark:text-gray-400 px-2 py-1 bg-gray-50 dark:bg-gray-800 rounded-lg">
               {t("myLists.collaborative")}
             </span>
           )}
           <div className="ml-auto flex items-center gap-2">
-            <span className="text-xs text-gray-400">
+            <span className="text-xs text-gray-400 dark:text-gray-500">
               {list.itemCount} {list.itemCount === 1 ? "item" : "items"}
               {list.participantCount > 0 &&
                 ` · ${list.participantCount} ${list.participantCount === 1 ? "participante" : "participantes"}`}
@@ -293,7 +293,7 @@ function MyListsPage() {
   }
 
   return (
-    <div className="h-dvh bg-[#FAFAF8] flex flex-col">
+    <div className="h-dvh bg-[#FAFAF8] dark:bg-gray-950 flex flex-col">
       <AppNav />
 
       <div className="flex-1 flex flex-col w-full max-w-3xl mx-auto overflow-hidden">
@@ -304,7 +304,7 @@ function MyListsPage() {
             <div className="flex gap-2">
               <form
                 onSubmit={handleSearch}
-                className="flex-1 flex gap-2 p-1.5 bg-gray-50 border border-gray-200 rounded-2xl focus-within:border-gray-400 transition-[border-color] duration-150"
+                className="flex-1 flex gap-2 p-1.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl focus-within:border-gray-400 dark:focus-within:border-gray-500 transition-[border-color] duration-150"
               >
                 <input
                   value={q}
@@ -312,7 +312,7 @@ function MyListsPage() {
                   placeholder={t("myLists.searchPlaceholder")}
                   aria-label={t("myLists.searchAriaLabel")}
                   data-testid="my-lists-search-input"
-                  className="flex-1 pl-3 text-sm text-gray-900 placeholder-gray-400 bg-transparent outline-none"
+                  className="flex-1 pl-3 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-600 bg-transparent outline-none"
                 />
                 <button
                   type="submit"
@@ -356,8 +356,8 @@ function MyListsPage() {
                 onClick={() => setSort(opt.value)}
                 className={`cursor-pointer px-3 py-1 text-xs font-medium rounded-lg border transition-colors duration-150 whitespace-nowrap shrink-0 ${
                   sort === opt.value
-                    ? "border-gray-900 bg-gray-900 text-white"
-                    : "border-gray-200 text-gray-500 bg-white hover:bg-gray-50 hover:text-gray-700"
+                    ? "border-gray-900 bg-gray-900 text-white dark:border-gray-100 dark:bg-gray-100 dark:text-gray-900"
+                    : "border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-200"
                 }`}
               >
                 {opt.label}
@@ -376,8 +376,8 @@ function MyListsPage() {
                   onClick={() => setVisibility(opt.value)}
                   className={`cursor-pointer px-3 py-1 text-xs font-medium rounded-lg border transition-colors duration-150 whitespace-nowrap shrink-0 ${
                     visibility === opt.value
-                      ? "border-gray-900 bg-gray-900 text-white"
-                      : "border-gray-200 text-gray-500 bg-white hover:bg-gray-50 hover:text-gray-700"
+                      ? "border-gray-900 bg-gray-900 text-white dark:border-gray-100 dark:bg-gray-100 dark:text-gray-900"
+                      : "border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-200"
                   }`}
                 >
                   {opt.label}

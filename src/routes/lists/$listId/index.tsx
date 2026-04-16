@@ -282,10 +282,10 @@ function ListDetailPage() {
 
   return (
     <>
-      <div className="min-h-dvh bg-[#FAFAF8] flex flex-col">
+      <div className="min-h-dvh bg-[#FAFAF8] dark:bg-gray-950 flex flex-col">
         <AppNav />
         <div className="flex-1 flex flex-col sm:items-center sm:p-6">
-          <div className="flex-1 flex flex-col w-full sm:max-w-3xl bg-white sm:rounded-3xl sm:border sm:border-gray-100 overflow-hidden sm:max-h-[calc(100dvh-3.25rem-3rem)]">
+          <div className="flex-1 flex flex-col w-full sm:max-w-3xl bg-white dark:bg-gray-900 sm:rounded-3xl sm:border sm:border-gray-100 dark:sm:border-gray-800 overflow-hidden sm:max-h-[calc(100dvh-3.25rem-3rem)]">
             <div className="px-5 pt-5 pb-4 shrink-0">
               <Link
                 to="/lists"
@@ -321,7 +321,7 @@ function ListDetailPage() {
                   </form>
                 ) : (
                   <h1
-                    className="text-xl font-bold text-gray-900 leading-tight text-pretty cursor-default"
+                    className="text-xl font-bold text-gray-900 dark:text-gray-100 leading-tight text-pretty cursor-default"
                     onDoubleClick={
                       isOwner
                         ? () => {

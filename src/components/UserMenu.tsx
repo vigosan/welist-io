@@ -51,22 +51,22 @@ export function UserMenu() {
         </button>
 
         {open && (
-          <div className="absolute right-0 top-full mt-1 min-w-40 bg-white border border-gray-200 rounded-xl z-50 py-1">
+          <div className="absolute right-0 top-full mt-1 min-w-40 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl z-50 py-1">
             <Link
               to="/lists"
               onClick={() => setOpen(false)}
-              className="block w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
+              className="block w-full px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors"
             >
               {t("user.myLists")}
             </Link>
             <Link
               to="/settings"
               onClick={() => setOpen(false)}
-              className="block w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
+              className="block w-full px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors"
             >
               {t("user.settings")}
             </Link>
-            <div className="border-t border-gray-100 my-1" />
+            <div className="border-t border-gray-100 dark:border-gray-700 my-1" />
             <button
               type="button"
               onClick={() => {
@@ -74,7 +74,7 @@ export function UserMenu() {
                 signOut();
               }}
               data-testid="sign-out-btn"
-              className="cursor-pointer block w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
+              className="cursor-pointer block w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors"
             >
               {t("user.signOut")}
             </button>
@@ -89,7 +89,7 @@ export function UserMenu() {
       type="button"
       onClick={() => signIn("google")}
       data-testid="sign-in-btn"
-      className="cursor-pointer h-7 flex items-center px-2.5 rounded-md border border-gray-200 text-xs font-medium text-gray-500 hover:border-gray-400 hover:text-gray-900 transition-[border-color,color] duration-150 active:scale-[0.96]"
+      className="cursor-pointer h-7 flex items-center px-2.5 rounded-md border border-gray-200 dark:border-gray-700 text-xs font-medium text-gray-500 dark:text-gray-400 hover:border-gray-400 dark:hover:border-gray-500 hover:text-gray-900 dark:hover:text-gray-100 transition-[border-color,color] duration-150 active:scale-[0.96]"
     >
       {t("user.signIn")}
     </button>

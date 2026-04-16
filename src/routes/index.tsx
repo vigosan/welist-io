@@ -31,7 +31,7 @@ function CreateForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex gap-2 p-1.5 bg-white border border-gray-200 rounded-2xl focus-within:border-gray-400 transition-[border-color] duration-150 w-full"
+      className="flex gap-2 p-1.5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl focus-within:border-gray-400 dark:focus-within:border-gray-500 transition-[border-color] duration-150 w-full"
     >
       <input
         autoFocus
@@ -40,7 +40,7 @@ function CreateForm() {
         placeholder={t("home.listNamePlaceholder")}
         aria-label={t("home.listNameAriaLabel")}
         data-testid="list-name-input"
-        className="flex-1 pl-3 text-sm text-gray-900 placeholder-gray-400 bg-transparent outline-none min-w-0"
+        className="flex-1 pl-3 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-600 bg-transparent outline-none min-w-0"
       />
       <button
         type="submit"
@@ -85,16 +85,16 @@ function HowItWorks() {
       {steps.map((step) => (
         <div
           key={step.number}
-          className="bg-white border border-gray-100 rounded-2xl px-5 py-5 flex flex-col gap-3 text-left"
+          className="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl px-5 py-5 flex flex-col gap-3 text-left"
         >
-          <span className="font-mono text-[11px] text-gray-300 tracking-widest">
+          <span className="font-mono text-[11px] text-gray-300 dark:text-gray-700 tracking-widest">
             {step.number}
           </span>
           <div className="flex flex-col gap-1.5">
-            <p className="text-sm font-semibold text-gray-900 leading-snug text-balance">
+            <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 leading-snug text-balance">
               {step.title}
             </p>
-            <p className="text-xs text-gray-400 leading-relaxed text-pretty">
+            <p className="text-xs text-gray-400 dark:text-gray-500 leading-relaxed text-pretty">
               {step.desc}
             </p>
           </div>
@@ -108,15 +108,15 @@ function HomePage() {
   const { t } = useTranslation();
 
   return (
-    <div className="min-h-dvh bg-[#FAFAF8] flex flex-col">
+    <div className="min-h-dvh bg-[#FAFAF8] dark:bg-gray-950 flex flex-col">
       <AppNav />
 
       <main className="flex-1 flex flex-col items-center justify-center text-center px-6 py-20 gap-16">
         <div className="max-w-3xl w-full flex flex-col items-center gap-6">
-          <h1 className="text-5xl sm:text-[3.5rem] font-bold tracking-tight text-gray-900 leading-[1.1] text-balance">
+          <h1 className="text-5xl sm:text-[3.5rem] font-bold tracking-tight text-gray-900 dark:text-gray-100 leading-[1.1] text-balance">
             {t("home.headline")}
           </h1>
-          <p className="text-base text-gray-500 leading-relaxed text-pretty max-w-md">
+          <p className="text-base text-gray-500 dark:text-gray-400 leading-relaxed text-pretty max-w-md">
             {t("home.tagline")}
           </p>
           <div className="w-full max-w-xl pt-2">

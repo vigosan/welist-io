@@ -77,7 +77,7 @@ export function CommandPalette({ open, onClose, actions }: Props) {
         role="dialog"
         aria-modal="true"
         aria-label={t("command.ariaLabel")}
-        className="relative w-full max-w-sm bg-white rounded-2xl border border-gray-200 overflow-hidden"
+        className="relative w-full max-w-sm bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden"
         onClick={(e) => e.stopPropagation()}
         onKeyDown={handleKeyDown}
       >
@@ -92,7 +92,7 @@ export function CommandPalette({ open, onClose, actions }: Props) {
           onChange={(e) => setQuery(e.target.value)}
           placeholder={t("command.searchPlaceholder")}
           data-testid="command-palette-input"
-          className="w-full px-4 py-3.5 text-sm text-gray-900 placeholder-gray-400 outline-none border-b border-gray-100"
+          className="w-full px-4 py-3.5 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-600 bg-transparent outline-none border-b border-gray-100 dark:border-gray-800"
         />
         <div
           id="command-palette-list"
@@ -103,7 +103,7 @@ export function CommandPalette({ open, onClose, actions }: Props) {
           {filtered.length === 0 ? (
             <p
               data-testid="command-empty"
-              className="px-4 py-3 text-sm text-gray-400"
+              className="px-4 py-3 text-sm text-gray-400 dark:text-gray-500"
             >
               {t("command.noResults")}
             </p>
@@ -122,8 +122,8 @@ export function CommandPalette({ open, onClose, actions }: Props) {
                 }}
                 className={`cursor-pointer w-full text-left px-4 py-2.5 text-sm transition-[background-color,color] duration-100 ${
                   i === selectedIndex
-                    ? "bg-gray-900 text-white"
-                    : "text-gray-700 hover:bg-gray-50"
+                    ? "bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900"
+                    : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
                 }`}
               >
                 {action.label}
@@ -131,10 +131,10 @@ export function CommandPalette({ open, onClose, actions }: Props) {
             ))
           )}
         </div>
-        <div className="px-4 py-2 border-t border-gray-100 flex items-center gap-3">
-          <span className="text-xs text-gray-300">{t("command.navigate")}</span>
-          <span className="text-xs text-gray-300">{t("command.select")}</span>
-          <span className="text-xs text-gray-300">{t("command.close")}</span>
+        <div className="px-4 py-2 border-t border-gray-100 dark:border-gray-800 flex items-center gap-3">
+          <span className="text-xs text-gray-300 dark:text-gray-600">{t("command.navigate")}</span>
+          <span className="text-xs text-gray-300 dark:text-gray-600">{t("command.select")}</span>
+          <span className="text-xs text-gray-300 dark:text-gray-600">{t("command.close")}</span>
         </div>
       </div>
     </div>
