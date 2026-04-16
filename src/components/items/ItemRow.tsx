@@ -46,7 +46,7 @@ export function ItemRow({ item, onToggle, onDelete, onEdit, onTagClick, activeTa
       onDragOver={onDragOver}
       onDrop={onDrop}
       onDragEnd={onDragEnd}
-      className={`flex items-center gap-3 px-3 py-3 rounded-lg transition-colors ${
+      className={`flex items-center gap-3 px-3 py-3.5 rounded-xl transition-colors ${
         isDragOver ? "bg-gray-200" : item.done ? "bg-gray-100" : "bg-gray-50 hover:bg-gray-100"
       }`}
     >
@@ -61,9 +61,9 @@ export function ItemRow({ item, onToggle, onDelete, onEdit, onTagClick, activeTa
         onClick={canWrite ? onToggle : undefined}
         data-testid={`item-checkbox-${item.id}`}
         aria-label={item.done ? t("items.markPending") : t("items.markDone")}
-        className={`shrink-0 w-10 h-10 rounded-full flex items-center justify-center transition-[transform] ${canWrite ? "cursor-pointer active:scale-[0.96]" : "cursor-default"}`}
+        className={`shrink-0 w-11 h-11 rounded-full flex items-center justify-center transition-transform ${canWrite ? "cursor-pointer active:scale-[0.96]" : "cursor-default"}`}
       >
-        <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-[background-color,border-color,box-shadow] ${
+        <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-[background-color,border-color] ${
           item.done
             ? "bg-gray-900"
             : "border-2 border-gray-300 hover:border-gray-600"
@@ -90,30 +90,34 @@ export function ItemRow({ item, onToggle, onDelete, onEdit, onTagClick, activeTa
             />
           </form>
         ) : (
-          <div className="flex items-baseline gap-x-1.5 flex-wrap">
+          <div className="flex flex-col gap-1.5">
             <span
               data-testid={`item-text-${item.id}`}
               onDoubleClick={canWrite && !item.done ? () => setEditing(true) : undefined}
-              className={`text-sm font-medium cursor-default select-none ${
+              className={`text-sm font-medium cursor-default select-none leading-snug ${
                 item.done ? "line-through text-gray-400" : "text-gray-800"
               }`}
             >
               {display || item.text}
             </span>
-            {tags.map((tag) => (
-              <button
-                key={tag}
-                data-testid={`item-tag-${item.id}-${tag}`}
-                onClick={() => onTagClick?.(tag)}
-                className={`cursor-pointer shrink-0 inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium transition ${
-                  activeTag === tag
-                    ? "border-gray-900 bg-gray-900 text-white"
-                    : tagColor(tag)
-                }`}
-              >
-                #{tag}
-              </button>
-            ))}
+            {tags.length > 0 && (
+              <div className="flex flex-wrap gap-1">
+                {tags.map((tag) => (
+                  <button
+                    key={tag}
+                    data-testid={`item-tag-${item.id}-${tag}`}
+                    onClick={() => onTagClick?.(tag)}
+                    className={`cursor-pointer inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium transition-colors active:scale-[0.96] ${
+                      activeTag === tag
+                        ? "bg-gray-900 text-white"
+                        : "bg-gray-200 text-gray-500 hover:bg-gray-300 hover:text-gray-700"
+                    }`}
+                  >
+                    #{tag}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -123,7 +127,7 @@ export function ItemRow({ item, onToggle, onDelete, onEdit, onTagClick, activeTa
           onClick={onDelete}
           data-testid={`item-delete-${item.id}`}
           aria-label={t("items.delete", { text: display || item.text })}
-          className="cursor-pointer shrink-0 p-3 -m-1 text-gray-300 hover:text-gray-600 transition active:scale-[0.96] rounded-lg hover:bg-gray-100"
+          className="cursor-pointer shrink-0 w-11 h-11 flex items-center justify-center text-gray-300 hover:text-gray-600 transition-colors active:scale-[0.96]"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
