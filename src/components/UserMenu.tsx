@@ -1,11 +1,13 @@
 import { useRef, useState, useEffect } from "react";
 import { useSession, signIn, signOut } from "@hono/auth-js/react";
 import { Link } from "@tanstack/react-router";
+import { useTranslation } from "@/i18n/service";
 
 export function UserMenu() {
   const { data: session, status } = useSession();
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (!open) return;
@@ -30,6 +32,8 @@ export function UserMenu() {
         <button
           onClick={() => setOpen((prev) => !prev)}
           data-testid="user-avatar-btn"
+          aria-label={t("user.menuAriaLabel")}
+          aria-expanded={open}
           className="cursor-pointer w-7 h-7 rounded-full outline outline-1 outline-black/10 overflow-hidden"
         >
           {session.user.image && (

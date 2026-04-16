@@ -33,6 +33,7 @@ function CreateForm() {
         value={name}
         onChange={(e) => setName(e.target.value)}
         placeholder={t("home.listNamePlaceholder")}
+        aria-label={t("home.listNameAriaLabel")}
         data-testid="list-name-input"
         className="flex-1 pl-3 text-sm text-gray-900 placeholder-gray-400 bg-transparent outline-none min-w-0"
       />

@@ -393,11 +393,12 @@ function ListDetailPage() {
                     value={slugValue}
                     onChange={(e) => setSlugValue(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))}
                     placeholder="mi-lista"
+                    aria-label={t("list.confirmSlug")}
                     data-testid="slug-input"
                     className="text-xs text-gray-700 bg-white border border-gray-200 rounded-md px-2 py-1 outline-none focus:border-gray-400 w-32 transition"
                   />
-                  <button type="submit" disabled={!slugValue.trim() || updateSlug.isPending} className="cursor-pointer text-xs text-gray-500 hover:text-gray-900 transition disabled:opacity-40 p-1">✓</button>
-                  <button type="button" onClick={() => setEditingSlug(false)} className="cursor-pointer text-xs text-gray-400 hover:text-gray-600 transition p-1">✕</button>
+                  <button type="submit" aria-label={t("list.confirmSlug")} disabled={!slugValue.trim() || updateSlug.isPending} className="cursor-pointer text-xs text-gray-500 hover:text-gray-900 transition disabled:opacity-40 p-1">✓</button>
+                  <button type="button" aria-label={t("list.cancelSlug")} onClick={() => setEditingSlug(false)} className="cursor-pointer text-xs text-gray-400 hover:text-gray-600 transition p-1">✕</button>
                 </form>
               ) : isOwner ? (
                 <button
@@ -561,6 +562,7 @@ function ListDetailPage() {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={(e) => { if (e.key === "Escape") closeSearch(); }}
                 placeholder={t("list.searchPlaceholder")}
+                aria-label={t("list.searchAriaLabel")}
                 data-testid="search-input"
                 className="flex-1 text-sm text-gray-900 placeholder-gray-400 bg-transparent outline-none"
               />
@@ -571,11 +573,12 @@ function ListDetailPage() {
               )}
               <button
                 type="button"
+                aria-label={t("list.closeSearch")}
                 onClick={closeSearch}
                 data-testid="search-close"
                 className="cursor-pointer text-gray-300 hover:text-gray-500 transition"
               >
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg aria-hidden="true" className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
@@ -662,6 +665,7 @@ function ListDetailPage() {
                     onChange={(e) => setNewItem(e.target.value)}
                     onPaste={handlePaste}
                     placeholder={t("list.addItemPlaceholder")}
+                    aria-label={t("list.addItemAriaLabel")}
                     data-testid="add-item-input"
                     className="flex-1 pl-3 text-sm text-gray-900 placeholder-gray-400 bg-transparent outline-none"
                   />

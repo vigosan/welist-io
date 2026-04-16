@@ -40,19 +40,19 @@ function ExploreListCard({ list, onAccept, acceptPending }: {
 
         <div className="flex items-center gap-1.5">
           <div className="flex items-center gap-1 px-2 py-1 bg-gray-50 rounded-lg">
-            <svg className="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg aria-hidden="true" className="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
             </svg>
             <span className="text-xs font-medium text-gray-500 tabular-nums">{list.itemCount}</span>
           </div>
           <div className="flex items-center gap-1 px-2 py-1 bg-gray-50 rounded-lg">
-            <svg className="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg aria-hidden="true" className="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
             <span className="text-xs font-medium text-gray-500 tabular-nums">{list.participantCount}</span>
           </div>
           <div className="flex items-center gap-1 px-2 py-1 bg-gray-50 rounded-lg">
-            <svg className="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg aria-hidden="true" className="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <span className="text-xs font-medium text-gray-500 tabular-nums">{list.completedCount}</span>
@@ -128,6 +128,7 @@ function ExplorePage() {
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder={t("explore.searchPlaceholder")}
+              aria-label={t("explore.searchAriaLabel")}
               data-testid="explore-search-input"
               className="flex-1 pl-3 text-sm text-gray-900 placeholder-gray-400 bg-transparent outline-none"
             />

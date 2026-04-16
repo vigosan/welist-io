@@ -10,6 +10,7 @@ const en: Translations = {
     headlineSub: "",
     tagline: "Share what you do. Let others try.",
     listNamePlaceholder: "Name your list…",
+    listNameAriaLabel: "List name",
     createList: "Create list",
     footer: "© {{year}} Welist",
     step1Title: "Create a list",
@@ -47,7 +48,11 @@ const en: Translations = {
     noItemsFilter: "No items match that filter.",
     addFirst: "Add the first item to your list.",
     addItemPlaceholder: "Add item…",
+    addItemAriaLabel: "New item text",
     addItem: "Add",
+    closeSearch: "Close search",
+    confirmSlug: "Custom URL",
+    cancelSlug: "Cancel URL editing",
     expandMore: "show more",
     expandLess: "show less",
     challengeInProgress: "You're taking this challenge",
@@ -68,6 +73,7 @@ const en: Translations = {
   },
   myLists: {
     searchPlaceholder: "Search my lists…",
+    searchAriaLabel: "Search my lists",
     search: "Search",
     sortRecent: "Recent",
     sortNewest: "Newest",
@@ -85,10 +91,14 @@ const en: Translations = {
     deleteYes: "Delete",
     newList: "New list",
     newListPlaceholder: "Name your list…",
+    newListAriaLabel: "New list name",
+    cancelCreate: "Cancel",
+    deleteList: "Delete list «{{name}}»",
     createList: "Create",
   },
   explore: {
     searchPlaceholder: "Search lists…",
+    searchAriaLabel: "Search public lists",
     search: "Search",
     loading: "Loading…",
     noListsSearch: "No lists found with that name.",
@@ -153,6 +163,12 @@ const en: Translations = {
   },
   help: {
     nav: "Help",
+  },
+  user: {
+    menuAriaLabel: "User menu",
+    signOut: "Sign out",
+    myLists: "My lists",
+    settings: "Settings",
   },
 };
 

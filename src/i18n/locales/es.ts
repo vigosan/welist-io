@@ -8,6 +8,7 @@ const es = {
     headlineSub: "",
     tagline: "Comparte lo que haces. Que otros lo intenten.",
     listNamePlaceholder: "Ponle un nombre a tu lista…",
+    listNameAriaLabel: "Nombre de la lista",
     createList: "Crear lista",
     footer: "© {{year}} Welist",
     step1Title: "Crea una lista",
@@ -45,7 +46,11 @@ const es = {
     noItemsFilter: "No hay elementos con ese filtro.",
     addFirst: "Añade el primer elemento a tu lista.",
     addItemPlaceholder: "Añadir elemento…",
+    addItemAriaLabel: "Texto del nuevo elemento",
     addItem: "Añadir",
+    closeSearch: "Cerrar búsqueda",
+    confirmSlug: "URL personalizada",
+    cancelSlug: "Cancelar edición de URL",
     expandMore: "ver más",
     expandLess: "ver menos",
     challengeInProgress: "Estás haciendo este reto",
@@ -66,6 +71,7 @@ const es = {
   },
   myLists: {
     searchPlaceholder: "Buscar mis listas…",
+    searchAriaLabel: "Buscar mis listas",
     search: "Buscar",
     sortRecent: "Recientes",
     sortNewest: "Más nuevas",
@@ -83,10 +89,14 @@ const es = {
     deleteYes: "Borrar",
     newList: "Nueva lista",
     newListPlaceholder: "Nombre de la lista…",
+    newListAriaLabel: "Nombre de la nueva lista",
+    cancelCreate: "Cancelar",
+    deleteList: "Borrar lista «{{name}}»",
     createList: "Crear",
   },
   explore: {
     searchPlaceholder: "Buscar listas…",
+    searchAriaLabel: "Buscar listas públicas",
     search: "Buscar",
     loading: "Cargando…",
     noListsSearch: "No hay listas con ese nombre.",
@@ -151,6 +161,12 @@ const es = {
   },
   help: {
     nav: "Ayuda",
+  },
+  user: {
+    menuAriaLabel: "Menú de usuario",
+    signOut: "Cerrar sesión",
+    myLists: "Mis listas",
+    settings: "Configuración",
   },
 } as const;
 

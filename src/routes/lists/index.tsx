@@ -54,6 +54,7 @@ function MyListCard({ list }: { list: List }) {
           </div>
           <button
             data-testid="delete-list-btn"
+            aria-label={t("myLists.deleteList", { name: list.name })}
             onClick={(e) => { e.preventDefault(); e.stopPropagation(); setConfirming(true); }}
             className="cursor-pointer h-10 w-10 flex items-center justify-center rounded-lg text-gray-300 hover:text-gray-500 transition-colors active:scale-[0.96] opacity-100 sm:opacity-0 sm:group-hover:opacity-100 shrink-0"
           >
@@ -73,7 +74,7 @@ function MyListCard({ list }: { list: List }) {
           {list.collaborative && (
             <span className="text-xs font-medium text-gray-500 px-2 py-1 bg-gray-50 rounded-lg">{t("myLists.collaborative")}</span>
           )}
-          <svg className="text-gray-200 w-4 h-4 shrink-0 ml-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg aria-hidden="true" className="text-gray-200 w-4 h-4 shrink-0 ml-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M9 18l6-6-6-6" />
           </svg>
         </div>
@@ -106,12 +107,14 @@ function CreateListInline({ onClose }: { onClose: () => void }) {
         value={name}
         onChange={(e) => setName(e.target.value)}
         placeholder={t("myLists.newListPlaceholder")}
+        aria-label={t("myLists.newListAriaLabel")}
         data-testid="new-list-name-input"
         className="flex-1 pl-3 text-sm text-gray-900 placeholder-gray-400 bg-transparent outline-none min-w-0"
         onKeyDown={(e) => e.key === "Escape" && onClose()}
       />
       <button
         type="button"
+        aria-label={t("myLists.cancelCreate")}
         onClick={onClose}
         className="cursor-pointer px-3 py-2 text-sm text-gray-400 hover:text-gray-700 transition-colors"
       >
@@ -191,6 +194,7 @@ function MyListsPage() {
                   value={q}
                   onChange={(e) => setQ(e.target.value)}
                   placeholder={t("myLists.searchPlaceholder")}
+                  aria-label={t("myLists.searchAriaLabel")}
                   data-testid="my-lists-search-input"
                   className="flex-1 pl-3 text-sm text-gray-900 placeholder-gray-400 bg-transparent outline-none"
                 />
