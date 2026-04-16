@@ -43,16 +43,37 @@ Each list has two independent boolean flags: `public` and `collaborative`.
 
 | | public: false | public: true |
 |---|---|---|
-| **collaborative: false** | Owner only | Anyone can view/participate |
-| **collaborative: true** | Anyone can view/edit (shared workspace) | Anyone can view/edit/participate |
+| **collaborative: false** | Owner only | Anyone can view/participate (challenger) |
+| **collaborative: true** | Anyone can view/edit (shared workspace, collaborator) | Anyone can view/edit/participate |
 
 Access control helpers in `api/app.ts`:
 - `canViewList` — returns true if `public`, `collaborative`, owner, or purchased
 - `canModifyList` — returns true if no owner, owner, or `collaborative`
 
-**Auto-join**: when a logged-in non-owner visits a `collaborative` list (`GET /lists/:listId`), a `participations` row is upserted silently. This makes the list appear in their `my-lists`.
+### Participation roles
+
+`participations.role` enum: `"challenger"` | `"collaborator"` (default: `"challenger"`).
+
+| Role | How they join | Can toggle items | Can add/edit/delete items | Progress tracked via |
+|---|---|---|---|---|
+| **challenger** | `POST /lists/:id/accept` from /explore | ✓ (own progress only) | ✗ | `item_progress` table |
+| **collaborator** | Auto-join on `GET /lists/:id` when `collaborative: true` | ✓ (shared) | ✓ | `items.done` directly |
+
+**Auto-join**: when a logged-in non-owner visits a `collaborative` list (`GET /lists/:listId`), a `participations` row is upserted with `role: "collaborator"`. This makes the list appear in their `my-lists`.
+
+**Toggle routing** (`PATCH /lists/:listId/items/:itemId/toggle`):
+1. Resolve list + item
+2. If `userId && !isOwner` → look up participation
+   - `role === "challenger"` → write to `item_progress`, check completion
+   - `role === "collaborator"` → fall through to shared toggle
+   - no participation → apply `canModifyList` (may 403)
+3. Shared toggle: `UPDATE items SET done = NOT done`
 
 **Leave vs delete**: `DELETE /lists/:listId` for a non-owner with a participation deletes only their participation row (leave). For the owner it deletes the list and cascades to items.
+
+### GET /lists/:listId/items
+
+Returns items with `done` state from `item_progress` overlay **only for challengers**. Collaborators and owners see `items.done` directly.
 
 ### Key data flow patterns
 - **Optimistic updates**: `cancelQueries → getQueryData (snapshot) → setQueryData (optimistic) → onError: restore snapshot → onSettled: setQueryData with server response`
@@ -62,7 +83,16 @@ Access control helpers in `api/app.ts`:
 Schema lives in `src/db/schema/lists.schema.ts`. The `index.ts` re-export uses **no `.js` extension** (drizzle-kit CJS incompatibility); the `client.ts` import uses `.js`. Migrations in `src/db/migrations/`.
 
 ### Testing
-Tests use `app.request()` (Hono test helper) with a mocked `db` via `vi.mock('../src/db/client')`. The mock must be set up before importing `app`.
+Tests use `app.request()` (Hono test helper) with a mocked `db` via `vi.mock('../src/db/client')`. The mock must be set up before importing `app`. To test authenticated endpoints, mock `getAuthUser` from `@hono/auth-js` before the app import:
+
+```ts
+const mockGetAuthUser = vi.fn().mockRejectedValue(new Error("no session"));
+vi.mock("@hono/auth-js", async (importOriginal) => {
+  const original = await importOriginal();
+  return { ...original, getAuthUser: (...args) => mockGetAuthUser(...args) };
+});
+// then per-test: mockGetAuthUser.mockResolvedValue({ session: { user: { id: "u1" } } });
+```
 
 ## UI Style Guide
 
