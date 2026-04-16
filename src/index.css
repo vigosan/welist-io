@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @utility no-scrollbar {
   &::-webkit-scrollbar { display: none; }
   scrollbar-width: none;
@@ -7,6 +9,11 @@
 
 @theme {
   --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+  /* Neutral dark-mode grays — Tailwind's defaults have a blue tint */
+  --color-gray-950: #0d0d0d;
+  --color-gray-900: #171717;
+  --color-gray-800: #242424;
+  --color-gray-700: #363636;
 }
 
 @layer base {
@@ -26,7 +33,7 @@
   }
 
   html.dark body {
-    background: #0a0a0a;
-    color: #f5f5f5;
+    background: #0d0d0d;
+    color: #ededed;
   }
 }
