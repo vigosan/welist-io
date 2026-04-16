@@ -66,16 +66,16 @@ export function ItemRow({
       onDragEnd={onDragEnd}
       className={`flex items-center gap-3 px-3 py-3.5 rounded-xl transition-colors ${
         isDragOver
-          ? "bg-gray-200"
+          ? "bg-gray-200 dark:bg-gray-700"
           : item.done
-            ? "bg-gray-100"
-            : "bg-gray-50 hover:bg-gray-100"
+            ? "bg-gray-100 dark:bg-gray-800"
+            : "bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800"
       }`}
     >
       {canWrite && onDragStart && (
         <span
           aria-hidden="true"
-          className="hidden sm:flex shrink-0 text-gray-300 cursor-grab active:cursor-grabbing touch-none select-none"
+          className="hidden sm:flex shrink-0 text-gray-300 dark:text-gray-600 cursor-grab active:cursor-grabbing touch-none select-none"
         >
           <svg
             aria-hidden="true"
@@ -103,14 +103,14 @@ export function ItemRow({
         <div
           className={`w-5 h-5 rounded-full flex items-center justify-center transition-[background-color,border-color] ${
             item.done
-              ? "bg-gray-900"
-              : "border-2 border-gray-300 hover:border-gray-600"
+              ? "bg-gray-900 dark:bg-white"
+              : "border-2 border-gray-300 dark:border-gray-600 hover:border-gray-600 dark:hover:border-gray-400"
           }`}
         >
           {item.done && (
             <svg
               aria-hidden="true"
-              className="w-3 h-3 text-white"
+              className="w-3 h-3 text-white dark:text-gray-900"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -145,7 +145,7 @@ export function ItemRow({
               }}
               aria-label={display || item.text}
               data-testid={`item-edit-input-${item.id}`}
-              className="w-full text-sm font-medium text-gray-900 bg-transparent outline-none"
+              className="w-full text-sm font-medium text-gray-900 dark:text-gray-100 bg-transparent outline-none"
             />
           </form>
         ) : (
@@ -162,7 +162,7 @@ export function ItemRow({
                   e.stopPropagation();
               }}
               className={`text-sm font-medium cursor-default select-none leading-snug ${
-                item.done ? "line-through text-gray-400" : "text-gray-800"
+                item.done ? "line-through text-gray-400 dark:text-gray-600" : "text-gray-800 dark:text-gray-200"
               }`}
             >
               {renderInlineMarkdown(display || item.text)}
@@ -176,8 +176,8 @@ export function ItemRow({
                   onClick={() => onTagClick?.(tag)}
                   className={`cursor-pointer inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium transition-colors active:scale-[0.96] ${
                     activeTag === tag
-                      ? "bg-gray-900 text-white"
-                      : "bg-gray-200 text-gray-500 hover:bg-gray-300 hover:text-gray-700"
+                      ? "bg-gray-900 text-white dark:bg-white dark:text-gray-900"
+                      : "bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-gray-600 hover:text-gray-700 dark:hover:text-gray-200"
                   }`}
                 >
                   #{tag}
@@ -195,7 +195,7 @@ export function ItemRow({
           aria-label={t("items.delete", {
             text: display || item.text,
           })}
-          className="cursor-pointer shrink-0 w-11 h-11 flex items-center justify-center text-gray-300 hover:text-gray-600 transition-colors active:scale-[0.96]"
+          className="cursor-pointer shrink-0 w-11 h-11 flex items-center justify-center text-gray-300 dark:text-gray-600 hover:text-gray-600 dark:hover:text-gray-400 transition-colors active:scale-[0.96]"
         >
           <svg
             aria-hidden="true"

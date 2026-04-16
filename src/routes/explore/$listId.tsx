@@ -88,7 +88,7 @@ function ExploreDetailPage() {
       <main className="flex-1 w-full max-w-3xl mx-auto px-4 py-6 flex flex-col gap-5">
         <Link
           to="/explore"
-          className="text-sm text-gray-500 hover:text-gray-900 transition-colors duration-150 w-fit"
+          className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors duration-150 w-fit"
           data-testid="back-to-explore"
         >
           {t("explore.backToExplore")}
@@ -115,7 +115,7 @@ function ExploreDetailPage() {
               </p>
             )}
             {detail.description && (
-              <p className="text-sm text-gray-600 leading-relaxed mt-2">
+              <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed mt-2">
                 {detail.description}
               </p>
             )}
@@ -130,10 +130,10 @@ function ExploreDetailPage() {
         </div>
 
         <div className="flex items-center gap-1.5 flex-wrap">
-          <div className="flex items-center gap-1 px-2 py-1 bg-gray-50 rounded-lg border border-gray-100">
+          <div className="flex items-center gap-1 px-2 py-1 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700">
             <svg
               aria-hidden="true"
-              className="w-3 h-3 text-gray-400"
+              className="w-3 h-3 text-gray-400 dark:text-gray-500"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -145,14 +145,14 @@ function ExploreDetailPage() {
                 d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
               />
             </svg>
-            <span className="text-xs font-medium text-gray-500 tabular-nums">
+            <span className="text-xs font-medium text-gray-500 dark:text-gray-400 tabular-nums">
               {itemCount}
             </span>
           </div>
-          <div className="flex items-center gap-1 px-2 py-1 bg-gray-50 rounded-lg border border-gray-100">
+          <div className="flex items-center gap-1 px-2 py-1 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700">
             <svg
               aria-hidden="true"
-              className="w-3 h-3 text-gray-400"
+              className="w-3 h-3 text-gray-400 dark:text-gray-500"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -164,7 +164,7 @@ function ExploreDetailPage() {
                 d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"
               />
             </svg>
-            <span className="text-xs font-medium text-gray-500 tabular-nums">
+            <span className="text-xs font-medium text-gray-500 dark:text-gray-400 tabular-nums">
               {totalParticipants}
             </span>
           </div>
@@ -180,15 +180,15 @@ function ExploreDetailPage() {
                     key={i}
                     src={p.image}
                     alt={p.name ?? ""}
-                    className="w-6 h-6 rounded-full outline outline-2 outline-white"
+                    className="w-6 h-6 rounded-full outline outline-2 outline-white dark:outline-gray-900"
                   />
                 ) : (
                   <div
                     // biome-ignore lint/suspicious/noArrayIndexKey: participants have no stable ID; names may be duplicate
                     key={i}
-                    className="w-6 h-6 rounded-full bg-gray-200 outline outline-2 outline-white flex items-center justify-center"
+                    className="w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-700 outline outline-2 outline-white dark:outline-gray-900 flex items-center justify-center"
                   >
-                    <span className="text-[8px] text-gray-500 font-medium">
+                    <span className="text-[8px] text-gray-500 dark:text-gray-400 font-medium">
                       {(p.name ?? "?")[0]?.toUpperCase()}
                     </span>
                   </div>
@@ -196,7 +196,7 @@ function ExploreDetailPage() {
               )}
             </div>
             {extraParticipants > 0 && (
-              <span className="text-xs text-gray-400 tabular-nums">
+              <span className="text-xs text-gray-400 dark:text-gray-500 tabular-nums">
                 {t("explore.moreParticipants", {
                   count: String(extraParticipants),
                 })}
@@ -208,20 +208,20 @@ function ExploreDetailPage() {
         <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 overflow-hidden">
           <div className="px-4 py-3">
             {itemsLoading && (
-              <p className="text-sm text-gray-400">{t("explore.loading")}</p>
+              <p className="text-sm text-gray-400 dark:text-gray-500">{t("explore.loading")}</p>
             )}
             {!itemsLoading && exploreItems && exploreItems.length === 0 && (
-              <p className="text-sm text-gray-400">{t("explore.noItems")}</p>
+              <p className="text-sm text-gray-400 dark:text-gray-500">{t("explore.noItems")}</p>
             )}
             {!itemsLoading && exploreItems && exploreItems.length > 0 && (
-              <ul className="divide-y divide-gray-50">
+              <ul className="divide-y divide-gray-50 dark:divide-gray-800">
                 {exploreItems.map((item) => (
                   <li key={item.id} className="flex items-center gap-3 py-2.5">
-                    <span className="w-4 h-4 rounded border shrink-0 border-gray-300" />
+                    <span className="w-4 h-4 rounded border shrink-0 border-gray-300 dark:border-gray-600" />
                     {/* biome-ignore lint/a11y/noStaticElementInteractions: link click passthrough */}
                     {/* biome-ignore lint/a11y/useKeyWithClickEvents: link click passthrough */}
                     <span
-                      className="text-sm text-gray-700"
+                      className="text-sm text-gray-700 dark:text-gray-300"
                       onClick={(e) => {
                         if ((e.target as HTMLElement).tagName === "A")
                           e.stopPropagation();

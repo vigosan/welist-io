@@ -810,9 +810,9 @@ function ListDetailPage() {
                               {c.name ?? "—"}
                             </span>
                             {!c.completedAt && c.totalItems > 0 && (
-                              <div className="h-1 w-full bg-gray-100 rounded-full overflow-hidden">
+                              <div className="h-1 w-full bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
                                 <div
-                                  className="h-full bg-gray-900 rounded-full transition-all"
+                                  className="h-full bg-gray-900 dark:bg-gray-100 rounded-full transition-all"
                                   style={{
                                     width: `${Math.round((c.doneCount / c.totalItems) * 100)}%`,
                                   }}
@@ -944,9 +944,9 @@ function ListDetailPage() {
               )}
 
               {!listLoading && progress > 0 && (
-                <div className="mt-3 h-0.5 bg-gray-100 overflow-hidden rounded-full">
+                <div className="mt-3 h-0.5 bg-gray-100 dark:bg-gray-700 overflow-hidden rounded-full">
                   <div
-                    className="h-full bg-gray-900 rounded-full transition-all duration-700"
+                    className="h-full bg-gray-900 dark:bg-gray-100 rounded-full transition-all duration-700"
                     style={{ width: `${progress}%` }}
                   />
                 </div>
@@ -965,8 +965,8 @@ function ListDetailPage() {
                         }
                         className={`cursor-pointer shrink-0 inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium transition ${
                           statusFilter === s
-                            ? "border-gray-900 bg-gray-900 text-white"
-                            : "border-gray-200 text-gray-500 bg-white hover:bg-gray-50 hover:text-gray-700"
+                            ? "border-gray-900 bg-gray-900 text-white dark:border-gray-100 dark:bg-gray-100 dark:text-gray-900"
+                            : "border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-700 dark:hover:text-gray-200"
                         }`}
                       >
                         {s === "pending"
@@ -1013,10 +1013,10 @@ function ListDetailPage() {
 
             {searchActive && (
               <div className="shrink-0 px-3 pb-2">
-                <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl">
+                <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl">
                   <svg
                     aria-hidden="true"
-                    className="w-3.5 h-3.5 text-gray-400 shrink-0"
+                    className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500 shrink-0"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -1038,7 +1038,7 @@ function ListDetailPage() {
                     placeholder={t("list.searchPlaceholder")}
                     aria-label={t("list.searchAriaLabel")}
                     data-testid="search-input"
-                    className="flex-1 text-sm text-gray-900 placeholder-gray-400 bg-transparent outline-none"
+                    className="flex-1 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-600 bg-transparent outline-none"
                   />
                   {searchQuery && (
                     <span className="text-xs text-gray-400 tabular-nums shrink-0">
@@ -1082,7 +1082,7 @@ function ListDetailPage() {
                   {Array.from({ length: 4 }, (_, i) => i).map((i) => (
                     <div
                       key={`skeleton-${i}`}
-                      className="flex items-center gap-3 px-3 py-3 rounded-lg bg-gray-50"
+                      className="flex items-center gap-3 px-3 py-3 rounded-lg bg-gray-50 dark:bg-gray-800/50"
                     >
                       <div className="shrink-0 w-10 h-10 flex items-center justify-center">
                         <div className="w-5 h-5 rounded-full bg-gray-200 animate-pulse" />
@@ -1182,7 +1182,7 @@ function ListDetailPage() {
                     )}
                     <form
                       onSubmit={handleAdd}
-                      className="flex gap-2 p-1.5 bg-gray-50 border border-gray-200 rounded-2xl"
+                      className="flex gap-2 p-1.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl"
                     >
                       <input
                         ref={addInputRef}
@@ -1192,7 +1192,7 @@ function ListDetailPage() {
                         placeholder={t("list.addItemPlaceholder")}
                         aria-label={t("list.addItemAriaLabel")}
                         data-testid="add-item-input"
-                        className="flex-1 pl-3 text-sm text-gray-900 placeholder-gray-400 bg-transparent outline-none"
+                        className="flex-1 pl-3 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-600 bg-transparent outline-none"
                       />
                       <button
                         type="submit"
