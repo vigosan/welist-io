@@ -170,6 +170,13 @@ const es = {
   help: {
     nav: "Ayuda",
   },
+  globalSearch: {
+    ariaLabel: "Búsqueda global de listas",
+    placeholder: "Buscar mis listas…",
+    resultsLabel: "Resultados",
+    noResults: "No hay listas con ese nombre.",
+    empty: "Empieza a escribir para buscar.",
+  },
   user: {
     menuAriaLabel: "Menú de usuario",
     signIn: "Iniciar sesión",

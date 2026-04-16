@@ -36,10 +36,6 @@ export function useCommandPalette({
 
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
-      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
-        e.preventDefault();
-        setPaletteOpen((o) => !o);
-      }
       if ((e.metaKey || e.ctrlKey) && e.key === "f") {
         e.preventDefault();
         onSearch();
@@ -114,5 +110,9 @@ export function useCommandPalette({
     },
   ];
 
-  return { paletteOpen, setPaletteOpen, paletteActions };
+  function openPalette() {
+    setPaletteOpen(true);
+  }
+
+  return { paletteOpen, setPaletteOpen, openPalette, paletteActions };
 }

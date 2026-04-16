@@ -1,7 +1,9 @@
 import { Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { useCachedSession } from "@/hooks/useCachedSession";
 import { useTheme } from "@/hooks/useTheme";
 import { setLanguage, useLanguage, useTranslation } from "@/i18n/service";
+import { GlobalCommandPalette } from "./GlobalCommandPalette";
 import { UserMenu } from "./UserMenu";
 
 export function AppNav() {
@@ -9,8 +11,24 @@ export function AppNav() {
   const { t } = useTranslation();
   const { language } = useLanguage();
   const { theme, toggle } = useTheme();
+  const [globalSearchOpen, setGlobalSearchOpen] = useState(false);
+
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        if (session?.user) {
+          e.preventDefault();
+          setGlobalSearchOpen((o) => !o);
+        }
+      }
+    }
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [session?.user]);
 
   return (
+    <>
+    <GlobalCommandPalette open={globalSearchOpen} onClose={() => setGlobalSearchOpen(false)} />
     <nav className="border-b border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-950 shrink-0">
       <div className="flex items-center justify-between px-6 h-13 max-w-3xl mx-auto w-full">
         <Link
@@ -88,5 +106,6 @@ export function AppNav() {
         </div>
       </div>
     </nav>
+    </>
   );
 }

@@ -720,6 +720,19 @@ function ListDetailPage() {
                         </span>
                       </button>
 
+                      <button
+                        type="button"
+                        onClick={() => setPaletteOpen(true)}
+                        data-testid="command-palette-btn"
+                        aria-label="Command palette (⌘K)"
+                        title="Command palette (⌘K)"
+                        className="cursor-pointer h-7 w-7 flex items-center justify-center rounded-md border border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500 hover:border-gray-400 dark:hover:border-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition active:scale-[0.96]"
+                      >
+                        <svg aria-hidden="true" className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                      </button>
+
                       {isOwner && (
                         <button
                           type="button"
@@ -730,7 +743,7 @@ function ListDetailPage() {
                           className={`cursor-pointer h-7 w-7 flex items-center justify-center rounded-md border transition active:scale-[0.96] ${
                             settingsOpen
                               ? "border-gray-900 bg-gray-900 text-white"
-                              : "border-gray-200 text-gray-400 hover:border-gray-400 hover:text-gray-700"
+                              : "border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500 hover:border-gray-400 dark:hover:border-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
                           }`}
                         >
                           <svg

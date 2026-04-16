@@ -171,6 +171,13 @@ const en: Translations = {
   help: {
     nav: "Help",
   },
+  globalSearch: {
+    ariaLabel: "Global list search",
+    placeholder: "Search my lists…",
+    resultsLabel: "Results",
+    noResults: "No lists found with that name.",
+    empty: "Start typing to search.",
+  },
   user: {
     menuAriaLabel: "User menu",
     signIn: "Sign in",
