@@ -2,6 +2,13 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { AppNav } from "@/components/AppNav";
 import type { List } from "@/db/schema/lists.schema";
+
+type MyList = List & {
+  itemCount: number;
+  doneCount: number;
+  participantCount: number;
+};
+
 import { useCreateList, useDeleteList, useMyLists } from "@/hooks/useList";
 import { useTranslation } from "@/i18n/service";
 
@@ -9,7 +16,7 @@ export const Route = createFileRoute("/lists/")({
   component: MyListsPage,
 });
 
-function MyListCard({ list }: { list: List }) {
+function MyListCard({ list }: { list: MyList }) {
   const [confirming, setConfirming] = useState(false);
   const deleteList = useDeleteList();
   const { t } = useTranslation();
@@ -95,6 +102,17 @@ function MyListCard({ list }: { list: List }) {
           </button>
         </div>
 
+        {list.itemCount > 0 && (
+          <div className="h-1 bg-gray-100 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-gray-900 rounded-full transition-all duration-300"
+              style={{
+                width: `${Math.round((list.doneCount / list.itemCount) * 100)}%`,
+              }}
+            />
+          </div>
+        )}
+
         <div className="flex items-center gap-1.5">
           {list.public && (
             <span className="text-xs font-medium text-gray-500 px-2 py-1 bg-gray-50 rounded-lg">
@@ -106,18 +124,25 @@ function MyListCard({ list }: { list: List }) {
               {t("myLists.collaborative")}
             </span>
           )}
-          <svg
-            aria-hidden="true"
-            className="text-gray-200 w-4 h-4 shrink-0 ml-auto"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M9 18l6-6-6-6" />
-          </svg>
+          <div className="ml-auto flex items-center gap-2">
+            <span className="text-xs text-gray-400">
+              {list.itemCount} {list.itemCount === 1 ? "item" : "items"}
+              {list.participantCount > 0 &&
+                ` · ${list.participantCount} ${list.participantCount === 1 ? "participante" : "participantes"}`}
+            </span>
+            <svg
+              aria-hidden="true"
+              className="text-gray-200 w-4 h-4 shrink-0"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M9 18l6-6-6-6" />
+            </svg>
+          </div>
         </div>
       </div>
     </Link>

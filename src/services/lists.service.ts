@@ -152,7 +152,11 @@ export const listsService = {
       params.set("visibility", visibility);
     const qs = params.toString();
     return apiClient<{
-      items: List[];
+      items: (List & {
+        itemCount: number;
+        doneCount: number;
+        participantCount: number;
+      })[];
       nextCursor: string | null;
     }>(`/api/my-lists${qs ? `?${qs}` : ""}`);
   },

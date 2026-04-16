@@ -249,6 +249,10 @@ app.get("/my-lists", async (c) => {
     visibilityFilter
   );
 
+  const itemCountExpr = sql<number>`cast((select count(*) from ${items} where ${items.listId} = ${lists.id}) as int)`;
+  const doneCountExpr = sql<number>`cast((select count(*) from ${items} where ${items.listId} = ${lists.id} and ${items.done} = true) as int)`;
+  const participantCountExpr = sql<number>`cast((select count(*) from ${participations} where ${participations.sourceListId} = ${lists.id}) as int)`;
+
   if (sort === "recent") {
     const activityExpr = sql<Date>`coalesce(max(${items.updatedAt}), ${lists.createdAt})`;
     const rows = await db
@@ -262,6 +266,9 @@ app.get("/my-lists", async (c) => {
         ownerId: lists.ownerId,
         createdAt: lists.createdAt,
         lastActivity: activityExpr,
+        itemCount: itemCountExpr,
+        doneCount: doneCountExpr,
+        participantCount: participantCountExpr,
       })
       .from(lists)
       .leftJoin(items, eq(items.listId, lists.id))
@@ -289,13 +296,24 @@ app.get("/my-lists", async (c) => {
           : lt(lists.createdAt, new Date(cursor))
       )
     : baseWhere;
-  const rows = await db.query.lists.findMany({
-    where,
-    orderBy: (t, { asc, desc }) => [
-      isAsc ? asc(t.createdAt) : desc(t.createdAt),
-    ],
-    limit: MY_LISTS_PAGE_SIZE,
-  });
+  const rows = await db
+    .select({
+      id: lists.id,
+      name: lists.name,
+      slug: lists.slug,
+      description: lists.description,
+      public: lists.public,
+      collaborative: lists.collaborative,
+      ownerId: lists.ownerId,
+      createdAt: lists.createdAt,
+      itemCount: itemCountExpr,
+      doneCount: doneCountExpr,
+      participantCount: participantCountExpr,
+    })
+    .from(lists)
+    .where(where)
+    .orderBy(isAsc ? lists.createdAt : desc(lists.createdAt))
+    .limit(MY_LISTS_PAGE_SIZE);
   const nextCursor =
     rows.length === MY_LISTS_PAGE_SIZE
       ? rows[rows.length - 1].createdAt.toISOString()
