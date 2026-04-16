@@ -15,7 +15,9 @@
     "db:migrate:prod": "tsx scripts/db-migrate.ts prod",
     "db:status": "tsx scripts/db-status.ts dev",
     "db:status:prod": "tsx scripts/db-status.ts prod",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write ."
   },
   "dependencies": {
     "@auth/core": "^0.41.1",
@@ -55,6 +57,7 @@
     "tsx": "^4.21.0",
     "typescript": "~5.8.3",
     "vite": "^6.3.1",
-    "vitest": "^3.1.1"
+    "vitest": "^3.1.1",
+    "@biomejs/biome": "2.4.12"
   }
 }

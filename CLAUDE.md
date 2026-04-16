@@ -17,6 +17,10 @@ npm run db:generate      # Generate Drizzle migration SQL from schema changes
 npm run db:migrate       # Apply pending migrations to dev DB
 npm run db:migrate:prod  # Apply pending migrations to prod DB (reads creds from 1Password)
 npm run db:status        # Show migration status for dev
+
+# Linting & formatting
+npm run lint             # Biome lint + format check
+npm run lint:fix         # Biome lint + format auto-fix
 ```
 
 DB credentials are read from 1Password via `op read`. Items: `Private → Apunta → apunta-dev-db` and `apunta-prod-db`. Requires `op signin` before running DB scripts.
