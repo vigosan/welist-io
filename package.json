@@ -33,6 +33,7 @@
     "react-dom": "^19.1.0",
     "react-i18next": "^17.0.2",
     "stripe": "^22.0.1",
+    "vercel": "^51.4.0",
     "zod": "^3.24.2"
   },
   "devDependencies": {
