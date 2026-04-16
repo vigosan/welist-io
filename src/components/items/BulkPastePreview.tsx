@@ -93,7 +93,7 @@ export function BulkPastePreview({
           onClick={onConfirm}
           disabled={isPending}
           data-testid="bulk-confirm"
-          className="cursor-pointer w-full py-2 text-sm font-medium bg-gray-900 text-white rounded-xl hover:bg-black disabled:opacity-40 disabled:cursor-not-allowed transition-[background-color,transform] duration-150 active:scale-[0.96]"
+          className="cursor-pointer w-full py-2 text-sm font-medium bg-gray-900 text-white dark:bg-white dark:text-gray-900 rounded-xl hover:bg-black dark:hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-[background-color,transform] duration-150 active:scale-[0.96]"
         >
           {isPending
             ? t("bulk.adding")

@@ -222,7 +222,7 @@ function CreateListInline({ onClose }: { onClose: () => void }) {
         type="submit"
         disabled={!name.trim() || createList.isPending}
         data-testid="new-list-create-btn"
-        className="cursor-pointer px-4 py-2 text-sm font-medium bg-gray-900 text-white rounded-xl hover:bg-black disabled:opacity-30 disabled:cursor-not-allowed transition-[background-color,transform] duration-150 active:scale-[0.96] shrink-0"
+        className="cursor-pointer px-4 py-2 text-sm font-medium bg-gray-900 text-white dark:bg-white dark:text-gray-900 rounded-xl hover:bg-black dark:hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-[background-color,transform] duration-150 active:scale-[0.96] shrink-0"
       >
         {createList.isPending ? "…" : t("myLists.createList")}
       </button>
@@ -316,7 +316,7 @@ function MyListsPage() {
                 />
                 <button
                   type="submit"
-                  className="cursor-pointer px-5 py-2.5 text-sm font-medium bg-gray-900 text-white rounded-xl hover:bg-black transition-[background-color] duration-150 active:scale-[0.96]"
+                  className="cursor-pointer px-5 py-2.5 text-sm font-medium bg-gray-900 text-white dark:bg-white dark:text-gray-900 rounded-xl hover:bg-black dark:hover:bg-gray-100 transition-[background-color] duration-150 active:scale-[0.96]"
                 >
                   {t("myLists.search")}
                 </button>

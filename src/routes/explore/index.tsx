@@ -121,7 +121,7 @@ function ExploreListCard({
             }}
             disabled={acceptPending}
             data-testid={`accept-btn-${list.id}`}
-            className="cursor-pointer w-full py-2 text-xs font-medium bg-gray-900 text-white rounded-xl hover:bg-black disabled:opacity-40 disabled:cursor-not-allowed transition-[background-color,transform] duration-150 active:scale-[0.96]"
+            className="cursor-pointer w-full py-2 text-xs font-medium bg-gray-900 text-white dark:bg-white dark:text-gray-900 rounded-xl hover:bg-black dark:hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-[background-color,transform] duration-150 active:scale-[0.96]"
           >
             {session?.user ? t("explore.acceptChallenge") : t("explore.signIn")}
           </button>
@@ -202,7 +202,7 @@ function ExplorePage() {
             />
             <button
               type="submit"
-              className="cursor-pointer px-5 py-2.5 text-sm font-medium bg-gray-900 text-white rounded-xl hover:bg-black transition-[background-color] duration-150 active:scale-[0.96]"
+              className="cursor-pointer px-5 py-2.5 text-sm font-medium bg-gray-900 text-white dark:bg-white dark:text-gray-900 rounded-xl hover:bg-black dark:hover:bg-gray-100 transition-[background-color] duration-150 active:scale-[0.96]"
             >
               {t("explore.search")}
             </button>
