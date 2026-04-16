@@ -21,7 +21,7 @@ import { BULK_ITEM_LIMIT } from "@/lib/constants";
 import { useTranslation } from "@/i18n/service";
 
 const searchSchema = z.object({
-  status: z.enum(["all", "pending", "done"]).optional().default("pending"),
+  status: z.enum(["all", "pending", "done"]).optional().default("all"),
   tag: z.string().optional(),
 });
 
