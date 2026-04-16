@@ -9,6 +9,7 @@ interface Props {
   onDelete: () => void;
   onEdit: (text: string) => void;
   onTagClick?: (tag: string) => void;
+  activeTag?: string;
   canWrite?: boolean;
   onDragStart?: (e: React.DragEvent) => void;
   onDragOver?: (e: React.DragEvent) => void;
@@ -17,7 +18,7 @@ interface Props {
   isDragOver?: boolean;
 }
 
-export function ItemRow({ item, onToggle, onDelete, onEdit, onTagClick, canWrite = true, onDragStart, onDragOver, onDrop, onDragEnd, isDragOver }: Props) {
+export function ItemRow({ item, onToggle, onDelete, onEdit, onTagClick, activeTag, canWrite = true, onDragStart, onDragOver, onDrop, onDragEnd, isDragOver }: Props) {
   const [editing, setEditing] = useState(false);
   const [text, setText] = useState(item.text);
   const cancelled = useRef(false);
@@ -104,7 +105,11 @@ export function ItemRow({ item, onToggle, onDelete, onEdit, onTagClick, canWrite
                 key={tag}
                 data-testid={`item-tag-${item.id}-${tag}`}
                 onClick={() => onTagClick?.(tag)}
-                className={`cursor-pointer shrink-0 inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium transition ${tagColor(tag)}`}
+                className={`cursor-pointer shrink-0 inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium transition ${
+                  activeTag === tag
+                    ? "border-gray-900 bg-gray-900 text-white"
+                    : tagColor(tag)
+                }`}
               >
                 #{tag}
               </button>

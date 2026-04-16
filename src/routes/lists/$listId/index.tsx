@@ -610,6 +610,7 @@ function ListDetailPage() {
                   onDelete={() => deleteItem.mutate(item.id)}
                   onEdit={(text) => updateItem.mutate({ id: item.id, text })}
                   onTagClick={(tag) => setActiveTag(activeTag === tag ? null : tag)}
+                  activeTag={activeTag}
                   canWrite={canWrite}
                   onDragStart={isOwner && !item.done ? handleDragStart(item.id) : undefined}
                   onDragOver={isOwner && !item.done ? handleDragOver(item.id) : undefined}
