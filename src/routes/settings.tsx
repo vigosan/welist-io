@@ -56,7 +56,7 @@ function SettingsPage() {
     <div className="min-h-dvh bg-[#FAFAF8] flex flex-col">
       <AppNav />
 
-      <main className="flex-1 w-full max-w-xl mx-auto px-4 py-8 flex flex-col gap-8">
+      <main className="flex-1 w-full max-w-4xl mx-auto px-4 py-8 flex flex-col gap-8">
         <div>
           <Link to="/lists" className="text-xs text-gray-400 hover:text-gray-700 transition">
             ← Mis listas

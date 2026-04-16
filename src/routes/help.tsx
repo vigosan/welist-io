@@ -159,7 +159,7 @@ function HelpPage() {
       <AppNav />
 
       <main className="flex-1 px-6 py-12">
-        <div className="max-w-xl mx-auto flex flex-col gap-10">
+        <div className="max-w-4xl mx-auto flex flex-col gap-10">
           <div className="flex flex-col gap-2">
             <h1 className="text-3xl font-bold tracking-tight text-gray-900">{page.title}</h1>
             <p className="text-sm text-gray-400 leading-relaxed">{page.subtitle}</p>

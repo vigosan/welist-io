@@ -59,7 +59,7 @@ function HowItWorks() {
   ];
 
   return (
-    <div className="w-full max-w-xl grid grid-cols-2 sm:grid-cols-4 gap-3">
+    <div className="w-full max-w-4xl grid grid-cols-2 sm:grid-cols-4 gap-3">
       {steps.map((step) => (
         <div key={step.number} className="bg-white border border-gray-100 rounded-2xl px-5 py-5 flex flex-col gap-3 text-left shadow-[0_1px_3px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.03)]">
           <span className="font-mono text-[11px] text-gray-300 tracking-widest">{step.number}</span>
@@ -81,14 +81,14 @@ function HomePage() {
       <AppNav />
 
       <main className="flex-1 flex flex-col items-center justify-center text-center px-6 py-20 gap-16">
-        <div className="max-w-xl w-full flex flex-col items-center gap-6">
+        <div className="max-w-4xl w-full flex flex-col items-center gap-6">
           <h1 className="text-5xl sm:text-[3.5rem] font-bold tracking-tight text-gray-900 leading-[1.1] text-balance">
             {t("home.headline")}
           </h1>
           <p className="text-base text-gray-500 leading-relaxed text-pretty max-w-md">
             {t("home.tagline")}
           </p>
-          <div className="w-full pt-2">
+          <div className="w-full max-w-xl pt-2">
             <CreateForm />
           </div>
         </div>

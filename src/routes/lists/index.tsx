@@ -180,7 +180,7 @@ function MyListsPage() {
     <div className="h-dvh bg-[#FAFAF8] flex flex-col">
       <AppNav />
 
-      <div className="flex-1 flex flex-col w-full max-w-xl mx-auto overflow-hidden">
+      <div className="flex-1 flex flex-col w-full max-w-4xl mx-auto overflow-hidden">
         <div className="px-4 pt-5 pb-3 shrink-0">
           {creating ? (
             <CreateListInline onClose={() => setCreating(false)} />
