@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import type { Action } from "@/components/CommandPalette";
 import type { List } from "@/db/schema";
 import { useTranslation } from "@/i18n/service";
@@ -49,89 +49,70 @@ export function useCommandPalette({
     return () => document.removeEventListener("keydown", onKeyDown);
   }, [onSearch]);
 
-  const paletteActions: Action[] = useMemo(
-    () => [
-      {
-        id: "search",
-        label: t("command.searchItems"),
-        onSelect: onSearch,
+  const paletteActions: Action[] = [
+    {
+      id: "search",
+      label: t("command.searchItems"),
+      onSelect: onSearch,
+    },
+    {
+      id: "add-item",
+      label: t("command.addItem"),
+      onSelect: () => addInputRef.current?.focus(),
+    },
+    {
+      id: "share",
+      label: t("command.copyLink"),
+      onSelect: handleShare,
+    },
+    {
+      id: "toggle-public",
+      label: list?.public ? t("command.makePrivate") : t("command.makePublic"),
+      onSelect: () => togglePublicMutate(!list?.public),
+    },
+    {
+      id: "rename",
+      label: t("command.rename"),
+      onSelect: () => {
+        setNameValue(list?.name ?? "");
+        setEditingName(true);
       },
-      {
-        id: "add-item",
-        label: t("command.addItem"),
-        onSelect: () => addInputRef.current?.focus(),
-      },
-      {
-        id: "share",
-        label: t("command.copyLink"),
-        onSelect: handleShare,
-      },
-      {
-        id: "toggle-public",
-        label: list?.public
-          ? t("command.makePrivate")
-          : t("command.makePublic"),
-        onSelect: () => togglePublicMutate(!list?.public),
-      },
-      {
-        id: "rename",
-        label: t("command.rename"),
-        onSelect: () => {
-          setNameValue(list?.name ?? "");
-          setEditingName(true);
-        },
-      },
-      ...allTags.map((tag) => ({
-        id: `filter-${tag}`,
-        label: t("command.filterByTag", { tag }),
-        onSelect: () => setActiveTag(activeTag === tag ? null : tag),
-      })),
-      {
-        id: "filter-all",
-        label: t("command.showAll"),
-        onSelect: () => setStatusFilter("all"),
-      },
-      {
-        id: "filter-pending",
-        label: t("command.showPending"),
-        onSelect: () => setStatusFilter("pending"),
-      },
-      {
-        id: "filter-done",
-        label: t("command.showDone"),
-        onSelect: () => setStatusFilter("done"),
-      },
-      ...(activeTag
-        ? [
-            {
-              id: "clear-filter",
-              label: t("command.clearTagFilter"),
-              onSelect: () => setActiveTag(null),
-            },
-          ]
-        : []),
-      {
-        id: "confetti",
-        label: t("command.testConfetti"),
-        onSelect: fireConfetti,
-      },
-    ],
-    [
-      t,
-      list?.public,
-      list?.name,
-      allTags,
-      activeTag,
-      handleShare,
-      addInputRef,
-      setActiveTag,
-      setStatusFilter,
-      setNameValue,
-      setEditingName,
-      togglePublicMutate,
-      onSearch,
-    ]
-  );
+    },
+    ...allTags.map((tag) => ({
+      id: `filter-${tag}`,
+      label: t("command.filterByTag", { tag }),
+      onSelect: () => setActiveTag(activeTag === tag ? null : tag),
+    })),
+    {
+      id: "filter-all",
+      label: t("command.showAll"),
+      onSelect: () => setStatusFilter("all"),
+    },
+    {
+      id: "filter-pending",
+      label: t("command.showPending"),
+      onSelect: () => setStatusFilter("pending"),
+    },
+    {
+      id: "filter-done",
+      label: t("command.showDone"),
+      onSelect: () => setStatusFilter("done"),
+    },
+    ...(activeTag
+      ? [
+          {
+            id: "clear-filter",
+            label: t("command.clearTagFilter"),
+            onSelect: () => setActiveTag(null),
+          },
+        ]
+      : []),
+    {
+      id: "confetti",
+      label: t("command.testConfetti"),
+      onSelect: fireConfetti,
+    },
+  ];
 
   return { paletteOpen, setPaletteOpen, paletteActions };
 }
