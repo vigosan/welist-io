@@ -26,7 +26,7 @@ function CreateForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex gap-2 p-1.5 bg-white border border-gray-200 rounded-2xl focus-within:border-gray-400 transition-[border-color] duration-150 w-full shadow-sm"
+      className="flex gap-2 p-1.5 bg-white border border-gray-200 rounded-2xl focus-within:border-gray-400 transition-[border-color] duration-150 w-full"
     >
       <input
         autoFocus
@@ -59,9 +59,9 @@ function HowItWorks() {
   ];
 
   return (
-    <div className="w-full max-w-4xl grid grid-cols-2 sm:grid-cols-4 gap-3">
+    <div className="w-full max-w-3xl grid grid-cols-2 sm:grid-cols-4 gap-3">
       {steps.map((step) => (
-        <div key={step.number} className="bg-white border border-gray-100 rounded-2xl px-5 py-5 flex flex-col gap-3 text-left shadow-[0_1px_3px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.03)]">
+        <div key={step.number} className="bg-white border border-gray-100 rounded-2xl px-5 py-5 flex flex-col gap-3 text-left">
           <span className="font-mono text-[11px] text-gray-300 tracking-widest">{step.number}</span>
           <div className="flex flex-col gap-1.5">
             <p className="text-sm font-semibold text-gray-900 leading-snug text-balance">{step.title}</p>
@@ -81,7 +81,7 @@ function HomePage() {
       <AppNav />
 
       <main className="flex-1 flex flex-col items-center justify-center text-center px-6 py-20 gap-16">
-        <div className="max-w-4xl w-full flex flex-col items-center gap-6">
+        <div className="max-w-3xl w-full flex flex-col items-center gap-6">
           <h1 className="text-5xl sm:text-[3.5rem] font-bold tracking-tight text-gray-900 leading-[1.1] text-balance">
             {t("home.headline")}
           </h1>

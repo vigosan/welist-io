@@ -121,7 +121,7 @@ function ExplorePage() {
     <div className="h-dvh bg-[#FAFAF8] flex flex-col">
       <AppNav />
 
-      <div className="flex-1 flex flex-col w-full max-w-4xl mx-auto overflow-hidden">
+      <div className="flex-1 flex flex-col w-full max-w-3xl mx-auto overflow-hidden">
         <div className="px-4 pt-6 pb-4 shrink-0">
           <form onSubmit={handleSearch} className="flex gap-2 p-1.5 bg-gray-50 border border-gray-200 rounded-2xl focus-within:border-gray-400 transition-[border-color] duration-150">
             <input

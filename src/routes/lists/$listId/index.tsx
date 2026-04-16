@@ -209,7 +209,7 @@ function ListDetailPage() {
     <div className="min-h-dvh bg-[#FAFAF8] flex flex-col">
       <AppNav />
     <div className="flex-1 flex flex-col sm:items-center sm:p-6">
-      <div className="flex-1 flex flex-col w-full sm:max-w-xl bg-white sm:rounded-3xl sm:border sm:border-gray-100 overflow-hidden sm:max-h-[calc(100dvh-3.25rem-3rem)]">
+      <div className="flex-1 flex flex-col w-full sm:max-w-3xl bg-white sm:rounded-3xl sm:border sm:border-gray-100 overflow-hidden sm:max-h-[calc(100dvh-3.25rem-3rem)]">
 
         <div className="px-5 pt-5 pb-4 shrink-0">
           <Link to="/lists" className="cursor-pointer text-xs text-gray-400 hover:text-gray-700 transition">
