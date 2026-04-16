@@ -975,7 +975,7 @@ function ListDetailPage() {
                       </button>
                     ))}
                     {allTags.length > 0 && (
-                      <div className="w-px shrink-0 self-stretch bg-gray-200 mx-0.5" />
+                      <div className="w-px shrink-0 self-stretch bg-gray-200 dark:bg-gray-700 mx-0.5" />
                     )}
                     {allTags.map((tag) => (
                       <button
@@ -987,7 +987,7 @@ function ListDetailPage() {
                         }
                         className={`cursor-pointer shrink-0 inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium transition ${
                           activeTag === tag
-                            ? "border-gray-900 bg-gray-900 text-white"
+                            ? "border-gray-900 bg-gray-900 text-white dark:border-gray-100 dark:bg-gray-100 dark:text-gray-900"
                             : tagColor(tag)
                         }`}
                       >
