@@ -1,0 +1,2 @@
+CREATE TYPE "public"."participation_role" AS ENUM('challenger', 'collaborator');--> statement-breakpoint
+ALTER TABLE "participations" ADD COLUMN "role" "participation_role" DEFAULT 'challenger' NOT NULL;

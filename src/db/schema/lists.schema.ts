@@ -28,6 +28,8 @@ export const items = pgTable(
   (t) => [index("items_list_position_idx").on(t.listId, t.position)],
 );
 
+export const participationRoleEnum = pgEnum("participation_role", ["challenger", "collaborator"]);
+
 export const participations = pgTable(
   "participations",
   {
@@ -35,6 +37,7 @@ export const participations = pgTable(
     sourceListId: uuid("source_list_id").references(() => lists.id, { onDelete: "set null" }),
     userListId: uuid("user_list_id").references(() => lists.id, { onDelete: "cascade" }),
     userId: text("user_id").notNull().references(() => users.id),
+    role: participationRoleEnum("role").notNull().default("challenger"),
     completedAt: timestamp("completed_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   },
