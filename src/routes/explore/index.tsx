@@ -164,12 +164,21 @@ function ExplorePage() {
   }
 
   function handleAccept(listId: string) {
+    const list = lists.find((l) => l.id === listId);
     acceptChallenge.mutate(listId, {
-      onSuccess: (list) =>
+      onSuccess: (accepted) =>
         navigate({
           to: "/lists/$listId",
-          params: { listId: list.id },
+          params: { listId: accepted.slug ?? accepted.id },
         }),
+      onError: (err) => {
+        if (err.message === "Already participating" && list) {
+          navigate({
+            to: "/lists/$listId",
+            params: { listId: list.slug ?? list.id },
+          });
+        }
+      },
     });
   }
 

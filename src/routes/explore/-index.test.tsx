@@ -149,4 +149,41 @@ describe("ExplorePage", () => {
     await userEvent.click(screen.getByTestId("accept-btn-e1"));
     expect(signIn).toHaveBeenCalledWith("google");
   });
+
+  it("accept error navigates to list when already participating", async () => {
+    let capturedOnError: ((err: Error) => void) | undefined;
+    const acceptMutate = vi.fn(
+      (_id: string, callbacks: { onError: (err: Error) => void }) => {
+        capturedOnError = callbacks.onError;
+      }
+    );
+    setupMocks({ sessionUser: { id: "u1" }, acceptMutate });
+
+    const qc = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false },
+        mutations: { retry: false },
+      },
+    });
+    const history = createMemoryHistory({ initialEntries: ["/explore"] });
+    const router = createRouter({
+      routeTree,
+      history,
+      context: { queryClient: qc },
+    });
+    render(
+      <QueryClientProvider client={qc}>
+        <RouterProvider router={router} />
+      </QueryClientProvider>
+    );
+
+    await waitFor(() =>
+      expect(screen.getByTestId("accept-btn-e1")).toBeInTheDocument()
+    );
+    await userEvent.click(screen.getByTestId("accept-btn-e1"));
+    expect(capturedOnError).toBeDefined();
+    // biome-ignore lint/style/noNonNullAssertion: captured in mock callback above
+    capturedOnError!(new Error("Already participating"));
+    expect(router.state.location.pathname).toBe("/lists/e1");
+  });
 });
