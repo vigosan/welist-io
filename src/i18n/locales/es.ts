@@ -169,6 +169,7 @@ const es = {
   },
   user: {
     menuAriaLabel: "Menú de usuario",
+    signIn: "Iniciar sesión",
     signOut: "Cerrar sesión",
     myLists: "Mis listas",
     settings: "Configuración",

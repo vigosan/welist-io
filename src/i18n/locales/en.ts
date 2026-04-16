@@ -170,6 +170,7 @@ const en: Translations = {
   },
   user: {
     menuAriaLabel: "User menu",
+    signIn: "Sign in",
     signOut: "Sign out",
     myLists: "My lists",
     settings: "Settings",

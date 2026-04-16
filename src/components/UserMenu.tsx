@@ -57,14 +57,14 @@ export function UserMenu() {
               onClick={() => setOpen(false)}
               className="block w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
             >
-              Mis listas
+              {t("user.myLists")}
             </Link>
             <Link
               to="/settings"
               onClick={() => setOpen(false)}
               className="block w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
             >
-              Configuración
+              {t("user.settings")}
             </Link>
             <div className="border-t border-gray-100 my-1" />
             <button
@@ -76,7 +76,7 @@ export function UserMenu() {
               data-testid="sign-out-btn"
               className="cursor-pointer block w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
             >
-              Cerrar sesión
+              {t("user.signOut")}
             </button>
           </div>
         )}
@@ -91,7 +91,7 @@ export function UserMenu() {
       data-testid="sign-in-btn"
       className="cursor-pointer h-7 flex items-center px-2.5 rounded-md border border-gray-200 text-xs font-medium text-gray-500 hover:border-gray-400 hover:text-gray-900 transition-[border-color,color] duration-150 active:scale-[0.96]"
     >
-      Iniciar sesión
+      {t("user.signIn")}
     </button>
   );
 }
