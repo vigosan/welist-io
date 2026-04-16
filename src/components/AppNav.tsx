@@ -10,7 +10,7 @@ export function AppNav() {
 
   return (
     <nav className="border-b border-gray-100 bg-white shrink-0">
-      <div className="flex items-center justify-between px-6 h-13 max-w-4xl mx-auto w-full">
+      <div className="flex items-center justify-between px-6 h-13 max-w-3xl mx-auto w-full">
         <Link to="/" data-testid="nav-logo" className="cursor-pointer font-mono text-sm font-bold text-gray-900 tracking-tight hover:text-gray-400 transition-colors duration-150">
           welist
         </Link>
@@ -24,7 +24,7 @@ export function AppNav() {
           </Link>
           {session?.user && (
             <>
-              <span className="text-gray-200 text-xs select-none">·</span>
+              <span className="text-gray-300 text-xs select-none">·</span>
               <Link
                 to="/lists"
                 data-testid="nav-my-lists"
@@ -34,7 +34,7 @@ export function AppNav() {
               </Link>
             </>
           )}
-          <span className="text-gray-200 text-xs select-none">·</span>
+          <span className="text-gray-300 text-xs select-none">·</span>
           <Link
             to="/help"
             data-testid="nav-help"
