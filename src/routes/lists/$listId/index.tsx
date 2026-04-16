@@ -20,7 +20,7 @@ import { BULK_ITEM_LIMIT } from "@/lib/constants";
 import { useTranslation } from "@/i18n/service";
 
 const searchSchema = z.object({
-  status: z.enum(["all", "pending", "done"]).optional().default("all"),
+  status: z.enum(["all", "pending", "done"]).optional().default("pending"),
   tag: z.string().optional(),
 });
 
@@ -54,7 +54,7 @@ function ListDetailPage() {
   }
 
   function setStatusFilter(s: "all" | "pending" | "done") {
-    navigate({ search: (prev) => ({ ...prev, status: s === "all" ? undefined : s }), replace: true });
+    navigate({ search: (prev) => ({ ...prev, status: s }), replace: true });
   }
   function setActiveTag(t: string | null) {
     navigate({ search: (prev) => ({ ...prev, tag: t ?? undefined }), replace: true });
