@@ -50,6 +50,13 @@ function UserProfilePage() {
       <AppNav />
 
       <main className="flex-1 w-full max-w-3xl mx-auto px-4 py-8 flex flex-col gap-8">
+        <Link
+          to="/explore"
+          className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors duration-150 w-fit"
+        >
+          {t("explore.backToExplore")}
+        </Link>
+
         <div className="flex items-center gap-4">
           {profile.image ? (
             <img
