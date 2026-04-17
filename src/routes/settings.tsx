@@ -54,10 +54,10 @@ function SettingsPage() {
 
   if (!session?.user) {
     return (
-      <div className="min-h-dvh bg-[#FAFAF8] flex flex-col">
+      <div className="min-h-dvh bg-[#FAFAF8] dark:bg-gray-950 flex flex-col">
         <AppNav />
         <main className="flex-1 flex items-center justify-center px-4">
-          <p className="text-sm text-gray-400">
+          <p className="text-sm text-gray-400 dark:text-gray-500">
             Inicia sesión para ver la configuración.
           </p>
         </main>
@@ -66,67 +66,67 @@ function SettingsPage() {
   }
 
   return (
-    <div className="min-h-dvh bg-[#FAFAF8] flex flex-col">
+    <div className="min-h-dvh bg-[#FAFAF8] dark:bg-gray-950 flex flex-col">
       <AppNav />
 
       <main className="flex-1 w-full max-w-3xl mx-auto px-4 py-8 flex flex-col gap-8">
         <div>
           <Link
             to="/lists"
-            className="text-xs text-gray-400 hover:text-gray-700 transition"
+            className="text-xs text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition"
           >
             ← Mis listas
           </Link>
-          <h1 className="mt-4 text-xl font-bold tracking-tight text-gray-900">
+          <h1 className="mt-4 text-xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
             Configuración
           </h1>
         </div>
 
-        <section className="bg-white border border-gray-100 rounded-2xl p-5 flex flex-col gap-4">
+        <section className="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl p-5 flex flex-col gap-4">
           <div>
-            <p className="text-sm font-semibold text-gray-900">Cuenta</p>
-            <p className="text-sm text-gray-500 mt-0.5">{session.user.email}</p>
+            <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">Cuenta</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{session.user.email}</p>
           </div>
 
           {session.user.image && (
             <img
               src={session.user.image}
               alt={session.user.name ?? ""}
-              className="w-12 h-12 rounded-full outline outline-1 outline-black/10"
+              className="w-12 h-12 rounded-full outline outline-1 outline-black/10 dark:outline-white/10"
             />
           )}
         </section>
 
-        <section className="bg-white border border-gray-100 rounded-2xl p-5 flex flex-col gap-4">
+        <section className="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl p-5 flex flex-col gap-4">
           <div>
-            <p className="text-sm font-semibold text-gray-900">
+            <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
               Pagos con Stripe
             </p>
-            <p className="text-xs text-gray-400 mt-0.5 leading-relaxed">
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5 leading-relaxed">
               Conecta tu cuenta de Stripe para vender el acceso a tus listas. El
               dinero va directo a tu cuenta.
             </p>
           </div>
 
           {stripeParam === "success" && (
-            <div className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-600">
+            <div className="px-3 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-xs text-gray-600 dark:text-gray-400">
               Cuenta conectada correctamente.
             </div>
           )}
           {stripeParam === "refresh" && (
-            <div className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-500">
+            <div className="px-3 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-xs text-gray-500 dark:text-gray-400">
               El proceso fue interrumpido. Vuelve a conectar tu cuenta.
             </div>
           )}
 
           {loading ? (
-            <div className="h-8 w-40 rounded-xl bg-gray-100 animate-pulse" />
+            <div className="h-8 w-40 rounded-xl bg-gray-100 dark:bg-gray-800 animate-pulse" />
           ) : status?.onboardingComplete ? (
             <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-700 px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-xl">
+              <span className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-700 dark:text-gray-300 px-3 py-1.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl">
                 <svg
                   aria-hidden="true"
-                  className="w-3 h-3 text-gray-500"
+                  className="w-3 h-3 text-gray-500 dark:text-gray-400"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"

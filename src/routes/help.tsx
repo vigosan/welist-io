@@ -166,16 +166,16 @@ function HelpSection({
 }) {
   return (
     <div className="flex flex-col gap-4">
-      <h2 className="text-sm font-semibold text-gray-900 tracking-tight">
+      <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-100 tracking-tight">
         {title}
       </h2>
       <ul className="flex flex-col gap-2">
         {items.map((item) => (
           <li
             key={item}
-            className="flex items-start gap-2.5 text-sm text-gray-600 leading-relaxed"
+            className="flex items-start gap-2.5 text-sm text-gray-600 dark:text-gray-400 leading-relaxed"
           >
-            <span className="mt-2 shrink-0 w-1 h-1 rounded-full bg-gray-300" />
+            <span className="mt-2 shrink-0 w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-600" />
             <span>{renderInlineMarkdown(item)}</span>
           </li>
         ))}
@@ -189,16 +189,16 @@ function HelpPage() {
   const page = content[language] ?? content.es;
 
   return (
-    <div className="min-h-dvh bg-[#FAFAF8] flex flex-col">
+    <div className="min-h-dvh bg-[#FAFAF8] dark:bg-gray-950 flex flex-col">
       <AppNav />
 
       <main className="flex-1 py-12">
         <div className="max-w-3xl mx-auto px-6 flex flex-col gap-10">
           <div className="flex flex-col gap-2">
-            <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+            <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
               {page.title}
             </h1>
-            <p className="text-sm text-gray-400 leading-relaxed">
+            <p className="text-sm text-gray-400 dark:text-gray-500 leading-relaxed">
               {page.subtitle}
             </p>
           </div>
