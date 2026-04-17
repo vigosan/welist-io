@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { useCachedSession } from "@/hooks/useCachedSession";
 import { useMyLists } from "@/hooks/useList";
 import { useTranslation } from "@/i18n/service";
+import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 
 interface Props {
   open: boolean;
@@ -17,7 +18,8 @@ export function GlobalCommandPalette({ open, onClose }: Props) {
   const { t } = useTranslation();
   const { data: session } = useCachedSession();
 
-  const { data } = useMyLists(query || undefined, "recent", undefined);
+  const debouncedQuery = useDebouncedValue(query, 200);
+  const { data } = useMyLists(debouncedQuery || undefined, "recent", undefined);
   const lists = data?.pages.flatMap((p) => p.items) ?? [];
 
   useEffect(() => {
