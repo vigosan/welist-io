@@ -44,7 +44,7 @@ export function ItemRow({
 }: Props) {
   const [editing, setEditing] = useState(false);
   const [text, setText] = useState(item.text);
-  const [pendingCoords, setPendingCoords] = useState<Coords | null>(null);
+  const [pendingCoords, setPendingCoords] = useState<Coords | null | undefined>(undefined);
   const [geoOpen, setGeoOpen] = useState(false);
   const cancelled = useRef(false);
   const { display, tags, places } = parseItemText(item.text);
@@ -63,7 +63,7 @@ export function ItemRow({
     if (trimmed && trimmed !== item.text) onEdit(trimmed, pendingCoords);
     setEditing(false);
     setGeoOpen(false);
-    setPendingCoords(null);
+    setPendingCoords(undefined);
   }
 
   function handleCancel() {
@@ -71,14 +71,14 @@ export function ItemRow({
     setText(item.text);
     setEditing(false);
     setGeoOpen(false);
-    setPendingCoords(null);
+    setPendingCoords(undefined);
   }
 
   function handleTextChange(val: string) {
     setText(val);
     const hasAt = PARTIAL_PLACE_REGEX.test(val);
     setGeoOpen(hasAt);
-    if (!hasAt) setPendingCoords(null);
+    if (!hasAt) setPendingCoords(undefined);
   }
 
   function handleKeyDown(e: React.KeyboardEvent) {
