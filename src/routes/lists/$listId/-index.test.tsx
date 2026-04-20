@@ -16,6 +16,9 @@ vi.mock("@/hooks/usePullToRefresh");
 vi.mock("@/hooks/useList");
 vi.mock("@/hooks/useListPrice");
 vi.mock("@/hooks/useStripeAccount");
+vi.mock("@/hooks/useGeocodingSearch", () => ({
+  useGeocodingSearch: () => ({ results: [], isLoading: false }),
+}));
 vi.mock("@/lib/confetti", () => ({
   fireConfetti: vi.fn(),
 }));
@@ -68,6 +71,9 @@ function makeItem(id: string, text: string, done = false): Item {
     text,
     done,
     position: 0,
+    latitude: null,
+    longitude: null,
+    placeName: null,
     createdAt: new Date(),
     updatedAt: new Date(),
   };
@@ -211,8 +217,11 @@ function setupMocks({
   vi.mocked(useItemsFilter).mockReturnValue({
     stableItems: items,
     allTags: [],
+    allPlaces: [],
     partialTag: null,
+    partialPlace: null,
     tagSuggestions: [],
+    placeSuggestions: [],
     filteredItems,
     resetOrder: vi.fn(),
     setOrder: vi.fn(),
@@ -435,8 +444,11 @@ describe("ListDetailPage", () => {
     vi.mocked(useItemsFilter).mockReturnValue({
       stableItems: undoneItems,
       allTags: [],
+      allPlaces: [],
       partialTag: null,
+      partialPlace: null,
       tagSuggestions: [],
+      placeSuggestions: [],
       filteredItems: undoneItems,
       resetOrder,
       setOrder: vi.fn(),
