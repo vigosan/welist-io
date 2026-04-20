@@ -229,7 +229,7 @@ const es = {
     lists_other: "{{count}} listas",
     completed_one: "{{count}} reto",
     completed_other: "{{count}} retos",
-    nav: "Personas",
+    nav: "Comunidad",
   },
 } as const;
 

@@ -230,7 +230,7 @@ const en: Translations = {
     lists_other: "{{count}} lists",
     completed_one: "{{count}} challenge",
     completed_other: "{{count}} challenges",
-    nav: "People",
+    nav: "Community",
   },
 };
 

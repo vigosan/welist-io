@@ -9,6 +9,13 @@ export const Route = createFileRoute("/users/")({
   component: UsersDirectoryPage,
 });
 
+function privateName(name: string | null): string {
+  if (!name) return "—";
+  const parts = name.trim().split(/\s+/);
+  if (parts.length === 1) return parts[0];
+  return `${parts[0]} ${parts[parts.length - 1][0]}.`;
+}
+
 function UserCard({ user }: { user: DirectoryUser }) {
   const { t } = useTranslation();
 
@@ -45,7 +52,7 @@ function UserCard({ user }: { user: DirectoryUser }) {
       )}
       <div className="flex-1 min-w-0">
         <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">
-          {user.name ?? "—"}
+          {privateName(user.name)}
         </p>
         <div className="flex items-center gap-2 mt-0.5">
           <span className="text-xs text-gray-400 dark:text-gray-500 tabular-nums">
