@@ -91,9 +91,36 @@ export const notificationsService = {
     apiClient<void>("/api/notifications/read-all", { method: "PATCH" }),
 };
 
+export type DirectoryUser = {
+  id: string;
+  name: string | null;
+  image: string | null;
+  publicListsCount: number;
+  completedChallengesCount: number;
+};
+
 export const usersService = {
   getProfile: (userId: string) =>
     apiClient<UserProfile>(`/api/users/${userId}/profile`),
+
+  directory: (q?: string, cursor?: string) => {
+    const params = new URLSearchParams();
+    if (q) params.set("q", q);
+    if (cursor) params.set("cursor", cursor);
+    const qs = params.toString();
+    return apiClient<{ users: DirectoryUser[]; nextCursor: string | null }>(
+      `/api/users${qs ? `?${qs}` : ""}`
+    );
+  },
+
+  getMe: () =>
+    apiClient<{ publicProfile: boolean }>("/api/users/me"),
+
+  updateProfile: (data: { publicProfile: boolean }) =>
+    apiClient<{ publicProfile: boolean }>("/api/users/me", {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    }),
 };
 
 export const stripeService = {

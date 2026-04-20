@@ -221,3 +221,32 @@ export function useUserProfile(userId: string) {
     staleTime: 60_000,
   });
 }
+
+export function useUserDirectory(q?: string) {
+  return useInfiniteQuery({
+    queryKey: queryKeys.userDirectory(q),
+    queryFn: ({ pageParam }) => usersService.directory(q, pageParam),
+    initialPageParam: undefined as string | undefined,
+    getNextPageParam: (last) => last.nextCursor ?? undefined,
+    staleTime: 60_000,
+  });
+}
+
+export function useUserMe() {
+  return useQuery({
+    queryKey: queryKeys.userMe(),
+    queryFn: () => usersService.getMe(),
+    staleTime: 60_000,
+  });
+}
+
+export function useUpdateProfile() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data: { publicProfile: boolean }) =>
+      usersService.updateProfile(data),
+    onSuccess: (updated) => {
+      qc.setQueryData(queryKeys.userMe(), updated);
+    },
+  });
+}
