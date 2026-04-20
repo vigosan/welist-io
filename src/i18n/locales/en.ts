@@ -74,6 +74,10 @@ const en: Translations = {
     visibilityPublic: "Public",
     accessSolo: "Only me",
     accessCollaborative: "Collaborative",
+    mapView: "Map",
+    listView: "List",
+    addPlace: "Add place",
+    removePlace: "Remove place",
   },
   myLists: {
     searchPlaceholder: "Search my lists…",

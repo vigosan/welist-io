@@ -73,6 +73,10 @@ const es = {
     visibilityPublic: "Pública",
     accessSolo: "Solo yo",
     accessCollaborative: "Colaborativa",
+    mapView: "Mapa",
+    listView: "Lista",
+    addPlace: "Añadir lugar",
+    removePlace: "Quitar lugar",
   },
   myLists: {
     searchPlaceholder: "Buscar mis listas…",
