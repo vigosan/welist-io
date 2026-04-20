@@ -2,6 +2,7 @@ import Google from "@auth/core/providers/google";
 import type { AuthUser } from "@hono/auth-js";
 import { authHandler, getAuthUser, initAuthConfig } from "@hono/auth-js";
 import { zValidator } from "@hono/zod-validator";
+import type { AnyColumn } from "drizzle-orm";
 import {
   and,
   countDistinct,
@@ -150,6 +151,10 @@ function canModifyList(
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+function inUuids(col: AnyColumn, ids: string[]) {
+  return sql`${col} = ANY(ARRAY[${sql.join(ids.map((id) => sql`${id}::uuid`), sql`, `)}])`;
+}
+
 function listWhere(param: string) {
   return UUID_RE.test(param) ? eq(lists.id, param) : eq(lists.slug, param);
 }
@@ -260,7 +265,7 @@ app.get("/my-lists", async (c) => {
     .filter((id): id is string => id !== null);
   const ownerOrParticipant =
     participatedIds.length > 0
-      ? or(eq(lists.ownerId, userId), inArray(lists.id, participatedIds))
+      ? or(eq(lists.ownerId, userId), inUuids(lists.id, participatedIds))
       : eq(lists.ownerId, userId);
   const baseWhere = and(
     ownerOrParticipant,
@@ -438,17 +443,18 @@ app.get("/lists/:listId/items", async (c) => {
   if (!participation || participation.role !== "challenger")
     return c.json(rows);
 
-  const progressRows = await db.query.itemProgress.findMany({
-    where: and(
-      // biome-ignore lint/style/noNonNullAssertion: userId checked by participation lookup above
-      eq(itemProgress.userId, userId!),
-      inArray(
-        itemProgress.itemId,
-        rows.map((r) => r.id)
-      )
-    ),
-    columns: { itemId: true, done: true },
-  });
+  const itemIds = rows.map((r) => r.id);
+  const progressRows =
+    itemIds.length === 0
+      ? []
+      : await db.query.itemProgress.findMany({
+          where: and(
+            // biome-ignore lint/style/noNonNullAssertion: userId checked by participation lookup above
+            eq(itemProgress.userId, userId!),
+            inUuids(itemProgress.itemId, itemIds)
+          ),
+          columns: { itemId: true, done: true },
+        });
   const progressMap = new Map(progressRows.map((p) => [p.itemId, p.done]));
   return c.json(
     rows.map((item) => ({
@@ -619,16 +625,17 @@ app.patch("/lists/:listId/items/:itemId/toggle", async (c) => {
       where: eq(items.listId, list.id),
       columns: { id: true },
     });
-    const allProgress = await db.query.itemProgress.findMany({
-      where: and(
-        eq(itemProgress.userId, userId),
-        inArray(
-          itemProgress.itemId,
-          allItems.map((i) => i.id)
-        )
-      ),
-      columns: { done: true },
-    });
+    const allItemIds = allItems.map((i) => i.id);
+    const allProgress =
+      allItemIds.length === 0
+        ? []
+        : await db.query.itemProgress.findMany({
+            where: and(
+              eq(itemProgress.userId, userId),
+              inUuids(itemProgress.itemId, allItemIds)
+            ),
+            columns: { done: true },
+          });
     const allDone =
       allItems.length > 0 &&
       allProgress.length === allItems.length &&
@@ -728,7 +735,7 @@ app.delete(
     const { ids } = c.req.valid("json");
     await db
       .delete(items)
-      .where(and(eq(items.listId, list.id), inArray(items.id, ids)));
+      .where(and(eq(items.listId, list.id), inUuids(items.id, ids)));
     return c.body(null, 204);
   }
 );
