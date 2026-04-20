@@ -847,8 +847,8 @@ app.get("/users", async (c) => {
       id: users.id,
       name: users.name,
       image: users.image,
-      publicListsCount: sql<number>`(select count(*)::int from lists where lists.owner_id = users.id and lists.public = true)`,
-      completedChallengesCount: sql<number>`(select count(*)::int from participations where participations.user_id = users.id and participations.completed_at is not null)`,
+      publicListsCount: sql<number>`cast((select count(*) from ${lists} where ${lists.ownerId} = ${users.id} and ${lists.public} = true) as int)`,
+      completedChallengesCount: sql<number>`cast((select count(*) from ${participations} where ${participations.userId} = ${users.id} and ${participations.completedAt} is not null) as int)`,
     })
     .from(users)
     .where(where)
