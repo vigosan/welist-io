@@ -4,9 +4,8 @@ import type { Item } from "@/hooks/useItems";
 import { useTranslation } from "@/i18n/service";
 import { renderInlineMarkdown } from "@/lib/inline-markdown";
 import { parseItemText } from "@/lib/item-text";
+import { PARTIAL_PLACE_REGEX } from "@/lib/places";
 import type { Coords } from "@/services/items.service";
-
-const PLACE_REGEX = /@([a-zA-ZÀ-ÿ\u00f1\u00d1\w]*)$/;
 
 interface Props {
   item: Item;
@@ -52,7 +51,7 @@ export function ItemRow({
   const { t } = useTranslation();
   const effectiveCanToggle = canToggle ?? canWrite;
 
-  const partialPlace = geoOpen ? (PLACE_REGEX.exec(text)?.[1] ?? null) : null;
+  const partialPlace = geoOpen ? (PARTIAL_PLACE_REGEX.exec(text)?.[1] ?? null) : null;
   const geocodingQuery =
     partialPlace !== null && partialPlace.length >= 3 ? partialPlace : "";
   const { results: geocodingResults, isLoading: geocodingLoading } =
@@ -77,7 +76,7 @@ export function ItemRow({
 
   function handleTextChange(val: string) {
     setText(val);
-    const hasAt = PLACE_REGEX.test(val);
+    const hasAt = PARTIAL_PLACE_REGEX.test(val);
     setGeoOpen(hasAt);
     if (!hasAt) setPendingCoords(null);
   }
@@ -86,7 +85,7 @@ export function ItemRow({
     if (e.key === "Escape") {
       e.preventDefault();
       if (geoOpen) {
-        setText((v) => v.replace(PLACE_REGEX, "").trimEnd());
+        setText((v) => v.replace(PARTIAL_PLACE_REGEX, "").trimEnd());
         setGeoOpen(false);
         setPendingCoords(null);
       } else {
@@ -191,7 +190,7 @@ export function ItemRow({
                     onMouseDown={(e) => e.preventDefault()}
                     onClick={() => {
                       setText((prev) =>
-                        prev.replace(PLACE_REGEX, `@${result.name} `)
+                        prev.replace(PARTIAL_PLACE_REGEX, `@${result.name} `)
                       );
                       setPendingCoords({
                         latitude: result.latitude,

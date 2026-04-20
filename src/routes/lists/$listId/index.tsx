@@ -37,6 +37,7 @@ import { useStripeAccountStatus } from "@/hooks/useStripeAccount";
 import { useTranslation } from "@/i18n/service";
 import { fireConfetti } from "@/lib/confetti";
 import { BULK_ITEM_LIMIT } from "@/lib/constants";
+import { PARTIAL_PLACE_REGEX } from "@/lib/places";
 import { tagColor } from "@/lib/tags";
 import type { Coords } from "@/services/items.service";
 
@@ -1355,7 +1356,7 @@ function ListDetailPage() {
                             onClick={() => {
                               setNewItem((prev) =>
                                 prev.replace(
-                                  /@([a-zA-ZÀ-ÿ\u00f1\u00d1\w]*)$/,
+                                  PARTIAL_PLACE_REGEX,
                                   `@${place} `
                                 )
                               );
@@ -1403,7 +1404,7 @@ function ListDetailPage() {
                               onClick={() => {
                                 setNewItem((prev) =>
                                   prev.replace(
-                                    /@([a-zA-ZÀ-ÿ\u00f1\u00d1\w]*)$/,
+                                    PARTIAL_PLACE_REGEX,
                                     `@${result.name} `
                                   )
                                 );
@@ -1455,9 +1456,7 @@ function ListDetailPage() {
                         onChange={(e) => {
                           const val = e.target.value;
                           setNewItem(val);
-                          const hasAt = /@([a-zA-ZÀ-ÿ\u00f1\u00d1\w]*)$/.test(
-                            val
-                          );
+                          const hasAt = PARTIAL_PLACE_REGEX.test(val);
                           setPlaceDropdownOpen(hasAt);
                           if (!hasAt) setPendingCoords(null);
                         }}
@@ -1466,7 +1465,7 @@ function ListDetailPage() {
                             e.preventDefault();
                             setNewItem((v) =>
                               v
-                                .replace(/@([a-zA-ZÀ-ÿ\u00f1\u00d1\w]*)$/, "")
+                                .replace(PARTIAL_PLACE_REGEX, "")
                                 .trimEnd()
                             );
                             setPlaceDropdownOpen(false);
