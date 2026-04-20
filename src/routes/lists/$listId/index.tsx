@@ -1274,7 +1274,7 @@ function ListDetailPage() {
 
             <div
               ref={pullRef}
-              className={`flex-1 overflow-y-auto overscroll-y-contain px-3 py-1 ${viewMode === "map" ? "hidden" : ""}`}
+              className={`flex-1 overflow-y-auto px-3 py-1 ${viewMode === "map" ? "hidden" : ""}`}
             >
               {itemsLoading ? (
                 <div className="space-y-1">
