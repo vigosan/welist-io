@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { z } from "zod";
 import { AppNav } from "@/components/AppNav";
 import { useStripeAccountStatus } from "@/hooks/useStripeAccount";
+import { useUpdateProfile, useUserMe } from "@/hooks/useList";
 import { queryKeys } from "@/lib/query-keys";
 
 const searchSchema = z.object({
@@ -27,6 +28,8 @@ function SettingsPage() {
     isLoading: loading,
     refetch,
   } = useStripeAccountStatus();
+  const { data: userMe } = useUserMe();
+  const updateProfile = useUpdateProfile();
   const [connecting, setConnecting] = useState(false);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: intentional — qc and refetch are stable
@@ -95,6 +98,43 @@ function SettingsPage() {
               className="w-12 h-12 rounded-full outline outline-1 outline-black/10 dark:outline-white/10"
             />
           )}
+        </section>
+
+        <section className="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl p-5 flex flex-col gap-4">
+          <div>
+            <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">Perfil</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5 leading-relaxed">
+              Controla si apareces en el directorio público de usuarios.
+            </p>
+          </div>
+          <label className="flex items-center justify-between gap-3 cursor-pointer">
+            <span className="text-sm text-gray-700 dark:text-gray-300">
+              Aparecer en el directorio de usuarios
+            </span>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={userMe?.publicProfile ?? true}
+              data-testid="public-profile-toggle"
+              onClick={() =>
+                updateProfile.mutate({
+                  publicProfile: !(userMe?.publicProfile ?? true),
+                })
+              }
+              disabled={updateProfile.isPending || userMe === undefined}
+              className={`cursor-pointer relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors duration-150 focus:outline-none disabled:opacity-40 ${
+                (userMe?.publicProfile ?? true)
+                  ? "bg-gray-900 dark:bg-white"
+                  : "bg-gray-200 dark:bg-gray-700"
+              }`}
+            >
+              <span
+                className={`inline-block h-3.5 w-3.5 rounded-full bg-white dark:bg-gray-900 shadow transition-transform duration-150 ${
+                  (userMe?.publicProfile ?? true) ? "translate-x-4.5" : "translate-x-0.5"
+                }`}
+              />
+            </button>
+          </label>
         </section>
 
         <section className="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl p-5 flex flex-col gap-4">
