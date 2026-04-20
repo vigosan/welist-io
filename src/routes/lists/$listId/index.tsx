@@ -332,7 +332,7 @@ function ListDetailPage() {
 
   return (
     <>
-      <div className="min-h-dvh bg-[#FAFAF8] dark:bg-gray-950 flex flex-col">
+      <div className="h-dvh bg-[#FAFAF8] dark:bg-gray-950 flex flex-col">
         <AppNav />
         <div className="flex-1 flex flex-col sm:items-center sm:p-6">
           <div className="flex-1 flex flex-col w-full sm:max-w-3xl bg-white dark:bg-gray-900 sm:rounded-3xl sm:border sm:border-gray-100 dark:sm:border-gray-800 [overflow:clip] sm:max-h-[calc(100dvh-3.25rem-3rem)]">
