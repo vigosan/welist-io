@@ -255,6 +255,135 @@ describe("POST /api/lists/:listId/items", () => {
     });
     expect(res.status).toBe(400);
   });
+
+  it("creates an item with coordinates and returns 201", async () => {
+    const item = {
+      id: "i1",
+      listId: "abc",
+      text: "Visitar @Barcelona",
+      done: false,
+      position: -1,
+      latitude: "41.3874",
+      longitude: "2.1686",
+      placeName: "Barcelona",
+    };
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "abc",
+      ownerId: null,
+      collaborative: false,
+    });
+    mockDb.select.mockReturnValue({
+      from: vi.fn().mockReturnValue({
+        where: vi.fn().mockResolvedValue([{ pos: null }]),
+      }),
+    });
+    const valuesMock = vi.fn().mockReturnValue({
+      returning: vi.fn().mockResolvedValue([item]),
+    });
+    mockDb.insert.mockReturnValue({ values: valuesMock });
+
+    const res = await app.request("/api/lists/abc/items", {
+      method: "POST",
+      body: JSON.stringify({
+        text: "Visitar @Barcelona",
+        latitude: "41.3874",
+        longitude: "2.1686",
+        placeName: "Barcelona",
+      }),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    expect(res.status).toBe(201);
+    expect(valuesMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        latitude: "41.3874",
+        longitude: "2.1686",
+        placeName: "Barcelona",
+      })
+    );
+  });
+});
+
+describe("PATCH /api/lists/:listId/items/:itemId (coordinates)", () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it("updates item with coordinates", async () => {
+    const updated = {
+      id: "i1",
+      listId: "abc",
+      text: "Texto",
+      done: false,
+      position: 0,
+      latitude: "41.3874",
+      longitude: "2.1686",
+      placeName: "Barcelona",
+    };
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "abc",
+      ownerId: null,
+      collaborative: false,
+    });
+    const setMock = vi.fn().mockReturnValue({
+      where: vi.fn().mockReturnValue({
+        returning: vi.fn().mockResolvedValue([updated]),
+      }),
+    });
+    mockDb.update.mockReturnValue({ set: setMock });
+
+    const res = await app.request("/api/lists/abc/items/i1", {
+      method: "PATCH",
+      body: JSON.stringify({
+        text: "Texto",
+        latitude: "41.3874",
+        longitude: "2.1686",
+        placeName: "Barcelona",
+      }),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as Record<string, unknown>;
+    expect(body.latitude).toBe("41.3874");
+  });
+
+  it("clears coordinates by passing null", async () => {
+    const updated = {
+      id: "i1",
+      listId: "abc",
+      text: "Texto",
+      done: false,
+      position: 0,
+      latitude: null,
+      longitude: null,
+      placeName: null,
+    };
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "abc",
+      ownerId: null,
+      collaborative: false,
+    });
+    const setMock = vi.fn().mockReturnValue({
+      where: vi.fn().mockReturnValue({
+        returning: vi.fn().mockResolvedValue([updated]),
+      }),
+    });
+    mockDb.update.mockReturnValue({ set: setMock });
+
+    const res = await app.request("/api/lists/abc/items/i1", {
+      method: "PATCH",
+      body: JSON.stringify({
+        text: "Texto",
+        latitude: null,
+        longitude: null,
+        placeName: null,
+      }),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as Record<string, unknown>;
+    expect(body.latitude).toBeNull();
+  });
 });
 
 describe("PATCH /api/lists/:listId/items/:itemId/toggle", () => {

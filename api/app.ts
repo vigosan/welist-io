@@ -151,9 +151,7 @@ const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 function listWhere(param: string) {
-  return UUID_RE.test(param)
-    ? eq(lists.id, param)
-    : eq(lists.slug, param);
+  return UUID_RE.test(param) ? eq(lists.id, param) : eq(lists.slug, param);
 }
 
 async function resolveList(param: string): Promise<{
@@ -462,7 +460,15 @@ app.get("/lists/:listId/items", async (c) => {
 
 app.post(
   "/lists/:listId/items",
-  zValidator("json", z.object({ text: z.string().min(1).max(1000) })),
+  zValidator(
+    "json",
+    z.object({
+      text: z.string().min(1).max(1000),
+      latitude: z.string().optional(),
+      longitude: z.string().optional(),
+      placeName: z.string().optional(),
+    })
+  ),
   async (c) => {
     const list = await resolveList(c.req.param("listId"));
     if (!list) return c.json({ error: "Not found" }, 404);
@@ -470,7 +476,7 @@ app.post(
     const userId = authUser?.session?.user?.id ?? null;
     if (!canModifyList(list, userId))
       return c.json({ error: "Forbidden" }, 403);
-    const { text } = c.req.valid("json");
+    const { text, latitude, longitude, placeName } = c.req.valid("json");
     const [minRow] = await db
       .select({ pos: min(items.position) })
       .from(items)
@@ -478,7 +484,14 @@ app.post(
     const position = (minRow?.pos ?? 0) - 1;
     const [item] = await db
       .insert(items)
-      .values({ listId: list.id, text, position })
+      .values({
+        listId: list.id,
+        text,
+        position,
+        latitude: latitude ?? null,
+        longitude: longitude ?? null,
+        placeName: placeName ?? null,
+      })
       .returning();
     if (list.public && list.collaborative && userId) {
       await logActivity(list.id, userId, "item_added", item.id, null, { text });
@@ -522,6 +535,9 @@ app.patch(
     z.object({
       text: z.string().min(1).max(1000).optional(),
       done: z.boolean().optional(),
+      latitude: z.string().nullable().optional(),
+      longitude: z.string().nullable().optional(),
+      placeName: z.string().nullable().optional(),
     })
   ),
   async (c) => {

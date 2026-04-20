@@ -33,6 +33,9 @@ const ITEM_A: Item = {
   text: "Tarea A",
   done: false,
   position: 0,
+  latitude: null,
+  longitude: null,
+  placeName: null,
   createdAt: new Date(),
   updatedAt: new Date(),
 };
@@ -42,6 +45,9 @@ const ITEM_B: Item = {
   text: "Tarea B",
   done: true,
   position: 1,
+  latitude: null,
+  longitude: null,
+  placeName: null,
   createdAt: new Date(),
   updatedAt: new Date(),
 };

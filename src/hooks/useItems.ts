@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { Item } from "@/db/schema";
 import { POLLING_INTERVAL_MS } from "@/lib/constants";
 import { queryKeys } from "@/lib/query-keys";
-import { itemsService } from "@/services/items.service";
+import { type Coords, itemsService } from "@/services/items.service";
 
 export type { Item };
 
@@ -23,7 +23,8 @@ export function useItems(listId: string) {
 export function useAddItem(listId: string) {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ text }: { text: string }) => itemsService.add(listId, text),
+    mutationFn: ({ text, coords }: { text: string; coords?: Coords }) =>
+      itemsService.add(listId, text, coords),
     onSettled: () =>
       qc.invalidateQueries({
         queryKey: queryKeys.items(listId),
@@ -60,11 +61,18 @@ export function useUpdateItem(listId: string) {
   return useMutation<
     Item,
     Error,
-    { id: string; text: string },
+    { id: string; text: string; coords?: Coords | null },
     MutationContext
   >({
-    mutationFn: ({ id, text }: { id: string; text: string }) =>
-      itemsService.update(listId, id, text),
+    mutationFn: ({
+      id,
+      text,
+      coords,
+    }: {
+      id: string;
+      text: string;
+      coords?: Coords | null;
+    }) => itemsService.update(listId, id, text, coords),
     onMutate: async ({ id, text }) => {
       await qc.cancelQueries({
         queryKey: queryKeys.items(listId),

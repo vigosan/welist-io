@@ -1,13 +1,19 @@
 import type { Item } from "@/db/schema";
 import { apiClient } from "@/lib/api-client";
 
+export interface Coords {
+  latitude: string;
+  longitude: string;
+  placeName: string;
+}
+
 export const itemsService = {
   list: (listId: string) => apiClient<Item[]>(`/api/lists/${listId}/items`),
 
-  add: (listId: string, text: string) =>
+  add: (listId: string, text: string, coords?: Coords) =>
     apiClient<Item>(`/api/lists/${listId}/items`, {
       method: "POST",
-      body: JSON.stringify({ text }),
+      body: JSON.stringify({ text, ...coords }),
     }),
 
   toggle: (listId: string, itemId: string) =>
@@ -15,10 +21,22 @@ export const itemsService = {
       method: "PATCH",
     }),
 
-  update: (listId: string, itemId: string, text: string) =>
+  update: (
+    listId: string,
+    itemId: string,
+    text: string,
+    coords?: Coords | null
+  ) =>
     apiClient<Item>(`/api/lists/${listId}/items/${itemId}`, {
       method: "PATCH",
-      body: JSON.stringify({ text }),
+      body: JSON.stringify({
+        text,
+        ...(coords !== undefined
+          ? coords === null
+            ? { latitude: null, longitude: null, placeName: null }
+            : coords
+          : {}),
+      }),
     }),
 
   delete: (listId: string, itemId: string) =>
