@@ -207,7 +207,9 @@ export const notifications = pgTable(
     type: notificationTypeEnum("type").notNull(),
     listId: uuid("list_id").references(() => lists.id, { onDelete: "cascade" }),
     listName: text("list_name"),
-    actorId: text("actor_id").references(() => users.id, { onDelete: "set null" }),
+    actorId: text("actor_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
     actorName: text("actor_name"),
     actorImage: text("actor_image"),
     readAt: timestamp("read_at", { withTimezone: true }),

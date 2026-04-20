@@ -20,7 +20,10 @@ export const Route = createFileRoute("/lists/")({
 function MyListCard({
   list,
   userId,
-}: { list: MyList; userId: string | null | undefined }) {
+}: {
+  list: MyList;
+  userId: string | null | undefined;
+}) {
   const [confirming, setConfirming] = useState(false);
   const deleteList = useDeleteList();
   const { t } = useTranslation();

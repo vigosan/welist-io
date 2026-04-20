@@ -728,8 +728,19 @@ function ListDetailPage() {
                         title="Command palette (⌘K)"
                         className="cursor-pointer h-7 w-7 flex items-center justify-center rounded-md border border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500 hover:border-gray-400 dark:hover:border-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition active:scale-[0.96]"
                       >
-                        <svg aria-hidden="true" className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        <svg
+                          aria-hidden="true"
+                          className="w-3.5 h-3.5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                          />
                         </svg>
                       </button>
 
@@ -894,13 +905,17 @@ function ListDetailPage() {
                           <span className="text-lg font-bold text-gray-900 dark:text-gray-100 tabular-nums">
                             {challengers.length}
                           </span>
-                          <span className="text-xs text-gray-400 dark:text-gray-500">{t("stats.challengers")}</span>
+                          <span className="text-xs text-gray-400 dark:text-gray-500">
+                            {t("stats.challengers")}
+                          </span>
                         </div>
                         <div className="flex flex-col gap-0.5">
                           <span className="text-lg font-bold text-gray-900 dark:text-gray-100 tabular-nums">
                             {challengers.filter((c) => c.completedAt).length}
                           </span>
-                          <span className="text-xs text-gray-400 dark:text-gray-500">{t("stats.completed")}</span>
+                          <span className="text-xs text-gray-400 dark:text-gray-500">
+                            {t("stats.completed")}
+                          </span>
                         </div>
                         <div className="flex flex-col gap-0.5">
                           <span className="text-lg font-bold text-gray-900 dark:text-gray-100 tabular-nums">
@@ -908,36 +923,53 @@ function ListDetailPage() {
                               ? `${Math.round((challengers.filter((c) => c.completedAt).length / challengers.length) * 100)}%`
                               : "0%"}
                           </span>
-                          <span className="text-xs text-gray-400 dark:text-gray-500">{t("stats.completionRate")}</span>
+                          <span className="text-xs text-gray-400 dark:text-gray-500">
+                            {t("stats.completionRate")}
+                          </span>
                         </div>
                       </div>
-                      {items.length > 0 && challengers.length > 0 && (() => {
-                        const itemCompletionRates = items.map((item) => {
-                          const doneCount = challengers.filter(
-                            (c) => c.doneCount > 0 && c.totalItems > 0
-                          ).length;
-                          return { item, approxRate: doneCount };
-                        });
-                        const avgProgress = challengers.length > 0
-                          ? Math.round(
-                              challengers.reduce((sum, c) => sum + (c.totalItems > 0 ? c.doneCount / c.totalItems : 0), 0) /
-                                challengers.length * 100
-                            )
-                          : 0;
-                        void itemCompletionRates;
-                        return (
-                          <div className="flex flex-col gap-1">
-                            <span className="text-xs text-gray-400 dark:text-gray-500">{t("stats.avgProgress")}</span>
-                            <div className="h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                              <div
-                                className="h-full bg-gray-900 dark:bg-gray-100 rounded-full transition-all duration-300"
-                                style={{ width: `${avgProgress}%` }}
-                              />
+                      {items.length > 0 &&
+                        challengers.length > 0 &&
+                        (() => {
+                          const itemCompletionRates = items.map((item) => {
+                            const doneCount = challengers.filter(
+                              (c) => c.doneCount > 0 && c.totalItems > 0
+                            ).length;
+                            return { item, approxRate: doneCount };
+                          });
+                          const avgProgress =
+                            challengers.length > 0
+                              ? Math.round(
+                                  (challengers.reduce(
+                                    (sum, c) =>
+                                      sum +
+                                      (c.totalItems > 0
+                                        ? c.doneCount / c.totalItems
+                                        : 0),
+                                    0
+                                  ) /
+                                    challengers.length) *
+                                    100
+                                )
+                              : 0;
+                          void itemCompletionRates;
+                          return (
+                            <div className="flex flex-col gap-1">
+                              <span className="text-xs text-gray-400 dark:text-gray-500">
+                                {t("stats.avgProgress")}
+                              </span>
+                              <div className="h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                                <div
+                                  className="h-full bg-gray-900 dark:bg-gray-100 rounded-full transition-all duration-300"
+                                  style={{ width: `${avgProgress}%` }}
+                                />
+                              </div>
+                              <span className="text-xs text-gray-400 dark:text-gray-500 tabular-nums">
+                                {avgProgress}%
+                              </span>
                             </div>
-                            <span className="text-xs text-gray-400 dark:text-gray-500 tabular-nums">{avgProgress}%</span>
-                          </div>
-                        );
-                      })()}
+                          );
+                        })()}
                     </div>
                   )}
                 </div>

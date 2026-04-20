@@ -26,7 +26,10 @@ function UserProfilePage() {
           </div>
           <div className="grid gap-2">
             {Array.from({ length: 3 }, (_, i) => i).map((i) => (
-              <div key={`sk-${i}`} className="h-16 bg-gray-100 dark:bg-gray-800 rounded-2xl animate-pulse" />
+              <div
+                key={`sk-${i}`}
+                className="h-16 bg-gray-100 dark:bg-gray-800 rounded-2xl animate-pulse"
+              />
             ))}
           </div>
         </main>
@@ -76,7 +79,10 @@ function UserProfilePage() {
               {profile.name ?? "Anonymous"}
             </h1>
             <p className="text-sm text-gray-400 dark:text-gray-500">
-              {profile.publicLists.length} {t("profile.publicLists").toLowerCase()} · {profile.completedChallenges.length} {t("profile.completedChallenges").toLowerCase()}
+              {profile.publicLists.length}{" "}
+              {t("profile.publicLists").toLowerCase()} ·{" "}
+              {profile.completedChallenges.length}{" "}
+              {t("profile.completedChallenges").toLowerCase()}
             </p>
           </div>
         </div>
@@ -86,7 +92,9 @@ function UserProfilePage() {
             {t("profile.publicLists")}
           </h2>
           {profile.publicLists.length === 0 ? (
-            <p className="text-sm text-gray-400 dark:text-gray-500">{t("profile.noPublicLists")}</p>
+            <p className="text-sm text-gray-400 dark:text-gray-500">
+              {t("profile.noPublicLists")}
+            </p>
           ) : (
             <div className="flex flex-col gap-2">
               {profile.publicLists.map((list) => (
@@ -122,11 +130,17 @@ function UserProfilePage() {
                     </svg>
                   </div>
                   <div className="flex items-center gap-2 text-xs text-gray-400 dark:text-gray-500 tabular-nums">
-                    <span>{t("profile.items", { count: String(list.itemCount) })}</span>
+                    <span>
+                      {t("profile.items", { count: String(list.itemCount) })}
+                    </span>
                     {list.participantCount > 0 && (
                       <>
                         <span>·</span>
-                        <span>{t("profile.participants", { count: String(list.participantCount) })}</span>
+                        <span>
+                          {t("profile.participants", {
+                            count: String(list.participantCount),
+                          })}
+                        </span>
                       </>
                     )}
                   </div>
@@ -141,7 +155,9 @@ function UserProfilePage() {
             {t("profile.completedChallenges")}
           </h2>
           {profile.completedChallenges.length === 0 ? (
-            <p className="text-sm text-gray-400 dark:text-gray-500">{t("profile.noCompletedChallenges")}</p>
+            <p className="text-sm text-gray-400 dark:text-gray-500">
+              {t("profile.noCompletedChallenges")}
+            </p>
           ) : (
             <div className="flex flex-col gap-2">
               {profile.completedChallenges.map((challenge) => (

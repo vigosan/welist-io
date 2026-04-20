@@ -21,7 +21,9 @@ function NotificationItem({ n }: { n: AppNotification }) {
         });
 
   const content = (
-    <div className={`flex items-start gap-3 px-4 py-3 ${isUnread ? "bg-gray-50 dark:bg-gray-800/60" : ""}`}>
+    <div
+      className={`flex items-start gap-3 px-4 py-3 ${isUnread ? "bg-gray-50 dark:bg-gray-800/60" : ""}`}
+    >
       {n.actorImage ? (
         <img
           src={n.actorImage}
@@ -36,8 +38,12 @@ function NotificationItem({ n }: { n: AppNotification }) {
         </div>
       )}
       <div className="flex-1 min-w-0">
-        <p className="text-xs text-gray-700 dark:text-gray-300 leading-snug">{label}</p>
-        <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5 tabular-nums">{date}</p>
+        <p className="text-xs text-gray-700 dark:text-gray-300 leading-snug">
+          {label}
+        </p>
+        <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5 tabular-nums">
+          {date}
+        </p>
       </div>
       {isUnread && (
         <div className="w-1.5 h-1.5 rounded-full bg-gray-900 dark:bg-gray-100 shrink-0 mt-1.5" />
@@ -47,7 +53,11 @@ function NotificationItem({ n }: { n: AppNotification }) {
 
   if (n.listId) {
     return (
-      <Link to="/explore/$listId" params={{ listId: n.listId }} className="block hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+      <Link
+        to="/explore/$listId"
+        params={{ listId: n.listId }}
+        className="block hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+      >
         {content}
       </Link>
     );
@@ -76,7 +86,10 @@ export function NotificationBell({ userId }: Props) {
     }
 
     function handleMouseDown(e: MouseEvent) {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(e.target as Node)
+      ) {
         setOpen(false);
       }
     }

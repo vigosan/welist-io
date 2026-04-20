@@ -1,9 +1,9 @@
 import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { useCachedSession } from "@/hooks/useCachedSession";
+import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { useMyLists } from "@/hooks/useList";
 import { useTranslation } from "@/i18n/service";
-import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 
 interface Props {
   open: boolean;
@@ -71,7 +71,10 @@ export function GlobalCommandPalette({ open, onClose }: Props) {
       className="fixed inset-0 z-50 flex items-start justify-center pt-[18vh] px-4"
       onClick={onClose}
     >
-      <div className="absolute inset-0 bg-black/20 dark:bg-black/50 backdrop-blur-sm" aria-hidden />
+      <div
+        className="absolute inset-0 bg-black/20 dark:bg-black/50 backdrop-blur-sm"
+        aria-hidden
+      />
       <div
         role="dialog"
         aria-modal="true"
@@ -128,12 +131,17 @@ export function GlobalCommandPalette({ open, onClose }: Props) {
                     : "hover:bg-gray-50 dark:hover:bg-gray-800"
                 }`}
               >
-                <p className={`text-sm font-medium truncate ${i === selectedIndex ? "text-white dark:text-gray-900" : "text-gray-900 dark:text-gray-100"}`}>
+                <p
+                  className={`text-sm font-medium truncate ${i === selectedIndex ? "text-white dark:text-gray-900" : "text-gray-900 dark:text-gray-100"}`}
+                >
                   {list.name}
                 </p>
                 {list.itemCount > 0 && (
-                  <p className={`text-xs mt-0.5 tabular-nums ${i === selectedIndex ? "text-gray-300 dark:text-gray-600" : "text-gray-400 dark:text-gray-500"}`}>
-                    {list.itemCount} items · {list.doneCount}/{list.itemCount} done
+                  <p
+                    className={`text-xs mt-0.5 tabular-nums ${i === selectedIndex ? "text-gray-300 dark:text-gray-600" : "text-gray-400 dark:text-gray-500"}`}
+                  >
+                    {list.itemCount} items · {list.doneCount}/{list.itemCount}{" "}
+                    done
                   </p>
                 )}
               </button>
@@ -141,9 +149,15 @@ export function GlobalCommandPalette({ open, onClose }: Props) {
           )}
         </div>
         <div className="px-4 py-2 border-t border-gray-100 dark:border-gray-800 flex items-center gap-3">
-          <span className="text-xs text-gray-300 dark:text-gray-600">{t("command.navigate")}</span>
-          <span className="text-xs text-gray-300 dark:text-gray-600">{t("command.select")}</span>
-          <span className="text-xs text-gray-300 dark:text-gray-600">{t("command.close")}</span>
+          <span className="text-xs text-gray-300 dark:text-gray-600">
+            {t("command.navigate")}
+          </span>
+          <span className="text-xs text-gray-300 dark:text-gray-600">
+            {t("command.select")}
+          </span>
+          <span className="text-xs text-gray-300 dark:text-gray-600">
+            {t("command.close")}
+          </span>
         </div>
       </div>
     </div>

@@ -216,10 +216,14 @@ function ExploreDetailPage() {
         <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 overflow-hidden">
           <div className="px-4 py-3">
             {itemsLoading && (
-              <p className="text-sm text-gray-400 dark:text-gray-500">{t("explore.loading")}</p>
+              <p className="text-sm text-gray-400 dark:text-gray-500">
+                {t("explore.loading")}
+              </p>
             )}
             {!itemsLoading && exploreItems && exploreItems.length === 0 && (
-              <p className="text-sm text-gray-400 dark:text-gray-500">{t("explore.noItems")}</p>
+              <p className="text-sm text-gray-400 dark:text-gray-500">
+                {t("explore.noItems")}
+              </p>
             )}
             {!itemsLoading && exploreItems && exploreItems.length > 0 && (
               <ul className="divide-y divide-gray-50 dark:divide-gray-800">

@@ -162,7 +162,9 @@ export function ItemRow({
                   e.stopPropagation();
               }}
               className={`text-sm font-medium cursor-default select-none leading-snug ${
-                item.done ? "line-through text-gray-400 dark:text-gray-600" : "text-gray-800 dark:text-gray-200"
+                item.done
+                  ? "line-through text-gray-400 dark:text-gray-600"
+                  : "text-gray-800 dark:text-gray-200"
               }`}
             >
               {renderInlineMarkdown(display || item.text)}

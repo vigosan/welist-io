@@ -132,9 +132,15 @@ export function CommandPalette({ open, onClose, actions }: Props) {
           )}
         </div>
         <div className="px-4 py-2 border-t border-gray-100 dark:border-gray-800 flex items-center gap-3">
-          <span className="text-xs text-gray-300 dark:text-gray-600">{t("command.navigate")}</span>
-          <span className="text-xs text-gray-300 dark:text-gray-600">{t("command.select")}</span>
-          <span className="text-xs text-gray-300 dark:text-gray-600">{t("command.close")}</span>
+          <span className="text-xs text-gray-300 dark:text-gray-600">
+            {t("command.navigate")}
+          </span>
+          <span className="text-xs text-gray-300 dark:text-gray-600">
+            {t("command.select")}
+          </span>
+          <span className="text-xs text-gray-300 dark:text-gray-600">
+            {t("command.close")}
+          </span>
         </div>
       </div>
     </div>
