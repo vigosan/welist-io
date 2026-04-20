@@ -22,7 +22,7 @@ interface PhotonResponse {
 }
 
 export async function searchPlaces(query: string): Promise<Place[]> {
-  const url = `https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&limit=5&lang=es`;
+  const url = `https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&limit=5&lang=en`;
   const res = await fetch(url);
   if (!res.ok) return [];
   const data = (await res.json()) as PhotonResponse;
