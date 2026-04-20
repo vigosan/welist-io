@@ -152,7 +152,7 @@ const UUID_RE =
 
 function listWhere(param: string) {
   return UUID_RE.test(param)
-    ? or(eq(lists.id, param), eq(lists.slug, param))
+    ? eq(lists.id, param)
     : eq(lists.slug, param);
 }
 
