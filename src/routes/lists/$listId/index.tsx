@@ -1273,10 +1273,11 @@ function ListDetailPage() {
                       item={item}
                       onToggle={() => toggleItem.mutate(item.id)}
                       onDelete={() => deleteItem.mutate(item.id)}
-                      onEdit={(text) =>
+                      onEdit={(text, coords) =>
                         updateItem.mutate({
                           id: item.id,
                           text,
+                          coords,
                         })
                       }
                       onTagClick={(tag) =>

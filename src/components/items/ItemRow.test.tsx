@@ -3,6 +3,10 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { ItemRow } from "./ItemRow";
 
+vi.mock("@/hooks/useGeocodingSearch", () => ({
+  useGeocodingSearch: () => ({ results: [], isLoading: false }),
+}));
+
 const baseItem = {
   id: "i1",
   listId: "l1",
@@ -149,7 +153,7 @@ describe("ItemRow", () => {
     await userEvent.clear(input);
     await userEvent.type(input, "Comprar pan");
     await userEvent.tab();
-    expect(onEdit).toHaveBeenCalledWith("Comprar pan");
+    expect(onEdit).toHaveBeenCalledWith("Comprar pan", null);
   });
 
   it("renders bold markdown in item text", () => {
