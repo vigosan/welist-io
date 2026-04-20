@@ -147,6 +147,7 @@ const es = {
   items: {
     markPending: "Marcar como pendiente",
     markDone: "Marcar como hecho",
+    edit: 'Editar "{{text}}"',
     delete: 'Eliminar "{{text}}"',
   },
   bulk: {

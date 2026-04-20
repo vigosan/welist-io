@@ -221,6 +221,30 @@ export function ItemRow({
         )}
       </div>
 
+      {canWrite && !item.done && !editing && (
+        <button
+          type="button"
+          onClick={() => setEditing(true)}
+          data-testid={`item-edit-${item.id}`}
+          aria-label={t("items.edit", { text: display || item.text })}
+          className="cursor-pointer shrink-0 w-11 h-11 flex items-center justify-center text-gray-300 dark:text-gray-600 hover:text-gray-600 dark:hover:text-gray-400 transition-colors active:scale-[0.96]"
+        >
+          <svg
+            aria-hidden="true"
+            className="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={1.5}
+              d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
+            />
+          </svg>
+        </button>
+      )}
       {canWrite && (
         <button
           type="button"

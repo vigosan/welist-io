@@ -148,6 +148,7 @@ const en: Translations = {
   items: {
     markPending: "Mark as pending",
     markDone: "Mark as done",
+    edit: 'Edit "{{text}}"',
     delete: 'Delete "{{text}}"',
   },
   bulk: {
