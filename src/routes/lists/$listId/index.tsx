@@ -12,7 +12,9 @@ import { CommandPalette } from "@/components/CommandPalette";
 import { BulkPastePreview } from "@/components/items/BulkPastePreview";
 import { ItemRow } from "@/components/items/ItemRow";
 import { ListSettingsPanel } from "@/components/ListSettingsPanel";
+import { ListMap } from "@/components/maps/ListMap";
 import { useCommandPalette } from "@/hooks/useCommandPalette";
+import { useGeocodingSearch } from "@/hooks/useGeocodingSearch";
 import {
   useAddItem,
   useBulkAddItems,
@@ -36,6 +38,7 @@ import { useTranslation } from "@/i18n/service";
 import { fireConfetti } from "@/lib/confetti";
 import { BULK_ITEM_LIMIT } from "@/lib/constants";
 import { tagColor } from "@/lib/tags";
+import type { Coords } from "@/services/items.service";
 
 const searchSchema = z.object({
   status: z.enum(["all", "pending", "done"]).optional().default("all"),
@@ -60,6 +63,10 @@ function ListDetailPage() {
   const [participantsPanel, setParticipantsPanel] = useState<
     "challengers" | "collaborators" | null
   >(null);
+  const [pendingCoords, setPendingCoords] = useState<Coords | null>(null);
+  const [placeDropdownOpen, setPlaceDropdownOpen] = useState(false);
+  const [activePlace, setActivePlace] = useState<string | undefined>(undefined);
+  const [viewMode, setViewMode] = useState<"list" | "map">("list");
   const addInputRef = useRef<HTMLInputElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const { t } = useTranslation();
@@ -161,15 +168,31 @@ function ListDetailPage() {
     refetch: refetchItems,
   } = useItems(listId);
 
-  const { allTags, tagSuggestions, filteredItems, resetOrder, setOrder } =
-    useItemsFilter({
-      items,
-      itemsLoading,
-      statusFilter,
-      activeTag,
-      searchQuery,
-      newItemText: newItem,
-    });
+  const {
+    allTags,
+    allPlaces,
+    tagSuggestions,
+    placeSuggestions,
+    partialPlace,
+    filteredItems,
+    resetOrder,
+    setOrder,
+  } = useItemsFilter({
+    items,
+    itemsLoading,
+    statusFilter,
+    activeTag,
+    activePlace,
+    searchQuery,
+    newItemText: newItem,
+  });
+
+  const geocodingQuery =
+    placeDropdownOpen && partialPlace !== null && partialPlace.length >= 3
+      ? partialPlace
+      : "";
+  const { results: geocodingResults, isLoading: geocodingLoading } =
+    useGeocodingSearch(geocodingQuery);
 
   const {
     containerRef: pullRef,
@@ -247,7 +270,16 @@ function ListDetailPage() {
     e.preventDefault();
     const trimmed = newItem.trim();
     if (!trimmed) return;
-    addItem.mutate({ text: trimmed }, { onSuccess: () => setNewItem("") });
+    addItem.mutate(
+      { text: trimmed, coords: pendingCoords ?? undefined },
+      {
+        onSuccess: () => {
+          setNewItem("");
+          setPendingCoords(null);
+          setPlaceDropdownOpen(false);
+        },
+      }
+    );
   }
 
   function handlePaste(e: React.ClipboardEvent<HTMLInputElement>) {
@@ -271,6 +303,9 @@ function ListDetailPage() {
 
   const doneCount = items.filter((i) => i.done).length;
   const progress = items.length > 0 ? (doneCount / items.length) * 100 : 0;
+  const hasGeoItems = items.some(
+    (i) => i.latitude !== null && i.longitude !== null
+  );
   const prevProgress = useRef(0);
   useEffect(() => {
     if (progress === 100 && prevProgress.current < 100 && items.length > 0)
@@ -641,6 +676,58 @@ function ListDetailPage() {
                     </div>
 
                     <div className="flex items-center gap-1.5 shrink-0">
+                      {hasGeoItems && (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setViewMode((v) => (v === "list" ? "map" : "list"))
+                          }
+                          data-testid="map-toggle-btn"
+                          aria-label={
+                            viewMode === "list"
+                              ? t("list.mapView")
+                              : t("list.listView")
+                          }
+                          title={
+                            viewMode === "list"
+                              ? t("list.mapView")
+                              : t("list.listView")
+                          }
+                          className={`cursor-pointer h-7 w-7 flex items-center justify-center rounded-md border transition active:scale-[0.96] ${viewMode === "map" ? "border-gray-900 text-gray-900 dark:border-gray-100 dark:text-gray-100" : "border-gray-200 text-gray-400 hover:border-gray-400 hover:text-gray-700"}`}
+                        >
+                          {viewMode === "list" ? (
+                            <svg
+                              aria-hidden="true"
+                              className="w-3.5 h-3.5"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
+                              />
+                            </svg>
+                          ) : (
+                            <svg
+                              aria-hidden="true"
+                              className="w-3.5 h-3.5"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M4 6h16M4 10h16M4 14h16M4 18h16"
+                              />
+                            </svg>
+                          )}
+                        </button>
+                      )}
                       {!searchActive && (
                         <button
                           type="button"
@@ -1026,6 +1113,40 @@ function ListDetailPage() {
                         #{tag}
                       </button>
                     ))}
+                    {allPlaces.length > 0 && (
+                      <div className="w-px shrink-0 self-stretch bg-gray-200 dark:bg-gray-700 mx-0.5" />
+                    )}
+                    {allPlaces.map((place) => (
+                      <button
+                        type="button"
+                        key={place}
+                        data-testid={`place-filter-${place}`}
+                        onClick={() =>
+                          setActivePlace(
+                            activePlace === place ? undefined : place
+                          )
+                        }
+                        className={`cursor-pointer shrink-0 inline-flex items-center gap-0.5 rounded-full border px-2.5 py-0.5 text-xs font-medium transition ${
+                          activePlace === place
+                            ? "border-gray-900 bg-gray-900 text-white dark:border-gray-100 dark:bg-gray-100 dark:text-gray-900"
+                            : "border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-700 dark:hover:text-gray-200"
+                        }`}
+                      >
+                        <svg
+                          aria-hidden="true"
+                          className="w-2.5 h-2.5 shrink-0"
+                          fill="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M11.54 22.351l.07.04.028.016a.76.76 0 00.723 0l.028-.015.07-.041a16.975 16.975 0 001.144-.742 19.58 19.58 0 002.683-2.282c1.944-2.007 3.864-5.175 3.864-9.15C20.15 5.413 16.415 2 12 2 7.585 2 3.85 5.413 3.85 10.174c0 3.975 1.92 7.143 3.864 9.15a19.58 19.58 0 002.683 2.282 16.975 16.975 0 001.144.742zM12 13.5a3.5 3.5 0 100-7 3.5 3.5 0 000 7z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                        {place}
+                      </button>
+                    ))}
                   </div>
                 </div>
               )}
@@ -1105,9 +1226,15 @@ function ListDetailPage() {
               </div>
             )}
 
+            {viewMode === "map" && hasGeoItems && (
+              <div className="flex-1 relative">
+                <ListMap items={filteredItems} />
+              </div>
+            )}
+
             <div
               ref={pullRef}
-              className="flex-1 overflow-y-auto overscroll-y-contain px-3 py-1"
+              className={`flex-1 overflow-y-auto overscroll-y-contain px-3 py-1 ${viewMode === "map" ? "hidden" : ""}`}
             >
               {itemsLoading ? (
                 <div className="space-y-1">
@@ -1156,6 +1283,12 @@ function ListDetailPage() {
                         setActiveTag(activeTag === tag ? null : tag)
                       }
                       activeTag={activeTag}
+                      onPlaceClick={(place) =>
+                        setActivePlace(
+                          activePlace === place ? undefined : place
+                        )
+                      }
+                      activePlace={activePlace}
                       canWrite={canWrite}
                       canToggle={canToggle}
                       onDragStart={
@@ -1212,6 +1345,105 @@ function ListDetailPage() {
                         ))}
                       </div>
                     )}
+                    {placeSuggestions.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5 px-1">
+                        {placeSuggestions.map((place) => (
+                          <button
+                            key={place}
+                            type="button"
+                            onClick={() => {
+                              setNewItem((prev) =>
+                                prev.replace(
+                                  /@([a-zA-ZÀ-ÿ\u00f1\u00d1\w]*)$/,
+                                  `@${place} `
+                                )
+                              );
+                              setPlaceDropdownOpen(false);
+                              addInputRef.current?.focus();
+                            }}
+                            className="cursor-pointer inline-flex items-center gap-0.5 rounded-full border border-gray-200 dark:border-gray-700 px-2.5 py-0.5 text-xs font-medium text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-700 dark:hover:text-gray-200 transition active:scale-[0.96]"
+                          >
+                            <svg
+                              aria-hidden="true"
+                              className="w-2.5 h-2.5 shrink-0"
+                              fill="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M11.54 22.351l.07.04.028.016a.76.76 0 00.723 0l.028-.015.07-.041a16.975 16.975 0 001.144-.742 19.58 19.58 0 002.683-2.282c1.944-2.007 3.864-5.175 3.864-9.15C20.15 5.413 16.415 2 12 2 7.585 2 3.85 5.413 3.85 10.174c0 3.975 1.92 7.143 3.864 9.15a19.58 19.58 0 002.683 2.282 16.975 16.975 0 001.144.742zM12 13.5a3.5 3.5 0 100-7 3.5 3.5 0 000 7z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                            {place}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                    {placeDropdownOpen &&
+                      partialPlace !== null &&
+                      partialPlace.length >= 3 && (
+                        <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm overflow-hidden">
+                          {geocodingLoading && (
+                            <div className="px-3 py-2 text-xs text-gray-400">
+                              {t("list.addPlace")}…
+                            </div>
+                          )}
+                          {!geocodingLoading &&
+                            geocodingResults.length === 0 && (
+                              <div className="px-3 py-2 text-xs text-gray-400">
+                                {t("list.noResults", { query: partialPlace })}
+                              </div>
+                            )}
+                          {geocodingResults.map((result) => (
+                            <button
+                              key={`${result.latitude}-${result.longitude}`}
+                              type="button"
+                              onClick={() => {
+                                setNewItem((prev) =>
+                                  prev.replace(
+                                    /@([a-zA-ZÀ-ÿ\u00f1\u00d1\w]*)$/,
+                                    `@${result.name} `
+                                  )
+                                );
+                                setPendingCoords({
+                                  latitude: result.latitude,
+                                  longitude: result.longitude,
+                                  placeName: result.name,
+                                });
+                                setPlaceDropdownOpen(false);
+                                addInputRef.current?.focus();
+                              }}
+                              className="cursor-pointer w-full flex items-start gap-2 px-3 py-2 text-left hover:bg-gray-50 dark:hover:bg-gray-700 transition border-b last:border-0 border-gray-100 dark:border-gray-700"
+                            >
+                              <svg
+                                aria-hidden="true"
+                                className="w-3.5 h-3.5 shrink-0 mt-0.5 text-gray-400"
+                                fill="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  fillRule="evenodd"
+                                  d="M11.54 22.351l.07.04.028.016a.76.76 0 00.723 0l.028-.015.07-.041a16.975 16.975 0 001.144-.742 19.58 19.58 0 002.683-2.282c1.944-2.007 3.864-5.175 3.864-9.15C20.15 5.413 16.415 2 12 2 7.585 2 3.85 5.413 3.85 10.174c0 3.975 1.92 7.143 3.864 9.15a19.58 19.58 0 002.683 2.282 16.975 16.975 0 001.144.742zM12 13.5a3.5 3.5 0 100-7 3.5 3.5 0 000 7z"
+                                  clipRule="evenodd"
+                                />
+                              </svg>
+                              <div className="min-w-0">
+                                <div className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+                                  {result.name}
+                                </div>
+                                {(result.city || result.country) && (
+                                  <div className="text-xs text-gray-400 truncate">
+                                    {[result.city, result.country]
+                                      .filter(Boolean)
+                                      .join(", ")}
+                                  </div>
+                                )}
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      )}
                     <form
                       onSubmit={handleAdd}
                       className="flex gap-2 p-1.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl"
@@ -1219,7 +1451,26 @@ function ListDetailPage() {
                       <input
                         ref={addInputRef}
                         value={newItem}
-                        onChange={(e) => setNewItem(e.target.value)}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setNewItem(val);
+                          const hasAt = /@([a-zA-ZÀ-ÿ\u00f1\u00d1\w]*)$/.test(
+                            val
+                          );
+                          setPlaceDropdownOpen(hasAt);
+                          if (!hasAt) setPendingCoords(null);
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === "Escape" && placeDropdownOpen) {
+                            e.preventDefault();
+                            setNewItem((v) =>
+                              v
+                                .replace(/@([a-zA-ZÀ-ÿ\u00f1\u00d1\w]*)$/, "")
+                                .trimEnd()
+                            );
+                            setPlaceDropdownOpen(false);
+                          }
+                        }}
                         onPaste={handlePaste}
                         placeholder={t("list.addItemPlaceholder")}
                         aria-label={t("list.addItemAriaLabel")}
