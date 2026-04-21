@@ -16,61 +16,72 @@ function privateName(name: string | null): string {
   return `${parts[0]} ${parts[parts.length - 1][0]}.`;
 }
 
-function UserCard({ user }: { user: DirectoryUser }) {
+function initials(name: string | null): string {
+  if (!name) return "?";
+  const parts = name.trim().split(/\s+/);
+  if (parts.length === 1) return parts[0][0].toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
+
+function UserRow({ user }: { user: DirectoryUser }) {
   const { t } = useTranslation();
+  const [hov, setHov] = useState(false);
 
   return (
     <Link
       to="/u/$userId"
       params={{ userId: user.id }}
-      className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-4 flex items-center gap-3 hover:border-gray-300 dark:hover:border-gray-600 transition-[border-color] duration-150 active:scale-[0.98]"
       data-testid={`user-card-${user.id}`}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      className="flex items-center gap-3.5 py-3.5 transition-colors duration-150"
+      style={{
+        borderBottom: "1px solid rgba(0,0,0,0.08)",
+        background: hov ? "rgba(0,0,0,0.02)" : "transparent",
+      }}
     >
       {user.image ? (
         <img
           src={user.image}
           alt=""
-          className="w-10 h-10 rounded-full shrink-0 outline outline-1 outline-black/10 dark:outline-white/10"
+          className="w-9 h-9 rounded-full shrink-0 outline outline-1 outline-black/10"
         />
       ) : (
-        <div className="w-10 h-10 rounded-full shrink-0 bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-          <svg
-            aria-hidden="true"
-            className="w-5 h-5 text-gray-400"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={1.5}
-              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-            />
-          </svg>
+        <div
+          className="w-9 h-9 rounded-full shrink-0 flex items-center justify-center text-[11px] font-semibold"
+          style={{
+            background: "rgba(255,255,255,0.14)",
+            color: "#0c0c0b",
+            fontFamily: "'Space Mono', monospace",
+            border: "1px solid rgba(0,0,0,0.08)",
+          }}
+        >
+          {initials(user.name)}
         </div>
       )}
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">
+      <div>
+        <p className="text-sm font-semibold text-[#0c0c0b] dark:text-[#f0ede8] mb-0.5">
           {privateName(user.name)}
         </p>
-        <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
-          <span className="text-xs text-gray-400 dark:text-gray-500 tabular-nums">
-            {t("directory.owned_other", { count: user.ownedListsCount })}
-          </span>
-          <span className="text-gray-200 dark:text-gray-700 text-xs select-none">·</span>
-          <span className="text-xs text-gray-400 dark:text-gray-500 tabular-nums">
-            {t("directory.challenged_other", { count: user.challengerCount })}
-          </span>
-          <span className="text-gray-200 dark:text-gray-700 text-xs select-none">·</span>
-          <span className="text-xs text-gray-400 dark:text-gray-500 tabular-nums">
-            {t("directory.completed_other", { count: user.completedChallengesCount })}
-          </span>
-          <span className="text-gray-200 dark:text-gray-700 text-xs select-none">·</span>
-          <span className="text-xs text-gray-400 dark:text-gray-500 tabular-nums">
-            {t("directory.collaborated_other", { count: user.collaboratorCount })}
-          </span>
-        </div>
+        <p
+          className="text-[11px]"
+          style={{
+            color: "#a0a09c",
+            fontFamily: "'Space Mono', monospace",
+          }}
+        >
+          {t("directory.owned_other", { count: user.ownedListsCount })}
+          {" · "}
+          {t("directory.challenged_other", { count: user.challengerCount })}
+          {" · "}
+          {t("directory.completed_other", {
+            count: user.completedChallengesCount,
+          })}
+          {" · "}
+          {t("directory.collaborated_other", {
+            count: user.collaboratorCount,
+          })}
+        </p>
       </div>
     </Link>
   );
@@ -79,6 +90,7 @@ function UserCard({ user }: { user: DirectoryUser }) {
 function UsersDirectoryPage() {
   const [q, setQ] = useState("");
   const [search, setSearch] = useState("");
+  const [focused, setFocused] = useState(false);
   const { data, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage } =
     useUserDirectory(search || undefined);
   const sentinelRef = useRef<HTMLDivElement>(null);
@@ -107,57 +119,60 @@ function UsersDirectoryPage() {
   }
 
   return (
-    <div className="h-dvh bg-[#FAFAF8] dark:bg-gray-950 flex flex-col">
+    <div className="min-h-dvh bg-[#f8f7f5] dark:bg-[#0c0c0b] flex flex-col">
       <AppNav />
 
-      <div className="flex-1 flex flex-col w-full max-w-3xl mx-auto overflow-hidden">
-        <div className="px-4 pt-6 pb-4 shrink-0">
-          <form
-            onSubmit={handleSearch}
-            className="flex gap-2 p-1.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl focus-within:border-gray-400 dark:focus-within:border-gray-500 transition-[border-color] duration-150"
+      <main className="flex-1 w-full max-w-[760px] mx-auto px-12 py-10">
+        <form
+          onSubmit={handleSearch}
+          className="flex overflow-hidden rounded-lg transition-all duration-200"
+          style={{
+            border: `1px solid ${focused ? "rgba(0,0,0,0.20)" : "rgba(0,0,0,0.08)"}`,
+            background: focused ? "rgba(0,0,0,0.06)" : "rgba(0,0,0,0.03)",
+          }}
+        >
+          <input
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            onFocus={() => setFocused(true)}
+            onBlur={() => setFocused(false)}
+            placeholder={t("directory.searchPlaceholder")}
+            aria-label={t("directory.searchAriaLabel")}
+            data-testid="directory-search-input"
+            className="flex-1 px-4 py-2.5 text-sm text-[#0c0c0b] dark:text-[#f0ede8] placeholder-[#a0a09c] bg-transparent outline-none"
+          />
+          <button
+            type="submit"
+            className="px-5 py-2.5 text-xs font-semibold tracking-[0.04em] bg-[#0c0c0b] text-[#f8f7f5] dark:bg-[#f0ede8] dark:text-[#0c0c0b] border-none cursor-pointer transition-opacity duration-150"
+            style={{ borderRadius: 0 }}
           >
-            <input
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              placeholder={t("directory.searchPlaceholder")}
-              aria-label={t("directory.searchAriaLabel")}
-              data-testid="directory-search-input"
-              className="flex-1 pl-3 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-600 bg-transparent outline-none"
-            />
-            <button
-              type="submit"
-              className="cursor-pointer px-5 py-2.5 text-sm font-medium bg-gray-900 text-white dark:bg-white dark:text-gray-900 rounded-xl hover:bg-black dark:hover:bg-gray-100 transition-[background-color] duration-150 active:scale-[0.96]"
-            >
-              {t("directory.search")}
-            </button>
-          </form>
-        </div>
+            {t("directory.search")}
+          </button>
+        </form>
 
-        <div className="flex-1 overflow-y-auto px-4 pb-6">
+        <div className="mt-7">
           {isLoading && (
-            <p className="text-sm text-gray-400 text-center py-10">
+            <p className="text-xs text-[#a0a09c] text-center py-10">
               {t("directory.loading")}
             </p>
           )}
           {!isLoading && userList.length === 0 && (
-            <p className="text-sm text-gray-400 text-center py-10">
+            <p className="text-xs text-[#a0a09c] text-center py-10">
               {search ? t("directory.noUsersSearch") : t("directory.noUsers")}
             </p>
           )}
-          <div className="flex flex-col gap-2">
-            {userList.map((user) => (
-              <UserCard key={user.id} user={user} />
-            ))}
-          </div>
-
-          <div ref={sentinelRef} className="h-4" />
-          {isFetchingNextPage && (
-            <p className="text-sm text-gray-400 text-center py-4">
-              {t("directory.loading")}
-            </p>
-          )}
+          {userList.map((user) => (
+            <UserRow key={user.id} user={user} />
+          ))}
         </div>
-      </div>
+
+        <div ref={sentinelRef} className="h-4" />
+        {isFetchingNextPage && (
+          <p className="text-xs text-[#a0a09c] text-center py-4">
+            {t("directory.loading")}
+          </p>
+        )}
+      </main>
     </div>
   );
 }
