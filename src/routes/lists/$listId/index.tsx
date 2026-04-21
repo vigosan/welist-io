@@ -412,6 +412,7 @@ function ListDetailPage() {
                     editingDescription ? (
                       <textarea
                         autoFocus
+                        aria-label={t("list.addDescriptionPlaceholder")}
                         value={descriptionValue}
                         onChange={(e) => setDescriptionValue(e.target.value)}
                         onBlur={() => {

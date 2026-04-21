@@ -14,6 +14,7 @@ export function GlobalCommandPalette({ open, onClose }: Props) {
   const [query, setQuery] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { data: session } = useCachedSession();
@@ -37,7 +38,21 @@ export function GlobalCommandPalette({ open, onClose }: Props) {
   }, [query]);
 
   function handleKeyDown(e: React.KeyboardEvent) {
-    if (e.key === "ArrowDown") {
+    if (e.key === "Tab") {
+      const focusable = dialogRef.current?.querySelectorAll<HTMLElement>(
+        'button, input, [tabindex]:not([tabindex="-1"])'
+      );
+      if (!focusable || focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    } else if (e.key === "ArrowDown") {
       e.preventDefault();
       setSelectedIndex((i) => Math.min(i + 1, lists.length - 1));
     } else if (e.key === "ArrowUp") {
@@ -79,6 +94,7 @@ export function GlobalCommandPalette({ open, onClose }: Props) {
         role="dialog"
         aria-modal="true"
         aria-label={t("globalSearch.ariaLabel")}
+        ref={dialogRef}
         className="relative w-full max-w-sm bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden"
         onClick={(e) => e.stopPropagation()}
         onKeyDown={handleKeyDown}
@@ -149,13 +165,13 @@ export function GlobalCommandPalette({ open, onClose }: Props) {
           )}
         </div>
         <div className="px-4 py-2 border-t border-gray-100 dark:border-gray-800 flex items-center gap-3">
-          <span className="text-xs text-gray-300 dark:text-gray-600">
+          <span className="text-xs text-gray-400 dark:text-gray-500">
             {t("command.navigate")}
           </span>
-          <span className="text-xs text-gray-300 dark:text-gray-600">
+          <span className="text-xs text-gray-400 dark:text-gray-500">
             {t("command.select")}
           </span>
-          <span className="text-xs text-gray-300 dark:text-gray-600">
+          <span className="text-xs text-gray-400 dark:text-gray-500">
             {t("command.close")}
           </span>
         </div>
