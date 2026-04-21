@@ -854,9 +854,9 @@ app.get("/users", async (c) => {
 
   const userIds = rows.map((r) => r.id);
 
-  const [listCounts, participationCounts] =
+  const [listCounts, challengerCounts, completedCounts, collaboratorCounts] =
     userIds.length === 0
-      ? [[], []]
+      ? [[], [], [], []]
       : await Promise.all([
           db
             .select({ ownerId: lists.ownerId, count: countDistinct(lists.id) })
@@ -869,20 +869,45 @@ app.get("/users", async (c) => {
             .where(
               and(
                 inArray(participations.userId, userIds),
+                eq(participations.role, "challenger")
+              )
+            )
+            .groupBy(participations.userId),
+          db
+            .select({ userId: participations.userId, count: countDistinct(participations.id) })
+            .from(participations)
+            .where(
+              and(
+                inArray(participations.userId, userIds),
+                eq(participations.role, "challenger"),
                 sql`${participations.completedAt} is not null`
+              )
+            )
+            .groupBy(participations.userId),
+          db
+            .select({ userId: participations.userId, count: countDistinct(participations.id) })
+            .from(participations)
+            .where(
+              and(
+                inArray(participations.userId, userIds),
+                eq(participations.role, "collaborator")
               )
             )
             .groupBy(participations.userId),
         ]);
 
   const listCountMap = new Map(listCounts.map((r) => [r.ownerId, r.count]));
-  const participationCountMap = new Map(participationCounts.map((r) => [r.userId, r.count]));
+  const challengerCountMap = new Map(challengerCounts.map((r) => [r.userId, r.count]));
+  const completedCountMap = new Map(completedCounts.map((r) => [r.userId, r.count]));
+  const collaboratorCountMap = new Map(collaboratorCounts.map((r) => [r.userId, r.count]));
 
   return c.json({
     users: rows.map((u) => ({
       ...u,
-      publicListsCount: listCountMap.get(u.id) ?? 0,
-      completedChallengesCount: participationCountMap.get(u.id) ?? 0,
+      ownedListsCount: listCountMap.get(u.id) ?? 0,
+      challengerCount: challengerCountMap.get(u.id) ?? 0,
+      completedChallengesCount: completedCountMap.get(u.id) ?? 0,
+      collaboratorCount: collaboratorCountMap.get(u.id) ?? 0,
     })),
     nextCursor,
   });
