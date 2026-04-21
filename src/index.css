@@ -8,7 +8,8 @@
 }
 
 @theme {
-  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+  --font-sans: "Space Grotesk", system-ui, -apple-system, sans-serif;
+  --font-mono: "Space Mono", "Courier New", monospace;
   /* Neutral dark-mode grays — Tailwind's defaults have a blue tint */
   --color-gray-950: #0d0d0d;
   --color-gray-900: #171717;
