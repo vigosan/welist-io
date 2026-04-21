@@ -152,7 +152,10 @@ const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 function inUuids(col: AnyColumn, ids: string[]) {
-  return sql`${col} = ANY(ARRAY[${sql.join(ids.map((id) => sql`${id}::uuid`), sql`, `)}])`;
+  return sql`${col} = ANY(ARRAY[${sql.join(
+    ids.map((id) => sql`${id}::uuid`),
+    sql`, `
+  )}])`;
 }
 
 function listWhere(param: string) {
@@ -864,7 +867,10 @@ app.get("/users", async (c) => {
             .where(and(eq(lists.public, true), inArray(lists.ownerId, userIds)))
             .groupBy(lists.ownerId),
           db
-            .select({ userId: participations.userId, count: countDistinct(participations.id) })
+            .select({
+              userId: participations.userId,
+              count: countDistinct(participations.id),
+            })
             .from(participations)
             .where(
               and(
@@ -874,7 +880,10 @@ app.get("/users", async (c) => {
             )
             .groupBy(participations.userId),
           db
-            .select({ userId: participations.userId, count: countDistinct(participations.id) })
+            .select({
+              userId: participations.userId,
+              count: countDistinct(participations.id),
+            })
             .from(participations)
             .where(
               and(
@@ -885,7 +894,10 @@ app.get("/users", async (c) => {
             )
             .groupBy(participations.userId),
           db
-            .select({ userId: participations.userId, count: countDistinct(participations.id) })
+            .select({
+              userId: participations.userId,
+              count: countDistinct(participations.id),
+            })
             .from(participations)
             .where(
               and(
@@ -897,9 +909,15 @@ app.get("/users", async (c) => {
         ]);
 
   const listCountMap = new Map(listCounts.map((r) => [r.ownerId, r.count]));
-  const challengerCountMap = new Map(challengerCounts.map((r) => [r.userId, r.count]));
-  const completedCountMap = new Map(completedCounts.map((r) => [r.userId, r.count]));
-  const collaboratorCountMap = new Map(collaboratorCounts.map((r) => [r.userId, r.count]));
+  const challengerCountMap = new Map(
+    challengerCounts.map((r) => [r.userId, r.count])
+  );
+  const completedCountMap = new Map(
+    completedCounts.map((r) => [r.userId, r.count])
+  );
+  const collaboratorCountMap = new Map(
+    collaboratorCounts.map((r) => [r.userId, r.count])
+  );
 
   return c.json({
     users: rows.map((u) => ({

@@ -46,14 +46,18 @@ export function ItemRow({
 }: Props) {
   const [editing, setEditing] = useState(false);
   const [text, setText] = useState(item.text);
-  const [pendingCoords, setPendingCoords] = useState<Coords | null | undefined>(undefined);
+  const [pendingCoords, setPendingCoords] = useState<Coords | null | undefined>(
+    undefined
+  );
   const [geoOpen, setGeoOpen] = useState(false);
   const cancelled = useRef(false);
   const { display, tags, places } = parseItemText(item.text);
   const { t } = useTranslation();
   const effectiveCanToggle = canToggle ?? canWrite;
 
-  const partialPlace = geoOpen ? (PARTIAL_PLACE_REGEX.exec(text)?.[1] ?? null) : null;
+  const partialPlace = geoOpen
+    ? (PARTIAL_PLACE_REGEX.exec(text)?.[1] ?? null)
+    : null;
   const geocodingQuery =
     partialPlace !== null && partialPlace.length >= 3 ? partialPlace : "";
   const { results: geocodingResults, isLoading: geocodingLoading } =
@@ -80,8 +84,7 @@ export function ItemRow({
     setText(val);
     const hasAt = PARTIAL_PLACE_REGEX.test(val);
     setGeoOpen(hasAt);
-    if (!hasAt)
-      setPendingCoords(item.latitude !== null ? null : undefined);
+    if (!hasAt) setPendingCoords(item.latitude !== null ? null : undefined);
   }
 
   function handleKeyDown(e: React.KeyboardEvent) {

@@ -1452,16 +1452,16 @@ describe("GET /api/users", () => {
       from: vi.fn().mockReturnThis(),
       where: vi.fn().mockReturnThis(),
       orderBy: vi.fn().mockReturnThis(),
-      limit: vi.fn().mockResolvedValue([{ id: "u1", name: "Alice", image: null }]),
+      limit: vi
+        .fn()
+        .mockResolvedValue([{ id: "u1", name: "Alice", image: null }]),
     };
     const emptyChain = {
       from: vi.fn().mockReturnThis(),
       where: vi.fn().mockReturnThis(),
       groupBy: vi.fn().mockResolvedValue([]),
     };
-    mockDb.select
-      .mockReturnValueOnce(usersChain)
-      .mockReturnValue(emptyChain);
+    mockDb.select.mockReturnValueOnce(usersChain).mockReturnValue(emptyChain);
 
     const res = await app.request("/api/users");
     expect(res.status).toBe(200);
@@ -1487,9 +1487,7 @@ describe("GET /api/users", () => {
       where: vi.fn().mockReturnThis(),
       groupBy: vi.fn().mockResolvedValue([]),
     };
-    mockDb.select
-      .mockReturnValueOnce(usersChain)
-      .mockReturnValue(emptyChain);
+    mockDb.select.mockReturnValueOnce(usersChain).mockReturnValue(emptyChain);
 
     const res = await app.request("/api/users");
     expect(res.status).toBe(200);
