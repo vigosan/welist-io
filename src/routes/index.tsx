@@ -120,7 +120,7 @@ function HomePage() {
       <main className="flex-1 flex flex-col">
         {/* Hero */}
         <div className="flex flex-col items-center text-center px-12 pt-[90px] pb-[72px]">
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col items-center w-full" style={{ maxWidth: 520 }}>
             {/* Badge */}
             <div
               className="mb-7 inline-block text-[10px] tracking-[0.16em] uppercase px-3.5 py-1 rounded-full border border-black/[0.08] dark:border-white/[0.08]"
@@ -167,7 +167,7 @@ function HomePage() {
             </p>
 
             {/* Input */}
-            <div className="w-full" style={{ maxWidth: 640 }}>
+            <div className="w-full">
               <CreateForm />
             </div>
 
