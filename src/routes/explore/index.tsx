@@ -44,7 +44,7 @@ function ExploreListCard({
             {list.name}
           </Link>
           {list.description && (
-            <p className="text-[12px] leading-[1.6] mb-2.5 text-[#a0a09c] dark:text-[#6b6b67]">
+            <p className="text-[12px] leading-[1.6] mb-2.5 text-gray-500 dark:text-[#6b6b67]">
               {list.description}
             </p>
           )}
@@ -56,7 +56,7 @@ function ExploreListCard({
             ].map(({ icon, v }) => (
               <span
                 key={icon}
-                className="text-[11px] text-[#a0a09c] dark:text-[#6b6b67]"
+                className="text-[11px] text-gray-500 dark:text-[#6b6b67]"
                 style={{ fontFamily: "'Space Mono', monospace" }}
               >
                 {icon} {v}
@@ -182,12 +182,12 @@ function ExplorePage() {
 
         <div className="mt-8">
           {isLoading && (
-            <p className="text-[12px] text-[#a0a09c] text-center py-10">
+            <p className="text-[12px] text-gray-500 text-center py-10">
               {t("explore.loading")}
             </p>
           )}
           {!isLoading && lists.length === 0 && (
-            <p className="text-[12px] text-[#a0a09c] text-center py-10">
+            <p className="text-[12px] text-gray-500 text-center py-10">
               {search ? t("explore.noListsSearch") : t("explore.noLists")}
             </p>
           )}
@@ -203,7 +203,7 @@ function ExplorePage() {
 
         <div ref={sentinelRef} className="h-4" />
         {isFetchingNextPage && (
-          <p className="text-[12px] text-[#a0a09c] text-center py-4">
+          <p className="text-[12px] text-gray-500 text-center py-4">
             {t("explore.loading")}
           </p>
         )}

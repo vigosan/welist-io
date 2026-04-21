@@ -152,12 +152,12 @@ function UsersDirectoryPage() {
 
         <div className="mt-7">
           {isLoading && (
-            <p className="text-xs text-[#a0a09c] text-center py-10">
+            <p className="text-xs text-gray-500 text-center py-10">
               {t("directory.loading")}
             </p>
           )}
           {!isLoading && userList.length === 0 && (
-            <p className="text-xs text-[#a0a09c] text-center py-10">
+            <p className="text-xs text-gray-500 text-center py-10">
               {search ? t("directory.noUsersSearch") : t("directory.noUsers")}
             </p>
           )}
@@ -168,7 +168,7 @@ function UsersDirectoryPage() {
 
         <div ref={sentinelRef} className="h-4" />
         {isFetchingNextPage && (
-          <p className="text-xs text-[#a0a09c] text-center py-4">
+          <p className="text-xs text-gray-500 text-center py-4">
             {t("directory.loading")}
           </p>
         )}

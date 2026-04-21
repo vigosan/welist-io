@@ -69,7 +69,7 @@ function NavLink({
         "no-underline",
         isActive
           ? "text-[#0c0c0b] dark:text-[#f0ede8] font-semibold"
-          : "text-[#a0a09c] dark:text-[#4a4a47] font-normal hover:text-[#0c0c0b] dark:hover:text-[#f0ede8]",
+          : "text-gray-500 dark:text-[#a0a09c] font-normal hover:text-[#0c0c0b] dark:hover:text-[#f0ede8]",
       ].join(" ")}
       style={{
         letterSpacing: "0.01em",
@@ -162,7 +162,7 @@ export function AppNav() {
                   ? "Switch to light mode"
                   : "Switch to dark mode"
               }
-              className="cursor-pointer text-[#a0a09c] dark:text-[#4a4a47] hover:text-[#0c0c0b] dark:hover:text-[#f0ede8] transition-colors duration-150"
+              className="cursor-pointer text-gray-500 dark:text-[#a0a09c] hover:text-[#0c0c0b] dark:hover:text-[#f0ede8] transition-colors duration-150"
             >
               {theme === "dark" ? <SunIcon /> : <MoonIcon />}
             </button>
@@ -170,7 +170,7 @@ export function AppNav() {
               type="button"
               onClick={() => setLanguage(language === "es" ? "en" : "es")}
               data-testid="lang-switcher"
-              className="cursor-pointer text-[11px] font-medium text-[#a0a09c] dark:text-[#4a4a47] hover:text-[#0c0c0b] dark:hover:text-[#f0ede8] transition-colors duration-150 tabular-nums"
+              className="cursor-pointer text-[11px] font-medium text-gray-500 dark:text-[#a0a09c] hover:text-[#0c0c0b] dark:hover:text-[#f0ede8] transition-colors duration-150 tabular-nums"
               style={{ fontFamily: "'Space Mono', monospace" }}
             >
               {language === "es" ? "EN" : "ES"}
@@ -224,7 +224,7 @@ export function AppNav() {
               onClick={() => setMobileOpen((o) => !o)}
               data-testid="nav-burger"
               aria-label="Toggle menu"
-              className="cursor-pointer h-8 w-8 flex items-center justify-center rounded-md text-[#a0a09c] dark:text-[#4a4a47] hover:text-[#0c0c0b] dark:hover:text-[#f0ede8] transition-colors duration-150"
+              className="cursor-pointer h-8 w-8 flex items-center justify-center rounded-md text-gray-500 dark:text-[#a0a09c] hover:text-[#0c0c0b] dark:hover:text-[#f0ede8] transition-colors duration-150"
             >
               {mobileOpen ? (
                 <svg
@@ -310,7 +310,7 @@ export function AppNav() {
                     ? "Switch to light mode"
                     : "Switch to dark mode"
                 }
-                className="cursor-pointer p-1.5 text-[#a0a09c] dark:text-[#4a4a47] hover:text-[#0c0c0b] dark:hover:text-[#f0ede8] transition-colors duration-150"
+                className="cursor-pointer p-1.5 text-gray-500 dark:text-[#a0a09c] hover:text-[#0c0c0b] dark:hover:text-[#f0ede8] transition-colors duration-150"
               >
                 {theme === "dark" ? <SunIcon /> : <MoonIcon />}
               </button>
@@ -321,7 +321,7 @@ export function AppNav() {
                   closeMobile();
                 }}
                 data-testid="lang-switcher-mobile"
-                className="cursor-pointer text-[11px] font-medium text-[#a0a09c] dark:text-[#4a4a47] hover:text-[#0c0c0b] dark:hover:text-[#f0ede8] transition-colors duration-150 tabular-nums"
+                className="cursor-pointer text-[11px] font-medium text-gray-500 dark:text-[#a0a09c] hover:text-[#0c0c0b] dark:hover:text-[#f0ede8] transition-colors duration-150 tabular-nums"
                 style={{ fontFamily: "'Space Mono', monospace" }}
               >
                 {language === "es" ? "EN" : "ES"}

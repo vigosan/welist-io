@@ -328,7 +328,7 @@ export function ItemRow({
               onClick={() => setEditing(true)}
               data-testid={`item-edit-${item.id}`}
               aria-label={t("items.edit", { text: display || item.text })}
-              className="cursor-pointer w-7 h-7 flex items-center justify-center text-gray-300 dark:text-gray-600 hover:text-gray-600 dark:hover:text-gray-400 transition-colors active:scale-[0.96]"
+              className="cursor-pointer w-7 h-7 flex items-center justify-center text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors active:scale-[0.96]"
             >
               <svg
                 aria-hidden="true"
@@ -353,7 +353,7 @@ export function ItemRow({
             aria-label={t("items.delete", {
               text: display || item.text,
             })}
-            className="cursor-pointer w-7 h-7 flex items-center justify-center text-gray-300 dark:text-gray-600 hover:text-gray-600 dark:hover:text-gray-400 transition-colors active:scale-[0.96]"
+            className="cursor-pointer w-7 h-7 flex items-center justify-center text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors active:scale-[0.96]"
           >
             <svg
               aria-hidden="true"

@@ -35,7 +35,7 @@ function MyListRow({
         className="flex items-center gap-2 py-4 border-b border-black/[0.08] dark:border-white/[0.08]"
         data-testid="my-list-card"
       >
-        <span className="flex-1 text-sm text-[#a0a09c] truncate">
+        <span className="flex-1 text-sm text-gray-500 truncate">
           {isOwner
             ? t("myLists.deleteConfirm", { name: list.name })
             : t("myLists.leaveConfirm", { name: list.name })}
@@ -44,7 +44,7 @@ function MyListRow({
           type="button"
           data-testid="delete-cancel-btn"
           onClick={() => setConfirming(false)}
-          className="cursor-pointer px-3 py-1.5 text-xs text-[#a0a09c] rounded-lg transition-colors duration-150 border border-black/[0.20] dark:border-white/[0.20]"
+          className="cursor-pointer px-3 py-1.5 text-xs text-gray-500 rounded-lg transition-colors duration-150 border border-black/[0.20] dark:border-white/[0.20]"
         >
           {t("myLists.deleteNo")}
         </button>
@@ -146,7 +146,7 @@ function MyListRow({
           e.stopPropagation();
           setConfirming(true);
         }}
-        className="absolute top-4 right-3 cursor-pointer h-7 w-7 flex items-center justify-center rounded-md text-[#d8d5d0] hover:text-[#a0a09c] transition-all duration-150 opacity-0 group-hover:opacity-100"
+        className="absolute top-4 right-3 cursor-pointer h-7 w-7 flex items-center justify-center rounded-md text-gray-400 hover:text-gray-500 transition-all duration-150 opacity-0 group-hover:opacity-100"
       >
         {isOwner ? (
           <svg
@@ -225,7 +225,7 @@ function CreateListInline({ onClose }: { onClose: () => void }) {
         type="button"
         aria-label={t("myLists.cancelCreate")}
         onClick={onClose}
-        className="cursor-pointer px-3 py-2.5 text-sm text-[#a0a09c] hover:text-[#0c0c0b] transition-colors bg-transparent border-none"
+        className="cursor-pointer px-3 py-2.5 text-sm text-gray-500 hover:text-[#0c0c0b] transition-colors bg-transparent border-none"
       >
         ✕
       </button>
@@ -261,7 +261,7 @@ function FilterChip({
       className={`cursor-pointer px-3 py-1 rounded-full text-xs transition-all duration-150 whitespace-nowrap shrink-0 border ${
         active
           ? "border-black/[0.20] dark:border-white/[0.20] bg-black/[0.12] dark:bg-white/[0.12] text-[#0c0c0b] dark:text-[#f0ede8] font-semibold"
-          : "border-black/[0.08] dark:border-white/[0.08] text-[#a0a09c] font-normal hover:border-black/[0.20] dark:hover:border-white/[0.20] hover:bg-black/[0.05] dark:hover:bg-white/[0.05]"
+          : "border-black/[0.08] dark:border-white/[0.08] text-gray-500 font-normal hover:border-black/[0.20] dark:hover:border-white/[0.20] hover:bg-black/[0.05] dark:hover:bg-white/[0.05]"
       }`}
     >
       {label}
@@ -350,7 +350,7 @@ function MyListsPage() {
                 type="button"
                 data-testid="new-list-btn"
                 onClick={() => setCreating(true)}
-                className="cursor-pointer flex items-center justify-center rounded-lg text-[#a0a09c] hover:text-[#0c0c0b] dark:hover:text-[#f0ede8] transition-colors duration-150 shrink-0 w-9 h-9 text-lg border border-black/[0.08] dark:border-white/[0.08] bg-transparent"
+                className="cursor-pointer flex items-center justify-center rounded-lg text-gray-500 hover:text-[#0c0c0b] dark:hover:text-[#f0ede8] transition-colors duration-150 shrink-0 w-9 h-9 text-lg border border-black/[0.08] dark:border-white/[0.08] bg-transparent"
                 aria-label={t("myLists.newList")}
               >
                 +
@@ -400,7 +400,7 @@ function MyListsPage() {
           </div>
         )}
         {!isLoading && lists.length === 0 && (
-          <p className="text-xs text-[#a0a09c] py-10 text-center">
+          <p className="text-xs text-gray-500 py-10 text-center">
             {search ? t("myLists.noListsSearch") : t("myLists.noLists")}
           </p>
         )}
@@ -414,7 +414,7 @@ function MyListsPage() {
 
         <div ref={sentinelRef} className="h-4" />
         {isFetchingNextPage && (
-          <p className="text-xs text-[#a0a09c] text-center py-4">
+          <p className="text-xs text-gray-500 text-center py-4">
             {t("myLists.loading")}
           </p>
         )}
