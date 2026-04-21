@@ -10,6 +10,7 @@ export function usePullToRefresh(onRefresh: () => Promise<unknown>) {
 
   const startY = useRef(0);
   const isPulling = useRef(false);
+  const directionLocked = useRef(false);
   const currentPull = useRef(0);
   const onRefreshRef = useRef(onRefresh);
 
@@ -22,23 +23,27 @@ export function usePullToRefresh(onRefresh: () => Promise<unknown>) {
     if (!el) return;
 
     function handleTouchStart(e: TouchEvent) {
-      // biome-ignore lint/style/noNonNullAssertion: el is checked above before this closure is registered
-      if (el!.scrollTop > 0) return;
       startY.current = e.touches[0].clientY;
-      isPulling.current = true;
+      isPulling.current = false;
+      directionLocked.current = false;
     }
 
     function handleTouchMove(e: TouchEvent) {
-      if (!isPulling.current) return;
       // biome-ignore lint/style/noNonNullAssertion: el is checked above before this closure is registered
-      if (el!.scrollTop > 0) {
-        isPulling.current = false;
-        currentPull.current = 0;
-        setPullDistance(0);
-        return;
-      }
+      if (el!.scrollTop > 0) return;
+
       const delta = e.touches[0].clientY - startY.current;
+
+      if (!directionLocked.current) {
+        directionLocked.current = true;
+        if (delta <= 0) return;
+        isPulling.current = true;
+      }
+
+      if (!isPulling.current) return;
+
       if (delta <= 0) {
+        isPulling.current = false;
         currentPull.current = 0;
         setPullDistance(0);
         return;
@@ -50,6 +55,7 @@ export function usePullToRefresh(onRefresh: () => Promise<unknown>) {
     }
 
     function handleTouchEnd() {
+      directionLocked.current = false;
       if (!isPulling.current) return;
       isPulling.current = false;
       if (currentPull.current >= THRESHOLD) {
