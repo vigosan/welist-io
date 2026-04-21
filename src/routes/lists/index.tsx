@@ -17,7 +17,7 @@ export const Route = createFileRoute("/lists/")({
   component: MyListsPage,
 });
 
-function MyListCard({
+function MyListRow({
   list,
   userId,
 }: {
@@ -25,6 +25,7 @@ function MyListCard({
   userId: string | null | undefined;
 }) {
   const [confirming, setConfirming] = useState(false);
+  const [hov, setHov] = useState(false);
   const deleteList = useDeleteList();
   const { t } = useTranslation();
   const isOwner = !list.ownerId || list.ownerId === userId;
@@ -32,10 +33,11 @@ function MyListCard({
   if (confirming) {
     return (
       <div
-        className="flex items-center gap-2 bg-white rounded-2xl border border-gray-200 px-4 py-3"
+        className="flex items-center gap-2 py-4"
+        style={{ borderBottom: "1px solid rgba(0,0,0,0.08)" }}
         data-testid="my-list-card"
       >
-        <span className="flex-1 text-sm text-gray-500 truncate">
+        <span className="flex-1 text-sm text-[#a0a09c] truncate">
           {isOwner
             ? t("myLists.deleteConfirm", { name: list.name })
             : t("myLists.leaveConfirm", { name: list.name })}
@@ -44,7 +46,8 @@ function MyListCard({
           type="button"
           data-testid="delete-cancel-btn"
           onClick={() => setConfirming(false)}
-          className="cursor-pointer px-3 py-1.5 text-xs text-gray-500 border border-gray-200 rounded-lg hover:border-gray-400 hover:text-gray-700 transition-[border-color,color,transform] duration-150 active:scale-[0.96]"
+          className="cursor-pointer px-3 py-1.5 text-xs text-[#a0a09c] rounded-lg transition-colors duration-150"
+          style={{ border: "1px solid rgba(0,0,0,0.20)" }}
         >
           {t("myLists.deleteNo")}
         </button>
@@ -53,7 +56,7 @@ function MyListCard({
           data-testid="delete-confirm-btn"
           onClick={() => deleteList.mutate(list.id)}
           disabled={deleteList.isPending}
-          className="cursor-pointer px-3 py-1.5 text-xs font-medium text-white bg-gray-900 rounded-lg hover:bg-black disabled:opacity-50 transition-[background-color,transform] duration-150 active:scale-[0.96]"
+          className="cursor-pointer px-3 py-1.5 text-xs font-semibold text-[#f8f7f5] bg-[#0c0c0b] rounded-lg disabled:opacity-50 transition-opacity duration-150"
         >
           {isOwner ? t("myLists.deleteYes") : t("myLists.leaveYes")}
         </button>
@@ -62,120 +65,137 @@ function MyListCard({
   }
 
   return (
-    <Link
-      to="/lists/$listId"
-      params={{ listId: list.slug ?? list.id }}
-      className="group bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 overflow-hidden hover:border-gray-300 dark:hover:border-gray-600 transition-[border-color,transform] duration-150 active:scale-[0.99]"
+    <div
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      className="relative py-4.5 transition-colors duration-150"
+      style={{
+        borderBottom: "1px solid rgba(0,0,0,0.08)",
+        background: hov ? "rgba(0,0,0,0.02)" : "transparent",
+        cursor: "pointer",
+      }}
       data-testid="my-list-card"
     >
-      <div className="p-4 flex flex-col gap-3">
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex-1 min-w-0">
-            <p className="font-semibold text-gray-900 dark:text-gray-100 leading-snug">
-              {list.name}
-            </p>
-            {list.description && (
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5 leading-snug line-clamp-2">
-                {list.description}
-              </p>
-            )}
-          </div>
-          <button
-            type="button"
-            data-testid="delete-list-btn"
-            aria-label={
-              isOwner
-                ? t("myLists.deleteList", { name: list.name })
-                : t("myLists.leaveList", { name: list.name })
-            }
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              setConfirming(true);
-            }}
-            className="cursor-pointer h-10 w-10 flex items-center justify-center rounded-lg text-gray-300 hover:text-gray-500 transition-colors active:scale-[0.96] opacity-100 sm:opacity-0 sm:group-hover:opacity-100 shrink-0"
+      <Link
+        to="/lists/$listId"
+        params={{ listId: list.slug ?? list.id }}
+        className="block"
+      >
+        <p
+          className="text-sm font-semibold text-[#0c0c0b] dark:text-[#f0ede8] mb-1.5 leading-snug tracking-[-0.01em]"
+          style={{ paddingRight: "2rem" }}
+        >
+          {list.name}
+        </p>
+        {list.description && (
+          <p
+            className="text-xs leading-[1.6] mb-2.5"
+            style={{ color: "#a0a09c", maxWidth: 480 }}
           >
-            {isOwner ? (
-              <svg
-                aria-hidden="true"
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <polyline points="3 6 5 6 21 6" />
-                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
-                <path d="M10 11v6M14 11v6" />
-                <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
-              </svg>
-            ) : (
-              <svg
-                aria-hidden="true"
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                <polyline points="16 17 21 12 16 7" />
-                <line x1="21" y1="12" x2="9" y2="12" />
-              </svg>
-            )}
-          </button>
-        </div>
-
+            {list.description}
+          </p>
+        )}
         {list.itemCount > 0 && (
-          <div className="h-1 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
+          <div
+            className="h-px mb-2.5 overflow-hidden"
+            style={{ background: "rgba(0,0,0,0.08)", width: "100%" }}
+          >
             <div
-              className="h-full bg-gray-900 dark:bg-gray-100 rounded-full transition-all duration-300"
+              className="h-full bg-[#0c0c0b] dark:bg-[#f0ede8] transition-all duration-300"
               style={{
                 width: `${Math.round((list.doneCount / list.itemCount) * 100)}%`,
               }}
             />
           </div>
         )}
-
-        <div className="flex items-center gap-1.5">
-          {list.public && (
-            <span className="text-xs font-medium text-gray-500 dark:text-gray-400 px-2 py-1 bg-gray-50 dark:bg-gray-800 rounded-lg">
-              {t("myLists.public")}
-            </span>
-          )}
-          {list.collaborative && (
-            <span className="text-xs font-medium text-gray-500 dark:text-gray-400 px-2 py-1 bg-gray-50 dark:bg-gray-800 rounded-lg">
-              {t("myLists.collaborative")}
-            </span>
-          )}
-          <div className="ml-auto flex items-center gap-2">
-            <span className="text-xs text-gray-400 dark:text-gray-500">
-              {list.itemCount} {list.itemCount === 1 ? "item" : "items"}
-              {list.participantCount > 0 &&
-                ` · ${list.participantCount} ${list.participantCount === 1 ? "participante" : "participantes"}`}
-            </span>
-            <svg
-              aria-hidden="true"
-              className="text-gray-200 w-4 h-4 shrink-0"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M9 18l6-6-6-6" />
-            </svg>
+        <div className="flex justify-between items-center">
+          <div className="flex gap-1.5">
+            {list.public && (
+              <span
+                className="text-[10px] px-2 py-0.5 rounded-full"
+                style={{
+                  border: "1px solid rgba(0,0,0,0.08)",
+                  color: "#a0a09c",
+                  fontFamily: "'Space Mono', monospace",
+                  letterSpacing: "0.04em",
+                }}
+              >
+                {t("myLists.public")}
+              </span>
+            )}
+            {list.collaborative && (
+              <span
+                className="text-[10px] px-2 py-0.5 rounded-full"
+                style={{
+                  border: "1px solid rgba(0,0,0,0.08)",
+                  color: "#a0a09c",
+                  fontFamily: "'Space Mono', monospace",
+                  letterSpacing: "0.04em",
+                }}
+              >
+                {t("myLists.collaborative")}
+              </span>
+            )}
           </div>
+          <span className="text-[11px]" style={{ color: "#a0a09c" }}>
+            {list.itemCount} {list.itemCount === 1 ? "item" : "items"}
+            {list.participantCount > 0 &&
+              ` · ${list.participantCount} ${list.participantCount === 1 ? "participante" : "participantes"}`}
+          </span>
         </div>
-      </div>
-    </Link>
+      </Link>
+      <button
+        type="button"
+        data-testid="delete-list-btn"
+        aria-label={
+          isOwner
+            ? t("myLists.deleteList", { name: list.name })
+            : t("myLists.leaveList", { name: list.name })
+        }
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          setConfirming(true);
+        }}
+        className="absolute top-4 right-0 cursor-pointer h-7 w-7 flex items-center justify-center rounded-md text-[#d8d5d0] hover:text-[#a0a09c] transition-colors duration-150"
+        style={{ opacity: hov ? 1 : 0 }}
+      >
+        {isOwner ? (
+          <svg
+            aria-hidden="true"
+            width="13"
+            height="13"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <polyline points="3 6 5 6 21 6" />
+            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+            <path d="M10 11v6M14 11v6" />
+            <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+          </svg>
+        ) : (
+          <svg
+            aria-hidden="true"
+            width="13"
+            height="13"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+            <polyline points="16 17 21 12 16 7" />
+            <line x1="21" y1="12" x2="9" y2="12" />
+          </svg>
+        )}
+      </button>
+    </div>
   );
 }
 
@@ -201,7 +221,11 @@ function CreateListInline({ onClose }: { onClose: () => void }) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex gap-2 p-1.5 bg-white border border-gray-300 rounded-2xl focus-within:border-gray-400 transition-[border-color] duration-150"
+      className="flex overflow-hidden rounded-lg"
+      style={{
+        border: "1px solid rgba(0,0,0,0.20)",
+        background: "rgba(0,0,0,0.03)",
+      }}
     >
       <input
         autoFocus
@@ -210,14 +234,14 @@ function CreateListInline({ onClose }: { onClose: () => void }) {
         placeholder={t("myLists.newListPlaceholder")}
         aria-label={t("myLists.newListAriaLabel")}
         data-testid="new-list-name-input"
-        className="flex-1 pl-3 text-sm text-gray-900 placeholder-gray-400 bg-transparent outline-none min-w-0"
+        className="flex-1 px-4 py-2.5 text-sm text-[#0c0c0b] dark:text-[#f0ede8] placeholder-[#a0a09c] bg-transparent outline-none min-w-0"
         onKeyDown={(e) => e.key === "Escape" && onClose()}
       />
       <button
         type="button"
         aria-label={t("myLists.cancelCreate")}
         onClick={onClose}
-        className="cursor-pointer px-3 py-2 text-sm text-gray-400 hover:text-gray-700 transition-colors"
+        className="cursor-pointer px-3 py-2.5 text-sm text-[#a0a09c] hover:text-[#0c0c0b] transition-colors bg-transparent border-none"
       >
         ✕
       </button>
@@ -225,7 +249,8 @@ function CreateListInline({ onClose }: { onClose: () => void }) {
         type="submit"
         disabled={!name.trim() || createList.isPending}
         data-testid="new-list-create-btn"
-        className="cursor-pointer px-4 py-2 text-sm font-medium bg-gray-900 text-white dark:bg-white dark:text-gray-900 rounded-xl hover:bg-black dark:hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-[background-color,transform] duration-150 active:scale-[0.96] shrink-0"
+        className="cursor-pointer px-4 py-2.5 text-xs font-semibold tracking-[0.04em] bg-[#0c0c0b] text-[#f8f7f5] dark:bg-[#f0ede8] dark:text-[#0c0c0b] border-none disabled:opacity-30 disabled:cursor-not-allowed transition-opacity duration-150 shrink-0"
+        style={{ borderRadius: 0 }}
       >
         {createList.isPending ? "…" : t("myLists.createList")}
       </button>
@@ -236,9 +261,43 @@ function CreateListInline({ onClose }: { onClose: () => void }) {
 type SortOption = "recent" | "created_desc" | "created_asc";
 type VisibilityFilter = "all" | "public" | "private";
 
+function FilterChip({
+  label,
+  active,
+  onClick,
+}: {
+  label: string;
+  active: boolean;
+  onClick: () => void;
+}) {
+  const [hov, setHov] = useState(false);
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      className="cursor-pointer px-3 py-1 rounded-full text-xs font-medium transition-all duration-150 whitespace-nowrap shrink-0"
+      style={{
+        border: `1px solid ${active || hov ? "rgba(0,0,0,0.20)" : "rgba(0,0,0,0.08)"}`,
+        background: active
+          ? "rgba(0,0,0,0.12)"
+          : hov
+            ? "rgba(0,0,0,0.05)"
+            : "transparent",
+        color: active ? "#0c0c0b" : "#a0a09c",
+        fontWeight: active ? 600 : 400,
+      }}
+    >
+      {label}
+    </button>
+  );
+}
+
 function MyListsPage() {
   const [q, setQ] = useState("");
   const [search, setSearch] = useState("");
+  const [focused, setFocused] = useState(false);
   const [sort, setSort] = useState<SortOption>("recent");
   const [visibility, setVisibility] = useState<VisibilityFilter>("all");
   const [creating, setCreating] = useState(false);
@@ -249,25 +308,13 @@ function MyListsPage() {
   const { data: session } = useSession();
   const userId = session?.user?.id;
 
-  const SORT_OPTIONS: {
-    value: SortOption;
-    label: string;
-  }[] = [
+  const SORT_OPTIONS: { value: SortOption; label: string }[] = [
     { value: "recent", label: t("myLists.sortRecent") },
-    {
-      value: "created_desc",
-      label: t("myLists.sortNewest"),
-    },
-    {
-      value: "created_asc",
-      label: t("myLists.sortOldest"),
-    },
+    { value: "created_desc", label: t("myLists.sortNewest") },
+    { value: "created_asc", label: t("myLists.sortOldest") },
   ];
 
-  const VISIBILITY_OPTIONS: {
-    value: VisibilityFilter;
-    label: string;
-  }[] = [
+  const VISIBILITY_OPTIONS: { value: VisibilityFilter; label: string }[] = [
     { value: "all", label: t("myLists.filterAll") },
     { value: "public", label: t("myLists.filterPublic") },
     { value: "private", label: t("myLists.filterPrivate") },
@@ -296,30 +343,37 @@ function MyListsPage() {
   }
 
   return (
-    <div className="h-dvh bg-[#FAFAF8] dark:bg-gray-950 flex flex-col">
+    <div className="min-h-dvh bg-[#f8f7f5] dark:bg-[#0c0c0b] flex flex-col">
       <AppNav />
 
-      <div className="flex-1 flex flex-col w-full max-w-3xl mx-auto overflow-hidden">
-        <div className="px-4 pt-5 pb-3 shrink-0">
+      <main className="flex-1 w-full max-w-[760px] mx-auto px-12 py-10">
+        <div className="mb-7">
           {creating ? (
             <CreateListInline onClose={() => setCreating(false)} />
           ) : (
             <div className="flex gap-2">
               <form
                 onSubmit={handleSearch}
-                className="flex-1 flex gap-2 p-1.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl focus-within:border-gray-400 dark:focus-within:border-gray-500 transition-[border-color] duration-150"
+                className="flex-1 flex overflow-hidden rounded-lg transition-all duration-200"
+                style={{
+                  border: `1px solid ${focused ? "rgba(0,0,0,0.20)" : "rgba(0,0,0,0.08)"}`,
+                  background: focused ? "rgba(0,0,0,0.06)" : "rgba(0,0,0,0.03)",
+                }}
               >
                 <input
                   value={q}
                   onChange={(e) => setQ(e.target.value)}
+                  onFocus={() => setFocused(true)}
+                  onBlur={() => setFocused(false)}
                   placeholder={t("myLists.searchPlaceholder")}
                   aria-label={t("myLists.searchAriaLabel")}
                   data-testid="my-lists-search-input"
-                  className="flex-1 pl-3 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-600 bg-transparent outline-none"
+                  className="flex-1 px-4 py-2.5 text-sm text-[#0c0c0b] dark:text-[#f0ede8] placeholder-[#a0a09c] bg-transparent outline-none"
                 />
                 <button
                   type="submit"
-                  className="cursor-pointer px-5 py-2.5 text-sm font-medium bg-gray-900 text-white dark:bg-white dark:text-gray-900 rounded-xl hover:bg-black dark:hover:bg-gray-100 transition-[background-color] duration-150 active:scale-[0.96]"
+                  className="px-5 py-2.5 text-xs font-semibold tracking-[0.04em] bg-[#0c0c0b] text-[#f8f7f5] dark:bg-[#f0ede8] dark:text-[#0c0c0b] border-none cursor-pointer transition-opacity duration-150"
+                  style={{ borderRadius: 0 }}
                 >
                   {t("myLists.search")}
                 </button>
@@ -328,99 +382,87 @@ function MyListsPage() {
                 type="button"
                 data-testid="new-list-btn"
                 onClick={() => setCreating(true)}
-                className="cursor-pointer h-[46px] w-[46px] flex items-center justify-center rounded-xl border border-gray-200 text-gray-500 hover:border-gray-900 hover:text-gray-900 transition-[border-color,color,transform] duration-150 active:scale-[0.96] shrink-0"
+                className="cursor-pointer flex items-center justify-center rounded-lg text-[#a0a09c] hover:text-[#0c0c0b] transition-colors duration-150 shrink-0"
+                style={{
+                  width: 36,
+                  height: 36,
+                  border: "1px solid rgba(0,0,0,0.08)",
+                  background: "transparent",
+                  fontSize: 18,
+                }}
                 aria-label={t("myLists.newList")}
               >
-                <svg
-                  aria-hidden="true"
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M12 5v14M5 12h14" />
-                </svg>
+                +
               </button>
             </div>
           )}
+
           <div
             className="flex items-center gap-1.5 mt-3 overflow-x-auto no-scrollbar"
             data-testid="sort-options"
           >
             {SORT_OPTIONS.map((opt) => (
-              <button
-                type="button"
+              <FilterChip
                 key={opt.value}
-                data-testid={`sort-${opt.value}`}
+                label={opt.label}
+                active={sort === opt.value}
                 onClick={() => setSort(opt.value)}
-                className={`cursor-pointer px-3 py-1 text-xs font-medium rounded-lg border transition-colors duration-150 whitespace-nowrap shrink-0 ${
-                  sort === opt.value
-                    ? "border-gray-900 bg-gray-900 text-white dark:border-gray-100 dark:bg-gray-100 dark:text-gray-900"
-                    : "border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-200"
-                }`}
-              >
-                {opt.label}
-              </button>
+              />
             ))}
-            <div className="w-px h-4 bg-gray-200 mx-0.5 shrink-0" />
+            <div
+              className="w-px h-3.5 shrink-0 mx-0.5"
+              style={{ background: "rgba(0,0,0,0.08)" }}
+            />
             <div
               className="flex gap-1.5 shrink-0"
               data-testid="visibility-filter"
             >
               {VISIBILITY_OPTIONS.map((opt) => (
-                <button
-                  type="button"
+                <FilterChip
                   key={opt.value}
-                  data-testid={`visibility-${opt.value}`}
+                  label={opt.label}
+                  active={visibility === opt.value}
                   onClick={() => setVisibility(opt.value)}
-                  className={`cursor-pointer px-3 py-1 text-xs font-medium rounded-lg border transition-colors duration-150 whitespace-nowrap shrink-0 ${
-                    visibility === opt.value
-                      ? "border-gray-900 bg-gray-900 text-white dark:border-gray-100 dark:bg-gray-100 dark:text-gray-900"
-                      : "border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-200"
-                  }`}
-                >
-                  {opt.label}
-                </button>
+                />
               ))}
             </div>
           </div>
         </div>
-        <div className="flex-1 overflow-y-auto px-4 pb-6">
-          {isLoading && (
-            <div className="flex flex-col gap-2">
-              {Array.from({ length: 6 }, (_, i) => i).map((i) => (
-                <div
-                  key={`skeleton-${i}`}
-                  className="h-16 rounded-2xl bg-gray-100 animate-pulse"
-                />
-              ))}
-            </div>
-          )}
-          {!isLoading && lists.length === 0 && (
-            <p className="text-sm text-gray-400 py-10 text-center">
-              {search ? t("myLists.noListsSearch") : t("myLists.noLists")}
-            </p>
-          )}
-          {!isLoading && lists.length > 0 && (
-            <div className="flex flex-col gap-2">
-              {lists.map((list) => (
-                <MyListCard key={list.id} list={list} userId={userId} />
-              ))}
-            </div>
-          )}
 
-          <div ref={sentinelRef} className="h-4" />
-          {isFetchingNextPage && (
-            <p className="text-sm text-gray-400 text-center py-4">
-              {t("myLists.loading")}
-            </p>
-          )}
-        </div>
-      </div>
+        {isLoading && (
+          <div className="flex flex-col">
+            {Array.from({ length: 6 }, (_, i) => i).map((i) => (
+              <div
+                key={`skeleton-${i}`}
+                className="h-16 animate-pulse"
+                style={{
+                  borderBottom: "1px solid rgba(0,0,0,0.08)",
+                  background: "rgba(0,0,0,0.02)",
+                }}
+              />
+            ))}
+          </div>
+        )}
+        {!isLoading && lists.length === 0 && (
+          <p className="text-xs text-[#a0a09c] py-10 text-center">
+            {search ? t("myLists.noListsSearch") : t("myLists.noLists")}
+          </p>
+        )}
+        {!isLoading && lists.length > 0 && (
+          <div>
+            {lists.map((list) => (
+              <MyListRow key={list.id} list={list} userId={userId} />
+            ))}
+          </div>
+        )}
+
+        <div ref={sentinelRef} className="h-4" />
+        {isFetchingNextPage && (
+          <p className="text-xs text-[#a0a09c] text-center py-4">
+            {t("myLists.loading")}
+          </p>
+        )}
+      </main>
     </div>
   );
 }
