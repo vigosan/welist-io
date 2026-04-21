@@ -350,7 +350,7 @@ function ListDetailPage() {
               >
                 {t("list.back")}
               </Link>
-              <div className="mt-4 order-3">
+              <div className="mt-4 order-2">
                 {listLoading ? (
                   <div className="h-7 w-3/4 rounded-lg bg-gray-200 animate-pulse" />
                 ) : editingName ? (
@@ -394,7 +394,7 @@ function ListDetailPage() {
               </div>
 
               {!listLoading && (isOwner || !!list?.description) && (
-                <div className="mt-2 order-4">
+                <div className="mt-3 order-5">
                   {isOwner ? (
                     editingDescription ? (
                       <textarea
@@ -482,7 +482,7 @@ function ListDetailPage() {
                 </div>
               )}
 
-              <div className="flex items-center justify-between gap-2 mt-1 order-2">
+              <div className="flex items-center justify-between gap-2 mt-2 order-3">
                 {listLoading ? (
                   <>
                     <div className="flex items-center gap-2 flex-1 min-w-0">
@@ -987,7 +987,7 @@ function ListDetailPage() {
                 isOwner &&
                 participantsPanel === "challengers" &&
                 challengers.length > 0 && (
-                  <div className="mt-2 border border-gray-100 rounded-xl overflow-hidden order-2">
+                  <div className="mt-2 border border-gray-100 rounded-xl overflow-hidden order-6">
                     <div className="px-3 py-2 border-b border-gray-100 flex items-center justify-between">
                       <span className="text-xs font-medium text-gray-500">
                         {challengers.length}{" "}
@@ -1045,7 +1045,7 @@ function ListDetailPage() {
                 isOwner &&
                 participantsPanel === "collaborators" &&
                 collaborators.length > 0 && (
-                  <div className="mt-2 border border-gray-100 rounded-xl overflow-hidden order-2">
+                  <div className="mt-2 border border-gray-100 rounded-xl overflow-hidden order-6">
                     <div className="px-3 py-2 border-b border-gray-100">
                       <span className="text-xs font-medium text-gray-500">
                         {collaborators.length}{" "}
@@ -1175,7 +1175,7 @@ function ListDetailPage() {
               )}
 
               {!listLoading && progress > 0 && (
-                <div className="mt-3 h-0.5 bg-gray-100 dark:bg-gray-700 overflow-hidden rounded-full order-5">
+                <div className="mt-2 h-0.5 bg-gray-100 dark:bg-gray-700 overflow-hidden rounded-full order-4">
                   <div
                     className="h-full bg-gray-900 dark:bg-gray-100 rounded-full transition-all duration-700"
                     style={{ width: `${progress}%` }}
@@ -1184,7 +1184,7 @@ function ListDetailPage() {
               )}
 
               {!itemsLoading && items.length > 0 && (
-                <div className="mt-3 -mx-5 order-5">
+                <div className="mt-3 -mx-5 order-7">
                   <div className="flex flex-wrap gap-1.5 px-5 pb-0.5">
                     {(["pending", "done"] as const).map((s) => (
                       <button
