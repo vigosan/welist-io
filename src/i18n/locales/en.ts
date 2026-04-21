@@ -6,9 +6,11 @@ const en: Translations = {
     myLists: "My lists",
   },
   home: {
+    badge: "Collaborative lists → v2.0",
     headline: "Create. Share. Challenge.",
     headlineSub: "",
     tagline: "Share what you do. Let others try.",
+    freeToStart: "No sign-up required. Free to start.",
     listNamePlaceholder: "Name your list…",
     listNameAriaLabel: "List name",
     createList: "Create list",

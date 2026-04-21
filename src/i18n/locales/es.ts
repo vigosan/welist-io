@@ -4,9 +4,11 @@ const es = {
     myLists: "Mis listas",
   },
   home: {
+    badge: "Listas colaborativas → v2.0",
     headline: "Crea. Comparte. Reta.",
     headlineSub: "",
     tagline: "Comparte lo que haces. Que otros lo intenten.",
+    freeToStart: "Sin registro. Gratuito para empezar.",
     listNamePlaceholder: "Ponle un nombre a tu lista…",
     listNameAriaLabel: "Nombre de la lista",
     createList: "Crear lista",
