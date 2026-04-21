@@ -766,6 +766,46 @@ function ListDetailPage() {
                               {t("list.searchTitle")}
                             </button>
                           )}
+                          {hasGeoItems && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setViewMode((v) =>
+                                  v === "list" ? "map" : "list"
+                                );
+                                setMenuOpen(false);
+                              }}
+                              data-testid="map-toggle-btn"
+                              className="cursor-pointer w-full flex items-center gap-2.5 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors whitespace-nowrap"
+                            >
+                              <svg
+                                aria-hidden="true"
+                                className="w-4 h-4 text-gray-400 shrink-0"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                {viewMode === "list" ? (
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
+                                  />
+                                ) : (
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M4 6h16M4 10h16M4 14h16M4 18h16"
+                                  />
+                                )}
+                              </svg>
+                              {viewMode === "list"
+                                ? t("list.mapView")
+                                : t("list.listView")}
+                            </button>
+                          )}
                           {filteredItems.some((i) => !i.done) && (
                             <button
                               type="button"
@@ -831,46 +871,31 @@ function ListDetailPage() {
                               {t("list.pickRandom")}
                             </button>
                           )}
-                          {hasGeoItems && (
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setViewMode((v) =>
-                                  v === "list" ? "map" : "list"
-                                );
-                                setMenuOpen(false);
-                              }}
-                              data-testid="map-toggle-btn"
-                              className="cursor-pointer w-full flex items-center gap-2.5 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors whitespace-nowrap"
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setPaletteOpen(true);
+                              setMenuOpen(false);
+                            }}
+                            data-testid="command-palette-btn"
+                            className="cursor-pointer w-full flex items-center gap-2.5 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors whitespace-nowrap"
+                          >
+                            <svg
+                              aria-hidden="true"
+                              className="w-4 h-4 text-gray-400 shrink-0"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
                             >
-                              <svg
-                                aria-hidden="true"
-                                className="w-4 h-4 text-gray-400 shrink-0"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                {viewMode === "list" ? (
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
-                                  />
-                                ) : (
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M4 6h16M4 10h16M4 14h16M4 18h16"
-                                  />
-                                )}
-                              </svg>
-                              {viewMode === "list"
-                                ? t("list.mapView")
-                                : t("list.listView")}
-                            </button>
-                          )}
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                              />
+                            </svg>
+                            {t("list.commandPalette")}
+                          </button>
                           <button
                             type="button"
                             onClick={() => {
@@ -906,31 +931,6 @@ function ListDetailPage() {
                             {copied
                               ? t("list.linkCopied")
                               : t("list.shareLink")}
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setPaletteOpen(true);
-                              setMenuOpen(false);
-                            }}
-                            data-testid="command-palette-btn"
-                            className="cursor-pointer w-full flex items-center gap-2.5 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors whitespace-nowrap"
-                          >
-                            <svg
-                              aria-hidden="true"
-                              className="w-4 h-4 text-gray-400 shrink-0"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                              />
-                            </svg>
-                            {t("list.commandPalette")}
                           </button>
                           <button
                             type="button"
