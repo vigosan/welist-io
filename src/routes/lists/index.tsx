@@ -25,7 +25,6 @@ function MyListRow({
   userId: string | null | undefined;
 }) {
   const [confirming, setConfirming] = useState(false);
-  const [hov, setHov] = useState(false);
   const deleteList = useDeleteList();
   const { t } = useTranslation();
   const isOwner = !list.ownerId || list.ownerId === userId;
@@ -33,8 +32,7 @@ function MyListRow({
   if (confirming) {
     return (
       <div
-        className="flex items-center gap-2 py-4"
-        style={{ borderBottom: "1px solid rgba(0,0,0,0.08)" }}
+        className="flex items-center gap-2 py-4 border-b border-black/[0.08] dark:border-white/[0.08]"
         data-testid="my-list-card"
       >
         <span className="flex-1 text-sm text-[#a0a09c] truncate">
@@ -46,8 +44,7 @@ function MyListRow({
           type="button"
           data-testid="delete-cancel-btn"
           onClick={() => setConfirming(false)}
-          className="cursor-pointer px-3 py-1.5 text-xs text-[#a0a09c] rounded-lg transition-colors duration-150"
-          style={{ border: "1px solid rgba(0,0,0,0.20)" }}
+          className="cursor-pointer px-3 py-1.5 text-xs text-[#a0a09c] rounded-lg transition-colors duration-150 border border-black/[0.20] dark:border-white/[0.20]"
         >
           {t("myLists.deleteNo")}
         </button>
@@ -66,14 +63,7 @@ function MyListRow({
 
   return (
     <div
-      onMouseEnter={() => setHov(true)}
-      onMouseLeave={() => setHov(false)}
-      className="relative py-4.5 px-3 -mx-3 rounded-lg transition-colors duration-150"
-      style={{
-        borderBottom: "1px solid rgba(0,0,0,0.08)",
-        background: hov ? "rgba(0,0,0,0.03)" : "transparent",
-        cursor: "pointer",
-      }}
+      className="group relative py-4.5 px-3 -mx-3 rounded-lg transition-colors duration-150 cursor-pointer border-b border-black/[0.08] dark:border-white/[0.08] hover:bg-black/[0.03] dark:hover:bg-white/[0.04]"
       data-testid="my-list-card"
     >
       <Link
@@ -97,8 +87,7 @@ function MyListRow({
         )}
         {list.itemCount > 0 && (
           <div
-            className="h-px mb-2.5 overflow-hidden"
-            style={{ background: "rgba(0,0,0,0.08)", width: "100%" }}
+            className="h-px mb-2.5 overflow-hidden w-full bg-black/[0.08] dark:bg-white/[0.08]"
           >
             <div
               className="h-full bg-[#0c0c0b] dark:bg-[#f0ede8] transition-all duration-300"
@@ -114,7 +103,7 @@ function MyListRow({
               <span
                 className="text-[10px] px-2 py-0.5 rounded-full"
                 style={{
-                  border: "1px solid rgba(0,0,0,0.08)",
+                  border: "1px solid rgba(255,255,255,0.2)",
                   color: "#a0a09c",
                   fontFamily: "'Space Mono', monospace",
                   letterSpacing: "0.04em",
@@ -127,7 +116,7 @@ function MyListRow({
               <span
                 className="text-[10px] px-2 py-0.5 rounded-full"
                 style={{
-                  border: "1px solid rgba(0,0,0,0.08)",
+                  border: "1px solid rgba(255,255,255,0.2)",
                   color: "#a0a09c",
                   fontFamily: "'Space Mono', monospace",
                   letterSpacing: "0.04em",
@@ -157,8 +146,7 @@ function MyListRow({
           e.stopPropagation();
           setConfirming(true);
         }}
-        className="absolute top-4 right-3 cursor-pointer h-7 w-7 flex items-center justify-center rounded-md text-[#d8d5d0] hover:text-[#a0a09c] transition-colors duration-150"
-        style={{ opacity: hov ? 1 : 0 }}
+        className="absolute top-4 right-3 cursor-pointer h-7 w-7 flex items-center justify-center rounded-md text-[#d8d5d0] hover:text-[#a0a09c] transition-all duration-150 opacity-0 group-hover:opacity-100"
       >
         {isOwner ? (
           <svg
@@ -221,11 +209,7 @@ function CreateListInline({ onClose }: { onClose: () => void }) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex overflow-hidden rounded-lg"
-      style={{
-        border: "1px solid rgba(0,0,0,0.20)",
-        background: "rgba(0,0,0,0.03)",
-      }}
+      className="flex overflow-hidden rounded-lg border border-black/[0.20] dark:border-white/[0.20] bg-black/[0.03] dark:bg-white/[0.03]"
     >
       <input
         autoFocus
@@ -270,24 +254,15 @@ function FilterChip({
   active: boolean;
   onClick: () => void;
 }) {
-  const [hov, setHov] = useState(false);
   return (
     <button
       type="button"
       onClick={onClick}
-      onMouseEnter={() => setHov(true)}
-      onMouseLeave={() => setHov(false)}
-      className="cursor-pointer px-3 py-1 rounded-full text-xs font-medium transition-all duration-150 whitespace-nowrap shrink-0"
-      style={{
-        border: `1px solid ${active || hov ? "rgba(0,0,0,0.20)" : "rgba(0,0,0,0.08)"}`,
-        background: active
-          ? "rgba(0,0,0,0.12)"
-          : hov
-            ? "rgba(0,0,0,0.05)"
-            : "transparent",
-        color: active ? "#0c0c0b" : "#a0a09c",
-        fontWeight: active ? 600 : 400,
-      }}
+      className={`cursor-pointer px-3 py-1 rounded-full text-xs transition-all duration-150 whitespace-nowrap shrink-0 border ${
+        active
+          ? "border-black/[0.20] dark:border-white/[0.20] bg-black/[0.12] dark:bg-white/[0.12] text-[#0c0c0b] dark:text-[#f0ede8] font-semibold"
+          : "border-black/[0.08] dark:border-white/[0.08] text-[#a0a09c] font-normal hover:border-black/[0.20] dark:hover:border-white/[0.20] hover:bg-black/[0.05] dark:hover:bg-white/[0.05]"
+      }`}
     >
       {label}
     </button>
@@ -297,7 +272,6 @@ function FilterChip({
 function MyListsPage() {
   const [q, setQ] = useState("");
   const [search, setSearch] = useState("");
-  const [focused, setFocused] = useState(false);
   const [sort, setSort] = useState<SortOption>("recent");
   const [visibility, setVisibility] = useState<VisibilityFilter>("all");
   const [creating, setCreating] = useState(false);
@@ -354,17 +328,11 @@ function MyListsPage() {
             <div className="flex gap-2">
               <form
                 onSubmit={handleSearch}
-                className="flex-1 flex overflow-hidden rounded-lg transition-all duration-200"
-                style={{
-                  border: `1px solid ${focused ? "rgba(0,0,0,0.20)" : "rgba(0,0,0,0.08)"}`,
-                  background: focused ? "rgba(0,0,0,0.06)" : "rgba(0,0,0,0.03)",
-                }}
+                className="flex-1 flex overflow-hidden rounded-lg transition-all duration-200 border border-black/[0.08] dark:border-white/[0.08] bg-black/[0.03] dark:bg-white/[0.03] focus-within:border-black/[0.20] dark:focus-within:border-white/[0.20] focus-within:bg-black/[0.06] dark:focus-within:bg-white/[0.06]"
               >
                 <input
                   value={q}
                   onChange={(e) => setQ(e.target.value)}
-                  onFocus={() => setFocused(true)}
-                  onBlur={() => setFocused(false)}
                   placeholder={t("myLists.searchPlaceholder")}
                   aria-label={t("myLists.searchAriaLabel")}
                   data-testid="my-lists-search-input"
@@ -382,14 +350,7 @@ function MyListsPage() {
                 type="button"
                 data-testid="new-list-btn"
                 onClick={() => setCreating(true)}
-                className="cursor-pointer flex items-center justify-center rounded-lg text-[#a0a09c] hover:text-[#0c0c0b] transition-colors duration-150 shrink-0"
-                style={{
-                  width: 36,
-                  height: 36,
-                  border: "1px solid rgba(0,0,0,0.08)",
-                  background: "transparent",
-                  fontSize: 18,
-                }}
+                className="cursor-pointer flex items-center justify-center rounded-lg text-[#a0a09c] hover:text-[#0c0c0b] dark:hover:text-[#f0ede8] transition-colors duration-150 shrink-0 w-9 h-9 text-lg border border-black/[0.08] dark:border-white/[0.08] bg-transparent"
                 aria-label={t("myLists.newList")}
               >
                 +
@@ -410,8 +371,7 @@ function MyListsPage() {
               />
             ))}
             <div
-              className="w-px h-3.5 shrink-0 mx-0.5"
-              style={{ background: "rgba(0,0,0,0.08)" }}
+              className="w-px h-3.5 shrink-0 mx-0.5 bg-black/[0.08] dark:bg-white/[0.08]"
             />
             <div
               className="flex gap-1.5 shrink-0"
@@ -434,11 +394,7 @@ function MyListsPage() {
             {Array.from({ length: 6 }, (_, i) => i).map((i) => (
               <div
                 key={`skeleton-${i}`}
-                className="h-16 animate-pulse"
-                style={{
-                  borderBottom: "1px solid rgba(0,0,0,0.08)",
-                  background: "rgba(0,0,0,0.02)",
-                }}
+                className="h-16 animate-pulse border-b border-black/[0.08] dark:border-white/[0.08] bg-black/[0.02] dark:bg-white/[0.02]"
               />
             ))}
           </div>

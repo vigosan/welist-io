@@ -44,7 +44,7 @@ function ExploreListCard({
             {list.name}
           </Link>
           {list.description && (
-            <p className="text-[12px] leading-[1.6] mb-2.5 text-[#a0a09c] dark:text-[#4a4a47]">
+            <p className="text-[12px] leading-[1.6] mb-2.5 text-[#a0a09c] dark:text-[#6b6b67]">
               {list.description}
             </p>
           )}
@@ -56,7 +56,7 @@ function ExploreListCard({
             ].map(({ icon, v }) => (
               <span
                 key={icon}
-                className="text-[11px] text-[#a0a09c] dark:text-[#4a4a47]"
+                className="text-[11px] text-[#a0a09c] dark:text-[#6b6b67]"
                 style={{ fontFamily: "'Space Mono', monospace" }}
               >
                 {icon} {v}
@@ -169,7 +169,7 @@ function ExplorePage() {
             placeholder={t("explore.searchPlaceholder")}
             aria-label={t("explore.searchAriaLabel")}
             data-testid="explore-search-input"
-            className="flex-1 px-4 py-2.5 text-[13px] text-[#0c0c0b] dark:text-[#f0ede8] placeholder-[#a0a09c] dark:placeholder-[#4a4a47] bg-transparent outline-none"
+            className="flex-1 px-4 py-2.5 text-[13px] text-[#0c0c0b] dark:text-[#f0ede8] placeholder-[#a0a09c] dark:placeholder-[#6b6b67] bg-transparent outline-none"
           />
           <button
             type="submit"

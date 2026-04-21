@@ -36,7 +36,7 @@ function UserRow({ user }: { user: DirectoryUser }) {
       onMouseLeave={() => setHov(false)}
       className="flex items-center gap-3.5 py-3.5 transition-colors duration-150"
       style={{
-        borderBottom: "1px solid rgba(0,0,0,0.08)",
+        borderBottom: "1px solid rgba(255,255,255,0.1)",
         background: hov ? "rgba(0,0,0,0.02)" : "transparent",
       }}
     >
@@ -53,7 +53,7 @@ function UserRow({ user }: { user: DirectoryUser }) {
             background: "rgba(255,255,255,0.14)",
             color: "#0c0c0b",
             fontFamily: "'Space Mono', monospace",
-            border: "1px solid rgba(0,0,0,0.08)",
+            border: "1px solid rgba(255,255,255,0.15)",
           }}
         >
           {initials(user.name)}
@@ -127,8 +127,8 @@ function UsersDirectoryPage() {
           onSubmit={handleSearch}
           className="flex overflow-hidden rounded-lg transition-all duration-200"
           style={{
-            border: `1px solid ${focused ? "rgba(0,0,0,0.20)" : "rgba(0,0,0,0.08)"}`,
-            background: focused ? "rgba(0,0,0,0.06)" : "rgba(0,0,0,0.03)",
+            border: `1px solid ${focused ? "rgba(255,255,255,0.3)" : "rgba(255,255,255,0.15)"}`,
+            background: focused ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.03)",
           }}
         >
           <input
