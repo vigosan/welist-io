@@ -155,6 +155,10 @@ const es = {
     markDone: "Marcar como hecho",
     edit: 'Editar "{{text}}"',
     delete: 'Eliminar "{{text}}"',
+    errorToggle: "No se pudo actualizar el elemento",
+    errorUpdate: "No se pudieron guardar los cambios",
+    errorDelete: "No se pudo eliminar el elemento",
+    errorAdd: "No se pudo añadir el elemento",
   },
   bulk: {
     header_one: "{{count}} elemento para añadir",

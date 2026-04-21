@@ -4,6 +4,7 @@ import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { Toaster } from "sonner";
 import { routeTree } from "./routeTree.gen";
 import "./i18n";
 import "./index.css";
@@ -34,6 +35,7 @@ createRoot(root).render(
       <SessionProvider>
         <QueryClientProvider client={queryClient}>
           <RouterProvider router={router} />
+          <Toaster position="bottom-center" richColors theme="system" />
         </QueryClientProvider>
       </SessionProvider>
     </ErrorBoundary>

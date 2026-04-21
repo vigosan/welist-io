@@ -1,5 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import type { Item } from "@/db/schema";
+import { t } from "@/i18n/service";
 import { queryKeys } from "@/lib/query-keys";
 import { type Coords, itemsService } from "@/services/items.service";
 
@@ -21,6 +23,7 @@ export function useAddItem(listId: string) {
   return useMutation({
     mutationFn: ({ text, coords }: { text: string; coords?: Coords }) =>
       itemsService.add(listId, text, coords),
+    onError: () => toast.error(t("items.errorAdd")),
     onSettled: () =>
       qc.invalidateQueries({
         queryKey: queryKeys.items(listId),
@@ -44,6 +47,7 @@ export function useToggleItem(listId: string) {
     },
     onError: (_err, _id, ctx) => {
       qc.setQueryData(queryKeys.items(listId), ctx?.previous);
+      toast.error(t("items.errorToggle"));
     },
     onSettled: () =>
       qc.invalidateQueries({
@@ -81,6 +85,7 @@ export function useUpdateItem(listId: string) {
     },
     onError: (_err, _vars, ctx) => {
       qc.setQueryData(queryKeys.items(listId), ctx?.previous);
+      toast.error(t("items.errorUpdate"));
     },
     onSettled: () =>
       qc.invalidateQueries({
@@ -166,6 +171,7 @@ export function useDeleteItem(listId: string) {
     },
     onError: (_err, _id, ctx) => {
       qc.setQueryData(queryKeys.items(listId), ctx?.previous);
+      toast.error(t("items.errorDelete"));
     },
   });
 }

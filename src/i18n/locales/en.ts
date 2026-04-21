@@ -156,6 +156,10 @@ const en: Translations = {
     markDone: "Mark as done",
     edit: 'Edit "{{text}}"',
     delete: 'Delete "{{text}}"',
+    errorToggle: "Failed to update item",
+    errorUpdate: "Failed to save changes",
+    errorDelete: "Failed to delete item",
+    errorAdd: "Failed to add item",
   },
   bulk: {
     header_one: "{{count}} item to add",
