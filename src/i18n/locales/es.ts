@@ -78,6 +78,9 @@ const es = {
     listView: "Lista",
     addPlace: "Añadir lugar",
     removePlace: "Quitar lugar",
+    menuAriaLabel: "Acciones de la lista",
+    commandPalette: "Paleta de comandos (⌘K)",
+    exportText: "Copiar como texto plano",
   },
   myLists: {
     searchPlaceholder: "Buscar mis listas…",

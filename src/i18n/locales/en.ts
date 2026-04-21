@@ -79,6 +79,9 @@ const en: Translations = {
     listView: "List",
     addPlace: "Add place",
     removePlace: "Remove place",
+    menuAriaLabel: "List actions",
+    commandPalette: "Command palette (⌘K)",
+    exportText: "Copy as plain text",
   },
   myLists: {
     searchPlaceholder: "Search my lists…",

@@ -69,6 +69,8 @@ function ListDetailPage() {
   const [activePlace, setActivePlace] = useState<string | undefined>(undefined);
   const [viewMode, setViewMode] = useState<"list" | "map">("list");
   const [highlightedItemId, setHighlightedItemId] = useState<string | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
   const addInputRef = useRef<HTMLInputElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const { t } = useTranslation();
@@ -94,6 +96,23 @@ function ListDetailPage() {
   function closeSearch() {
     setSearchActive(false);
     setSearchQuery("");
+  }
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    function handleClickOutside(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [menuOpen]);
+
+  function handleExport() {
+    const text = items.map((i) => i.text).join("\n");
+    navigator.clipboard.writeText(text);
+    setMenuOpen(false);
   }
 
   function setStatusFilter(s: "all" | "pending" | "done") {
@@ -690,221 +709,129 @@ function ListDetailPage() {
                       )}
                     </div>
 
-                    <div className="flex items-center gap-1.5 shrink-0">
-                      {hasGeoItems && (
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setViewMode((v) => (v === "list" ? "map" : "list"))
-                          }
-                          data-testid="map-toggle-btn"
-                          aria-label={
-                            viewMode === "list"
-                              ? t("list.mapView")
-                              : t("list.listView")
-                          }
-                          title={
-                            viewMode === "list"
-                              ? t("list.mapView")
-                              : t("list.listView")
-                          }
-                          className={`cursor-pointer h-7 w-7 flex items-center justify-center rounded-md border transition active:scale-[0.96] ${viewMode === "map" ? "border-gray-900 text-gray-900 dark:border-gray-100 dark:text-gray-100" : "border-gray-200 text-gray-400 hover:border-gray-400 hover:text-gray-700"}`}
-                        >
-                          {viewMode === "list" ? (
-                            <svg
-                              aria-hidden="true"
-                              className="w-3.5 h-3.5"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
-                              />
-                            </svg>
-                          ) : (
-                            <svg
-                              aria-hidden="true"
-                              className="w-3.5 h-3.5"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M4 6h16M4 10h16M4 14h16M4 18h16"
-                              />
-                            </svg>
-                          )}
-                        </button>
-                      )}
-                      {!searchActive && filteredItems.some((i) => !i.done) && (
-                        <button
-                          type="button"
-                          onClick={pickRandomItem}
-                          data-testid="random-item-btn"
-                          aria-label={t("list.pickRandom")}
-                          title={t("list.pickRandom")}
-                          className="cursor-pointer h-7 w-7 flex items-center justify-center rounded-md border border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500 hover:border-gray-400 dark:hover:border-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition active:scale-[0.96]"
-                        >
-                          <svg
-                            aria-hidden="true"
-                            className="w-3.5 h-3.5"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <rect x="2" y="2" width="20" height="20" rx="3" ry="3" strokeWidth={2} />
-                            <circle cx="8" cy="8" r="1.2" fill="currentColor" stroke="none" />
-                            <circle cx="16" cy="8" r="1.2" fill="currentColor" stroke="none" />
-                            <circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none" />
-                            <circle cx="8" cy="16" r="1.2" fill="currentColor" stroke="none" />
-                            <circle cx="16" cy="16" r="1.2" fill="currentColor" stroke="none" />
-                          </svg>
-                        </button>
-                      )}
-                      {!searchActive && (
-                        <button
-                          type="button"
-                          onClick={openSearch}
-                          data-testid="search-btn"
-                          aria-label={t("list.searchAriaLabel")}
-                          title={t("list.searchTitle")}
-                          className="cursor-pointer h-7 w-7 flex items-center justify-center rounded-md border border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500 hover:border-gray-400 dark:hover:border-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition active:scale-[0.96]"
-                        >
-                          <svg
-                            aria-hidden="true"
-                            className="w-3.5 h-3.5"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                            />
-                          </svg>
-                        </button>
-                      )}
-
-                      <span aria-live="polite" className="sr-only">
-                        {copied ? t("list.linkCopied") : ""}
-                      </span>
+                    <div className="relative flex items-center shrink-0" ref={menuRef}>
                       <button
                         type="button"
-                        onClick={handleShare}
-                        data-testid="share-btn"
-                        aria-label={
-                          copied ? t("list.linkCopied") : t("list.shareLink")
-                        }
-                        title={
-                          copied ? t("list.copiedTooltip") : t("list.shareLink")
-                        }
-                        className="cursor-pointer relative h-7 w-7 flex items-center justify-center rounded-md border border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500 hover:border-gray-400 dark:hover:border-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition active:scale-[0.96] overflow-hidden"
+                        onClick={() => setMenuOpen((v) => !v)}
+                        data-testid="list-menu-btn"
+                        aria-label={t("list.menuAriaLabel")}
+                        className={`cursor-pointer h-7 w-7 flex items-center justify-center rounded-md border transition active:scale-[0.96] ${menuOpen ? "border-gray-900 bg-gray-900 text-white" : "border-gray-200 text-gray-400 hover:border-gray-400 hover:text-gray-700"}`}
                       >
-                        <span
-                          className={`absolute inset-0 flex items-center justify-center transition-[opacity,transform] duration-150 ease-[cubic-bezier(0.2,0,0,1)] ${copied ? "opacity-0 scale-75" : "opacity-100 scale-100"}`}
-                        >
-                          <svg
-                            aria-hidden="true"
-                            className="w-3.5 h-3.5"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
-                            />
-                          </svg>
-                        </span>
-                        <span
-                          className={`absolute inset-0 flex items-center justify-center transition-[opacity,transform] duration-150 ease-[cubic-bezier(0.2,0,0,1)] ${copied ? "opacity-100 scale-100" : "opacity-0 scale-75"}`}
-                        >
-                          <svg
-                            aria-hidden="true"
-                            className="w-3.5 h-3.5"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2.5}
-                              d="M5 13l4 4L19 7"
-                            />
-                          </svg>
-                        </span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => setPaletteOpen(true)}
-                        data-testid="command-palette-btn"
-                        aria-label="Command palette (⌘K)"
-                        title="Command palette (⌘K)"
-                        className="cursor-pointer h-7 w-7 flex items-center justify-center rounded-md border border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500 hover:border-gray-400 dark:hover:border-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition active:scale-[0.96]"
-                      >
-                        <svg
-                          aria-hidden="true"
-                          className="w-3.5 h-3.5"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                          />
+                        <svg aria-hidden="true" className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                          <circle cx="4" cy="10" r="1.5" />
+                          <circle cx="10" cy="10" r="1.5" />
+                          <circle cx="16" cy="10" r="1.5" />
                         </svg>
                       </button>
 
-                      {isOwner && (
-                        <button
-                          type="button"
-                          onClick={() => setSettingsOpen((v) => !v)}
-                          data-testid="settings-btn"
-                          aria-label={t("list.settings")}
-                          title={t("list.settings")}
-                          className={`cursor-pointer h-7 w-7 flex items-center justify-center rounded-md border transition active:scale-[0.96] ${
-                            settingsOpen
-                              ? "border-gray-900 bg-gray-900 text-white"
-                              : "border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500 hover:border-gray-400 dark:hover:border-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
-                          }`}
-                        >
-                          <svg
-                            aria-hidden="true"
-                            className="w-3.5 h-3.5"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
+                      {menuOpen && (
+                        <div className="absolute right-0 top-full mt-1.5 z-50 min-w-44 bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded-xl shadow-lg overflow-hidden">
+                          <span aria-live="polite" className="sr-only">
+                            {copied ? t("list.linkCopied") : ""}
+                          </span>
+                          {!searchActive && (
+                            <button
+                              type="button"
+                              onClick={() => { openSearch(); setMenuOpen(false); }}
+                              data-testid="search-btn"
+                              className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors"
+                            >
+                              <svg aria-hidden="true" className="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                              </svg>
+                              {t("list.searchTitle")}
+                            </button>
+                          )}
+                          {filteredItems.some((i) => !i.done) && (
+                            <button
+                              type="button"
+                              onClick={() => { pickRandomItem(); setMenuOpen(false); }}
+                              data-testid="random-item-btn"
+                              className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors"
+                            >
+                              <svg aria-hidden="true" className="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <rect x="2" y="2" width="20" height="20" rx="3" ry="3" strokeWidth={2} />
+                                <circle cx="8" cy="8" r="1.2" fill="currentColor" stroke="none" />
+                                <circle cx="16" cy="8" r="1.2" fill="currentColor" stroke="none" />
+                                <circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none" />
+                                <circle cx="8" cy="16" r="1.2" fill="currentColor" stroke="none" />
+                                <circle cx="16" cy="16" r="1.2" fill="currentColor" stroke="none" />
+                              </svg>
+                              {t("list.pickRandom")}
+                            </button>
+                          )}
+                          {hasGeoItems && (
+                            <button
+                              type="button"
+                              onClick={() => { setViewMode((v) => (v === "list" ? "map" : "list")); setMenuOpen(false); }}
+                              data-testid="map-toggle-btn"
+                              className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors"
+                            >
+                              <svg aria-hidden="true" className="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                {viewMode === "list" ? (
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                                ) : (
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                                )}
+                              </svg>
+                              {viewMode === "list" ? t("list.mapView") : t("list.listView")}
+                            </button>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => { handleShare(); setMenuOpen(false); }}
+                            data-testid="share-btn"
+                            className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors"
                           >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-                            />
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                            />
-                          </svg>
-                        </button>
+                            <svg aria-hidden="true" className="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              {copied ? (
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                              ) : (
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                              )}
+                            </svg>
+                            {copied ? t("list.linkCopied") : t("list.shareLink")}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => { setPaletteOpen(true); setMenuOpen(false); }}
+                            data-testid="command-palette-btn"
+                            className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors"
+                          >
+                            <svg aria-hidden="true" className="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            {t("list.commandPalette")}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={handleExport}
+                            data-testid="export-btn"
+                            className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors"
+                          >
+                            <svg aria-hidden="true" className="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                            </svg>
+                            {t("list.exportText")}
+                          </button>
+                          {isOwner && (
+                            <>
+                              <div className="border-t border-gray-100 dark:border-gray-800" />
+                              <button
+                                type="button"
+                                onClick={() => { setSettingsOpen((v) => !v); setMenuOpen(false); }}
+                                data-testid="settings-btn"
+                                className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors"
+                              >
+                                <svg aria-hidden="true" className="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                                {t("list.settings")}
+                              </button>
+                            </>
+                          )}
+                        </div>
                       )}
                     </div>
                   </>
