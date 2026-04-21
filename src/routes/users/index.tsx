@@ -54,17 +54,21 @@ function UserCard({ user }: { user: DirectoryUser }) {
         <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">
           {privateName(user.name)}
         </p>
-        <div className="flex items-center gap-2 mt-0.5">
+        <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
           <span className="text-xs text-gray-400 dark:text-gray-500 tabular-nums">
-            {t("directory.lists_other", { count: user.publicListsCount })}
+            {t("directory.owned_other", { count: user.ownedListsCount })}
           </span>
-          <span className="text-gray-200 dark:text-gray-700 text-xs select-none">
-            ·
-          </span>
+          <span className="text-gray-200 dark:text-gray-700 text-xs select-none">·</span>
           <span className="text-xs text-gray-400 dark:text-gray-500 tabular-nums">
-            {t("directory.completed_other", {
-              count: user.completedChallengesCount,
-            })}
+            {t("directory.challenged_other", { count: user.challengerCount })}
+          </span>
+          <span className="text-gray-200 dark:text-gray-700 text-xs select-none">·</span>
+          <span className="text-xs text-gray-400 dark:text-gray-500 tabular-nums">
+            {t("directory.completed_other", { count: user.completedChallengesCount })}
+          </span>
+          <span className="text-gray-200 dark:text-gray-700 text-xs select-none">·</span>
+          <span className="text-xs text-gray-400 dark:text-gray-500 tabular-nums">
+            {t("directory.collaborated_other", { count: user.collaboratorCount })}
           </span>
         </div>
       </div>

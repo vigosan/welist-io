@@ -95,8 +95,10 @@ export type DirectoryUser = {
   id: string;
   name: string | null;
   image: string | null;
-  publicListsCount: number;
+  ownedListsCount: number;
+  challengerCount: number;
   completedChallengesCount: number;
+  collaboratorCount: number;
 };
 
 export const usersService = {
