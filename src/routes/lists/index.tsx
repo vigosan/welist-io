@@ -251,15 +251,18 @@ function FilterChip({
   label,
   active,
   onClick,
+  testId,
 }: {
   label: string;
   active: boolean;
   onClick: () => void;
+  testId?: string;
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
+      data-testid={testId}
       className={`cursor-pointer px-3 py-1 rounded-full text-xs transition-all duration-150 whitespace-nowrap shrink-0 border ${
         active
           ? "border-black/[0.20] dark:border-white/[0.20] bg-black/[0.12] dark:bg-white/[0.12] text-[#0c0c0b] dark:text-[#f0ede8] font-semibold"
@@ -370,6 +373,7 @@ function MyListsPage() {
                 label={opt.label}
                 active={sort === opt.value}
                 onClick={() => setSort(opt.value)}
+                testId={`sort-${opt.value}`}
               />
             ))}
             <div className="w-px h-3.5 shrink-0 mx-0.5 bg-black/[0.08] dark:bg-white/[0.08]" />

@@ -543,6 +543,10 @@ describe("ListDetailPage", () => {
       await waitFor(() =>
         expect(screen.getByTestId("add-item-input")).toBeInTheDocument()
       );
+      await userEvent.click(screen.getByTestId("list-menu-btn"));
+      await waitFor(() =>
+        expect(screen.getByTestId("settings-btn")).toBeInTheDocument()
+      );
       await userEvent.click(screen.getByTestId("settings-btn"));
       await waitFor(() =>
         expect(screen.getByTestId("list-settings-panel")).toBeInTheDocument()
