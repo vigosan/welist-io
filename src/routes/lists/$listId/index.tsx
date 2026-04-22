@@ -21,6 +21,8 @@ import { ItemRow } from "@/components/items/ItemRow";
 import { ListSettingsPanel } from "@/components/ListSettingsPanel";
 import { ListDropdownMenu } from "@/components/lists/ListDropdownMenu";
 import { ListFilterBar } from "@/components/lists/ListFilterBar";
+import { ListStatsCard } from "@/components/lists/ListStatsCard";
+import { ParticipantsPanel } from "@/components/lists/ParticipantsPanel";
 
 const ListMap = lazy(() =>
   import("@/components/maps/ListMap").then((m) => ({ default: m.ListMap }))
@@ -736,104 +738,13 @@ function ListDetailPage() {
                 )}
               </div>
 
-              {!listLoading &&
-                isOwner &&
-                participantsPanel === "challengers" &&
-                challengers.length > 0 && (
-                  <div className="mt-2 border border-gray-100 rounded-xl overflow-hidden order-6">
-                    <div className="px-3 py-2 border-b border-gray-100 flex items-center justify-between">
-                      <span className="text-xs font-medium text-gray-500">
-                        {challengers.length}{" "}
-                        {challengers.length === 1
-                          ? "challenger"
-                          : "challengers"}
-                      </span>
-                    </div>
-                    <ul className="divide-y divide-gray-50">
-                      {challengers.map((c) => (
-                        <li
-                          key={c.id}
-                          className="flex items-center gap-3 px-3 py-2.5"
-                        >
-                          {c.image ? (
-                            <img
-                              src={c.image}
-                              alt={c.name ?? ""}
-                              className="w-6 h-6 rounded-full shrink-0"
-                            />
-                          ) : (
-                            <div className="w-6 h-6 rounded-full bg-gray-200 shrink-0 flex items-center justify-center">
-                              <span className="text-[8px] text-gray-500 font-medium">
-                                {(c.name ?? "?")[0]?.toUpperCase()}
-                              </span>
-                            </div>
-                          )}
-                          <div className="flex-1 min-w-0 flex flex-col gap-1">
-                            <span className="text-xs text-gray-700 truncate">
-                              {c.name ?? "—"}
-                            </span>
-                            {!c.completedAt && c.totalItems > 0 && (
-                              <div className="h-1 w-full bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
-                                <div
-                                  className="h-full bg-gray-900 dark:bg-gray-100 rounded-full transition-all"
-                                  style={{
-                                    width: `${Math.round((c.doneCount / c.totalItems) * 100)}%`,
-                                  }}
-                                />
-                              </div>
-                            )}
-                          </div>
-                          <span className="text-xs text-gray-400 tabular-nums shrink-0">
-                            {c.completedAt
-                              ? "✓"
-                              : `${c.doneCount}/${c.totalItems}`}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-              {!listLoading &&
-                isOwner &&
-                participantsPanel === "collaborators" &&
-                collaborators.length > 0 && (
-                  <div className="mt-2 border border-gray-100 rounded-xl overflow-hidden order-6">
-                    <div className="px-3 py-2 border-b border-gray-100">
-                      <span className="text-xs font-medium text-gray-500">
-                        {collaborators.length}{" "}
-                        {collaborators.length === 1
-                          ? "collaborator"
-                          : "collaborators"}
-                      </span>
-                    </div>
-                    <ul className="divide-y divide-gray-50">
-                      {collaborators.map((c) => (
-                        <li
-                          key={c.id}
-                          className="flex items-center gap-3 px-3 py-2.5"
-                        >
-                          {c.image ? (
-                            <img
-                              src={c.image}
-                              alt={c.name ?? ""}
-                              className="w-6 h-6 rounded-full shrink-0"
-                            />
-                          ) : (
-                            <div className="w-6 h-6 rounded-full bg-gray-200 shrink-0 flex items-center justify-center">
-                              <span className="text-[8px] text-gray-500 font-medium">
-                                {(c.name ?? "?")[0]?.toUpperCase()}
-                              </span>
-                            </div>
-                          )}
-                          <span className="text-xs text-gray-700 flex-1 truncate">
-                            {c.name ?? "—"}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
+              {!listLoading && isOwner && participantsPanel && (
+                <ParticipantsPanel
+                  panel={participantsPanel}
+                  challengers={challengers}
+                  collaborators={collaborators}
+                />
+              )}
 
               {!listLoading && isOwner && settingsOpen && (
                 <div className="mt-3 flex flex-col gap-2 order-7">
@@ -848,83 +759,10 @@ function ListDetailPage() {
                     onRemovePrice={() => removePrice.mutate()}
                     onClose={() => setSettingsOpen(false)}
                   />
-                  {challengers.length > 0 && (
-                    <div className="bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl p-4 flex flex-col gap-3">
-                      <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        {t("stats.title")}
-                      </span>
-                      <div className="grid grid-cols-3 gap-3">
-                        <div className="flex flex-col gap-0.5">
-                          <span className="text-lg font-bold text-gray-900 dark:text-gray-100 tabular-nums">
-                            {challengers.length}
-                          </span>
-                          <span className="text-xs text-gray-400 dark:text-gray-500">
-                            {t("stats.challengers")}
-                          </span>
-                        </div>
-                        <div className="flex flex-col gap-0.5">
-                          <span className="text-lg font-bold text-gray-900 dark:text-gray-100 tabular-nums">
-                            {challengers.filter((c) => c.completedAt).length}
-                          </span>
-                          <span className="text-xs text-gray-400 dark:text-gray-500">
-                            {t("stats.completed")}
-                          </span>
-                        </div>
-                        <div className="flex flex-col gap-0.5">
-                          <span className="text-lg font-bold text-gray-900 dark:text-gray-100 tabular-nums">
-                            {challengers.length > 0
-                              ? `${Math.round((challengers.filter((c) => c.completedAt).length / challengers.length) * 100)}%`
-                              : "0%"}
-                          </span>
-                          <span className="text-xs text-gray-400 dark:text-gray-500">
-                            {t("stats.completionRate")}
-                          </span>
-                        </div>
-                      </div>
-                      {items.length > 0 &&
-                        challengers.length > 0 &&
-                        (() => {
-                          const itemCompletionRates = items.map((item) => {
-                            const doneCount = challengers.filter(
-                              (c) => c.doneCount > 0 && c.totalItems > 0
-                            ).length;
-                            return { item, approxRate: doneCount };
-                          });
-                          const avgProgress =
-                            challengers.length > 0
-                              ? Math.round(
-                                  (challengers.reduce(
-                                    (sum, c) =>
-                                      sum +
-                                      (c.totalItems > 0
-                                        ? c.doneCount / c.totalItems
-                                        : 0),
-                                    0
-                                  ) /
-                                    challengers.length) *
-                                    100
-                                )
-                              : 0;
-                          void itemCompletionRates;
-                          return (
-                            <div className="flex flex-col gap-1">
-                              <span className="text-xs text-gray-400 dark:text-gray-500">
-                                {t("stats.avgProgress")}
-                              </span>
-                              <div className="h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                                <div
-                                  className="h-full bg-gray-900 dark:bg-gray-100 rounded-full transition-all duration-300"
-                                  style={{ width: `${avgProgress}%` }}
-                                />
-                              </div>
-                              <span className="text-xs text-gray-400 dark:text-gray-500 tabular-nums">
-                                {avgProgress}%
-                              </span>
-                            </div>
-                          );
-                        })()}
-                    </div>
-                  )}
+                  <ListStatsCard
+                    challengers={challengers}
+                    itemCount={items.length}
+                  />
                 </div>
               )}
 
