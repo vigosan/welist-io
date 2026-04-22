@@ -22,8 +22,8 @@ export function GlobalCommandPalette({ open, onClose }: Props) {
   const { data: session } = useCachedSession();
 
   const debouncedQuery = useDebouncedValue(query, 200);
-  const { data } = useMyLists(debouncedQuery || undefined, "recent", undefined);
-  const lists = data?.pages.flatMap((p) => p.items) ?? [];
+  const result = useMyLists(debouncedQuery || undefined, "recent", undefined);
+  const lists = result?.data?.pages.flatMap((p) => p.items) ?? [];
 
   useEffect(() => {
     if (open) {
