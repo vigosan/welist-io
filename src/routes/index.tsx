@@ -144,6 +144,7 @@ function HomePage() {
                 fontSize: "clamp(48px, 7vw, 72px)",
                 letterSpacing: "-0.04em",
                 lineHeight: 1.0,
+                textWrap: "balance",
               }}
             >
               {t("home.headline")
