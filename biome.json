@@ -38,7 +38,7 @@
       "!**/src/routeTree.gen.ts",
       "!**/src/db/migrations",
       "!**/*.css",
-      "!welist-io/**"
+      "!welist-io"
     ]
   }
 }
