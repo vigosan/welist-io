@@ -33,7 +33,7 @@ function ExploreListCard({
   }
 
   return (
-    <div className="py-5 border-b border-black/[0.08] dark:border-white/[0.08]">
+    <div className="py-4.5 border-b border-black/[0.08] dark:border-white/[0.08]">
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1 min-w-0">
           <Link

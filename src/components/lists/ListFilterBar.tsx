@@ -25,7 +25,15 @@ export function ListFilterBar({
   const { t } = useTranslation();
 
   return (
-    <div className="mt-3 -mx-5 order-7">
+    <div className="mt-3 -mx-5 order-7 relative">
+      <div
+        className="pointer-events-none absolute left-0 top-0 bottom-0 w-5 z-10 bg-gradient-to-r from-[#FAFAF8] dark:from-[#0c0c0b] to-transparent"
+        aria-hidden
+      />
+      <div
+        className="pointer-events-none absolute right-0 top-0 bottom-0 w-8 z-10 bg-gradient-to-l from-[#FAFAF8] dark:from-[#0c0c0b] to-transparent"
+        aria-hidden
+      />
       <div className="flex flex-wrap gap-1.5 px-5 pb-0.5">
         {(["pending", "done"] as const).map((s) => (
           <button

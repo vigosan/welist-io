@@ -63,7 +63,7 @@ function MyListRow({
 
   return (
     <div
-      className="group relative py-4.5 px-3 -mx-3 rounded-lg transition-colors duration-150 cursor-pointer border-b border-black/[0.08] dark:border-white/[0.08] hover:bg-black/[0.03] dark:hover:bg-white/[0.04]"
+      className="group relative py-4.5 border-b border-black/[0.08] dark:border-white/[0.08]"
       data-testid="my-list-card"
     >
       <Link
@@ -86,13 +86,12 @@ function MyListRow({
           </p>
         )}
         {list.itemCount > 0 && (
-          <div
-            className="h-px mb-2.5 overflow-hidden w-full bg-black/[0.08] dark:bg-white/[0.08]"
-          >
+          <div className="h-px mb-2.5 overflow-hidden w-full bg-black/[0.08] dark:bg-white/[0.08]">
             <div
-              className="h-full bg-[#0c0c0b] dark:bg-[#f0ede8] transition-all duration-300"
+              className="h-full bg-[#0c0c0b] dark:bg-[#f0ede8]"
               style={{
                 width: `${Math.round((list.doneCount / list.itemCount) * 100)}%`,
+                transition: "width 600ms cubic-bezier(0.2, 0, 0, 1)",
               }}
             />
           </div>
@@ -126,7 +125,10 @@ function MyListRow({
               </span>
             )}
           </div>
-          <span className="text-[11px]" style={{ color: "#a0a09c" }}>
+          <span
+            className="text-[11px] tabular-nums"
+            style={{ color: "#a0a09c" }}
+          >
             {list.itemCount} {list.itemCount === 1 ? "item" : "items"}
             {list.participantCount > 0 &&
               ` · ${list.participantCount} ${list.participantCount === 1 ? "participante" : "participantes"}`}
@@ -146,7 +148,7 @@ function MyListRow({
           e.stopPropagation();
           setConfirming(true);
         }}
-        className="absolute top-4 right-3 cursor-pointer h-7 w-7 flex items-center justify-center rounded-md text-gray-400 hover:text-gray-500 transition-all duration-150 opacity-0 group-hover:opacity-100"
+        className="absolute top-4 right-0 cursor-pointer h-7 w-7 flex items-center justify-center rounded-md text-gray-400 hover:text-gray-500 transition-all duration-150 opacity-0 group-hover:opacity-100"
       >
         {isOwner ? (
           <svg
@@ -350,7 +352,7 @@ function MyListsPage() {
                 type="button"
                 data-testid="new-list-btn"
                 onClick={() => setCreating(true)}
-                className="cursor-pointer flex items-center justify-center rounded-lg text-gray-500 hover:text-[#0c0c0b] dark:hover:text-[#f0ede8] transition-colors duration-150 shrink-0 w-9 h-9 text-lg border border-black/[0.08] dark:border-white/[0.08] bg-transparent"
+                className="cursor-pointer flex items-center justify-center rounded-lg text-gray-500 hover:text-[#0c0c0b] dark:hover:text-[#f0ede8] transition-colors duration-150 shrink-0 w-9 self-stretch text-lg border border-black/[0.08] dark:border-white/[0.08] bg-transparent"
                 aria-label={t("myLists.newList")}
               >
                 +
@@ -370,9 +372,7 @@ function MyListsPage() {
                 onClick={() => setSort(opt.value)}
               />
             ))}
-            <div
-              className="w-px h-3.5 shrink-0 mx-0.5 bg-black/[0.08] dark:bg-white/[0.08]"
-            />
+            <div className="w-px h-3.5 shrink-0 mx-0.5 bg-black/[0.08] dark:bg-white/[0.08]" />
             <div
               className="flex gap-1.5 shrink-0"
               data-testid="visibility-filter"
@@ -394,15 +394,28 @@ function MyListsPage() {
             {Array.from({ length: 6 }, (_, i) => i).map((i) => (
               <div
                 key={`skeleton-${i}`}
-                className="h-16 animate-pulse border-b border-black/[0.08] dark:border-white/[0.08] bg-black/[0.02] dark:bg-white/[0.02]"
-              />
+                className="py-4.5 px-3 -mx-3 border-b border-black/[0.08] dark:border-white/[0.08] animate-pulse"
+                style={{ animationDelay: `${i * 60}ms` }}
+              >
+                <div className="h-3.5 w-2/3 rounded bg-black/[0.06] dark:bg-white/[0.06] mb-2.5" />
+                <div className="h-px w-full rounded bg-black/[0.06] dark:bg-white/[0.06] mb-2.5" />
+                <div className="h-2.5 w-1/4 rounded bg-black/[0.04] dark:bg-white/[0.04]" />
+              </div>
             ))}
           </div>
         )}
         {!isLoading && lists.length === 0 && (
-          <p className="text-xs text-gray-500 py-10 text-center">
-            {search ? t("myLists.noListsSearch") : t("myLists.noLists")}
-          </p>
+          <div className="flex flex-col items-center gap-2 py-16 text-center">
+            <span className="text-2xl select-none" aria-hidden>
+              {search ? "🔍" : "✦"}
+            </span>
+            <p
+              className="text-sm text-gray-500"
+              style={{ textWrap: "balance" }}
+            >
+              {search ? t("myLists.noListsSearch") : t("myLists.noLists")}
+            </p>
+          </div>
         )}
         {!isLoading && lists.length > 0 && (
           <div>
