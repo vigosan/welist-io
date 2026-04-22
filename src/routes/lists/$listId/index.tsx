@@ -1227,7 +1227,7 @@ function ListDetailPage() {
                     aria-label={t("list.closeSearch")}
                     onClick={closeSearch}
                     data-testid="search-close"
-                    className="cursor-pointer text-gray-300 hover:text-gray-500 transition"
+                    className="cursor-pointer text-gray-400 hover:text-gray-600 transition"
                   >
                     <svg
                       aria-hidden="true"
