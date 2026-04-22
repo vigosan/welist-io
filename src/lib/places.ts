@@ -1,7 +1,7 @@
 const PLACE_RE =
   /@([a-zA-ZÀ-ÿ\u00f1\u00d1\w]+(?: [a-zA-ZÀ-ÿ\u00f1\u00d1\w]+)*)/g;
 
-export const PARTIAL_PLACE_REGEX = /@([^@#]*[^\s@#])$/;
+export const PARTIAL_PLACE_REGEX = /@([^\s@#]*)$/;
 
 export function getPartialPlace(value: string): string | null {
   const match = value.match(PARTIAL_PLACE_REGEX);

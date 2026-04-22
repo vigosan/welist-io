@@ -153,7 +153,7 @@ describe("ItemRow", () => {
     await userEvent.clear(input);
     await userEvent.type(input, "Comprar pan");
     await userEvent.tab();
-    expect(onEdit).toHaveBeenCalledWith("Comprar pan", null);
+    expect(onEdit).toHaveBeenCalledWith("Comprar pan", undefined);
   });
 
   it("renders bold markdown in item text", () => {
