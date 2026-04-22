@@ -120,7 +120,7 @@ export function AppNav() {
         className="shrink-0 sticky top-0 z-50 bg-[#f8f7f5] dark:bg-[#0c0c0b] border-b border-black/[0.08] dark:border-white/[0.08]"
         style={{ height: 52 }}
       >
-        <div className="flex items-center justify-between px-12 h-full">
+        <div className="flex items-center justify-between px-4 sm:px-12 h-full">
           <Link
             to="/"
             data-testid="nav-logo"

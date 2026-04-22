@@ -119,7 +119,7 @@ function HomePage() {
 
       <main className="flex-1 flex flex-col">
         {/* Hero */}
-        <div className="flex flex-col items-center text-center px-12 pt-[90px] pb-[72px]">
+        <div className="flex flex-col items-center text-center px-4 sm:px-12 pt-[90px] pb-[72px]">
           <div className="flex flex-col items-center w-full" style={{ maxWidth: 520 }}>
             {/* Badge */}
             <div

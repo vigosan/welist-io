@@ -320,7 +320,7 @@ function MyListsPage() {
     <div className="min-h-dvh bg-[#f8f7f5] dark:bg-[#0c0c0b] flex flex-col">
       <AppNav />
 
-      <main className="flex-1 w-full max-w-[760px] mx-auto px-12 py-10">
+      <main className="flex-1 w-full max-w-[760px] mx-auto px-4 sm:px-12 py-10">
         <div className="mb-7">
           {creating ? (
             <CreateListInline onClose={() => setCreating(false)} />

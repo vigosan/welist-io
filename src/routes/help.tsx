@@ -246,7 +246,7 @@ function HelpPage() {
       <AppNav />
 
       <main className="flex-1 py-10">
-        <div className="max-w-[640px] mx-auto px-12">
+        <div className="max-w-[640px] mx-auto px-4 sm:px-12">
           <div className="mb-9">
             <h1
               className="text-[28px] font-bold text-[#0c0c0b] dark:text-[#f0ede8] mb-2"
