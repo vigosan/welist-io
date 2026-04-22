@@ -1081,7 +1081,7 @@ function ListDetailPage() {
                 )}
 
               {!listLoading && isOwner && settingsOpen && (
-                <div className="mt-3 flex flex-col gap-2">
+                <div className="mt-3 flex flex-col gap-2 order-7">
                   <ListSettingsPanel
                     isPublic={!!list?.public}
                     isCollaborative={!!list?.collaborative}
@@ -1091,6 +1091,7 @@ function ListDetailPage() {
                     onToggleCollaborative={(v) => toggleCollaborative.mutate(v)}
                     onSetPrice={(cents) => setPrice.mutate(cents)}
                     onRemovePrice={() => removePrice.mutate()}
+                    onClose={() => setSettingsOpen(false)}
                   />
                   {challengers.length > 0 && (
                     <div className="bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl p-4 flex flex-col gap-3">

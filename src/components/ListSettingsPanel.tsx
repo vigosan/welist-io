@@ -11,6 +11,7 @@ type Props = {
   onToggleCollaborative: (v: boolean) => void;
   onSetPrice: (cents: number) => void;
   onRemovePrice: () => void;
+  onClose: () => void;
 };
 
 function SegmentedToggle({
@@ -65,6 +66,7 @@ export function ListSettingsPanel({
   onToggleCollaborative,
   onSetPrice,
   onRemovePrice,
+  onClose,
 }: Props) {
   const { t } = useTranslation();
   const isPaid = priceInCents !== null;
@@ -100,6 +102,22 @@ export function ListSettingsPanel({
       data-testid="list-settings-panel"
       className="bg-gray-50 border border-gray-100 rounded-xl p-4 flex flex-col gap-3"
     >
+      <div className="flex items-center justify-between">
+        <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+          {t("list.settings")}
+        </span>
+        <button
+          type="button"
+          onClick={onClose}
+          data-testid="settings-close-btn"
+          aria-label="Close settings"
+          className="cursor-pointer h-6 w-6 flex items-center justify-center rounded-md text-gray-400 hover:text-gray-700 transition"
+        >
+          <svg aria-hidden="true" className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
       <div className="flex items-center justify-between">
         <span className="text-xs text-gray-500">{t("list.visibility")}</span>
         <SegmentedToggle
