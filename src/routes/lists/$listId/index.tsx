@@ -376,7 +376,10 @@ function ListDetailPage() {
         <div className="flex-1 flex flex-col sm:items-center sm:p-6">
           <div className="flex-1 flex flex-col w-full sm:max-w-3xl bg-white dark:bg-gray-900 sm:rounded-3xl sm:border sm:border-gray-100 dark:sm:border-gray-800 [overflow:clip] sm:max-h-[calc(100dvh-3.25rem-3rem)]">
             <div className="px-5 pt-5 pb-4 shrink-0 flex flex-col">
-              <div className="flex items-center justify-between order-1" ref={menuRef}>
+              <div
+                className="flex items-center justify-between order-1"
+                ref={menuRef}
+              >
                 <Link
                   to="/lists"
                   className="cursor-pointer text-xs text-gray-400 hover:text-gray-700 transition"
