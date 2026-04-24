@@ -85,10 +85,10 @@ function MyListRow({
             {list.description}
           </p>
         )}
-        {list.itemCount > 0 && (
-          <div className="h-px mb-2.5 overflow-hidden w-full bg-black/[0.08] dark:bg-white/[0.08]">
+        {list.itemCount > 0 && list.doneCount > 0 && (
+          <div className="h-0.5 mb-2.5 overflow-hidden w-full rounded-full bg-black/[0.06] dark:bg-white/[0.06]">
             <div
-              className="h-full bg-[#0c0c0b] dark:bg-[#f0ede8]"
+              className="h-full rounded-full bg-[#0c0c0b] dark:bg-[#f0ede8]"
               style={{
                 width: `${Math.round((list.doneCount / list.itemCount) * 100)}%`,
                 transition: "width 600ms cubic-bezier(0.2, 0, 0, 1)",
