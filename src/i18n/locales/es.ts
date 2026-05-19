@@ -170,6 +170,7 @@ const es = {
     allCategories: "Todas",
     previewLabel: "Incluye",
     by: "por",
+    avgProgress: "{{pct}}% completado de media",
     metaItems_one: "{{count}} elemento",
     metaItems_other: "{{count}} elementos",
     metaParticipants_one: "{{count}} participante",

@@ -87,6 +87,43 @@ function ExploreListCard({
               .filter(Boolean)
               .join(" · ")}
           </div>
+          {list.participantCount > 0 && list.itemCount > 0 && (
+            <div
+              data-testid={`explore-card-progress-${list.id}`}
+              className="mt-2"
+            >
+              {(() => {
+                const pct = Math.min(
+                  100,
+                  Math.round(
+                    (list.progressDoneTotal /
+                      (list.participantCount * list.itemCount)) *
+                      100
+                  )
+                );
+                return (
+                  <>
+                    <div className="h-0.5 w-full overflow-hidden rounded-full bg-black/[0.06] dark:bg-white/[0.06]">
+                      <div
+                        className="h-full rounded-full bg-[#0c0c0b] dark:bg-[#f0ede8]"
+                        style={{
+                          width: `${pct}%`,
+                          transition: "width 600ms cubic-bezier(0.2, 0, 0, 1)",
+                        }}
+                      />
+                    </div>
+                    <p className="mt-1 text-[11px] tabular-nums text-gray-400 dark:text-gray-500">
+                      {t("explore.avgProgress", { pct })}
+                      {list.completedCount > 0 &&
+                        ` · ${t("explore.metaCompleted", {
+                          count: list.completedCount,
+                        })}`}
+                    </p>
+                  </>
+                );
+              })()}
+            </div>
+          )}
           {list.owner?.id && list.owner?.name && (
             <div className="mt-1 text-[11px] text-gray-400 dark:text-gray-500">
               {t("explore.by")}{" "}

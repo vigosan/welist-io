@@ -22,6 +22,7 @@ export type ExploreItem = Pick<
   itemCount: number;
   participantCount: number;
   completedCount: number;
+  progressDoneTotal: number;
   previewItems: string[];
   participants: Array<{
     id: string;

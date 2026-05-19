@@ -34,6 +34,7 @@ const EXPLORE_A: ExploreItem = {
   itemCount: 5,
   participantCount: 3,
   completedCount: 1,
+  progressDoneTotal: 6,
   previewItems: [
     "[Torre del Visco](https://torredelvisco.com) #teruel",
     "Piedrafita Lodge",
@@ -55,6 +56,7 @@ const EXPLORE_B: ExploreItem = {
   itemCount: 2,
   participantCount: 0,
   completedCount: 0,
+  progressDoneTotal: 0,
   previewItems: [],
   participants: [],
   owner: null,
@@ -132,6 +134,20 @@ describe("ExplorePage", () => {
       expect(screen.getByText("Lista Explorar A")).toBeInTheDocument()
     );
     expect(screen.getByText("Lista Explorar B")).toBeInTheDocument();
+  });
+
+  it("shows the average progress bar and completion count, only when there are participants", async () => {
+    setupMocks();
+    renderPage();
+    await waitFor(() =>
+      expect(screen.getByTestId("explore-card-progress-e1")).toBeInTheDocument()
+    );
+    const prog = screen.getByTestId("explore-card-progress-e1");
+    expect(prog).toHaveTextContent("40%");
+    expect(prog).toHaveTextContent("1 completado");
+    expect(
+      screen.queryByTestId("explore-card-progress-e2")
+    ).not.toBeInTheDocument();
   });
 
   it("shows participant avatars with an overflow count, only when there are participants", async () => {

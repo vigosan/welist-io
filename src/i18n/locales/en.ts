@@ -171,6 +171,7 @@ const en: Translations = {
     allCategories: "All",
     previewLabel: "Includes",
     by: "by",
+    avgProgress: "{{pct}}% average progress",
     metaItems_one: "{{count}} item",
     metaItems_other: "{{count}} items",
     metaParticipants_one: "{{count}} participant",

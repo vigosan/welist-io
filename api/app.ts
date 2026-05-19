@@ -845,6 +845,7 @@ app.get("/explore", async (c) => {
       itemCount: sql<number>`cast((select count(*) from ${items} where ${items.listId} = ${lists.id}) as int)`,
       participantCount: sql<number>`cast((select count(*) from ${participations} where ${participations.sourceListId} = ${lists.id}) as int)`,
       completedCount: sql<number>`cast((select count(*) from ${participations} where ${participations.sourceListId} = ${lists.id} and ${participations.completedAt} is not null) as int)`,
+      progressDoneTotal: sql<number>`cast((select count(*) from ${itemProgress} ip join ${items} i on i.id = ip.item_id where i.list_id = ${lists.id} and ip.done = true and ip.user_id in (select user_id from ${participations} where source_list_id = ${lists.id})) as int)`,
       previewItems: sql<
         string[]
       >`coalesce((select array_agg(p.text) from (select ${items.text} as text from ${items} where ${items.listId} = ${lists.id} order by ${items.position} asc limit 3) p), array[]::text[])`,
