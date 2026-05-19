@@ -39,7 +39,11 @@ import {
   useUpdateItem,
 } from "@/hooks/useItems";
 import { useItemsFilter } from "@/hooks/useItemsFilter";
-import { useCollaborators, useToggleCollaborative } from "@/hooks/useList";
+import {
+  useCollaborators,
+  useToggleCollaborative,
+  useUpdateCategory,
+} from "@/hooks/useList";
 import { useListHeader } from "@/hooks/useListHeader";
 import {
   useListPrice,
@@ -129,6 +133,7 @@ function setupMocks({
   updateMutate = vi.fn(),
   bulkMutate = vi.fn(),
   reorderMutate = vi.fn(),
+  categoryMutate = vi.fn(),
   bulkIsPending = false,
   sessionUser = null as SessionUser | null,
 }: {
@@ -141,6 +146,7 @@ function setupMocks({
   updateMutate?: ReturnType<typeof vi.fn>;
   bulkMutate?: ReturnType<typeof vi.fn>;
   reorderMutate?: ReturnType<typeof vi.fn>;
+  categoryMutate?: ReturnType<typeof vi.fn>;
   bulkIsPending?: boolean;
   sessionUser?: SessionUser | null;
 } = {}) {
@@ -237,6 +243,10 @@ function setupMocks({
 
   vi.mocked(useToggleCollaborative).mockReturnValue({
     mutate: vi.fn(),
+    isPending: false,
+  } as never);
+  vi.mocked(useUpdateCategory).mockReturnValue({
+    mutate: categoryMutate,
     isPending: false,
   } as never);
   vi.mocked(useCollaborators).mockReturnValue({
@@ -588,5 +598,35 @@ describe("ListDetailPage sign-in nudge", () => {
       expect(screen.getByTestId("add-item-input")).toBeInTheDocument()
     );
     expect(screen.queryByTestId("signin-nudge")).not.toBeInTheDocument();
+  });
+});
+
+describe("ListDetailPage category", () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it("updates the category from the settings panel", async () => {
+    const categoryMutate = vi.fn();
+    setupMocks({
+      list: { ...LIST, ownerId: "owner-id" },
+      sessionUser: { id: "owner-id" },
+      categoryMutate,
+    });
+    renderPage();
+    await waitFor(() =>
+      expect(screen.getByTestId("add-item-input")).toBeInTheDocument()
+    );
+    await userEvent.click(screen.getByTestId("list-menu-btn"));
+    await waitFor(() =>
+      expect(screen.getByTestId("settings-btn")).toBeInTheDocument()
+    );
+    await userEvent.click(screen.getByTestId("settings-btn"));
+    await waitFor(() =>
+      expect(screen.getByTestId("category-select")).toBeInTheDocument()
+    );
+    await userEvent.selectOptions(
+      screen.getByTestId("category-select"),
+      "books"
+    );
+    expect(categoryMutate).toHaveBeenCalledWith("books");
   });
 });

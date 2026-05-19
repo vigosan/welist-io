@@ -153,6 +153,7 @@ export const listsService = {
       name?: string;
       slug?: string | null;
       description?: string | null;
+      category?: string | null;
       public?: boolean;
       collaborative?: boolean;
     }

@@ -94,6 +94,32 @@ export function useUpdateDescription(listId: string) {
   });
 }
 
+export function useUpdateCategory(listId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (category: string | null) =>
+      listsService.update(listId, { category }),
+    onMutate: async (category) => {
+      await qc.cancelQueries({
+        queryKey: queryKeys.list(listId),
+      });
+      const previous = qc.getQueryData<ListWithParticipation>(
+        queryKeys.list(listId)
+      );
+      qc.setQueryData<ListWithParticipation>(queryKeys.list(listId), (old) =>
+        old ? { ...old, category } : old
+      );
+      return { previous };
+    },
+    onError: (_err, _val, ctx) => {
+      qc.setQueryData(queryKeys.list(listId), ctx?.previous);
+    },
+    onSettled: (updated) => {
+      if (updated) qc.setQueryData(queryKeys.list(listId), updated);
+    },
+  });
+}
+
 export function useUpdateSlug(listId: string) {
   const qc = useQueryClient();
   return useMutation({

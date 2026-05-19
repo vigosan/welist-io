@@ -46,6 +46,7 @@ import {
   useCollaborators,
   useDeleteList,
   useToggleCollaborative,
+  useUpdateCategory,
 } from "@/hooks/useList";
 import { useListHeader } from "@/hooks/useListHeader";
 import {
@@ -165,6 +166,7 @@ function ListDetailPage() {
   );
 
   const toggleCollaborative = useToggleCollaborative(listId);
+  const updateCategory = useUpdateCategory(listId);
   const { data: session } = useSession();
 
   const { data: listPrice } = useListPrice(listId, settingsOpen);
@@ -771,10 +773,12 @@ function ListDetailPage() {
                   <ListSettingsPanel
                     isPublic={!!list?.public}
                     isCollaborative={!!list?.collaborative}
+                    category={list?.category ?? null}
                     priceInCents={listPrice?.priceInCents ?? null}
                     stripeConnected={!!stripeStatus?.onboardingComplete}
                     onTogglePublic={(v) => togglePublic.mutate(v)}
                     onToggleCollaborative={(v) => toggleCollaborative.mutate(v)}
+                    onSetCategory={(cat) => updateCategory.mutate(cat)}
                     onSetPrice={(cents) => setPrice.mutate(cents)}
                     onRemovePrice={() => removePrice.mutate()}
                     onClose={() => setSettingsOpen(false)}

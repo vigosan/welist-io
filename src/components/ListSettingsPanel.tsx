@@ -1,14 +1,17 @@
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useTranslation } from "@/i18n/service";
+import { LIST_CATEGORIES } from "@/lib/categories";
 
 type Props = {
   isPublic: boolean;
   isCollaborative: boolean;
+  category: string | null;
   priceInCents: number | null;
   stripeConnected: boolean;
   onTogglePublic: (v: boolean) => void;
   onToggleCollaborative: (v: boolean) => void;
+  onSetCategory: (c: string | null) => void;
   onSetPrice: (cents: number) => void;
   onRemovePrice: () => void;
   onClose: () => void;
@@ -60,10 +63,12 @@ function SegmentedToggle({
 export function ListSettingsPanel({
   isPublic,
   isCollaborative,
+  category,
   priceInCents,
   stripeConnected,
   onTogglePublic,
   onToggleCollaborative,
+  onSetCategory,
   onSetPrice,
   onRemovePrice,
   onClose,
@@ -149,6 +154,23 @@ export function ListSettingsPanel({
           onLeft={() => onToggleCollaborative(false)}
           onRight={() => onToggleCollaborative(true)}
         />
+      </div>
+
+      <div className="flex items-center justify-between">
+        <span className="text-xs text-gray-500">{t("list.category")}</span>
+        <select
+          data-testid="category-select"
+          value={category ?? ""}
+          onChange={(e) => onSetCategory(e.target.value || null)}
+          className="cursor-pointer text-xs text-gray-700 bg-white border border-gray-200 rounded-lg px-2 py-1.5 outline-none focus:border-gray-400 transition"
+        >
+          <option value="">{t("categories.none")}</option>
+          {LIST_CATEGORIES.map((c) => (
+            <option key={c} value={c}>
+              {t(`categories.${c}`)}
+            </option>
+          ))}
+        </select>
       </div>
 
       <div className="flex items-center justify-between">
