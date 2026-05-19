@@ -1812,3 +1812,66 @@ describe("follow endpoints", () => {
     expect(body.isFollowing).toBe(true);
   });
 });
+
+describe("GET /api/feed", () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it("returns 401 without a session", async () => {
+    mockGetAuthUser.mockRejectedValue(new Error("no session"));
+    const res = await app.request("/api/feed");
+    expect(res.status).toBe(401);
+  });
+
+  it("returns an empty feed when the user follows nobody", async () => {
+    mockGetAuthUser.mockResolvedValue({ session: { user: { id: "u1" } } });
+    mockDb.select.mockReturnValueOnce({
+      from: vi.fn().mockReturnValue({
+        where: vi.fn().mockResolvedValue([]),
+      }),
+    });
+    const res = await app.request("/api/feed");
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ items: [] });
+  });
+
+  it("returns public lists from followed users", async () => {
+    mockGetAuthUser.mockResolvedValue({ session: { user: { id: "u1" } } });
+    mockDb.select
+      .mockReturnValueOnce({
+        from: vi.fn().mockReturnValue({
+          where: vi.fn().mockResolvedValue([{ id: "u2" }, { id: "u3" }]),
+        }),
+      })
+      .mockReturnValueOnce({
+        from: vi.fn().mockReturnThis(),
+        leftJoin: vi.fn().mockReturnThis(),
+        where: vi.fn().mockReturnThis(),
+        orderBy: vi.fn().mockReturnThis(),
+        limit: vi.fn().mockResolvedValue([
+          {
+            id: "l1",
+            name: "Lista de u2",
+            slug: null,
+            description: null,
+            createdAt: new Date("2026-05-10"),
+            itemCount: 3,
+            ownerId: "u2",
+            ownerName: "Bob",
+            ownerImage: null,
+          },
+        ]),
+      });
+    const res = await app.request("/api/feed");
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as {
+      items: Array<Record<string, unknown>>;
+    };
+    expect(body.items).toHaveLength(1);
+    expect(body.items[0].name).toBe("Lista de u2");
+    expect(body.items[0].owner).toEqual({
+      id: "u2",
+      name: "Bob",
+      image: null,
+    });
+  });
+});

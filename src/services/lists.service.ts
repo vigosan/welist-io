@@ -72,6 +72,16 @@ export type UserProfile = {
   }>;
 };
 
+export type FeedItem = {
+  id: string;
+  name: string;
+  slug: string | null;
+  description: string | null;
+  createdAt: string;
+  itemCount: number;
+  owner: { id: string | null; name: string | null; image: string | null };
+};
+
 export type AppNotification = {
   id: string;
   userId: string;
@@ -141,6 +151,8 @@ export const usersService = {
     apiClient<{ following: boolean }>(`/api/users/${userId}/follow`, {
       method: "DELETE",
     }),
+
+  getFeed: () => apiClient<{ items: FeedItem[] }>("/api/feed"),
 
   updateProfile: (data: { publicProfile: boolean }) =>
     apiClient<{ publicProfile: boolean }>("/api/users/me", {

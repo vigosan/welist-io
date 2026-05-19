@@ -4,6 +4,13 @@ const en: Translations = {
   nav: {
     explore: "Explore",
     myLists: "My lists",
+    feed: "Feed",
+  },
+  feed: {
+    title: "Your feed",
+    empty: "Follow people to see their public lists here.",
+    signIn: "Sign in to see your feed.",
+    loading: "Loading…",
   },
   home: {
     badge: "Collaborative lists → v2.0",
