@@ -56,3 +56,26 @@
     color: var(--color-paper);
   }
 }
+
+/* Unlayered on purpose: must win over Tailwind's layered `outline-none`
+   utilities so keyboard focus is always visible. */
+:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+html.dark :focus-visible {
+  outline-color: var(--color-paper);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
