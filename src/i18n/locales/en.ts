@@ -116,6 +116,9 @@ const en: Translations = {
     leaveYes: "Leave",
     leaveList: "Leave list «{{name}}»",
     createList: "Create",
+    progressComplete: "Completed",
+    progressPending_one: "{{count}} pending",
+    progressPending_other: "{{count}} pending",
   },
   explore: {
     searchPlaceholder: "Search lists…",

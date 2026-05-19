@@ -115,6 +115,9 @@ const es = {
     leaveYes: "Abandonar",
     leaveList: "Abandonar lista «{{name}}»",
     createList: "Crear",
+    progressComplete: "Completada",
+    progressPending_one: "{{count}} pendiente",
+    progressPending_other: "{{count}} pendientes",
   },
   explore: {
     searchPlaceholder: "Buscar listas…",

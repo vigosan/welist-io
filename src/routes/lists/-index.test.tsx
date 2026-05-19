@@ -48,6 +48,30 @@ const LIST_PARTICIPATED: List = {
   ownerId: "other-user",
   createdAt: new Date(),
 };
+const LIST_IN_PROGRESS = {
+  ...LIST_A,
+  id: "lp",
+  name: "En progreso",
+  itemCount: 10,
+  doneCount: 3,
+  participantCount: 0,
+};
+const LIST_NOT_STARTED = {
+  ...LIST_A,
+  id: "lns",
+  name: "Sin empezar",
+  itemCount: 5,
+  doneCount: 0,
+  participantCount: 0,
+};
+const LIST_DONE = {
+  ...LIST_A,
+  id: "ld",
+  name: "Terminada",
+  itemCount: 4,
+  doneCount: 4,
+  participantCount: 0,
+};
 
 function renderPage() {
   const qc = new QueryClient({
@@ -179,6 +203,42 @@ describe("MyListsPage", () => {
     await userEvent.click(screen.getByTestId("delete-list-btn"));
     await userEvent.click(screen.getByTestId("delete-confirm-btn"));
     expect(deleteMutate).toHaveBeenCalledWith(LIST_PARTICIPATED.id);
+  });
+
+  it("shows progress count and pending items for an in-progress list", async () => {
+    setupMocks({ lists: [LIST_IN_PROGRESS] });
+    renderPage();
+    await waitFor(() =>
+      expect(screen.getByTestId("list-progress")).toBeInTheDocument()
+    );
+    expect(screen.getByTestId("list-progress")).toHaveTextContent("3/10");
+    expect(screen.getByTestId("list-progress")).toHaveTextContent(
+      "7 pendientes"
+    );
+  });
+
+  it("shows the progress bar track even when nothing is done", async () => {
+    setupMocks({ lists: [LIST_NOT_STARTED] });
+    renderPage();
+    await waitFor(() =>
+      expect(screen.getByTestId("list-progress-bar")).toBeInTheDocument()
+    );
+    expect(screen.getByTestId("list-progress")).toHaveTextContent("0/5");
+    expect(screen.getByTestId("list-progress")).toHaveTextContent(
+      "5 pendientes"
+    );
+  });
+
+  it("shows a completed label when all items are done", async () => {
+    setupMocks({ lists: [LIST_DONE] });
+    renderPage();
+    await waitFor(() =>
+      expect(screen.getByTestId("list-progress")).toBeInTheDocument()
+    );
+    expect(screen.getByTestId("list-progress")).toHaveTextContent("Completada");
+    expect(screen.getByTestId("list-progress")).not.toHaveTextContent(
+      "pendiente"
+    );
   });
 
   it("renders sort option buttons when filters are opened", async () => {

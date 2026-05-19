@@ -85,15 +85,42 @@ function MyListRow({
             {list.description}
           </p>
         )}
-        {list.itemCount > 0 && list.doneCount > 0 && (
-          <div className="h-0.5 mb-2.5 overflow-hidden w-full rounded-full bg-black/[0.06] dark:bg-white/[0.06]">
-            <div
-              className="h-full rounded-full bg-[#0c0c0b] dark:bg-[#f0ede8]"
-              style={{
-                width: `${Math.round((list.doneCount / list.itemCount) * 100)}%`,
-                transition: "width 600ms cubic-bezier(0.2, 0, 0, 1)",
-              }}
-            />
+        {list.itemCount > 0 && (
+          <div className="mb-2.5" data-testid="list-progress">
+            <div className="flex items-center justify-between mb-1.5">
+              <span
+                className="text-[10px] tabular-nums"
+                style={{
+                  color: "#a0a09c",
+                  fontFamily: "'Space Mono', monospace",
+                }}
+              >
+                {list.doneCount}/{list.itemCount}
+              </span>
+              <span
+                className="text-[10px] tabular-nums"
+                style={{
+                  color: "#a0a09c",
+                  fontFamily: "'Space Mono', monospace",
+                }}
+              >
+                {list.doneCount >= list.itemCount
+                  ? t("myLists.progressComplete")
+                  : t("myLists.progressPending", {
+                      count: list.itemCount - list.doneCount,
+                    })}
+              </span>
+            </div>
+            <div className="h-0.5 overflow-hidden w-full rounded-full bg-black/[0.06] dark:bg-white/[0.06]">
+              <div
+                data-testid="list-progress-bar"
+                className="h-full rounded-full bg-[#0c0c0b] dark:bg-[#f0ede8]"
+                style={{
+                  width: `${Math.round((list.doneCount / list.itemCount) * 100)}%`,
+                  transition: "width 600ms cubic-bezier(0.2, 0, 0, 1)",
+                }}
+              />
+            </div>
           </div>
         )}
         <div className="flex justify-between items-center">
