@@ -848,6 +848,8 @@ app.get("/explore", async (c) => {
       previewItems: sql<
         string[]
       >`coalesce((select array_agg(p.text) from (select ${items.text} as text from ${items} where ${items.listId} = ${lists.id} order by ${items.position} asc limit 3) p), array[]::text[])`,
+      ownerId: users.id,
+      ownerName: users.name,
       ownerImage: users.image,
     })
     .from(lists)
@@ -865,11 +867,15 @@ app.get("/explore", async (c) => {
       ? rows[rows.length - 1].createdAt.toISOString()
       : null;
 
-  const exploreItems = rows.map(({ ownerImage, completedCount, ...row }) => ({
-    ...row,
-    completedCount,
-    owner: ownerImage ? { image: ownerImage } : null,
-  }));
+  const exploreItems = rows.map(
+    ({ ownerId, ownerName, ownerImage, completedCount, ...row }) => ({
+      ...row,
+      completedCount,
+      owner: ownerId
+        ? { id: ownerId, name: ownerName, image: ownerImage }
+        : null,
+    })
+  );
 
   return c.json({ items: exploreItems, nextCursor });
 });

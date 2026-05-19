@@ -39,7 +39,7 @@ const EXPLORE_A: ExploreItem = {
     "Piedrafita Lodge",
     "Parador de Bielsa",
   ],
-  owner: null,
+  owner: { id: "u2", name: "Bob", image: null },
 };
 const EXPLORE_B: ExploreItem = {
   id: "e2",
@@ -127,6 +127,20 @@ describe("ExplorePage", () => {
       expect(screen.getByText("Lista Explorar A")).toBeInTheDocument()
     );
     expect(screen.getByText("Lista Explorar B")).toBeInTheDocument();
+  });
+
+  it("shows the author linking to their profile, only when there is an owner", async () => {
+    setupMocks();
+    renderPage();
+    await waitFor(() =>
+      expect(screen.getByTestId("explore-card-author-e1")).toBeInTheDocument()
+    );
+    const author = screen.getByTestId("explore-card-author-e1");
+    expect(author).toHaveTextContent("Bob");
+    expect(author).toHaveAttribute("href", "/u/u2");
+    expect(
+      screen.queryByTestId("explore-card-author-e2")
+    ).not.toBeInTheDocument();
   });
 
   it("shows the category badge only when the list has a category", async () => {

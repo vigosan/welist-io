@@ -87,6 +87,19 @@ function ExploreListCard({
               .filter(Boolean)
               .join(" · ")}
           </div>
+          {list.owner?.id && list.owner?.name && (
+            <div className="mt-1 text-[11px] text-gray-400 dark:text-gray-500">
+              {t("explore.by")}{" "}
+              <Link
+                to="/u/$userId"
+                params={{ userId: list.owner.id }}
+                data-testid={`explore-card-author-${list.id}`}
+                className="font-medium text-gray-500 no-underline hover:text-[#0c0c0b] dark:text-[#6b6b67] dark:hover:text-[#f0ede8]"
+              >
+                {list.owner.name}
+              </Link>
+            </div>
+          )}
         </div>
         {list.owner?.image ? (
           <img

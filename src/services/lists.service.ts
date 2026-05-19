@@ -23,7 +23,11 @@ export type ExploreItem = Pick<
   participantCount: number;
   completedCount: number;
   previewItems: string[];
-  owner: { image: string | null } | null;
+  owner: {
+    id: string | null;
+    name: string | null;
+    image: string | null;
+  } | null;
 };
 
 export type ExploreDetail = {
