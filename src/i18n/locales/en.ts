@@ -9,6 +9,7 @@ const en: Translations = {
   feed: {
     title: "Your feed",
     empty: "Follow people to see their public lists here.",
+    emptyCta: "Explore lists",
     signIn: "Sign in to see your feed.",
     loading: "Loading…",
   },

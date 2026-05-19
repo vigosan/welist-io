@@ -7,6 +7,7 @@ const es = {
   feed: {
     title: "Tu feed",
     empty: "Sigue a otras personas para ver aquí sus listas públicas.",
+    emptyCta: "Explorar listas",
     signIn: "Inicia sesión para ver tu feed.",
     loading: "Cargando…",
   },

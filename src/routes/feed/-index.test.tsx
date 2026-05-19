@@ -86,6 +86,18 @@ describe("FeedPage", () => {
     );
   });
 
+  it("offers a link to explore from the empty state", async () => {
+    setupMocks({ items: [] });
+    renderPage();
+    await waitFor(() =>
+      expect(screen.getByTestId("feed-empty-cta")).toBeInTheDocument()
+    );
+    expect(screen.getByTestId("feed-empty-cta")).toHaveAttribute(
+      "href",
+      "/explore"
+    );
+  });
+
   it("prompts to sign in when logged out", async () => {
     setupMocks({ sessionUserId: null });
     renderPage();

@@ -50,13 +50,22 @@ function FeedPage() {
         )}
 
         {loggedIn && !isLoading && items.length === 0 && (
-          <p
-            data-testid="feed-empty"
-            className="text-sm text-gray-500 text-center py-16"
-            style={{ textWrap: "balance" }}
-          >
-            {t("feed.empty")}
-          </p>
+          <div className="flex flex-col items-center gap-4 py-16 text-center">
+            <p
+              data-testid="feed-empty"
+              className="text-sm text-gray-500"
+              style={{ textWrap: "balance" }}
+            >
+              {t("feed.empty")}
+            </p>
+            <Link
+              to="/explore"
+              data-testid="feed-empty-cta"
+              className="cursor-pointer rounded-xl bg-gray-900 px-4 py-2 text-sm font-semibold text-white no-underline transition active:scale-[0.96] hover:bg-black dark:bg-[#f0ede8] dark:text-[#0c0c0b]"
+            >
+              {t("feed.emptyCta")}
+            </Link>
+          </div>
         )}
 
         {loggedIn && items.length > 0 && (
