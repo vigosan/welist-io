@@ -169,6 +169,12 @@ const en: Translations = {
     sortLabel: "Sort",
     categoryLabel: "Category",
     allCategories: "All",
+    metaItems_one: "{{count}} item",
+    metaItems_other: "{{count}} items",
+    metaParticipants_one: "{{count}} participant",
+    metaParticipants_other: "{{count}} participants",
+    metaCompleted_one: "{{count}} completed",
+    metaCompleted_other: "{{count}} completed",
   },
   command: {
     ariaLabel: "Command palette",

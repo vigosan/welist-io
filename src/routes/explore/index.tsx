@@ -49,20 +49,23 @@ function ExploreListCard({
               {list.description}
             </p>
           )}
-          <div className="flex gap-4">
+          <div
+            data-testid={`explore-card-meta-${list.id}`}
+            className="text-[11px] tabular-nums text-gray-500 dark:text-[#6b6b67]"
+          >
             {[
-              { icon: "▤", v: list.itemCount },
-              { icon: "⟳", v: list.participantCount },
-              { icon: "✓", v: list.completedCount },
-            ].map(({ icon, v }) => (
-              <span
-                key={icon}
-                className="text-[11px] text-gray-500 dark:text-[#6b6b67]"
-                style={{ fontFamily: "'Space Mono', monospace" }}
-              >
-                {icon} {v}
-              </span>
-            ))}
+              t("explore.metaItems", { count: list.itemCount }),
+              list.participantCount > 0
+                ? t("explore.metaParticipants", {
+                    count: list.participantCount,
+                  })
+                : null,
+              list.completedCount > 0
+                ? t("explore.metaCompleted", { count: list.completedCount })
+                : null,
+            ]
+              .filter(Boolean)
+              .join(" · ")}
           </div>
         </div>
         {list.owner?.image ? (

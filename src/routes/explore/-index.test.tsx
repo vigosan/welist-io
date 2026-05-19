@@ -121,6 +121,23 @@ describe("ExplorePage", () => {
     expect(screen.getByText("Lista Explorar B")).toBeInTheDocument();
   });
 
+  it("shows readable metrics and hides zero counts", async () => {
+    setupMocks();
+    renderPage();
+    await waitFor(() =>
+      expect(screen.getByTestId("explore-card-meta-e1")).toBeInTheDocument()
+    );
+    const a = screen.getByTestId("explore-card-meta-e1");
+    expect(a).toHaveTextContent("5 elementos");
+    expect(a).toHaveTextContent("3 participantes");
+    expect(a).toHaveTextContent("1 completado");
+
+    const b = screen.getByTestId("explore-card-meta-e2");
+    expect(b).toHaveTextContent("2 elementos");
+    expect(b).not.toHaveTextContent("participante");
+    expect(b).not.toHaveTextContent("completado");
+  });
+
   it("shows empty state when there are no lists", async () => {
     setupMocks({ lists: [] });
     renderPage();

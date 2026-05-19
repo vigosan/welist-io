@@ -168,6 +168,12 @@ const es = {
     sortLabel: "Ordenar",
     categoryLabel: "Categoría",
     allCategories: "Todas",
+    metaItems_one: "{{count}} elemento",
+    metaItems_other: "{{count}} elementos",
+    metaParticipants_one: "{{count}} participante",
+    metaParticipants_other: "{{count}} participantes",
+    metaCompleted_one: "{{count}} completado",
+    metaCompleted_other: "{{count}} completados",
   },
   command: {
     ariaLabel: "Paleta de comandos",
