@@ -57,6 +57,17 @@ function ExploreListCard({
               {list.description}
             </p>
           )}
+          {list.previewItems.length > 0 && (
+            <p
+              data-testid={`explore-card-preview-${list.id}`}
+              className="mb-2.5 truncate text-[12px] text-gray-400 dark:text-gray-500"
+            >
+              <span className="text-gray-500 dark:text-[#6b6b67]">
+                {t("explore.previewLabel")}:
+              </span>{" "}
+              {list.previewItems.join(" · ")}
+            </p>
+          )}
           <div
             data-testid={`explore-card-meta-${list.id}`}
             className="text-[11px] tabular-nums text-gray-500 dark:text-[#6b6b67]"

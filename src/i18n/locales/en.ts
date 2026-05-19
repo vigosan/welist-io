@@ -169,6 +169,7 @@ const en: Translations = {
     sortLabel: "Sort",
     categoryLabel: "Category",
     allCategories: "All",
+    previewLabel: "Includes",
     metaItems_one: "{{count}} item",
     metaItems_other: "{{count}} items",
     metaParticipants_one: "{{count}} participant",

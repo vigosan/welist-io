@@ -34,6 +34,7 @@ const EXPLORE_A: ExploreItem = {
   itemCount: 5,
   participantCount: 3,
   completedCount: 1,
+  previewItems: ["Reto uno", "Reto dos", "Reto tres"],
   owner: null,
 };
 const EXPLORE_B: ExploreItem = {
@@ -46,6 +47,7 @@ const EXPLORE_B: ExploreItem = {
   itemCount: 2,
   participantCount: 0,
   completedCount: 0,
+  previewItems: [],
   owner: null,
 };
 
@@ -134,6 +136,21 @@ describe("ExplorePage", () => {
     );
     expect(
       screen.queryByTestId("explore-card-category-e2")
+    ).not.toBeInTheDocument();
+  });
+
+  it("shows an item preview only when the list has preview items", async () => {
+    setupMocks();
+    renderPage();
+    await waitFor(() =>
+      expect(screen.getByTestId("explore-card-preview-e1")).toBeInTheDocument()
+    );
+    const preview = screen.getByTestId("explore-card-preview-e1");
+    expect(preview).toHaveTextContent("Reto uno");
+    expect(preview).toHaveTextContent("Reto dos");
+    expect(preview).toHaveTextContent("Reto tres");
+    expect(
+      screen.queryByTestId("explore-card-preview-e2")
     ).not.toBeInTheDocument();
   });
 
