@@ -810,10 +810,17 @@ app.get("/explore", async (c) => {
   const sort = c.req.query("sort") ?? "created_desc";
   const isAsc = sort === "created_asc";
   const isTrending = sort === "trending";
+  const category = c.req.query("category");
+  const categoryFilter =
+    category && (LIST_CATEGORIES as readonly string[]).includes(category)
+      ? eq(lists.category, category)
+      : undefined;
 
-  const baseWhere = q
-    ? and(eq(lists.public, true), ilike(lists.name, `%${q}%`))
-    : eq(lists.public, true);
+  const baseWhere = and(
+    eq(lists.public, true),
+    q ? ilike(lists.name, `%${q}%`) : undefined,
+    categoryFilter
+  );
   const where =
     cursor && !isTrending
       ? and(

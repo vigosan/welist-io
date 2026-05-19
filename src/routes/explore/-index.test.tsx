@@ -156,7 +156,11 @@ describe("ExplorePage", () => {
     await waitFor(() =>
       expect(screen.getByTestId("explore-sort-recent")).toBeInTheDocument()
     );
-    expect(useExplore).toHaveBeenCalledWith(undefined, "created_desc");
+    expect(useExplore).toHaveBeenCalledWith(
+      undefined,
+      "created_desc",
+      undefined
+    );
   });
 
   it("requests trending sort when the trending tab is clicked", async () => {
@@ -166,7 +170,48 @@ describe("ExplorePage", () => {
       expect(screen.getByTestId("explore-sort-trending")).toBeInTheDocument()
     );
     await userEvent.click(screen.getByTestId("explore-sort-trending"));
-    expect(useExplore).toHaveBeenLastCalledWith(undefined, "trending");
+    expect(useExplore).toHaveBeenLastCalledWith(
+      undefined,
+      "trending",
+      undefined
+    );
+  });
+
+  it("renders category filter chips", async () => {
+    setupMocks();
+    renderPage();
+    await waitFor(() =>
+      expect(screen.getByTestId("explore-category-movies")).toBeInTheDocument()
+    );
+  });
+
+  it("requests the selected category when a category chip is clicked", async () => {
+    setupMocks();
+    renderPage();
+    await waitFor(() =>
+      expect(screen.getByTestId("explore-category-movies")).toBeInTheDocument()
+    );
+    await userEvent.click(screen.getByTestId("explore-category-movies"));
+    expect(useExplore).toHaveBeenLastCalledWith(
+      undefined,
+      "created_desc",
+      "movies"
+    );
+  });
+
+  it("clears the category when the active chip is clicked again", async () => {
+    setupMocks();
+    renderPage();
+    await waitFor(() =>
+      expect(screen.getByTestId("explore-category-movies")).toBeInTheDocument()
+    );
+    await userEvent.click(screen.getByTestId("explore-category-movies"));
+    await userEvent.click(screen.getByTestId("explore-category-movies"));
+    expect(useExplore).toHaveBeenLastCalledWith(
+      undefined,
+      "created_desc",
+      undefined
+    );
   });
 
   it("accept error navigates to list when already participating", async () => {

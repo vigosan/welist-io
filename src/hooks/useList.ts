@@ -180,10 +180,11 @@ export function useToggleCollaborative(listId: string) {
   });
 }
 
-export function useExplore(q?: string, sort?: string) {
+export function useExplore(q?: string, sort?: string, category?: string) {
   return useInfiniteQuery({
-    queryKey: queryKeys.explore(q, sort),
-    queryFn: ({ pageParam }) => listsService.explore(q, pageParam, sort),
+    queryKey: queryKeys.explore(q, sort, category),
+    queryFn: ({ pageParam }) =>
+      listsService.explore(q, pageParam, sort, category),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (last) => last.nextCursor ?? undefined,
   });

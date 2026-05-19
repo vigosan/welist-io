@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { AppNav } from "@/components/AppNav";
 import { useAcceptChallenge, useExplore } from "@/hooks/useList";
 import { useTranslation } from "@/i18n/service";
+import { LIST_CATEGORIES } from "@/lib/categories";
 import type { ExploreItem } from "@/services/lists.service";
 
 export const Route = createFileRoute("/explore/")({
@@ -103,8 +104,9 @@ function ExplorePage() {
   const [search, setSearch] = useState("");
   const [focused, setFocused] = useState(false);
   const [sort, setSort] = useState<"created_desc" | "trending">("created_desc");
+  const [category, setCategory] = useState<string | undefined>(undefined);
   const { data, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage } =
-    useExplore(search || undefined, sort);
+    useExplore(search || undefined, sort, category);
   const acceptChallenge = useAcceptChallenge();
   const sentinelRef = useRef<HTMLDivElement>(null);
   const { t } = useTranslation();
@@ -210,6 +212,27 @@ function ExplorePage() {
               {opt.label}
             </button>
           ))}
+        </div>
+
+        <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
+          {LIST_CATEGORIES.map((cat) => {
+            const active = category === cat;
+            return (
+              <button
+                key={cat}
+                type="button"
+                data-testid={`explore-category-${cat}`}
+                onClick={() => setCategory(active ? undefined : cat)}
+                className={`cursor-pointer shrink-0 px-3 py-1 rounded-full text-xs transition-all duration-150 border ${
+                  active
+                    ? "border-black/[0.20] dark:border-white/[0.20] bg-black/[0.12] dark:bg-white/[0.12] text-[#0c0c0b] dark:text-[#f0ede8] font-semibold"
+                    : "border-black/[0.08] dark:border-white/[0.08] text-gray-500 font-normal hover:border-black/[0.20] dark:hover:border-white/[0.20] hover:bg-black/[0.05] dark:hover:bg-white/[0.05]"
+                }`}
+              >
+                {t(`categories.${cat}`)}
+              </button>
+            );
+          })}
         </div>
 
         <div className="mt-6">

@@ -862,6 +862,22 @@ describe("GET /api/explore", () => {
     expect(chain.where).toHaveBeenCalled();
   });
 
+  it("accepts a valid category filter without failing", async () => {
+    mockDb.select.mockReturnValue(chainMock([{ id: "l1", name: "Cine" }]));
+
+    const res = await app.request("/api/explore?category=movies");
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as Record<string, unknown>;
+    expect((body.items as unknown[]).length).toBe(1);
+  });
+
+  it("ignores an invalid category instead of failing", async () => {
+    mockDb.select.mockReturnValue(chainMock([]));
+
+    const res = await app.request("/api/explore?category=not-real");
+    expect(res.status).toBe(200);
+  });
+
   it("disables pagination for trending sort even when results fill the page", async () => {
     const rows = Array.from({ length: 6 }, (_, i) => ({
       id: `l${i}`,

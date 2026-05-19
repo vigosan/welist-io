@@ -163,11 +163,12 @@ export const listsService = {
       body: JSON.stringify(patch),
     }),
 
-  explore: (q?: string, cursor?: string, sort?: string) => {
+  explore: (q?: string, cursor?: string, sort?: string, category?: string) => {
     const params = new URLSearchParams();
     if (q) params.set("q", q);
     if (cursor) params.set("cursor", cursor);
     if (sort) params.set("sort", sort);
+    if (category) params.set("category", category);
     const qs = params.toString();
     return apiClient<{
       items: ExploreItem[];
