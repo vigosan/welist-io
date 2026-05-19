@@ -154,3 +154,14 @@ export function renderInlineMarkdown(text: string): ReactNode[] {
   }
   return nodes;
 }
+
+export function stripInlineMarkdown(text: string): string {
+  return text
+    .replace(LINK_RE, "$1")
+    .replace(CODE_RE, "$1")
+    .replace(BOLD_RE, "$1")
+    .replace(ITALIC_RE, "$1")
+    .replace(BARE_URL_RE, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}

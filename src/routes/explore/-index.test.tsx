@@ -34,7 +34,11 @@ const EXPLORE_A: ExploreItem = {
   itemCount: 5,
   participantCount: 3,
   completedCount: 1,
-  previewItems: ["Reto uno", "Reto dos", "Reto tres"],
+  previewItems: [
+    "[Torre del Visco](https://torredelvisco.com) #teruel",
+    "Piedrafita Lodge",
+    "Parador de Bielsa",
+  ],
   owner: null,
 };
 const EXPLORE_B: ExploreItem = {
@@ -146,9 +150,12 @@ describe("ExplorePage", () => {
       expect(screen.getByTestId("explore-card-preview-e1")).toBeInTheDocument()
     );
     const preview = screen.getByTestId("explore-card-preview-e1");
-    expect(preview).toHaveTextContent("Reto uno");
-    expect(preview).toHaveTextContent("Reto dos");
-    expect(preview).toHaveTextContent("Reto tres");
+    expect(preview).toHaveTextContent("Torre del Visco");
+    expect(preview).toHaveTextContent("Piedrafita Lodge");
+    expect(preview).toHaveTextContent("Parador de Bielsa");
+    expect(preview.textContent).not.toContain("https://");
+    expect(preview.textContent).not.toContain("[Torre");
+    expect(preview.textContent).not.toContain("#teruel");
     expect(
       screen.queryByTestId("explore-card-preview-e2")
     ).not.toBeInTheDocument();

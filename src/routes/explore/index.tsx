@@ -5,6 +5,7 @@ import { AppNav } from "@/components/AppNav";
 import { useAcceptChallenge, useExplore } from "@/hooks/useList";
 import { useTranslation } from "@/i18n/service";
 import { LIST_CATEGORIES } from "@/lib/categories";
+import { plainItemText } from "@/lib/item-text";
 import type { ExploreItem } from "@/services/lists.service";
 
 export const Route = createFileRoute("/explore/")({
@@ -65,7 +66,7 @@ function ExploreListCard({
               <span className="text-gray-500 dark:text-[#6b6b67]">
                 {t("explore.previewLabel")}:
               </span>{" "}
-              {list.previewItems.join(" · ")}
+              {list.previewItems.map(plainItemText).join(" · ")}
             </p>
           )}
           <div

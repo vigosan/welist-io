@@ -1,5 +1,27 @@
 import { describe, expect, it } from "vitest";
-import { parseItemText } from "./item-text";
+import { parseItemText, plainItemText } from "./item-text";
+
+describe("plainItemText", () => {
+  it("returns plain text unchanged", () => {
+    expect(plainItemText("comprar leche")).toBe("comprar leche");
+  });
+
+  it("strips tags and flattens markdown links", () => {
+    expect(
+      plainItemText("[Torre del Visco](https://torredelvisco.com) #teruel")
+    ).toBe("Torre del Visco");
+  });
+
+  it("strips places", () => {
+    expect(plainItemText("visitar @Barcelona")).toBe("visitar");
+  });
+
+  it("drops trailing bare urls", () => {
+    expect(plainItemText("Parador de Bielsa https://paradores.es")).toBe(
+      "Parador de Bielsa"
+    );
+  });
+});
 
 describe("parseItemText", () => {
   it("handles text with no tags or places", () => {

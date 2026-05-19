@@ -1,6 +1,6 @@
 import type { ReactElement } from "react";
 import { describe, expect, it } from "vitest";
-import { renderInlineMarkdown } from "./inline-markdown";
+import { renderInlineMarkdown, stripInlineMarkdown } from "./inline-markdown";
 
 function toHtml(nodes: ReturnType<typeof renderInlineMarkdown>): string {
   return nodes
@@ -19,6 +19,34 @@ function toHtml(nodes: ReturnType<typeof renderInlineMarkdown>): string {
     })
     .join("");
 }
+
+describe("stripInlineMarkdown", () => {
+  it("returns plain text unchanged", () => {
+    expect(stripInlineMarkdown("hello world")).toBe("hello world");
+  });
+
+  it("flattens a markdown link to its label", () => {
+    expect(
+      stripInlineMarkdown("[Torre del Visco](https://torredelvisco.com)")
+    ).toBe("Torre del Visco");
+  });
+
+  it("flattens bold, italic and code", () => {
+    expect(stripInlineMarkdown("**a** *b* `c`")).toBe("a b c");
+  });
+
+  it("drops bare URLs", () => {
+    expect(stripInlineMarkdown("ver https://example.com ahora")).toBe(
+      "ver ahora"
+    );
+  });
+
+  it("flattens a mix of link and tags-free text", () => {
+    expect(
+      stripInlineMarkdown("[Parador](https://paradores.es) de Bielsa")
+    ).toBe("Parador de Bielsa");
+  });
+});
 
 describe("renderInlineMarkdown", () => {
   it("returns plain text unchanged", () => {
