@@ -183,56 +183,66 @@ function ExplorePage() {
           </button>
         </form>
 
-        <div className="mt-4 flex gap-2">
-          {(
-            [
-              {
-                value: "created_desc",
-                label: t("explore.sortRecent"),
-                testId: "explore-sort-recent",
-              },
-              {
-                value: "trending",
-                label: t("explore.sortTrending"),
-                testId: "explore-sort-trending",
-              },
-            ] as const
-          ).map((opt) => (
-            <button
-              key={opt.value}
-              type="button"
-              data-testid={opt.testId}
-              onClick={() => setSort(opt.value)}
-              className={`cursor-pointer px-3 py-1 rounded-full text-xs transition-all duration-150 border ${
-                sort === opt.value
-                  ? "border-black/[0.20] dark:border-white/[0.20] bg-black/[0.12] dark:bg-white/[0.12] text-[#0c0c0b] dark:text-[#f0ede8] font-semibold"
-                  : "border-black/[0.08] dark:border-white/[0.08] text-gray-500 font-normal hover:border-black/[0.20] dark:hover:border-white/[0.20] hover:bg-black/[0.05] dark:hover:bg-white/[0.05]"
-              }`}
-            >
-              {opt.label}
-            </button>
-          ))}
-        </div>
-
-        <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
-          {LIST_CATEGORIES.map((cat) => {
-            const active = category === cat;
-            return (
+        <div className="mt-5 flex items-center gap-3">
+          <span className="shrink-0 text-[10px] font-medium uppercase tracking-wider text-gray-400 dark:text-gray-500">
+            {t("explore.sortLabel")}
+          </span>
+          <div className="inline-flex rounded-full border border-black/[0.08] p-0.5 dark:border-white/[0.08]">
+            {(
+              [
+                {
+                  value: "created_desc",
+                  label: t("explore.sortRecent"),
+                  testId: "explore-sort-recent",
+                },
+                {
+                  value: "trending",
+                  label: t("explore.sortTrending"),
+                  testId: "explore-sort-trending",
+                },
+              ] as const
+            ).map((opt) => (
               <button
-                key={cat}
+                key={opt.value}
                 type="button"
-                data-testid={`explore-category-${cat}`}
-                onClick={() => setCategory(active ? undefined : cat)}
-                className={`cursor-pointer shrink-0 px-3 py-1 rounded-full text-xs transition-all duration-150 border ${
-                  active
-                    ? "border-black/[0.20] dark:border-white/[0.20] bg-black/[0.12] dark:bg-white/[0.12] text-[#0c0c0b] dark:text-[#f0ede8] font-semibold"
-                    : "border-black/[0.08] dark:border-white/[0.08] text-gray-500 font-normal hover:border-black/[0.20] dark:hover:border-white/[0.20] hover:bg-black/[0.05] dark:hover:bg-white/[0.05]"
+                data-testid={opt.testId}
+                onClick={() => setSort(opt.value)}
+                className={`cursor-pointer rounded-full px-3.5 py-1.5 text-xs transition active:scale-[0.96] ${
+                  sort === opt.value
+                    ? "bg-[#0c0c0b] font-semibold text-[#f8f7f5] dark:bg-[#f0ede8] dark:text-[#0c0c0b]"
+                    : "font-normal text-gray-500 hover:text-[#0c0c0b] dark:hover:text-[#f0ede8]"
                 }`}
               >
-                {t(`categories.${cat}`)}
+                {opt.label}
               </button>
-            );
-          })}
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-3 flex items-center gap-3">
+          <span className="shrink-0 text-[10px] font-medium uppercase tracking-wider text-gray-400 dark:text-gray-500">
+            {t("explore.categoryLabel")}
+          </span>
+          <div className="-mb-1 flex gap-1.5 overflow-x-auto pb-1">
+            {LIST_CATEGORIES.map((cat) => {
+              const active = category === cat;
+              return (
+                <button
+                  key={cat}
+                  type="button"
+                  data-testid={`explore-category-${cat}`}
+                  onClick={() => setCategory(active ? undefined : cat)}
+                  className={`shrink-0 cursor-pointer rounded-full border px-3 py-1.5 text-xs transition active:scale-[0.96] ${
+                    active
+                      ? "border-transparent bg-[#0c0c0b] font-semibold text-[#f8f7f5] dark:bg-[#f0ede8] dark:text-[#0c0c0b]"
+                      : "border-black/[0.08] font-normal text-gray-500 hover:border-black/[0.20] hover:text-[#0c0c0b] dark:border-white/[0.08] dark:hover:border-white/[0.20] dark:hover:text-[#f0ede8]"
+                  }`}
+                >
+                  {t(`categories.${cat}`)}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         <div className="mt-6">

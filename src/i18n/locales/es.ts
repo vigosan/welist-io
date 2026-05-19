@@ -164,6 +164,8 @@ const es = {
     createdBy: "por {{name}}",
     sortRecent: "Recientes",
     sortTrending: "Tendencia",
+    sortLabel: "Ordenar",
+    categoryLabel: "Categoría",
   },
   command: {
     ariaLabel: "Paleta de comandos",

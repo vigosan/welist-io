@@ -165,6 +165,8 @@ const en: Translations = {
     createdBy: "by {{name}}",
     sortRecent: "Recent",
     sortTrending: "Trending",
+    sortLabel: "Sort",
+    categoryLabel: "Category",
   },
   command: {
     ariaLabel: "Command palette",
