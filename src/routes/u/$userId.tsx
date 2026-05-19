@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppNav } from "@/components/AppNav";
+import { FollowButton } from "@/components/FollowButton";
 import { useUserProfile } from "@/hooks/useList";
 import { useTranslation } from "@/i18n/service";
 
@@ -86,6 +87,8 @@ function UserProfilePage() {
             </p>
           </div>
         </div>
+
+        <FollowButton userId={userId} />
 
         <section className="flex flex-col gap-3">
           <h2 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">

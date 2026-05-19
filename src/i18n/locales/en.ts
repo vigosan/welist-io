@@ -231,6 +231,10 @@ const en: Translations = {
     completedOn: "Completed on {{date}}",
     participants: "{{count}} participants",
     items: "{{count}} items",
+    follow: "Follow",
+    following: "Following",
+    followers_one: "{{count}} follower",
+    followers_other: "{{count}} followers",
   },
   stats: {
     title: "Stats",

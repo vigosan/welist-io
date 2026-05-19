@@ -291,3 +291,52 @@ export function useStreak() {
     staleTime: 60_000,
   });
 }
+
+type FollowStatus = {
+  isFollowing: boolean;
+  followerCount: number;
+  followingCount: number;
+};
+
+export function useFollowStatus(userId: string, enabled = true) {
+  return useQuery({
+    queryKey: queryKeys.followStatus(userId),
+    queryFn: () => usersService.followStatus(userId),
+    enabled,
+    staleTime: 60_000,
+  });
+}
+
+export function useToggleFollow(userId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (isFollowing: boolean) =>
+      isFollowing ? usersService.unfollow(userId) : usersService.follow(userId),
+    onMutate: async (isFollowing) => {
+      await qc.cancelQueries({
+        queryKey: queryKeys.followStatus(userId),
+      });
+      const previous = qc.getQueryData<FollowStatus>(
+        queryKeys.followStatus(userId)
+      );
+      qc.setQueryData<FollowStatus>(queryKeys.followStatus(userId), (old) =>
+        old
+          ? {
+              ...old,
+              isFollowing: !isFollowing,
+              followerCount: old.followerCount + (isFollowing ? -1 : 1),
+            }
+          : old
+      );
+      return { previous };
+    },
+    onError: (_err, _val, ctx) => {
+      qc.setQueryData(queryKeys.followStatus(userId), ctx?.previous);
+    },
+    onSettled: () => {
+      qc.invalidateQueries({
+        queryKey: queryKeys.followStatus(userId),
+      });
+    },
+  });
+}

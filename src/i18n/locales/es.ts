@@ -230,6 +230,10 @@ const es = {
     completedOn: "Completado el {{date}}",
     participants: "{{count}} participantes",
     items: "{{count}} elementos",
+    follow: "Seguir",
+    following: "Siguiendo",
+    followers_one: "{{count}} seguidor",
+    followers_other: "{{count}} seguidores",
   },
   stats: {
     title: "Estadísticas",

@@ -14,6 +14,7 @@ export const queryKeys = {
   userProfile: (userId: string) => ["user-profile", userId] as const,
   userDirectory: (q?: string) => ["user-directory", q ?? ""] as const,
   userMe: () => ["user-me"] as const,
+  followStatus: (userId: string) => ["follow-status", userId] as const,
   notifications: () => ["notifications"] as const,
   stats: () => ["stats"] as const,
   streak: () => ["streak"] as const,

@@ -125,6 +125,23 @@ export const usersService = {
 
   getStreak: () => apiClient<{ current: number }>("/api/me/streak"),
 
+  followStatus: (userId: string) =>
+    apiClient<{
+      isFollowing: boolean;
+      followerCount: number;
+      followingCount: number;
+    }>(`/api/users/${userId}/follow-status`),
+
+  follow: (userId: string) =>
+    apiClient<{ following: boolean }>(`/api/users/${userId}/follow`, {
+      method: "POST",
+    }),
+
+  unfollow: (userId: string) =>
+    apiClient<{ following: boolean }>(`/api/users/${userId}/follow`, {
+      method: "DELETE",
+    }),
+
   updateProfile: (data: { publicProfile: boolean }) =>
     apiClient<{ publicProfile: boolean }>("/api/users/me", {
       method: "PATCH",
