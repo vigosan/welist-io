@@ -39,6 +39,10 @@ const EXPLORE_A: ExploreItem = {
     "Piedrafita Lodge",
     "Parador de Bielsa",
   ],
+  participants: [
+    { id: "p1", name: "Ana", image: null },
+    { id: "p2", name: "Leo", image: "https://img/leo.jpg" },
+  ],
   owner: { id: "u2", name: "Bob", image: null },
 };
 const EXPLORE_B: ExploreItem = {
@@ -52,6 +56,7 @@ const EXPLORE_B: ExploreItem = {
   participantCount: 0,
   completedCount: 0,
   previewItems: [],
+  participants: [],
   owner: null,
 };
 
@@ -127,6 +132,22 @@ describe("ExplorePage", () => {
       expect(screen.getByText("Lista Explorar A")).toBeInTheDocument()
     );
     expect(screen.getByText("Lista Explorar B")).toBeInTheDocument();
+  });
+
+  it("shows participant avatars with an overflow count, only when there are participants", async () => {
+    setupMocks();
+    renderPage();
+    await waitFor(() =>
+      expect(
+        screen.getByTestId("explore-card-participants-e1")
+      ).toBeInTheDocument()
+    );
+    const participants = screen.getByTestId("explore-card-participants-e1");
+    expect(participants).toHaveTextContent("+1");
+    expect(participants).toHaveTextContent("A");
+    expect(
+      screen.queryByTestId("explore-card-participants-e2")
+    ).not.toBeInTheDocument();
   });
 
   it("shows the author linking to their profile, only when there is an owner", async () => {

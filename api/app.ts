@@ -848,6 +848,9 @@ app.get("/explore", async (c) => {
       previewItems: sql<
         string[]
       >`coalesce((select array_agg(p.text) from (select ${items.text} as text from ${items} where ${items.listId} = ${lists.id} order by ${items.position} asc limit 3) p), array[]::text[])`,
+      participants: sql<
+        Array<{ id: string; name: string | null; image: string | null }>
+      >`coalesce((select json_agg(s) from (select u.id, u.name, u.image from ${participations} pa join ${users} u on u.id = pa.user_id where pa.source_list_id = ${lists.id} order by pa.created_at desc limit 5) s), '[]'::json)`,
       ownerId: users.id,
       ownerName: users.name,
       ownerImage: users.image,
