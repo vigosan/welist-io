@@ -142,6 +142,8 @@ const es = {
     moreParticipants: "+{{count}} más",
     progressLabel: "{{done}} de {{total}}",
     createdBy: "por {{name}}",
+    sortRecent: "Recientes",
+    sortTrending: "Tendencia",
   },
   command: {
     ariaLabel: "Paleta de comandos",

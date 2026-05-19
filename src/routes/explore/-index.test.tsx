@@ -150,6 +150,25 @@ describe("ExplorePage", () => {
     expect(signIn).toHaveBeenCalledWith("google");
   });
 
+  it("requests created_desc sort by default", async () => {
+    setupMocks();
+    renderPage();
+    await waitFor(() =>
+      expect(screen.getByTestId("explore-sort-recent")).toBeInTheDocument()
+    );
+    expect(useExplore).toHaveBeenCalledWith(undefined, "created_desc");
+  });
+
+  it("requests trending sort when the trending tab is clicked", async () => {
+    setupMocks();
+    renderPage();
+    await waitFor(() =>
+      expect(screen.getByTestId("explore-sort-trending")).toBeInTheDocument()
+    );
+    await userEvent.click(screen.getByTestId("explore-sort-trending"));
+    expect(useExplore).toHaveBeenLastCalledWith(undefined, "trending");
+  });
+
   it("accept error navigates to list when already participating", async () => {
     let capturedOnError: ((err: Error) => void) | undefined;
     const acceptMutate = vi.fn(

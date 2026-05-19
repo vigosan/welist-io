@@ -806,18 +806,22 @@ app.get("/explore", async (c) => {
   const cursor = c.req.query("cursor");
   const sort = c.req.query("sort") ?? "created_desc";
   const isAsc = sort === "created_asc";
+  const isTrending = sort === "trending";
 
   const baseWhere = q
     ? and(eq(lists.public, true), ilike(lists.name, `%${q}%`))
     : eq(lists.public, true);
-  const where = cursor
-    ? and(
-        baseWhere,
-        isAsc
-          ? gt(lists.createdAt, new Date(cursor))
-          : lt(lists.createdAt, new Date(cursor))
-      )
-    : baseWhere;
+  const where =
+    cursor && !isTrending
+      ? and(
+          baseWhere,
+          isAsc
+            ? gt(lists.createdAt, new Date(cursor))
+            : lt(lists.createdAt, new Date(cursor))
+        )
+      : baseWhere;
+
+  const trendScore = sql<number>`cast((select count(*) from ${participations} where ${participations.sourceListId} = ${lists.id} and ${participations.createdAt} > now() - interval '30 days') as int)`;
 
   const rows = await db
     .select({
@@ -834,11 +838,15 @@ app.get("/explore", async (c) => {
     .from(lists)
     .leftJoin(users, eq(users.id, lists.ownerId))
     .where(where)
-    .orderBy(isAsc ? lists.createdAt : desc(lists.createdAt))
+    .orderBy(
+      ...(isTrending
+        ? [desc(trendScore), desc(lists.createdAt)]
+        : [isAsc ? lists.createdAt : desc(lists.createdAt)])
+    )
     .limit(EXPLORE_PAGE_SIZE);
 
   const nextCursor =
-    rows.length === EXPLORE_PAGE_SIZE
+    !isTrending && rows.length === EXPLORE_PAGE_SIZE
       ? rows[rows.length - 1].createdAt.toISOString()
       : null;
 

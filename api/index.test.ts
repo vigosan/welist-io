@@ -791,6 +791,23 @@ describe("GET /api/explore", () => {
     const chain = mockDb.select.mock.results[0].value;
     expect(chain.where).toHaveBeenCalled();
   });
+
+  it("disables pagination for trending sort even when results fill the page", async () => {
+    const rows = Array.from({ length: 6 }, (_, i) => ({
+      id: `l${i}`,
+      name: `Lista ${i}`,
+      slug: null,
+      createdAt: new Date(`2024-01-${String(i + 1).padStart(2, "0")}`),
+      itemCount: 0,
+    }));
+    mockDb.select.mockReturnValue(chainMock(rows));
+
+    const res = await app.request("/api/explore?sort=trending");
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as Record<string, unknown>;
+    expect(body.items).toHaveLength(6);
+    expect(body.nextCursor).toBeNull();
+  });
 });
 
 describe("GET /api/explore/:listId", () => {

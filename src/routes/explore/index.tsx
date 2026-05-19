@@ -102,8 +102,9 @@ function ExplorePage() {
   const [q, setQ] = useState("");
   const [search, setSearch] = useState("");
   const [focused, setFocused] = useState(false);
+  const [sort, setSort] = useState<"created_desc" | "trending">("created_desc");
   const { data, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage } =
-    useExplore(search || undefined);
+    useExplore(search || undefined, sort);
   const acceptChallenge = useAcceptChallenge();
   const sentinelRef = useRef<HTMLDivElement>(null);
   const { t } = useTranslation();
@@ -180,7 +181,38 @@ function ExplorePage() {
           </button>
         </form>
 
-        <div className="mt-8">
+        <div className="mt-4 flex gap-2">
+          {(
+            [
+              {
+                value: "created_desc",
+                label: t("explore.sortRecent"),
+                testId: "explore-sort-recent",
+              },
+              {
+                value: "trending",
+                label: t("explore.sortTrending"),
+                testId: "explore-sort-trending",
+              },
+            ] as const
+          ).map((opt) => (
+            <button
+              key={opt.value}
+              type="button"
+              data-testid={opt.testId}
+              onClick={() => setSort(opt.value)}
+              className={`cursor-pointer px-3 py-1 rounded-full text-xs transition-all duration-150 border ${
+                sort === opt.value
+                  ? "border-black/[0.20] dark:border-white/[0.20] bg-black/[0.12] dark:bg-white/[0.12] text-[#0c0c0b] dark:text-[#f0ede8] font-semibold"
+                  : "border-black/[0.08] dark:border-white/[0.08] text-gray-500 font-normal hover:border-black/[0.20] dark:hover:border-white/[0.20] hover:bg-black/[0.05] dark:hover:bg-white/[0.05]"
+              }`}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+
+        <div className="mt-6">
           {isLoading && (
             <p className="text-[12px] text-gray-500 text-center py-10">
               {t("explore.loading")}

@@ -143,6 +143,8 @@ const en: Translations = {
     moreParticipants: "+{{count}} more",
     progressLabel: "{{done}} of {{total}}",
     createdBy: "by {{name}}",
+    sortRecent: "Recent",
+    sortTrending: "Trending",
   },
   command: {
     ariaLabel: "Command palette",
