@@ -166,6 +166,7 @@ const es = {
     sortTrending: "Tendencia",
     sortLabel: "Ordenar",
     categoryLabel: "Categoría",
+    allCategories: "Todas",
   },
   command: {
     ariaLabel: "Paleta de comandos",

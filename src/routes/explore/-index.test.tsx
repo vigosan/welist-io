@@ -185,6 +185,21 @@ describe("ExplorePage", () => {
     );
   });
 
+  it("clears the category when the 'all' chip is clicked", async () => {
+    setupMocks();
+    renderPage();
+    await waitFor(() =>
+      expect(screen.getByTestId("explore-category-all")).toBeInTheDocument()
+    );
+    await userEvent.click(screen.getByTestId("explore-category-movies"));
+    await userEvent.click(screen.getByTestId("explore-category-all"));
+    expect(useExplore).toHaveBeenLastCalledWith(
+      undefined,
+      "created_desc",
+      undefined
+    );
+  });
+
   it("requests the selected category when a category chip is clicked", async () => {
     setupMocks();
     renderPage();

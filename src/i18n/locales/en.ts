@@ -167,6 +167,7 @@ const en: Translations = {
     sortTrending: "Trending",
     sortLabel: "Sort",
     categoryLabel: "Category",
+    allCategories: "All",
   },
   command: {
     ariaLabel: "Command palette",

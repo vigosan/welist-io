@@ -98,6 +98,14 @@ function ExploreListCard({
   );
 }
 
+function categoryChipClass(active: boolean): string {
+  return `shrink-0 cursor-pointer rounded-full border px-3 py-1.5 text-xs transition active:scale-[0.96] ${
+    active
+      ? "border-transparent bg-[#0c0c0b] font-semibold text-[#f8f7f5] dark:bg-[#f0ede8] dark:text-[#0c0c0b]"
+      : "border-black/[0.08] font-normal text-gray-500 hover:border-black/[0.20] hover:text-[#0c0c0b] dark:border-white/[0.08] dark:hover:border-white/[0.20] dark:hover:text-[#f0ede8]"
+  }`;
+}
+
 function ExplorePage() {
   const navigate = useNavigate();
   const [q, setQ] = useState("");
@@ -224,6 +232,14 @@ function ExplorePage() {
             {t("explore.categoryLabel")}
           </span>
           <div className="-mb-1 flex gap-1.5 overflow-x-auto pb-1">
+            <button
+              type="button"
+              data-testid="explore-category-all"
+              onClick={() => setCategory(undefined)}
+              className={categoryChipClass(!category)}
+            >
+              {t("explore.allCategories")}
+            </button>
             {LIST_CATEGORIES.map((cat) => {
               const active = category === cat;
               return (
@@ -232,11 +248,7 @@ function ExplorePage() {
                   type="button"
                   data-testid={`explore-category-${cat}`}
                   onClick={() => setCategory(active ? undefined : cat)}
-                  className={`shrink-0 cursor-pointer rounded-full border px-3 py-1.5 text-xs transition active:scale-[0.96] ${
-                    active
-                      ? "border-transparent bg-[#0c0c0b] font-semibold text-[#f8f7f5] dark:bg-[#f0ede8] dark:text-[#0c0c0b]"
-                      : "border-black/[0.08] font-normal text-gray-500 hover:border-black/[0.20] hover:text-[#0c0c0b] dark:border-white/[0.08] dark:hover:border-white/[0.20] dark:hover:text-[#f0ede8]"
-                  }`}
+                  className={categoryChipClass(active)}
                 >
                   {t(`categories.${cat}`)}
                 </button>
