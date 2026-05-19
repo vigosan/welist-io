@@ -16,4 +16,5 @@ export const queryKeys = {
   userMe: () => ["user-me"] as const,
   notifications: () => ["notifications"] as const,
   stats: () => ["stats"] as const,
+  streak: () => ["streak"] as const,
 };

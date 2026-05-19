@@ -16,7 +16,7 @@ vi.mock("@hono/auth-js/react", () => ({
 }));
 
 import { useSession } from "@hono/auth-js/react";
-import { useDeleteList, useMyLists } from "@/hooks/useList";
+import { useDeleteList, useMyLists, useStreak } from "@/hooks/useList";
 
 const LIST_A: List = {
   id: "l1",
@@ -99,11 +99,14 @@ function setupMocks({
   lists = [LIST_A, LIST_B],
   isLoading = false,
   deleteMutate = vi.fn(),
+  streak,
 }: {
   lists?: List[];
   isLoading?: boolean;
   deleteMutate?: ReturnType<typeof vi.fn>;
+  streak?: { current: number };
 } = {}) {
+  vi.mocked(useStreak).mockReturnValue({ data: streak } as never);
   vi.mocked(useSession).mockReturnValue({
     data: { user: { id: "u1", name: "User" }, expires: "" },
     status: "authenticated",
@@ -239,6 +242,26 @@ describe("MyListsPage", () => {
     expect(screen.getByTestId("list-progress")).not.toHaveTextContent(
       "pendiente"
     );
+  });
+
+  it("shows the streak badge when the user has an active streak", async () => {
+    setupMocks({ streak: { current: 5 } });
+    renderPage();
+    await waitFor(() =>
+      expect(screen.getByTestId("streak-badge")).toBeInTheDocument()
+    );
+    expect(screen.getByTestId("streak-badge")).toHaveTextContent(
+      "5 días de racha"
+    );
+  });
+
+  it("hides the streak badge when there is no active streak", async () => {
+    setupMocks({ streak: { current: 0 } });
+    renderPage();
+    await waitFor(() =>
+      expect(screen.getAllByTestId("my-list-card").length).toBeGreaterThan(0)
+    );
+    expect(screen.queryByTestId("streak-badge")).not.toBeInTheDocument();
   });
 
   it("renders sort option buttons when filters are opened", async () => {

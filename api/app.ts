@@ -190,6 +190,24 @@ async function getParticipation(sourceListId: string, userId: string) {
   });
 }
 
+function computeDayStreak(days: string[], now: Date): number {
+  if (days.length === 0) return 0;
+  const DAY_MS = 86_400_000;
+  const toNum = (s: string) =>
+    Math.floor(Date.parse(`${s}T00:00:00Z`) / DAY_MS);
+  const todayNum = Math.floor(
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()) / DAY_MS
+  );
+  const nums = [...new Set(days.map(toNum))].sort((a, b) => b - a);
+  if (nums[0] < todayNum - 1) return 0;
+  let streak = 1;
+  for (let i = 1; i < nums.length; i++) {
+    if (nums[i - 1] - nums[i] === 1) streak += 1;
+    else break;
+  }
+  return streak;
+}
+
 async function createNotification(
   recipientId: string,
   type: "challenge_accepted" | "challenge_completed",
@@ -983,6 +1001,25 @@ app.get("/users/me", async (c) => {
   });
   if (!user) return c.json({ error: "Not found" }, 404);
   return c.json({ publicProfile: user.publicProfile });
+});
+
+app.get("/me/streak", async (c) => {
+  const authUser = getOptionalUser(c);
+  const userId = authUser?.session?.user?.id;
+  if (!userId) return c.json({ error: "Unauthorized" }, 401);
+  const dayExpr = sql<string>`to_char(${itemProgress.updatedAt}, 'YYYY-MM-DD')`;
+  const rows = await db
+    .select({ day: dayExpr })
+    .from(itemProgress)
+    .where(and(eq(itemProgress.userId, userId), eq(itemProgress.done, true)))
+    .groupBy(dayExpr)
+    .orderBy(desc(dayExpr));
+  return c.json({
+    current: computeDayStreak(
+      rows.map((r) => r.day),
+      new Date()
+    ),
+  });
 });
 
 app.get("/users/:userId/profile", async (c) => {

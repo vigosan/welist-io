@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const mockDb = {
   query: {
@@ -1554,5 +1554,69 @@ describe("GET /api/users/me", () => {
     expect(res.status).toBe(200);
     const body = (await res.json()) as Record<string, unknown>;
     expect(body.publicProfile).toBe(true);
+  });
+});
+
+describe("GET /api/me/streak", () => {
+  const chainMock = (rows: unknown[]) => ({
+    from: vi.fn().mockReturnThis(),
+    where: vi.fn().mockReturnThis(),
+    groupBy: vi.fn().mockReturnThis(),
+    orderBy: vi.fn().mockResolvedValue(rows),
+  });
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-05-19T12:00:00Z"));
+  });
+
+  afterEach(() => vi.useRealTimers());
+
+  it("returns 401 when there is no session", async () => {
+    mockGetAuthUser.mockRejectedValue(new Error("no session"));
+    const res = await app.request("/api/me/streak");
+    expect(res.status).toBe(401);
+  });
+
+  it("counts consecutive days ending today", async () => {
+    mockGetAuthUser.mockResolvedValue({ session: { user: { id: "u1" } } });
+    mockDb.select.mockReturnValue(
+      chainMock([
+        { day: "2026-05-19" },
+        { day: "2026-05-18" },
+        { day: "2026-05-17" },
+      ])
+    );
+
+    const res = await app.request("/api/me/streak");
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ current: 3 });
+  });
+
+  it("keeps the streak alive when the latest activity was yesterday", async () => {
+    mockGetAuthUser.mockResolvedValue({ session: { user: { id: "u1" } } });
+    mockDb.select.mockReturnValue(
+      chainMock([{ day: "2026-05-18" }, { day: "2026-05-17" }])
+    );
+
+    const res = await app.request("/api/me/streak");
+    expect(await res.json()).toEqual({ current: 2 });
+  });
+
+  it("returns 0 when the latest activity is older than yesterday", async () => {
+    mockGetAuthUser.mockResolvedValue({ session: { user: { id: "u1" } } });
+    mockDb.select.mockReturnValue(chainMock([{ day: "2026-05-15" }]));
+
+    const res = await app.request("/api/me/streak");
+    expect(await res.json()).toEqual({ current: 0 });
+  });
+
+  it("returns 0 when there is no progress", async () => {
+    mockGetAuthUser.mockResolvedValue({ session: { user: { id: "u1" } } });
+    mockDb.select.mockReturnValue(chainMock([]));
+
+    const res = await app.request("/api/me/streak");
+    expect(await res.json()).toEqual({ current: 0 });
   });
 });

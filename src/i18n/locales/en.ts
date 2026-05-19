@@ -119,6 +119,8 @@ const en: Translations = {
     progressComplete: "Completed",
     progressPending_one: "{{count}} pending",
     progressPending_other: "{{count}} pending",
+    streak_one: "{{count}}-day streak",
+    streak_other: "{{count}}-day streak",
   },
   explore: {
     searchPlaceholder: "Search lists…",

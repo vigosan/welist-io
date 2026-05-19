@@ -118,6 +118,8 @@ const es = {
     progressComplete: "Completada",
     progressPending_one: "{{count}} pendiente",
     progressPending_other: "{{count}} pendientes",
+    streak_one: "{{count}} día de racha",
+    streak_other: "{{count}} días de racha",
   },
   explore: {
     searchPlaceholder: "Buscar listas…",

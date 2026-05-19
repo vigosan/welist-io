@@ -123,6 +123,8 @@ export const usersService = {
 
   getMe: () => apiClient<{ publicProfile: boolean }>("/api/users/me"),
 
+  getStreak: () => apiClient<{ current: number }>("/api/me/streak"),
+
   updateProfile: (data: { publicProfile: boolean }) =>
     apiClient<{ publicProfile: boolean }>("/api/users/me", {
       method: "PATCH",

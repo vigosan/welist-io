@@ -256,3 +256,11 @@ export function useStats() {
     staleTime: 5 * 60_000,
   });
 }
+
+export function useStreak() {
+  return useQuery({
+    queryKey: queryKeys.streak(),
+    queryFn: () => usersService.getStreak(),
+    staleTime: 60_000,
+  });
+}
