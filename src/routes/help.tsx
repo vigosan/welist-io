@@ -242,7 +242,7 @@ function HelpPage() {
   const page = content[language] ?? content.es;
 
   return (
-    <div className="min-h-dvh bg-[#f8f7f5] dark:bg-[#0c0c0b] flex flex-col">
+    <div className="min-h-dvh bg-canvas dark:bg-canvas-dark flex flex-col">
       <AppNav />
 
       <main className="flex-1 py-10">

@@ -153,16 +153,15 @@ function StatsBar() {
 
   return (
     <div className="px-4 sm:px-0 border-t border-b border-black/[0.08] dark:border-white/[0.08]">
-      <div
-        ref={ref}
-        className="max-w-[1100px] mx-auto grid grid-cols-3"
-      >
+      <div ref={ref} className="max-w-[1100px] mx-auto grid grid-cols-3">
         {stats.map((s, i) => (
           <div
             key={s.label}
             className={[
               "flex flex-col gap-2 px-7 py-10",
-              i < 2 ? "border-r border-black/[0.08] dark:border-white/[0.08]" : "",
+              i < 2
+                ? "border-r border-black/[0.08] dark:border-white/[0.08]"
+                : "",
             ].join(" ")}
           >
             <span
@@ -323,7 +322,7 @@ function HomePage() {
   const { t } = useTranslation();
 
   return (
-    <div className="min-h-dvh bg-[#f8f7f5] dark:bg-[#0c0c0b] flex flex-col text-[#0c0c0b] dark:text-[#f0ede8]">
+    <div className="min-h-dvh bg-canvas dark:bg-canvas-dark flex flex-col text-[#0c0c0b] dark:text-[#f0ede8]">
       <AppNav />
 
       <main className="flex-1 flex flex-col">

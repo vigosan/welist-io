@@ -57,7 +57,7 @@ function SettingsPage() {
 
   if (!session?.user) {
     return (
-      <div className="min-h-dvh bg-[#FAFAF8] dark:bg-gray-950 flex flex-col">
+      <div className="min-h-dvh bg-canvas dark:bg-canvas-dark flex flex-col">
         <AppNav />
         <main className="flex-1 flex items-center justify-center px-4">
           <p className="text-sm text-gray-400 dark:text-gray-500">
@@ -69,7 +69,7 @@ function SettingsPage() {
   }
 
   return (
-    <div className="min-h-dvh bg-[#FAFAF8] dark:bg-gray-950 flex flex-col">
+    <div className="min-h-dvh bg-canvas dark:bg-canvas-dark flex flex-col">
       <AppNav />
 
       <main className="flex-1 w-full max-w-3xl mx-auto px-4 py-8 flex flex-col gap-8">

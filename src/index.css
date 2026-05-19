@@ -15,6 +15,13 @@
   --color-gray-900: #171717;
   --color-gray-800: #242424;
   --color-gray-700: #363636;
+  /* Semantic surface/text tokens — single source of truth for the
+     black & white palette. Replaces scattered hex literals. */
+  --color-canvas: #f8f7f5;
+  --color-canvas-dark: #0d0d0d;
+  --color-ink: #0c0c0b;
+  --color-paper: #f0ede8;
+  --color-muted: #a0a09c;
 }
 
 @keyframes fadeInUp {
@@ -39,13 +46,13 @@
   }
 
   body {
-    background: #fff;
-    color: #111;
+    background: var(--color-canvas);
+    color: var(--color-ink);
     font-family: var(--font-sans);
   }
 
   html.dark body {
-    background: #0d0d0d;
-    color: #ededed;
+    background: var(--color-canvas-dark);
+    color: var(--color-paper);
   }
 }

@@ -377,7 +377,7 @@ function ListDetailPage() {
 
   return (
     <>
-      <div className="h-dvh bg-[#FAFAF8] dark:bg-gray-950 flex flex-col">
+      <div className="h-dvh bg-canvas dark:bg-canvas-dark flex flex-col">
         <AppNav />
         {showSignInNudge && (
           <div className="w-full sm:max-w-3xl mx-auto px-5 sm:px-6 pt-4">

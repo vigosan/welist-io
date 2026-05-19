@@ -81,7 +81,7 @@ function AdminPage() {
 
   if (!password || error) {
     return (
-      <div className="min-h-dvh bg-[#FAFAF8] flex items-center justify-center px-4">
+      <div className="min-h-dvh bg-canvas dark:bg-canvas-dark flex items-center justify-center px-4">
         <div className="w-full max-w-xs flex flex-col gap-6">
           <h1 className="text-xl font-bold tracking-tight text-gray-900">
             Admin
@@ -113,14 +113,14 @@ function AdminPage() {
 
   if (loading || !stats) {
     return (
-      <div className="min-h-dvh bg-[#FAFAF8] flex items-center justify-center">
+      <div className="min-h-dvh bg-canvas dark:bg-canvas-dark flex items-center justify-center">
         <div className="w-8 h-8 rounded-full border-2 border-gray-200 border-t-gray-900 animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-dvh bg-[#FAFAF8] flex flex-col">
+    <div className="min-h-dvh bg-canvas dark:bg-canvas-dark flex flex-col">
       <header className="w-full max-w-4xl mx-auto px-4 py-6 flex items-center justify-between">
         <h1 className="text-xl font-bold tracking-tight text-gray-900">
           Admin

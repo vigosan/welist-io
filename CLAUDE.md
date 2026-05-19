@@ -100,8 +100,8 @@ vi.mock("@hono/auth-js", async (importOriginal) => {
 
 ## UI Style Guide
 
-**Palette — black & white only.**
-- Background: `bg-white` (pages) / `bg-[#FAFAF8]` (list detail wrapper)
+**Palette — black & white only.** Semantic tokens live in `src/index.css` `@theme` (`--color-canvas`, `--color-canvas-dark`, `--color-ink`, `--color-paper`, `--color-muted`) — prefer the generated utilities (`bg-canvas`, `dark:bg-canvas-dark`, …) over hardcoded hex literals.
+- Background: `bg-canvas dark:bg-canvas-dark` (all page roots — one unified canvas, no `#FAFAF8`/`#f8f7f5` split)
 - Primary text: `text-gray-900`
 - Secondary text: `text-gray-500` / `text-gray-400`
 - Borders: `border-gray-100` (subtle) / `border-gray-200` (normal)
@@ -128,7 +128,7 @@ vi.mock("@hono/auth-js", async (importOriginal) => {
 - List detail: search icon button in the header meta row toggles the inline search bar (`openSearch()`).
 
 **Typography.**
-- Font: Inter (loaded from Google Fonts).
+- Font: Space Grotesk for UI, Space Mono for numerics (both loaded from Google Fonts in `index.html`; exposed as `--font-sans` / `--font-mono`).
 - Headings: `font-bold tracking-tight text-gray-900`.
 - Body: `text-sm text-gray-600 leading-relaxed`.
 

@@ -15,7 +15,7 @@ function UserProfilePage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-dvh bg-[#FAFAF8] dark:bg-gray-950 flex flex-col">
+      <div className="min-h-dvh bg-canvas dark:bg-canvas-dark flex flex-col">
         <AppNav />
         <main className="flex-1 w-full max-w-3xl mx-auto px-4 py-8 flex flex-col gap-6">
           <div className="flex items-center gap-4">
@@ -40,7 +40,7 @@ function UserProfilePage() {
 
   if (!profile) {
     return (
-      <div className="min-h-dvh bg-[#FAFAF8] dark:bg-gray-950 flex flex-col">
+      <div className="min-h-dvh bg-canvas dark:bg-canvas-dark flex flex-col">
         <AppNav />
         <div className="flex-1 flex items-center justify-center">
           <p className="text-sm text-gray-400">{t("error.notFound")}</p>
@@ -50,7 +50,7 @@ function UserProfilePage() {
   }
 
   return (
-    <div className="min-h-dvh bg-[#FAFAF8] dark:bg-gray-950 flex flex-col">
+    <div className="min-h-dvh bg-canvas dark:bg-canvas-dark flex flex-col">
       <AppNav />
 
       <main className="flex-1 w-full max-w-3xl mx-auto px-4 py-8 flex flex-col gap-8">

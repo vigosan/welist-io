@@ -55,7 +55,7 @@ function ExploreDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="h-dvh bg-[#FAFAF8] dark:bg-gray-950 flex flex-col">
+      <div className="h-dvh bg-canvas dark:bg-canvas-dark flex flex-col">
         <AppNav />
         <main className="flex-1 w-full max-w-3xl mx-auto px-4 py-6 flex flex-col gap-5">
           <div className="h-4 w-24 rounded bg-gray-200 animate-pulse" />
@@ -72,7 +72,7 @@ function ExploreDetailPage() {
 
   if (!detail) {
     return (
-      <div className="h-dvh bg-[#FAFAF8] dark:bg-gray-950 flex flex-col">
+      <div className="h-dvh bg-canvas dark:bg-canvas-dark flex flex-col">
         <AppNav />
         <div className="flex-1 flex items-center justify-center">
           <p className="text-sm text-gray-400">{t("error.notFound")}</p>
@@ -82,7 +82,7 @@ function ExploreDetailPage() {
   }
 
   return (
-    <div className="min-h-dvh bg-[#FAFAF8] dark:bg-gray-950 flex flex-col">
+    <div className="min-h-dvh bg-canvas dark:bg-canvas-dark flex flex-col">
       <AppNav />
 
       <main className="flex-1 w-full max-w-3xl mx-auto px-4 py-6 flex flex-col gap-5">
