@@ -12,6 +12,7 @@ const LIST: List = {
   name: "Mi lista",
   slug: null,
   description: null,
+  category: null,
   public: false,
   collaborative: false,
   ownerId: null,

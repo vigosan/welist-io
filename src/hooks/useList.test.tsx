@@ -37,6 +37,7 @@ const LIST: ListWithParticipation = {
   name: "Mi lista",
   slug: null,
   description: null,
+  category: null,
   public: false,
   collaborative: false,
   ownerId: null,

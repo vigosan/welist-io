@@ -536,6 +536,76 @@ describe("PATCH /api/lists/:listId", () => {
     expect(res.status).toBe(400);
   });
 
+  it("updates category and returns the list", async () => {
+    const updated = {
+      id: "abc",
+      name: "Lista",
+      category: "movies",
+      slug: null,
+      public: false,
+      ownerId: null,
+    };
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "abc",
+      ownerId: null,
+      collaborative: false,
+    });
+    const setMock = vi.fn().mockReturnValue({
+      where: vi.fn().mockReturnValue({
+        returning: vi.fn().mockResolvedValue([updated]),
+      }),
+    });
+    mockDb.update.mockReturnValue({ set: setMock });
+
+    const res = await app.request("/api/lists/abc", {
+      method: "PATCH",
+      body: JSON.stringify({ category: "movies" }),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    expect(res.status).toBe(200);
+    expect(setMock).toHaveBeenCalledWith(
+      expect.objectContaining({ category: "movies" })
+    );
+    const body = (await res.json()) as Record<string, unknown>;
+    expect(body.category).toBe("movies");
+  });
+
+  it("returns 400 for an invalid category", async () => {
+    const res = await app.request("/api/lists/abc", {
+      method: "PATCH",
+      body: JSON.stringify({ category: "not-a-category" }),
+      headers: { "Content-Type": "application/json" },
+    });
+    expect(res.status).toBe(400);
+  });
+
+  it("clears the category when set to null", async () => {
+    const updated = { id: "abc", name: "Lista", category: null };
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "abc",
+      ownerId: null,
+      collaborative: false,
+    });
+    const setMock = vi.fn().mockReturnValue({
+      where: vi.fn().mockReturnValue({
+        returning: vi.fn().mockResolvedValue([updated]),
+      }),
+    });
+    mockDb.update.mockReturnValue({ set: setMock });
+
+    const res = await app.request("/api/lists/abc", {
+      method: "PATCH",
+      body: JSON.stringify({ category: null }),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    expect(res.status).toBe(200);
+    expect(setMock).toHaveBeenCalledWith(
+      expect.objectContaining({ category: null })
+    );
+  });
+
   it("returns 403 when user does not own the list", async () => {
     mockDb.query.lists.findFirst.mockResolvedValue({
       id: "abc",

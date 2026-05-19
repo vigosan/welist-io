@@ -19,6 +19,7 @@ export const lists = pgTable(
     name: text("name").notNull(),
     slug: text("slug").unique(),
     description: text("description"),
+    category: text("category"),
     public: boolean("public").notNull().default(false),
     collaborative: boolean("collaborative").notNull().default(false),
     ownerId: text("owner_id").references(() => users.id),

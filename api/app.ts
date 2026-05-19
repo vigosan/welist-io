@@ -33,6 +33,7 @@ import {
   stripeAccounts,
   users,
 } from "../src/db/schema/index.js";
+import { LIST_CATEGORIES } from "../src/lib/categories.js";
 import { rateLimit } from "./rate-limit.js";
 
 type Variables = { authUser: AuthUser | null };
@@ -408,6 +409,7 @@ app.patch(
         .optional()
         .nullable(),
       description: z.string().max(500).optional().nullable(),
+      category: z.enum(LIST_CATEGORIES).optional().nullable(),
       public: z.boolean().optional(),
       collaborative: z.boolean().optional(),
     })
@@ -427,6 +429,7 @@ app.patch(
     if (body.name !== undefined) patch.name = body.name;
     if ("slug" in body) patch.slug = body.slug ?? null;
     if ("description" in body) patch.description = body.description ?? null;
+    if ("category" in body) patch.category = body.category ?? null;
     if (body.public !== undefined) patch.public = body.public;
     if (body.collaborative !== undefined)
       patch.collaborative = body.collaborative;

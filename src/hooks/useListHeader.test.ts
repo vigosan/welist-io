@@ -28,6 +28,7 @@ const LIST: List = {
   name: "Mi lista",
   slug: "mi-lista",
   description: null,
+  category: null,
   public: false,
   collaborative: false,
   ownerId: null,
