@@ -29,6 +29,7 @@ const EXPLORE_A: ExploreItem = {
   name: "Lista Explorar A",
   slug: null,
   description: null,
+  category: "movies",
   createdAt: new Date(),
   itemCount: 5,
   participantCount: 3,
@@ -40,6 +41,7 @@ const EXPLORE_B: ExploreItem = {
   name: "Lista Explorar B",
   slug: "lista-b",
   description: "Desc",
+  category: null,
   createdAt: new Date(),
   itemCount: 2,
   participantCount: 0,
@@ -119,6 +121,20 @@ describe("ExplorePage", () => {
       expect(screen.getByText("Lista Explorar A")).toBeInTheDocument()
     );
     expect(screen.getByText("Lista Explorar B")).toBeInTheDocument();
+  });
+
+  it("shows the category badge only when the list has a category", async () => {
+    setupMocks();
+    renderPage();
+    await waitFor(() =>
+      expect(screen.getByTestId("explore-card-category-e1")).toBeInTheDocument()
+    );
+    expect(screen.getByTestId("explore-card-category-e1")).toHaveTextContent(
+      "Películas"
+    );
+    expect(
+      screen.queryByTestId("explore-card-category-e2")
+    ).not.toBeInTheDocument();
   });
 
   it("shows readable metrics and hides zero counts", async () => {

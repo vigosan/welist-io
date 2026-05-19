@@ -840,6 +840,7 @@ app.get("/explore", async (c) => {
       name: lists.name,
       slug: lists.slug,
       description: lists.description,
+      category: lists.category,
       createdAt: lists.createdAt,
       itemCount: sql<number>`cast((select count(*) from ${items} where ${items.listId} = ${lists.id}) as int)`,
       participantCount: sql<number>`cast((select count(*) from ${participations} where ${participations.sourceListId} = ${lists.id}) as int)`,

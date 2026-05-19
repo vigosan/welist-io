@@ -37,6 +37,14 @@ function ExploreListCard({
     <div className="py-4.5 border-b border-black/[0.08] dark:border-white/[0.08]">
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1 min-w-0">
+          {list.category && (
+            <span
+              data-testid={`explore-card-category-${list.id}`}
+              className="mb-1.5 inline-block text-[10px] font-medium uppercase tracking-wider text-gray-400 dark:text-gray-500"
+            >
+              {t(`categories.${list.category}`)}
+            </span>
+          )}
           <Link
             to="/explore/$listId"
             params={{ listId: list.slug ?? list.id }}

@@ -17,7 +17,7 @@ export type ListWithParticipation = List & {
 
 export type ExploreItem = Pick<
   List,
-  "id" | "name" | "slug" | "description" | "createdAt"
+  "id" | "name" | "slug" | "description" | "category" | "createdAt"
 > & {
   itemCount: number;
   participantCount: number;
