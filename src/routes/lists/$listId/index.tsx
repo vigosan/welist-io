@@ -24,6 +24,7 @@ import { ListDropdownMenu } from "@/components/lists/ListDropdownMenu";
 import { ListFilterBar } from "@/components/lists/ListFilterBar";
 import { ListStatsCard } from "@/components/lists/ListStatsCard";
 import { ParticipantsPanel } from "@/components/lists/ParticipantsPanel";
+import { SignInNudge } from "@/components/SignInNudge";
 
 const ListMap = lazy(() =>
   import("@/components/maps/ListMap").then((m) => ({ default: m.ListMap }))
@@ -232,6 +233,9 @@ function ListDetailPage() {
 
   const { data: items = [], isLoading: itemsLoading } = useItems(listId);
 
+  const showSignInNudge =
+    !session?.user && list?.ownerId === null && items.length >= 1;
+
   const {
     allTags,
     allPlaces,
@@ -373,6 +377,11 @@ function ListDetailPage() {
     <>
       <div className="h-dvh bg-[#FAFAF8] dark:bg-gray-950 flex flex-col">
         <AppNav />
+        {showSignInNudge && (
+          <div className="w-full sm:max-w-3xl mx-auto px-5 sm:px-6 pt-4">
+            <SignInNudge storageKey={listId} />
+          </div>
+        )}
         <div className="flex-1 flex flex-col sm:items-center sm:p-6">
           <div className="flex-1 flex flex-col w-full sm:max-w-3xl bg-white dark:bg-gray-900 sm:rounded-3xl sm:border sm:border-gray-100 dark:sm:border-gray-800 [overflow:clip] sm:max-h-[calc(100dvh-3.25rem-3rem)]">
             <div className="px-5 pt-5 pb-4 shrink-0 flex flex-col">

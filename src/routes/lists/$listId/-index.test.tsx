@@ -24,6 +24,7 @@ vi.mock("@/lib/confetti", () => ({
 }));
 vi.mock("@hono/auth-js/react", () => ({
   useSession: vi.fn(),
+  signIn: vi.fn(),
 }));
 
 import { useSession } from "@hono/auth-js/react";
@@ -553,5 +554,38 @@ describe("ListDetailPage", () => {
       );
       expect(screen.getByTestId("item-delete-i1")).toBeInTheDocument();
     });
+  });
+});
+
+describe("ListDetailPage sign-in nudge", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    localStorage.clear();
+  });
+
+  it("shows the sign-in nudge for an anonymous visitor on an ownerless list with items", async () => {
+    setupMocks({ sessionUser: null });
+    renderPage();
+    await waitFor(() =>
+      expect(screen.getByTestId("signin-nudge")).toBeInTheDocument()
+    );
+  });
+
+  it("hides the sign-in nudge for an authenticated user", async () => {
+    setupMocks({ sessionUser: { id: "u1" } });
+    renderPage();
+    await waitFor(() =>
+      expect(screen.getByTestId("add-item-input")).toBeInTheDocument()
+    );
+    expect(screen.queryByTestId("signin-nudge")).not.toBeInTheDocument();
+  });
+
+  it("hides the sign-in nudge when the list has no items", async () => {
+    setupMocks({ sessionUser: null, items: [], filteredItems: [] });
+    renderPage();
+    await waitFor(() =>
+      expect(screen.getByTestId("add-item-input")).toBeInTheDocument()
+    );
+    expect(screen.queryByTestId("signin-nudge")).not.toBeInTheDocument();
   });
 });

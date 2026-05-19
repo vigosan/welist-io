@@ -122,6 +122,11 @@ const en: Translations = {
     streak_one: "{{count}}-day streak",
     streak_other: "{{count}}-day streak",
   },
+  nudge: {
+    signInToSave: "Sign in to save this list so you don't lose it.",
+    signIn: "Sign in",
+    dismiss: "Dismiss",
+  },
   explore: {
     searchPlaceholder: "Search lists…",
     searchAriaLabel: "Search public lists",

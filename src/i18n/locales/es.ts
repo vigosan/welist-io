@@ -121,6 +121,11 @@ const es = {
     streak_one: "{{count}} día de racha",
     streak_other: "{{count}} días de racha",
   },
+  nudge: {
+    signInToSave: "Inicia sesión para guardar esta lista y no perderla.",
+    signIn: "Entrar",
+    dismiss: "Descartar",
+  },
   explore: {
     searchPlaceholder: "Buscar listas…",
     searchAriaLabel: "Buscar listas públicas",
