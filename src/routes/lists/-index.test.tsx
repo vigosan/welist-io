@@ -181,12 +181,14 @@ describe("MyListsPage", () => {
     expect(deleteMutate).toHaveBeenCalledWith(LIST_PARTICIPATED.id);
   });
 
-  it("renders sort option buttons", async () => {
+  it("renders sort option buttons when filters are opened", async () => {
     setupMocks();
     renderPage();
     await waitFor(() =>
-      expect(screen.getByTestId("sort-recent")).toBeInTheDocument()
+      expect(screen.getByTestId("filter-toggle")).toBeInTheDocument()
     );
+    await userEvent.click(screen.getByTestId("filter-toggle"));
+    expect(screen.getByTestId("sort-recent")).toBeInTheDocument();
     expect(screen.getByTestId("sort-created_desc")).toBeInTheDocument();
     expect(screen.getByTestId("sort-created_asc")).toBeInTheDocument();
   });
