@@ -227,7 +227,29 @@ export const notifications = pgTable(
   ]
 );
 
+export const follows = pgTable(
+  "follows",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    followerId: text("follower_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    followingId: text("following_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => [
+    unique("follows_follower_following_uidx").on(t.followerId, t.followingId),
+    index("follows_following_idx").on(t.followingId),
+    index("follows_follower_idx").on(t.followerId),
+  ]
+);
+
 export type List = typeof lists.$inferSelect;
+export type Follow = typeof follows.$inferSelect;
 export type Item = typeof items.$inferSelect;
 export type Participation = typeof participations.$inferSelect;
 export type ItemProgress = typeof itemProgress.$inferSelect;

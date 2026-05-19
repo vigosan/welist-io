@@ -22,6 +22,7 @@ import Stripe from "stripe";
 import { z } from "zod";
 import { db } from "../src/db/client.js";
 import {
+  follows,
   itemProgress,
   items,
   listActivity,
@@ -1090,6 +1091,63 @@ app.get("/users/:userId/profile", async (c) => {
     publicLists,
     completedChallenges,
   });
+});
+
+app.post("/users/:userId/follow", async (c) => {
+  const authUser = getOptionalUser(c);
+  const followerId = authUser?.session?.user?.id;
+  if (!followerId) return c.json({ error: "Unauthorized" }, 401);
+  const followingId = c.req.param("userId");
+  if (followingId === followerId)
+    return c.json({ error: "Cannot follow yourself" }, 400);
+  const target = await db.query.users.findFirst({
+    where: eq(users.id, followingId),
+    columns: { id: true },
+  });
+  if (!target) return c.json({ error: "Not found" }, 404);
+  await db
+    .insert(follows)
+    .values({ followerId, followingId })
+    .onConflictDoNothing();
+  return c.json({ following: true });
+});
+
+app.delete("/users/:userId/follow", async (c) => {
+  const authUser = getOptionalUser(c);
+  const followerId = authUser?.session?.user?.id;
+  if (!followerId) return c.json({ error: "Unauthorized" }, 401);
+  const followingId = c.req.param("userId");
+  await db
+    .delete(follows)
+    .where(
+      and(
+        eq(follows.followerId, followerId),
+        eq(follows.followingId, followingId)
+      )
+    );
+  return c.json({ following: false });
+});
+
+app.get("/users/:userId/follow-status", async (c) => {
+  const authUser = getOptionalUser(c);
+  const viewerId = authUser?.session?.user?.id ?? null;
+  const userId = c.req.param("userId");
+  const [followerCount, followingCount] = await Promise.all([
+    db.$count(follows, eq(follows.followingId, userId)),
+    db.$count(follows, eq(follows.followerId, userId)),
+  ]);
+  let isFollowing = false;
+  if (viewerId && viewerId !== userId) {
+    const existing = await db
+      .select({ id: follows.id })
+      .from(follows)
+      .where(
+        and(eq(follows.followerId, viewerId), eq(follows.followingId, userId))
+      )
+      .limit(1);
+    isFollowing = existing.length > 0;
+  }
+  return c.json({ isFollowing, followerCount, followingCount });
 });
 
 app.get("/explore/:listId", async (c) => {

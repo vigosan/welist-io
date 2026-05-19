@@ -1723,3 +1723,92 @@ describe("GET /api/me/streak", () => {
     expect(await res.json()).toEqual({ current: 0 });
   });
 });
+
+describe("follow endpoints", () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it("POST follow returns 401 without a session", async () => {
+    mockGetAuthUser.mockRejectedValue(new Error("no session"));
+    const res = await app.request("/api/users/u2/follow", { method: "POST" });
+    expect(res.status).toBe(401);
+  });
+
+  it("POST follow returns 400 when following yourself", async () => {
+    mockGetAuthUser.mockResolvedValue({ session: { user: { id: "u1" } } });
+    const res = await app.request("/api/users/u1/follow", { method: "POST" });
+    expect(res.status).toBe(400);
+  });
+
+  it("POST follow returns 404 when the target user does not exist", async () => {
+    mockGetAuthUser.mockResolvedValue({ session: { user: { id: "u1" } } });
+    mockDb.query.users.findFirst.mockResolvedValue(undefined);
+    const res = await app.request("/api/users/ghost/follow", {
+      method: "POST",
+    });
+    expect(res.status).toBe(404);
+  });
+
+  it("POST follow inserts the follow and returns following: true", async () => {
+    mockGetAuthUser.mockResolvedValue({ session: { user: { id: "u1" } } });
+    mockDb.query.users.findFirst.mockResolvedValue({ id: "u2" });
+    const onConflict = vi.fn().mockResolvedValue(undefined);
+    mockDb.insert.mockReturnValue({
+      values: vi.fn().mockReturnValue({ onConflictDoNothing: onConflict }),
+    });
+    const res = await app.request("/api/users/u2/follow", { method: "POST" });
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ following: true });
+    expect(onConflict).toHaveBeenCalled();
+  });
+
+  it("DELETE follow returns 401 without a session", async () => {
+    mockGetAuthUser.mockRejectedValue(new Error("no session"));
+    const res = await app.request("/api/users/u2/follow", {
+      method: "DELETE",
+    });
+    expect(res.status).toBe(401);
+  });
+
+  it("DELETE follow removes the follow and returns following: false", async () => {
+    mockGetAuthUser.mockResolvedValue({ session: { user: { id: "u1" } } });
+    mockDb.delete.mockReturnValue({
+      where: vi.fn().mockResolvedValue(undefined),
+    });
+    const res = await app.request("/api/users/u2/follow", {
+      method: "DELETE",
+    });
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ following: false });
+  });
+
+  it("GET follow-status returns counts and isFollowing false when not following", async () => {
+    mockGetAuthUser.mockResolvedValue({ session: { user: { id: "u1" } } });
+    mockDb.$count.mockResolvedValue(2);
+    mockDb.select.mockReturnValue({
+      from: vi.fn().mockReturnThis(),
+      where: vi.fn().mockReturnThis(),
+      limit: vi.fn().mockResolvedValue([]),
+    });
+    const res = await app.request("/api/users/u2/follow-status");
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({
+      isFollowing: false,
+      followerCount: 2,
+      followingCount: 2,
+    });
+  });
+
+  it("GET follow-status returns isFollowing true when a follow exists", async () => {
+    mockGetAuthUser.mockResolvedValue({ session: { user: { id: "u1" } } });
+    mockDb.$count.mockResolvedValue(5);
+    mockDb.select.mockReturnValue({
+      from: vi.fn().mockReturnThis(),
+      where: vi.fn().mockReturnThis(),
+      limit: vi.fn().mockResolvedValue([{ id: "f1" }]),
+    });
+    const res = await app.request("/api/users/u2/follow-status");
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as Record<string, unknown>;
+    expect(body.isFollowing).toBe(true);
+  });
+});
