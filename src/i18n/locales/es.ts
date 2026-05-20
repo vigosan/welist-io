@@ -296,6 +296,7 @@ const es = {
     completed_other: "{{count}} completados",
     collaborated_one: "{{count}} colaboración",
     collaborated_other: "{{count}} colaboraciones",
+    noActivity: "sin actividad pública",
     nav: "Comunidad",
   },
 } as const;

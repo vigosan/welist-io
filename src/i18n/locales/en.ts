@@ -297,6 +297,7 @@ const en: Translations = {
     completed_other: "{{count}} completed",
     collaborated_one: "{{count}} collaboration",
     collaborated_other: "{{count}} collaborations",
+    noActivity: "no public activity",
     nav: "Community",
   },
 };
