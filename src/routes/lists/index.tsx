@@ -37,7 +37,7 @@ function MyListRow({
   if (confirming) {
     return (
       <div
-        className="flex items-center gap-2 py-4 border-b border-black/[0.08] dark:border-white/[0.08]"
+        className="flex items-center gap-2 rounded-2xl border border-black/[0.08] dark:border-white/[0.08] bg-white dark:bg-white/[0.02] p-4"
         data-testid="my-list-card"
       >
         <span className="flex-1 text-sm text-gray-500 truncate">
@@ -68,7 +68,7 @@ function MyListRow({
 
   return (
     <div
-      className="group relative py-4.5 border-b border-black/[0.08] dark:border-white/[0.08]"
+      className="group relative rounded-2xl border border-black/[0.08] dark:border-white/[0.08] bg-white dark:bg-white/[0.02] p-5 transition-colors duration-150 hover:border-black/[0.18] dark:hover:border-white/[0.18]"
       data-testid="my-list-card"
     >
       <Link
@@ -76,6 +76,16 @@ function MyListRow({
         params={{ listId: list.slug ?? list.id }}
         className="block"
       >
+        {(list.public || list.collaborative) && (
+          <p className="mb-2 text-[10px] font-medium uppercase tracking-wider text-gray-400 dark:text-gray-500">
+            {[
+              list.public ? t("myLists.public") : null,
+              list.collaborative ? t("myLists.collaborative") : null,
+            ]
+              .filter(Boolean)
+              .join(" · ")}
+          </p>
+        )}
         <p
           className="text-sm font-semibold text-[#0c0c0b] dark:text-[#f0ede8] mb-1.5 leading-snug tracking-[-0.01em]"
           style={{ paddingRight: "2rem" }}
@@ -128,44 +138,11 @@ function MyListRow({
             </div>
           </div>
         )}
-        <div className="flex justify-between items-center">
-          <div className="flex gap-1.5">
-            {list.public && (
-              <span
-                className="text-[10px] px-2 py-0.5 rounded-full"
-                style={{
-                  border: "1px solid rgba(255,255,255,0.2)",
-                  color: "#a0a09c",
-                  fontFamily: "'Space Mono', monospace",
-                  letterSpacing: "0.04em",
-                }}
-              >
-                {t("myLists.public")}
-              </span>
-            )}
-            {list.collaborative && (
-              <span
-                className="text-[10px] px-2 py-0.5 rounded-full"
-                style={{
-                  border: "1px solid rgba(255,255,255,0.2)",
-                  color: "#a0a09c",
-                  fontFamily: "'Space Mono', monospace",
-                  letterSpacing: "0.04em",
-                }}
-              >
-                {t("myLists.collaborative")}
-              </span>
-            )}
-          </div>
-          <span
-            className="text-[11px] tabular-nums"
-            style={{ color: "#a0a09c" }}
-          >
-            {list.itemCount} {list.itemCount === 1 ? "item" : "items"}
-            {list.participantCount > 0 &&
-              ` · ${list.participantCount} ${list.participantCount === 1 ? "participante" : "participantes"}`}
-          </span>
-        </div>
+        <p className="text-[11px] tabular-nums text-gray-400 dark:text-gray-500">
+          {list.itemCount} {list.itemCount === 1 ? "item" : "items"}
+          {list.participantCount > 0 &&
+            ` · ${list.participantCount} ${list.participantCount === 1 ? "participante" : "participantes"}`}
+        </p>
       </Link>
       <button
         type="button"
@@ -180,7 +157,7 @@ function MyListRow({
           e.stopPropagation();
           setConfirming(true);
         }}
-        className="absolute top-4 right-0 cursor-pointer h-7 w-7 flex items-center justify-center rounded-md text-gray-400 hover:text-gray-500 transition-all duration-150 opacity-0 group-hover:opacity-100"
+        className="absolute top-4 right-4 cursor-pointer h-7 w-7 flex items-center justify-center rounded-md text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors duration-150 opacity-0 group-hover:opacity-100"
       >
         {isOwner ? (
           <svg
@@ -548,11 +525,11 @@ function MyListsPage() {
         </div>
 
         {isLoading && (
-          <div className="flex flex-col">
+          <div className="flex flex-col gap-3">
             {Array.from({ length: 6 }, (_, i) => i).map((i) => (
               <div
                 key={`skeleton-${i}`}
-                className="py-4.5 px-3 -mx-3 border-b border-black/[0.08] dark:border-white/[0.08] animate-pulse"
+                className="rounded-2xl border border-black/[0.08] dark:border-white/[0.08] bg-white dark:bg-white/[0.02] p-5 animate-pulse"
                 style={{ animationDelay: `${i * 60}ms` }}
               >
                 <div className="h-3.5 w-2/3 rounded bg-black/[0.06] dark:bg-white/[0.06] mb-2.5" />
@@ -576,7 +553,7 @@ function MyListsPage() {
           </div>
         )}
         {!isLoading && lists.length > 0 && (
-          <div>
+          <div className="flex flex-col gap-3">
             {lists.map((list) => (
               <MyListRow key={list.id} list={list} userId={userId} />
             ))}
