@@ -227,6 +227,30 @@ export const notifications = pgTable(
   ]
 );
 
+export const achievementTypeEnum = pgEnum("achievement_type", [
+  "first_list_completed",
+  "ten_lists_accepted",
+  "first_sale",
+]);
+
+export const achievements = pgTable(
+  "achievements",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    type: achievementTypeEnum("type").notNull(),
+    unlockedAt: timestamp("unlocked_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => [
+    unique("achievements_user_type_uidx").on(t.userId, t.type),
+    index("achievements_user_idx").on(t.userId),
+  ]
+);
+
 export const events = pgTable(
   "events",
   {
@@ -284,3 +308,5 @@ export type ListPrice = typeof listPrices.$inferSelect;
 export type ListPurchase = typeof listPurchases.$inferSelect;
 export type Notification = typeof notifications.$inferSelect;
 export type Event = typeof events.$inferSelect;
+export type Achievement = typeof achievements.$inferSelect;
+export type AchievementType = Achievement["type"];
