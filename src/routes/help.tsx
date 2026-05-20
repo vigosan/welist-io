@@ -183,50 +183,60 @@ const content = {
 } as const;
 
 function HelpSection({
+  index,
   title,
   items,
   defaultOpen,
 }: {
+  index: number;
   title: string;
   items: readonly string[];
   defaultOpen?: boolean;
 }) {
   const [open, setOpen] = useState(defaultOpen ?? false);
+  const numberLabel = String(index + 1).padStart(2, "0");
 
   return (
-    <div className="border-t border-black/[0.08] dark:border-white/[0.08]">
+    <div className="rounded-2xl border border-black/[0.08] dark:border-white/[0.08] bg-white dark:bg-white/[0.02] transition-colors duration-150 hover:border-black/[0.14] dark:hover:border-white/[0.14]">
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="w-full flex justify-between items-center py-4 bg-transparent border-none cursor-pointer"
+        aria-expanded={open}
+        className="w-full flex items-center gap-4 px-5 py-4 bg-transparent border-none cursor-pointer text-left"
       >
-        <span className="text-sm font-semibold text-[#0c0c0b] dark:text-[#f0ede8] tracking-[0.01em]">
+        <span
+          className="text-[11px] text-gray-400 dark:text-[#6b6b67] tabular-nums shrink-0"
+          style={{ fontFamily: "'Space Mono', monospace" }}
+        >
+          {numberLabel}
+        </span>
+        <span className="flex-1 text-sm font-semibold text-[#0c0c0b] dark:text-[#f0ede8] tracking-[0.01em]">
           {title}
         </span>
-        <span
-          className="text-sm transition-transform duration-200"
-          style={{
-            color: "#a0a09c",
-            transform: open ? "rotate(90deg)" : "none",
-          }}
+        <svg
+          aria-hidden="true"
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="shrink-0 text-gray-400 dark:text-[#6b6b67] transition-transform duration-200"
+          style={{ transform: open ? "rotate(90deg)" : "none" }}
         >
-          ›
-        </span>
+          <polyline points="9 18 15 12 9 6" />
+        </svg>
       </button>
       {open && (
-        <div className="pb-5">
+        <div className="px-5 pb-5 pt-1 border-t border-black/[0.06] dark:border-white/[0.06]">
           {items.map((item) => (
             <div key={item} className="flex gap-2.5 py-1.5">
-              <span
-                className="shrink-0 mt-0.5 text-[11px]"
-                style={{ color: "#a0a09c" }}
-              >
+              <span className="shrink-0 mt-0.5 text-[11px] text-gray-400 dark:text-[#6b6b67]">
                 →
               </span>
-              <span
-                className="text-sm leading-[1.6]"
-                style={{ color: "#a0a09c" }}
-              >
+              <span className="text-sm leading-[1.6] text-gray-600 dark:text-[#a0a09c]">
                 {renderInlineMarkdown(item)}
               </span>
             </div>
@@ -246,7 +256,7 @@ function HelpPage() {
       <AppNav />
 
       <main className="flex-1 py-10">
-        <div className="max-w-[640px] mx-auto px-4 sm:px-12">
+        <div className="max-w-[760px] mx-auto px-4 sm:px-12">
           <div className="mb-9">
             <h1
               className="text-[28px] font-bold text-[#0c0c0b] dark:text-[#f0ede8] mb-2"
@@ -254,20 +264,22 @@ function HelpPage() {
             >
               {page.title}
             </h1>
-            <p className="text-sm" style={{ color: "#a0a09c" }}>
+            <p className="text-sm text-gray-500 dark:text-[#a0a09c]">
               {page.subtitle}
             </p>
           </div>
 
-          {page.sections.map((section, i) => (
-            <HelpSection
-              key={section.title}
-              title={section.title}
-              items={section.items}
-              defaultOpen={i === 0}
-            />
-          ))}
-          <div className="border-t border-black/[0.08] dark:border-white/[0.08]" />
+          <div className="flex flex-col gap-2.5">
+            {page.sections.map((section, i) => (
+              <HelpSection
+                key={section.title}
+                index={i}
+                title={section.title}
+                items={section.items}
+                defaultOpen={i === 0}
+              />
+            ))}
+          </div>
         </div>
       </main>
 
