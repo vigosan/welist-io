@@ -23,6 +23,7 @@ import Stripe from "stripe";
 import { z } from "zod";
 import { db } from "../src/db/client.js";
 import {
+  achievements,
   events,
   follows,
   itemProgress,
@@ -1131,6 +1132,19 @@ app.get("/users/:userId/profile", async (c) => {
     publicLists,
     completedChallenges,
   });
+});
+
+app.get("/users/:userId/achievements", async (c) => {
+  const userId = c.req.param("userId");
+  const rows = await db
+    .select({
+      type: achievements.type,
+      unlockedAt: achievements.unlockedAt,
+    })
+    .from(achievements)
+    .where(eq(achievements.userId, userId))
+    .orderBy(desc(achievements.unlockedAt));
+  return c.json({ achievements: rows });
 });
 
 app.post("/users/:userId/follow", async (c) => {

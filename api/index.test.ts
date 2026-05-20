@@ -2056,6 +2056,40 @@ describe("GET /api/cron/random-item-nudge", () => {
   });
 });
 
+describe("GET /api/users/:userId/achievements", () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it("returns the user's unlocked achievements", async () => {
+    const rows = [
+      { type: "ten_lists_accepted", unlockedAt: new Date().toISOString() },
+      { type: "first_list_completed", unlockedAt: new Date().toISOString() },
+    ];
+    mockDb.select.mockReturnValue({
+      from: vi.fn().mockReturnThis(),
+      where: vi.fn().mockReturnThis(),
+      orderBy: vi.fn().mockResolvedValue(rows),
+    });
+
+    const res = await app.request("/api/users/u1/achievements");
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as { achievements: unknown[] };
+    expect(body.achievements).toHaveLength(2);
+  });
+
+  it("returns an empty array when the user has none", async () => {
+    mockDb.select.mockReturnValue({
+      from: vi.fn().mockReturnThis(),
+      where: vi.fn().mockReturnThis(),
+      orderBy: vi.fn().mockResolvedValue([]),
+    });
+
+    const res = await app.request("/api/users/ghost/achievements");
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as { achievements: unknown[] };
+    expect(body.achievements).toEqual([]);
+  });
+});
+
 describe("POST /api/events", () => {
   beforeEach(() => {
     vi.clearAllMocks();
