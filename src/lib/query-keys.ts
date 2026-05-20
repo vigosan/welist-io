@@ -12,6 +12,7 @@ export const queryKeys = {
     ["list-collaborators", listId] as const,
   stripeAccountStatus: () => ["stripe-account-status"] as const,
   userProfile: (userId: string) => ["user-profile", userId] as const,
+  userAchievements: (userId: string) => ["user-achievements", userId] as const,
   userDirectory: (q?: string) => ["user-directory", q ?? ""] as const,
   userMe: () => ["user-me"] as const,
   followStatus: (userId: string) => ["follow-status", userId] as const,

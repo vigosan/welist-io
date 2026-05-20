@@ -124,6 +124,11 @@ export type DirectoryUser = {
 
 export type AppStats = { users: number; lists: number; challenges: number };
 
+export type UserAchievement = {
+  type: "first_list_completed" | "ten_lists_accepted" | "first_sale";
+  unlockedAt: string;
+};
+
 export const statsService = {
   get: () => apiClient<AppStats>("/api/stats"),
 };
@@ -131,6 +136,11 @@ export const statsService = {
 export const usersService = {
   getProfile: (userId: string) =>
     apiClient<UserProfile>(`/api/users/${userId}/profile`),
+
+  getAchievements: (userId: string) =>
+    apiClient<{ achievements: UserAchievement[] }>(
+      `/api/users/${userId}/achievements`
+    ),
 
   directory: (q?: string, cursor?: string) => {
     const params = new URLSearchParams();

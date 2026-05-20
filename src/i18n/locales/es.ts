@@ -255,6 +255,22 @@ const es = {
     following: "Siguiendo",
     followers_one: "{{count}} seguidor",
     followers_other: "{{count}} seguidores",
+    achievements: "Logros",
+    noAchievements: "Aún no ha desbloqueado logros.",
+  },
+  achievements: {
+    first_list_completed: {
+      title: "Primer reto completado",
+      description: "Terminaste tu primera lista de retos.",
+    },
+    ten_lists_accepted: {
+      title: "Diez retos aceptados",
+      description: "Aceptaste 10 retos de otras personas.",
+    },
+    first_sale: {
+      title: "Primera venta",
+      description: "Vendiste tu primera lista.",
+    },
   },
   stats: {
     title: "Estadísticas",

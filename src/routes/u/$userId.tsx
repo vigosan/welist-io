@@ -1,8 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppNav } from "@/components/AppNav";
 import { FollowButton } from "@/components/FollowButton";
-import { useUserProfile } from "@/hooks/useList";
+import { useUserAchievements, useUserProfile } from "@/hooks/useList";
 import { useTranslation } from "@/i18n/service";
+import type { UserAchievement } from "@/services/lists.service";
 
 export const Route = createFileRoute("/u/$userId")({
   component: UserProfilePage,
@@ -11,6 +12,7 @@ export const Route = createFileRoute("/u/$userId")({
 function UserProfilePage() {
   const { userId } = Route.useParams();
   const { data: profile, isLoading } = useUserProfile(userId);
+  const { data: achievements = [] } = useUserAchievements(userId);
   const { t } = useTranslation();
 
   if (isLoading) {
@@ -91,6 +93,34 @@ function UserProfilePage() {
         </div>
 
         <FollowButton userId={userId} />
+
+        <section className="flex flex-col gap-3">
+          <h2 className="text-[11px] font-semibold text-gray-500 dark:text-[#a0a09c] uppercase tracking-wider">
+            {t("profile.achievements")}
+          </h2>
+          {achievements.length === 0 ? (
+            <p className="text-sm text-gray-500 dark:text-[#a0a09c]">
+              {t("profile.noAchievements")}
+            </p>
+          ) : (
+            <ul
+              data-testid="achievements-list"
+              className="flex flex-wrap gap-2"
+            >
+              {achievements.map((a: UserAchievement) => (
+                <li
+                  key={a.type}
+                  data-testid={`achievement-${a.type}`}
+                  title={t(`achievements.${a.type}.description`)}
+                  className="inline-flex items-center gap-2 rounded-full border border-black/[0.08] dark:border-white/[0.08] bg-white dark:bg-white/[0.02] px-3 py-1.5 text-xs font-medium text-[#0c0c0b] dark:text-[#f0ede8]"
+                >
+                  <span aria-hidden="true">★</span>
+                  <span>{t(`achievements.${a.type}.title`)}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
 
         <section className="flex flex-col gap-3">
           <h2 className="text-[11px] font-semibold text-gray-500 dark:text-[#a0a09c] uppercase tracking-wider">

@@ -256,6 +256,22 @@ const en: Translations = {
     following: "Following",
     followers_one: "{{count}} follower",
     followers_other: "{{count}} followers",
+    achievements: "Achievements",
+    noAchievements: "No achievements unlocked yet.",
+  },
+  achievements: {
+    first_list_completed: {
+      title: "First challenge completed",
+      description: "You finished your first challenge list.",
+    },
+    ten_lists_accepted: {
+      title: "Ten challenges accepted",
+      description: "You accepted 10 challenges from other people.",
+    },
+    first_sale: {
+      title: "First sale",
+      description: "You sold your first list.",
+    },
   },
   stats: {
     title: "Stats",
