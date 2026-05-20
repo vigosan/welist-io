@@ -35,7 +35,7 @@ function ExploreListCard({
   }
 
   return (
-    <div className="py-4.5 border-b border-black/[0.08] dark:border-white/[0.08]">
+    <div className="rounded-2xl border border-black/[0.08] dark:border-white/[0.08] bg-white dark:bg-white/[0.02] p-5 transition-colors duration-150 hover:border-black/[0.18] dark:hover:border-white/[0.18]">
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1 min-w-0">
           {list.category && (
@@ -374,14 +374,16 @@ function ExplorePage() {
               {search ? t("explore.noListsSearch") : t("explore.noLists")}
             </p>
           )}
-          {lists.map((list) => (
-            <ExploreListCard
-              key={list.id}
-              list={list}
-              onAccept={handleAccept}
-              acceptPending={acceptChallenge.isPending}
-            />
-          ))}
+          <div className="flex flex-col gap-3">
+            {lists.map((list) => (
+              <ExploreListCard
+                key={list.id}
+                list={list}
+                onAccept={handleAccept}
+                acceptPending={acceptChallenge.isPending}
+              />
+            ))}
+          </div>
         </div>
 
         <div ref={sentinelRef} className="h-4" />
