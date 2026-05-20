@@ -287,7 +287,7 @@ function ExplorePage() {
             placeholder={t("explore.searchPlaceholder")}
             aria-label={t("explore.searchAriaLabel")}
             data-testid="explore-search-input"
-            className="flex-1 px-4 py-2.5 text-[13px] text-[#0c0c0b] dark:text-[#f0ede8] placeholder-[#a0a09c] dark:placeholder-[#6b6b67] bg-transparent outline-none"
+            className="flex-1 px-4 py-2.5 text-sm text-[#0c0c0b] dark:text-[#f0ede8] placeholder-[#a0a09c] dark:placeholder-[#6b6b67] bg-transparent outline-none"
           />
           <button
             type="submit"
