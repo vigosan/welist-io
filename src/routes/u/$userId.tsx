@@ -57,10 +57,10 @@ function UserProfilePage() {
 
       <main className="flex-1 w-full max-w-[760px] mx-auto px-4 sm:px-12 py-10 flex flex-col gap-8">
         <Link
-          to="/explore"
+          to="/users"
           className="text-sm text-gray-500 dark:text-[#a0a09c] hover:text-[#0c0c0b] dark:hover:text-[#f0ede8] transition-colors duration-150 w-fit"
         >
-          {t("explore.backToExplore")}
+          {t("directory.backToUsers")}
         </Link>
 
         <div className="flex items-center gap-4">
