@@ -6,6 +6,7 @@ import {
 } from "@tanstack/react-query";
 import { notFound } from "@tanstack/react-router";
 import { queryKeys } from "@/lib/query-keys";
+import { eventsService } from "@/services/events.service";
 import type { ListWithParticipation } from "@/services/lists.service";
 import {
   listsService,
@@ -236,6 +237,9 @@ export function useDeleteList() {
 export function useAcceptChallenge() {
   return useMutation({
     mutationFn: (listId: string) => listsService.accept(listId),
+    onSuccess: (_data, listId) => {
+      eventsService.track({ type: "list_accepted", listId });
+    },
   });
 }
 

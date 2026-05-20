@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { List } from "@/db/schema";
 import type { ListWithParticipation } from "@/services/lists.service";
 import {
+  useAcceptChallenge,
   useList,
   useTogglePublic,
   useUpdateDescription,
@@ -18,7 +19,12 @@ vi.mock("@/services/lists.service", () => ({
     update: vi.fn(),
     clone: vi.fn(),
     explore: vi.fn(),
+    accept: vi.fn(),
   },
+}));
+
+vi.mock("@/services/events.service", () => ({
+  eventsService: { track: vi.fn().mockResolvedValue(undefined) },
 }));
 
 vi.mock("@tanstack/react-router", async (importOriginal) => {
@@ -203,5 +209,45 @@ describe("useTogglePublic", () => {
     await waitFor(() => expect(result.current.isError).toBe(true));
     const cached = qc.getQueryData<List>(["list", LIST.id]);
     expect(cached?.public).toBe(false);
+  });
+});
+
+describe("useAcceptChallenge", () => {
+  it("tracks list_accepted on successful accept", async () => {
+    vi.mocked(listsService.accept).mockResolvedValue({
+      ...LIST,
+      id: "user-list-1",
+    });
+    const { eventsService } = await import("@/services/events.service");
+    const { Wrapper } = makeWrapper();
+
+    const { result } = renderHook(() => useAcceptChallenge(), {
+      wrapper: Wrapper,
+    });
+    await act(async () => {
+      result.current.mutate("source-list-1");
+    });
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+
+    expect(eventsService.track).toHaveBeenCalledWith({
+      type: "list_accepted",
+      listId: "source-list-1",
+    });
+  });
+
+  it("does not track when accept fails", async () => {
+    vi.mocked(listsService.accept).mockRejectedValue(new Error("boom"));
+    const { eventsService } = await import("@/services/events.service");
+    const { Wrapper } = makeWrapper();
+
+    const { result } = renderHook(() => useAcceptChallenge(), {
+      wrapper: Wrapper,
+    });
+    await act(async () => {
+      result.current.mutate("source-list-2");
+    });
+    await waitFor(() => expect(result.current.isError).toBe(true));
+
+    expect(eventsService.track).not.toHaveBeenCalled();
   });
 });
