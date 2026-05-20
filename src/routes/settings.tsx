@@ -151,13 +151,13 @@ function SettingsPage() {
               Notificaciones por email
             </p>
             <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5 leading-relaxed">
-              Recibe un empujón quincenal con un ítem aleatorio pendiente de tus
-              listas para que no se te olvide.
+              Recibe un recordatorio quincenal con un ítem aleatorio pendiente
+              de tus listas para que no se te olvide.
             </p>
           </div>
           <label className="flex items-center justify-between gap-3 cursor-pointer">
             <span className="text-sm text-gray-700 dark:text-gray-300">
-              Recibir empujones por email
+              Recibir recordatorios por email
             </span>
             <button
               type="button"
