@@ -142,7 +142,8 @@ export const usersService = {
     );
   },
 
-  getMe: () => apiClient<{ publicProfile: boolean }>("/api/users/me"),
+  getMe: () =>
+    apiClient<{ publicProfile: boolean; emailOptIn: boolean }>("/api/users/me"),
 
   getStreak: () => apiClient<{ current: number }>("/api/me/streak"),
 
@@ -165,11 +166,14 @@ export const usersService = {
 
   getFeed: () => apiClient<{ items: FeedItem[] }>("/api/feed"),
 
-  updateProfile: (data: { publicProfile: boolean }) =>
-    apiClient<{ publicProfile: boolean }>("/api/users/me", {
-      method: "PATCH",
-      body: JSON.stringify(data),
-    }),
+  updateProfile: (data: { publicProfile?: boolean; emailOptIn?: boolean }) =>
+    apiClient<{ publicProfile: boolean; emailOptIn: boolean }>(
+      "/api/users/me",
+      {
+        method: "PATCH",
+        body: JSON.stringify(data),
+      }
+    ),
 };
 
 export const stripeService = {

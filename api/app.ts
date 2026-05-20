@@ -1009,19 +1009,37 @@ app.get("/users", async (c) => {
 
 app.patch(
   "/users/me",
-  zValidator("json", z.object({ publicProfile: z.boolean() })),
+  zValidator(
+    "json",
+    z.object({
+      publicProfile: z.boolean().optional(),
+      emailOptIn: z.boolean().optional(),
+    })
+  ),
   async (c) => {
     const authUser = getOptionalUser(c);
     const userId = authUser?.session?.user?.id;
     if (!userId) return c.json({ error: "Unauthorized" }, 401);
-    const { publicProfile } = c.req.valid("json");
+    const body = c.req.valid("json");
+    const patch: Record<string, unknown> = {};
+    if (body.publicProfile !== undefined)
+      patch.publicProfile = body.publicProfile;
+    if (body.emailOptIn !== undefined) patch.emailOptIn = body.emailOptIn;
+    if (Object.keys(patch).length === 0)
+      return c.json({ error: "no_fields" }, 400);
     const [updated] = await db
       .update(users)
-      .set({ publicProfile })
+      .set(patch)
       .where(eq(users.id, userId))
-      .returning({ publicProfile: users.publicProfile });
+      .returning({
+        publicProfile: users.publicProfile,
+        emailOptIn: users.emailOptIn,
+      });
     if (!updated) return c.json({ error: "Not found" }, 404);
-    return c.json({ publicProfile: updated.publicProfile });
+    return c.json({
+      publicProfile: updated.publicProfile,
+      emailOptIn: updated.emailOptIn,
+    });
   }
 );
 
@@ -1031,10 +1049,13 @@ app.get("/users/me", async (c) => {
   if (!userId) return c.json({ error: "Unauthorized" }, 401);
   const user = await db.query.users.findFirst({
     where: eq(users.id, userId),
-    columns: { id: true, publicProfile: true },
+    columns: { id: true, publicProfile: true, emailOptIn: true },
   });
   if (!user) return c.json({ error: "Not found" }, 404);
-  return c.json({ publicProfile: user.publicProfile });
+  return c.json({
+    publicProfile: user.publicProfile,
+    emailOptIn: user.emailOptIn,
+  });
 });
 
 app.get("/me/streak", async (c) => {

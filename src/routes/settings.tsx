@@ -148,6 +148,48 @@ function SettingsPage() {
         <section className="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl p-5 flex flex-col gap-4">
           <div>
             <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+              Notificaciones por email
+            </p>
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5 leading-relaxed">
+              Recibe un empujón quincenal con un ítem aleatorio pendiente de tus
+              listas para que no se te olvide.
+            </p>
+          </div>
+          <label className="flex items-center justify-between gap-3 cursor-pointer">
+            <span className="text-sm text-gray-700 dark:text-gray-300">
+              Recibir empujones por email
+            </span>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={userMe?.emailOptIn ?? true}
+              data-testid="email-opt-in-toggle"
+              onClick={() =>
+                updateProfile.mutate({
+                  emailOptIn: !(userMe?.emailOptIn ?? true),
+                })
+              }
+              disabled={updateProfile.isPending || userMe === undefined}
+              className={`cursor-pointer relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors duration-150 focus:outline-none disabled:opacity-40 ${
+                (userMe?.emailOptIn ?? true)
+                  ? "bg-gray-900 dark:bg-white"
+                  : "bg-gray-200 dark:bg-gray-700"
+              }`}
+            >
+              <span
+                className={`inline-block h-3.5 w-3.5 rounded-full bg-white dark:bg-gray-900 shadow transition-transform duration-150 ${
+                  (userMe?.emailOptIn ?? true)
+                    ? "translate-x-4.5"
+                    : "translate-x-0.5"
+                }`}
+              />
+            </button>
+          </label>
+        </section>
+
+        <section className="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl p-5 flex flex-col gap-4">
+          <div>
+            <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
               Pagos con Stripe
             </p>
             <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5 leading-relaxed">

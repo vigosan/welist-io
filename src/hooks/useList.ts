@@ -277,7 +277,7 @@ export function useUserMe() {
 export function useUpdateProfile() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (data: { publicProfile: boolean }) =>
+    mutationFn: (data: { publicProfile?: boolean; emailOptIn?: boolean }) =>
       usersService.updateProfile(data),
     onSuccess: (updated) => {
       qc.setQueryData(queryKeys.userMe(), updated);

@@ -1619,7 +1619,9 @@ describe("PATCH /api/users/me", () => {
     mockDb.update.mockReturnValue({
       set: vi.fn().mockReturnValue({
         where: vi.fn().mockReturnValue({
-          returning: vi.fn().mockResolvedValue([{ publicProfile: false }]),
+          returning: vi
+            .fn()
+            .mockResolvedValue([{ publicProfile: false, emailOptIn: true }]),
         }),
       }),
     });
@@ -1632,6 +1634,40 @@ describe("PATCH /api/users/me", () => {
     expect(res.status).toBe(200);
     const body = (await res.json()) as Record<string, unknown>;
     expect(body.publicProfile).toBe(false);
+  });
+
+  it("updates emailOptIn and returns the new value", async () => {
+    mockGetAuthUser.mockResolvedValue({ session: { user: { id: "u1" } } });
+    const setMock = vi.fn().mockReturnValue({
+      where: vi.fn().mockReturnValue({
+        returning: vi
+          .fn()
+          .mockResolvedValue([{ publicProfile: true, emailOptIn: false }]),
+      }),
+    });
+    mockDb.update.mockReturnValue({ set: setMock });
+
+    const res = await app.request("/api/users/me", {
+      method: "PATCH",
+      body: JSON.stringify({ emailOptIn: false }),
+      headers: { "Content-Type": "application/json" },
+    });
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as Record<string, unknown>;
+    expect(body.emailOptIn).toBe(false);
+    expect(setMock).toHaveBeenCalledWith(
+      expect.objectContaining({ emailOptIn: false })
+    );
+  });
+
+  it("returns 400 when no profile fields are provided", async () => {
+    mockGetAuthUser.mockResolvedValue({ session: { user: { id: "u1" } } });
+    const res = await app.request("/api/users/me", {
+      method: "PATCH",
+      body: JSON.stringify({}),
+      headers: { "Content-Type": "application/json" },
+    });
+    expect(res.status).toBe(400);
   });
 });
 
