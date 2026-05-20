@@ -262,7 +262,7 @@ describe("ExplorePage", () => {
     setupMocks();
     renderPage();
     await waitFor(() =>
-      expect(screen.getByTestId("explore-sort-recent")).toBeInTheDocument()
+      expect(screen.getByTestId("filter-toggle")).toBeInTheDocument()
     );
     expect(useExplore).toHaveBeenCalledWith(
       undefined,
@@ -275,8 +275,9 @@ describe("ExplorePage", () => {
     setupMocks();
     renderPage();
     await waitFor(() =>
-      expect(screen.getByTestId("explore-sort-trending")).toBeInTheDocument()
+      expect(screen.getByTestId("filter-toggle")).toBeInTheDocument()
     );
+    await userEvent.click(screen.getByTestId("filter-toggle"));
     await userEvent.click(screen.getByTestId("explore-sort-trending"));
     expect(useExplore).toHaveBeenLastCalledWith(
       undefined,
@@ -285,20 +286,23 @@ describe("ExplorePage", () => {
     );
   });
 
-  it("renders category filter chips", async () => {
+  it("renders category filter chips when filters are opened", async () => {
     setupMocks();
     renderPage();
     await waitFor(() =>
-      expect(screen.getByTestId("explore-category-movies")).toBeInTheDocument()
+      expect(screen.getByTestId("filter-toggle")).toBeInTheDocument()
     );
+    await userEvent.click(screen.getByTestId("filter-toggle"));
+    expect(screen.getByTestId("explore-category-movies")).toBeInTheDocument();
   });
 
   it("clears the category when the 'all' chip is clicked", async () => {
     setupMocks();
     renderPage();
     await waitFor(() =>
-      expect(screen.getByTestId("explore-category-all")).toBeInTheDocument()
+      expect(screen.getByTestId("filter-toggle")).toBeInTheDocument()
     );
+    await userEvent.click(screen.getByTestId("filter-toggle"));
     await userEvent.click(screen.getByTestId("explore-category-movies"));
     await userEvent.click(screen.getByTestId("explore-category-all"));
     expect(useExplore).toHaveBeenLastCalledWith(
@@ -312,8 +316,9 @@ describe("ExplorePage", () => {
     setupMocks();
     renderPage();
     await waitFor(() =>
-      expect(screen.getByTestId("explore-category-movies")).toBeInTheDocument()
+      expect(screen.getByTestId("filter-toggle")).toBeInTheDocument()
     );
+    await userEvent.click(screen.getByTestId("filter-toggle"));
     await userEvent.click(screen.getByTestId("explore-category-movies"));
     expect(useExplore).toHaveBeenLastCalledWith(
       undefined,
@@ -326,8 +331,9 @@ describe("ExplorePage", () => {
     setupMocks();
     renderPage();
     await waitFor(() =>
-      expect(screen.getByTestId("explore-category-movies")).toBeInTheDocument()
+      expect(screen.getByTestId("filter-toggle")).toBeInTheDocument()
     );
+    await userEvent.click(screen.getByTestId("filter-toggle"));
     await userEvent.click(screen.getByTestId("explore-category-movies"));
     await userEvent.click(screen.getByTestId("explore-category-movies"));
     expect(useExplore).toHaveBeenLastCalledWith(

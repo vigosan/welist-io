@@ -204,11 +204,11 @@ function ExploreListCard({
   );
 }
 
-function categoryChipClass(active: boolean): string {
-  return `shrink-0 cursor-pointer rounded-full border px-3 py-1.5 text-xs transition active:scale-[0.96] ${
+function chipClass(active: boolean): string {
+  return `cursor-pointer px-3 py-1 rounded-full text-xs transition-all duration-150 whitespace-nowrap shrink-0 border ${
     active
-      ? "border-transparent bg-[#0c0c0b] font-semibold text-[#f8f7f5] dark:bg-[#f0ede8] dark:text-[#0c0c0b]"
-      : "border-black/[0.08] font-normal text-gray-500 hover:border-black/[0.20] hover:text-[#0c0c0b] dark:border-white/[0.08] dark:hover:border-white/[0.20] dark:hover:text-[#f0ede8]"
+      ? "border-black/[0.20] dark:border-white/[0.20] bg-black/[0.12] dark:bg-white/[0.12] text-[#0c0c0b] dark:text-[#f0ede8] font-semibold"
+      : "border-black/[0.08] dark:border-white/[0.08] text-gray-500 font-normal hover:border-black/[0.20] dark:hover:border-white/[0.20] hover:bg-black/[0.05] dark:hover:bg-white/[0.05]"
   }`;
 }
 
@@ -219,6 +219,7 @@ function ExplorePage() {
   const [focused, setFocused] = useState(false);
   const [sort, setSort] = useState<"created_desc" | "trending">("created_desc");
   const [category, setCategory] = useState<string | undefined>(undefined);
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const { data, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage } =
     useExplore(search || undefined, sort, category);
   const acceptChallenge = useAcceptChallenge();
@@ -297,71 +298,160 @@ function ExplorePage() {
           </button>
         </form>
 
-        <div className="mt-5 flex items-center gap-3">
-          <span className="shrink-0 text-[10px] font-medium uppercase tracking-wider text-gray-400 dark:text-gray-500">
-            {t("explore.sortLabel")}
-          </span>
-          <div className="inline-flex rounded-full border border-black/[0.08] p-0.5 dark:border-white/[0.08]">
-            {(
-              [
-                {
-                  value: "created_desc",
-                  label: t("explore.sortRecent"),
-                  testId: "explore-sort-recent",
-                },
-                {
-                  value: "trending",
-                  label: t("explore.sortTrending"),
-                  testId: "explore-sort-trending",
-                },
-              ] as const
-            ).map((opt) => (
+        {(() => {
+          const hasNonDefault =
+            sort !== "created_desc" || category !== undefined;
+          const activeSortLabel =
+            sort === "trending" ? t("explore.sortTrending") : null;
+          const activeCategoryLabel = category
+            ? t(`categories.${category}`)
+            : null;
+          return (
+            <div className="mt-4 flex items-center gap-2 flex-wrap">
               <button
-                key={opt.value}
                 type="button"
-                data-testid={opt.testId}
-                onClick={() => setSort(opt.value)}
-                className={`cursor-pointer rounded-full px-3.5 py-1.5 text-xs transition active:scale-[0.96] ${
-                  sort === opt.value
-                    ? "bg-[#0c0c0b] font-semibold text-[#f8f7f5] dark:bg-[#f0ede8] dark:text-[#0c0c0b]"
-                    : "font-normal text-gray-500 hover:text-[#0c0c0b] dark:hover:text-[#f0ede8]"
+                data-testid="filter-toggle"
+                onClick={() => setFiltersOpen((v) => !v)}
+                className={`cursor-pointer inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs transition-all duration-150 whitespace-nowrap shrink-0 ${
+                  hasNonDefault
+                    ? "border-black/[0.20] dark:border-white/[0.20] bg-black/[0.12] dark:bg-white/[0.12] text-[#0c0c0b] dark:text-[#f0ede8] font-semibold"
+                    : "border-black/[0.08] dark:border-white/[0.08] text-gray-500 font-normal hover:border-black/[0.20] dark:hover:border-white/[0.20] hover:bg-black/[0.05] dark:hover:bg-white/[0.05]"
                 }`}
               >
-                {opt.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="mt-3 flex items-center gap-3">
-          <span className="shrink-0 text-[10px] font-medium uppercase tracking-wider text-gray-400 dark:text-gray-500">
-            {t("explore.categoryLabel")}
-          </span>
-          <div className="-mb-1 flex gap-1.5 overflow-x-auto pb-1">
-            <button
-              type="button"
-              data-testid="explore-category-all"
-              onClick={() => setCategory(undefined)}
-              className={categoryChipClass(!category)}
-            >
-              {t("explore.allCategories")}
-            </button>
-            {LIST_CATEGORIES.map((cat) => {
-              const active = category === cat;
-              return (
-                <button
-                  key={cat}
-                  type="button"
-                  data-testid={`explore-category-${cat}`}
-                  onClick={() => setCategory(active ? undefined : cat)}
-                  className={categoryChipClass(active)}
+                <svg
+                  aria-hidden="true"
+                  className="w-2.5 h-2.5 shrink-0"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
                 >
-                  {t(`categories.${cat}`)}
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M3 4h18M7 9h10M11 14h2"
+                  />
+                </svg>
+                Filters
+                {hasNonDefault && (
+                  <span className="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-black/[0.15] dark:bg-white/[0.15] text-[10px] font-bold leading-none">
+                    {(sort !== "created_desc" ? 1 : 0) + (category ? 1 : 0)}
+                  </span>
+                )}
+                <svg
+                  aria-hidden="true"
+                  className={`w-2.5 h-2.5 shrink-0 transition-transform duration-200 ${filtersOpen ? "rotate-180" : ""}`}
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </button>
+
+              {!filtersOpen && hasNonDefault && (
+                <div className="flex items-center gap-1.5">
+                  {sort !== "created_desc" && (
+                    <button
+                      type="button"
+                      onClick={() => setSort("created_desc")}
+                      className="cursor-pointer inline-flex items-center gap-1 rounded-full border border-black/[0.10] dark:border-white/[0.10] px-2 py-0.5 text-xs text-gray-500 hover:border-black/[0.25] hover:text-gray-700 transition"
+                    >
+                      {activeSortLabel}
+                      <span
+                        aria-hidden
+                        className="text-gray-300 dark:text-gray-600 leading-none"
+                      >
+                        ×
+                      </span>
+                    </button>
+                  )}
+                  {category && (
+                    <button
+                      type="button"
+                      onClick={() => setCategory(undefined)}
+                      className="cursor-pointer inline-flex items-center gap-1 rounded-full border border-black/[0.10] dark:border-white/[0.10] px-2 py-0.5 text-xs text-gray-500 hover:border-black/[0.25] hover:text-gray-700 transition"
+                    >
+                      {activeCategoryLabel}
+                      <span
+                        aria-hidden
+                        className="text-gray-300 dark:text-gray-600 leading-none"
+                      >
+                        ×
+                      </span>
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+          );
+        })()}
+
+        {filtersOpen && (
+          <div className="mt-2 flex flex-col gap-2">
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <span className="text-[10px] font-medium uppercase tracking-wider text-gray-400 dark:text-gray-500 shrink-0">
+                {t("explore.sortLabel")}
+              </span>
+              {(
+                [
+                  {
+                    value: "created_desc",
+                    label: t("explore.sortRecent"),
+                    testId: "explore-sort-recent",
+                  },
+                  {
+                    value: "trending",
+                    label: t("explore.sortTrending"),
+                    testId: "explore-sort-trending",
+                  },
+                ] as const
+              ).map((opt) => (
+                <button
+                  key={opt.value}
+                  type="button"
+                  data-testid={opt.testId}
+                  onClick={() => setSort(opt.value)}
+                  className={chipClass(sort === opt.value)}
+                >
+                  {opt.label}
                 </button>
-              );
-            })}
+              ))}
+            </div>
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
+              <span className="text-[10px] font-medium uppercase tracking-wider text-gray-400 dark:text-gray-500 shrink-0">
+                {t("explore.categoryLabel")}
+              </span>
+              <button
+                type="button"
+                data-testid="explore-category-all"
+                onClick={() => setCategory(undefined)}
+                className={chipClass(!category)}
+              >
+                {t("explore.allCategories")}
+              </button>
+              {LIST_CATEGORIES.map((cat) => {
+                const active = category === cat;
+                return (
+                  <button
+                    key={cat}
+                    type="button"
+                    data-testid={`explore-category-${cat}`}
+                    onClick={() => setCategory(active ? undefined : cat)}
+                    className={chipClass(active)}
+                  >
+                    {t(`categories.${cat}`)}
+                  </button>
+                );
+              })}
+            </div>
           </div>
-        </div>
+        )}
 
         <div className="mt-6">
           {isLoading && (
