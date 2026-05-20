@@ -145,9 +145,6 @@ export function AppNav() {
               label={t("nav.explore")}
               testId="nav-explore"
             />
-            {session?.user && (
-              <NavLink to="/feed" label={t("nav.feed")} testId="nav-feed" />
-            )}
             <NavLink
               to="/users"
               label={t("directory.nav")}
@@ -303,16 +300,6 @@ export function AppNav() {
             >
               {t("nav.explore")}
             </Link>
-            {session?.user && (
-              <Link
-                to="/feed"
-                data-testid="nav-feed-mobile"
-                className="block px-6 py-3 text-sm font-medium text-[#0c0c0b] dark:text-[#f0ede8] hover:bg-black/[0.02] dark:hover:bg-white/[0.03] transition-colors duration-150 no-underline"
-                onClick={closeMobile}
-              >
-                {t("nav.feed")}
-              </Link>
-            )}
             <Link
               to="/users"
               data-testid="nav-users-mobile"
@@ -333,6 +320,14 @@ export function AppNav() {
             {/* User actions / sign in */}
             {session?.user ? (
               <>
+                <Link
+                  to="/feed"
+                  data-testid="user-menu-feed-mobile"
+                  className="block px-6 py-3 text-sm font-medium text-[#0c0c0b] dark:text-[#f0ede8] hover:bg-black/[0.02] dark:hover:bg-white/[0.03] transition-colors duration-150 no-underline"
+                  onClick={closeMobile}
+                >
+                  {t("nav.feed")}
+                </Link>
                 <Link
                   to="/settings"
                   className="block px-6 py-3 text-sm font-medium text-[#0c0c0b] dark:text-[#f0ede8] hover:bg-black/[0.02] dark:hover:bg-white/[0.03] transition-colors duration-150 no-underline"
