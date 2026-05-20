@@ -11,6 +11,7 @@ import {
   gt,
   ilike,
   inArray,
+  isNotNull,
   lt,
   max,
   min,
@@ -35,7 +36,9 @@ import {
   users,
 } from "../src/db/schema/index.js";
 import { LIST_CATEGORIES } from "../src/lib/categories.js";
-import { verifyUnsubscribeToken } from "./email-token.js";
+import { plainItemText } from "../src/lib/item-text.js";
+import { sendEmail } from "./email.js";
+import { signUnsubscribeToken, verifyUnsubscribeToken } from "./email-token.js";
 import { rateLimit } from "./rate-limit.js";
 
 type Variables = { authUser: AuthUser | null };
@@ -1235,6 +1238,115 @@ async function handleUnsubscribe(c: Context<{ Variables: Variables }>) {
 
 app.get("/unsubscribe", handleUnsubscribe);
 app.post("/unsubscribe", handleUnsubscribe);
+
+function escapeHtml(s: string): string {
+  return s.replace(
+    /[&<>"']/g,
+    (c) =>
+      (
+        ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;",
+        }) as Record<string, string>
+      )[c]
+  );
+}
+
+function buildNudgeEmail(args: {
+  item: string;
+  listName: string;
+  listLink: string;
+  unsubscribeUrl: string;
+}): { subject: string; html: string; text: string } {
+  const subject = `welist · No olvides este ítem de ${args.listName}`;
+  const text = [
+    "Hola,",
+    "",
+    `Tienes pendiente: ${args.item}`,
+    `En tu lista "${args.listName}".`,
+    "",
+    `Abrir la lista: ${args.listLink}`,
+    "",
+    `Darte de baja: ${args.unsubscribeUrl}`,
+  ].join("\n");
+  const html = `<!doctype html><html lang="es"><body style="margin:0;padding:0;background:#f8f7f5;color:#0c0c0b;font-family:system-ui,-apple-system,sans-serif">
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f8f7f5">
+  <tr><td align="center" style="padding:40px 16px">
+    <table role="presentation" width="480" cellspacing="0" cellpadding="0" style="max-width:480px;background:#fff;border:1px solid #ebe9e4;border-radius:16px">
+      <tr><td style="padding:32px">
+        <p style="margin:0 0 4px;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#a0a09c">welist</p>
+        <h1 style="margin:0 0 16px;font-size:18px;font-weight:600;letter-spacing:-0.01em">No olvides este ítem</h1>
+        <p style="margin:0 0 4px;font-size:11px;text-transform:uppercase;letter-spacing:0.12em;color:#a0a09c">${escapeHtml(args.listName)}</p>
+        <p style="margin:0 0 24px;font-size:16px;line-height:1.5;color:#0c0c0b">${escapeHtml(args.item)}</p>
+        <a href="${args.listLink}" style="display:inline-block;background:#0c0c0b;color:#f8f7f5;padding:10px 16px;border-radius:10px;text-decoration:none;font-size:13px;font-weight:600">Abrir la lista →</a>
+      </td></tr>
+      <tr><td style="padding:0 32px 24px;border-top:1px solid #ebe9e4">
+        <p style="margin:16px 0 0;font-size:11px;color:#a0a09c">¿Demasiados emails? <a href="${args.unsubscribeUrl}" style="color:#a0a09c;text-decoration:underline">Darte de baja</a>.</p>
+      </td></tr>
+    </table>
+  </td></tr>
+</table>
+</body></html>`;
+  return { subject, html, text };
+}
+
+app.get("/cron/random-item-nudge", async (c) => {
+  const auth = c.req.header("Authorization") ?? "";
+  const cronSecret = process.env.CRON_SECRET ?? "";
+  if (!cronSecret || auth !== `Bearer ${cronSecret}`)
+    return c.json({ error: "Unauthorized" }, 401);
+
+  const eligible = await db
+    .select({ id: users.id, email: users.email, name: users.name })
+    .from(users)
+    .where(and(eq(users.emailOptIn, true), isNotNull(users.email)));
+
+  const authSecret = process.env.AUTH_SECRET ?? "";
+  const appUrl = process.env.APP_URL ?? "https://welist.io";
+  let sent = 0;
+  for (const u of eligible) {
+    if (!u.email) continue;
+    const [pick] = await db
+      .select({
+        itemId: items.id,
+        itemText: items.text,
+        listId: lists.id,
+        listName: lists.name,
+        listSlug: lists.slug,
+      })
+      .from(items)
+      .innerJoin(lists, eq(lists.id, items.listId))
+      .where(and(eq(lists.ownerId, u.id), eq(items.done, false)))
+      .orderBy(sql`random()`)
+      .limit(1);
+    if (!pick) continue;
+    const token = await signUnsubscribeToken(u.id, authSecret);
+    const unsubscribeUrl = `${appUrl}/api/unsubscribe?token=${encodeURIComponent(token)}`;
+    const listLink = `${appUrl}/lists/${pick.listSlug ?? pick.listId}`;
+    const email = buildNudgeEmail({
+      item: plainItemText(pick.itemText),
+      listName: pick.listName,
+      listLink,
+      unsubscribeUrl,
+    });
+    try {
+      await sendEmail({
+        to: u.email,
+        subject: email.subject,
+        html: email.html,
+        text: email.text,
+        listUnsubscribeUrl: unsubscribeUrl,
+      });
+      sent += 1;
+    } catch {
+      /* skip this user, continue */
+    }
+  }
+  return c.json({ sent });
+});
 
 app.get("/explore/:listId", async (c) => {
   const listId = c.req.param("listId");

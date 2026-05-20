@@ -29,7 +29,12 @@ vi.mock("@hono/auth-js", async (importOriginal) => {
   };
 });
 
+vi.mock("./email", () => ({
+  sendEmail: vi.fn().mockResolvedValue({ skipped: false, id: "test-msg" }),
+}));
+
 const { app } = await import("./app");
+const { sendEmail: mockSendEmail } = await import("./email");
 
 describe("POST /api/lists", () => {
   beforeEach(() => vi.clearAllMocks());
@@ -1957,3 +1962,98 @@ describe("unsubscribe endpoint", () => {
     expect(res.status).toBe(200);
   });
 });
+
+import { signUnsubscribeToken as _sign } from "./email-token";
+
+describe("GET /api/cron/random-item-nudge", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(mockSendEmail).mockResolvedValue({
+      skipped: false,
+      id: "test-msg",
+    });
+    process.env.CRON_SECRET = "cron-test-secret";
+    process.env.AUTH_SECRET = "auth-test-secret";
+  });
+
+  it("returns 401 without an Authorization header", async () => {
+    const res = await app.request("/api/cron/random-item-nudge");
+    expect(res.status).toBe(401);
+  });
+
+  it("returns 401 with a wrong secret", async () => {
+    const res = await app.request("/api/cron/random-item-nudge", {
+      headers: { Authorization: "Bearer wrong-secret" },
+    });
+    expect(res.status).toBe(401);
+  });
+
+  it("sends one email per eligible user with a pending item", async () => {
+    mockDb.select
+      .mockReturnValueOnce({
+        from: vi.fn().mockReturnThis(),
+        where: vi
+          .fn()
+          .mockResolvedValue([
+            { id: "u1", email: "u1@example.com", name: "Alice" },
+          ]),
+      })
+      .mockReturnValueOnce({
+        from: vi.fn().mockReturnThis(),
+        innerJoin: vi.fn().mockReturnThis(),
+        where: vi.fn().mockReturnThis(),
+        orderBy: vi.fn().mockReturnThis(),
+        limit: vi.fn().mockResolvedValue([
+          {
+            itemId: "i1",
+            itemText: "[Tarea pendiente](https://x.com)",
+            listId: "l1",
+            listName: "Mi lista",
+            listSlug: null,
+          },
+        ]),
+      });
+
+    const res = await app.request("/api/cron/random-item-nudge", {
+      headers: { Authorization: "Bearer cron-test-secret" },
+    });
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ sent: 1 });
+    expect(mockSendEmail).toHaveBeenCalledTimes(1);
+    const args = vi.mocked(mockSendEmail).mock.calls[0][0];
+    expect(args.to).toBe("u1@example.com");
+    expect(args.subject).toMatch(/welist/i);
+    expect(args.text).toContain("Tarea pendiente");
+    expect(args.text).not.toContain("[Tarea");
+    expect(args.html).toContain("Mi lista");
+    expect(args.listUnsubscribeUrl).toContain("/api/unsubscribe?token=");
+  });
+
+  it("skips users without any pending item and returns sent: 0", async () => {
+    mockDb.select
+      .mockReturnValueOnce({
+        from: vi.fn().mockReturnThis(),
+        where: vi
+          .fn()
+          .mockResolvedValue([
+            { id: "u1", email: "u1@example.com", name: "Alice" },
+          ]),
+      })
+      .mockReturnValueOnce({
+        from: vi.fn().mockReturnThis(),
+        innerJoin: vi.fn().mockReturnThis(),
+        where: vi.fn().mockReturnThis(),
+        orderBy: vi.fn().mockReturnThis(),
+        limit: vi.fn().mockResolvedValue([]),
+      });
+
+    const res = await app.request("/api/cron/random-item-nudge", {
+      headers: { Authorization: "Bearer cron-test-secret" },
+    });
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ sent: 0 });
+    expect(mockSendEmail).not.toHaveBeenCalled();
+  });
+});
+
+void _sign;
