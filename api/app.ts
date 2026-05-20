@@ -23,6 +23,7 @@ import Stripe from "stripe";
 import { z } from "zod";
 import { db } from "../src/db/client.js";
 import {
+  type AchievementType,
   achievements,
   events,
   follows,
@@ -682,6 +683,7 @@ app.patch("/lists/:listId/items/:itemId/toggle", async (c) => {
           )
         );
       await logActivity(list.id, userId, "challenge_completed");
+      await unlockAchievement(userId, "first_list_completed");
       if (list.ownerId) {
         const actor = await db.query.users.findFirst({
           where: eq(users.id, userId),
@@ -1134,6 +1136,15 @@ app.get("/users/:userId/profile", async (c) => {
   });
 });
 
+async function unlockAchievement(userId: string, type: AchievementType) {
+  await db
+    .insert(achievements)
+    .values({ userId, type })
+    .onConflictDoNothing({
+      target: [achievements.userId, achievements.type],
+    });
+}
+
 app.get("/users/:userId/achievements", async (c) => {
   const userId = c.req.param("userId");
   const rows = await db
@@ -1539,6 +1550,14 @@ app.post("/lists/:listId/accept", async (c) => {
     role: "challenger",
   });
   await logActivity(source.id, userId, "challenge_accepted");
+
+  const acceptedCount = await db.$count(
+    participations,
+    eq(participations.userId, userId)
+  );
+  if (acceptedCount >= 10) {
+    await unlockAchievement(userId, "ten_lists_accepted");
+  }
 
   if (source.ownerId) {
     const actor = await db.query.users.findFirst({

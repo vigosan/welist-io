@@ -35,6 +35,22 @@ vi.mock("./email", () => ({
 
 const { app } = await import("./app");
 const { sendEmail: mockSendEmail } = await import("./email");
+const { achievements } = await import("../src/db/schema/index");
+
+function chainableInsert() {
+  const valuesMock = vi.fn().mockImplementation(() => {
+    const p: Promise<undefined> & {
+      onConflictDoNothing?: ReturnType<typeof vi.fn>;
+      onConflictDoUpdate?: ReturnType<typeof vi.fn>;
+      returning?: ReturnType<typeof vi.fn>;
+    } = Promise.resolve(undefined);
+    p.onConflictDoNothing = vi.fn().mockResolvedValue(undefined);
+    p.onConflictDoUpdate = vi.fn().mockResolvedValue(undefined);
+    p.returning = vi.fn().mockResolvedValue([]);
+    return p;
+  });
+  return { values: valuesMock };
+}
 
 describe("POST /api/lists", () => {
   beforeEach(() => vi.clearAllMocks());
@@ -2053,6 +2069,78 @@ describe("GET /api/cron/random-item-nudge", () => {
     expect(res.status).toBe(200);
     expect(await res.json()).toEqual({ sent: 0 });
     expect(mockSendEmail).not.toHaveBeenCalled();
+  });
+});
+
+describe("achievement unlock triggers", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockGetAuthUser.mockResolvedValue({ session: { user: { id: "u1" } } });
+  });
+
+  it("unlocks ten_lists_accepted when accept brings the count to 10", async () => {
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "src",
+      public: true,
+      ownerId: null,
+      name: "L",
+    });
+    mockDb.query.participations.findFirst.mockResolvedValue(null);
+    mockDb.$count.mockResolvedValue(10);
+    mockDb.insert.mockReturnValue(chainableInsert());
+
+    await app.request("/api/lists/src/accept", { method: "POST" });
+
+    expect(mockDb.insert).toHaveBeenCalledWith(achievements);
+  });
+
+  it("does not unlock ten_lists_accepted when count is below 10", async () => {
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "src",
+      public: true,
+      ownerId: null,
+      name: "L",
+    });
+    mockDb.query.participations.findFirst.mockResolvedValue(null);
+    mockDb.$count.mockResolvedValue(5);
+    mockDb.insert.mockReturnValue(chainableInsert());
+
+    await app.request("/api/lists/src/accept", { method: "POST" });
+
+    expect(mockDb.insert).not.toHaveBeenCalledWith(achievements);
+  });
+
+  it("unlocks first_list_completed when a challenger toggles the last item done", async () => {
+    const item = { id: "i1", listId: "abc", text: "Tarea", done: false };
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "abc",
+      ownerId: "owner",
+      collaborative: false,
+      public: true,
+    });
+    mockDb.query.items.findFirst.mockResolvedValue(item);
+    mockDb.query.participations.findFirst.mockResolvedValue({
+      id: "p1",
+      completedAt: null,
+      role: "challenger",
+    });
+    mockDb.query.itemProgress.findFirst.mockResolvedValue(null);
+    mockDb.query.items.findMany.mockResolvedValue([item]);
+    mockDb.query.itemProgress.findMany.mockResolvedValue([{ done: true }]);
+    mockDb.query.users.findFirst.mockResolvedValue({
+      name: "Alice",
+      image: null,
+    });
+    mockDb.insert.mockReturnValue(chainableInsert());
+    mockDb.update.mockReturnValue({
+      set: vi.fn().mockReturnValue({
+        where: vi.fn().mockResolvedValue(undefined),
+      }),
+    });
+
+    await app.request("/api/lists/abc/items/i1/toggle", { method: "PATCH" });
+
+    expect(mockDb.insert).toHaveBeenCalledWith(achievements);
   });
 });
 
