@@ -127,6 +127,13 @@
       "when": 1779184950209,
       "tag": "0017_clever_wrecker",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1779256198908,
+      "tag": "0018_smiling_bishop",
+      "breakpoints": true
     }
   ]
 }
