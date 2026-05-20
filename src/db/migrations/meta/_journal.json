@@ -134,6 +134,13 @@
       "when": 1779256198908,
       "tag": "0018_smiling_bishop",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1779291418900,
+      "tag": "0019_lazy_bug",
+      "breakpoints": true
     }
   ]
 }

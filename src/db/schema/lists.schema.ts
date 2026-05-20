@@ -227,6 +227,31 @@ export const notifications = pgTable(
   ]
 );
 
+export const events = pgTable(
+  "events",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: text("user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    sessionId: text("session_id"),
+    type: text("type").notNull(),
+    listId: uuid("list_id").references(() => lists.id, {
+      onDelete: "set null",
+    }),
+    itemId: uuid("item_id"),
+    metadata: jsonb("metadata"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => [
+    index("events_type_created_idx").on(t.type, t.createdAt),
+    index("events_list_type_idx").on(t.listId, t.type),
+    index("events_user_created_idx").on(t.userId, t.createdAt),
+  ]
+);
+
 export const follows = pgTable(
   "follows",
   {
@@ -258,3 +283,4 @@ export type StripeAccount = typeof stripeAccounts.$inferSelect;
 export type ListPrice = typeof listPrices.$inferSelect;
 export type ListPurchase = typeof listPurchases.$inferSelect;
 export type Notification = typeof notifications.$inferSelect;
+export type Event = typeof events.$inferSelect;
