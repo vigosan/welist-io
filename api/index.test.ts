@@ -1875,3 +1875,49 @@ describe("GET /api/feed", () => {
     });
   });
 });
+
+import { signUnsubscribeToken } from "./email-token";
+
+describe("unsubscribe endpoint", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    process.env.AUTH_SECRET = "test-unsub-secret";
+  });
+
+  it("returns 400 when token is missing", async () => {
+    const res = await app.request("/api/unsubscribe");
+    expect(res.status).toBe(400);
+  });
+
+  it("returns 400 when token is invalid", async () => {
+    const res = await app.request("/api/unsubscribe?token=garbage");
+    expect(res.status).toBe(400);
+  });
+
+  it("disables email opt-in for a valid token via GET", async () => {
+    const token = await signUnsubscribeToken("u1", "test-unsub-secret");
+    const setMock = vi.fn().mockReturnValue({
+      where: vi.fn().mockResolvedValue(undefined),
+    });
+    mockDb.update.mockReturnValue({ set: setMock });
+
+    const res = await app.request(`/api/unsubscribe?token=${token}`);
+    expect(res.status).toBe(200);
+    expect(setMock).toHaveBeenCalledWith(
+      expect.objectContaining({ emailOptIn: false })
+    );
+  });
+
+  it("accepts POST for one-click unsubscribe", async () => {
+    const token = await signUnsubscribeToken("u1", "test-unsub-secret");
+    mockDb.update.mockReturnValue({
+      set: vi.fn().mockReturnValue({
+        where: vi.fn().mockResolvedValue(undefined),
+      }),
+    });
+    const res = await app.request(`/api/unsubscribe?token=${token}`, {
+      method: "POST",
+    });
+    expect(res.status).toBe(200);
+  });
+});

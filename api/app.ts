@@ -35,6 +35,7 @@ import {
   users,
 } from "../src/db/schema/index.js";
 import { LIST_CATEGORIES } from "../src/lib/categories.js";
+import { verifyUnsubscribeToken } from "./email-token.js";
 import { rateLimit } from "./rate-limit.js";
 
 type Variables = { authUser: AuthUser | null };
@@ -1197,6 +1198,22 @@ app.get("/feed", async (c) => {
   }));
   return c.json({ items: feedItems });
 });
+
+async function handleUnsubscribe(c: Context<{ Variables: Variables }>) {
+  const token = c.req.query("token");
+  if (!token) return c.json({ error: "missing_token" }, 400);
+  const secret = process.env.AUTH_SECRET ?? "";
+  const userId = await verifyUnsubscribeToken(token, secret);
+  if (!userId) return c.json({ error: "invalid_token" }, 400);
+  await db.update(users).set({ emailOptIn: false }).where(eq(users.id, userId));
+  if (c.req.method === "POST") return c.json({ ok: true });
+  return c.html(
+    `<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Te has dado de baja — welist</title><style>html,body{margin:0;padding:0;background:#f8f7f5;color:#0c0c0b;font-family:system-ui,-apple-system,sans-serif}main{max-width:480px;margin:80px auto;padding:0 24px;text-align:center}h1{font-size:24px;margin:0 0 12px;letter-spacing:-0.02em}p{color:#a0a09c;line-height:1.6;margin:0}</style></head><body><main><h1>Te has dado de baja</h1><p>Ya no recibirás emails de empujón. Puedes reactivarlos cuando quieras desde los ajustes de tu perfil.</p></main></body></html>`
+  );
+}
+
+app.get("/unsubscribe", handleUnsubscribe);
+app.post("/unsubscribe", handleUnsubscribe);
 
 app.get("/explore/:listId", async (c) => {
   const listId = c.req.param("listId");
