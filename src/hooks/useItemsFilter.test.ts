@@ -119,6 +119,18 @@ describe("useItemsFilter", () => {
     expect(ids.indexOf("b")).toBeGreaterThan(ids.indexOf("c"));
   });
 
+  it("sorts immediately when items finish loading (no reorder lag)", () => {
+    const { result, rerender } = renderHook(
+      ({ items, itemsLoading }: { items: Item[]; itemsLoading: boolean }) =>
+        useItemsFilter({ ...BASE_OPTS, items, itemsLoading }),
+      { initialProps: { items: [] as Item[], itemsLoading: true } }
+    );
+    rerender({ items: [DONE, PENDING, PLAIN], itemsLoading: false });
+    const ids = result.current.stableItems.map((i) => i.id);
+    expect(ids.indexOf("b")).toBeGreaterThan(ids.indexOf("a"));
+    expect(ids.indexOf("b")).toBeGreaterThan(ids.indexOf("c"));
+  });
+
   it("resetOrder clears the stable sort reference", () => {
     const { result } = renderHook(() =>
       useItemsFilter({

@@ -1,10 +1,8 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import type { Item } from "@/db/schema";
 import { parseItemText } from "@/lib/item-text";
 import { getPartialPlace, parsePlaces } from "@/lib/places";
 import { getPartialTag, parseTags } from "@/lib/tags";
-
-const REORDER_DELAY_MS = 600;
 
 interface Options {
   items: Item[];
@@ -27,28 +25,12 @@ export function useItemsFilter({
 }: Options) {
   const [sortedIds, setSortedIds] = useState<string[] | null>(null);
   const initializedRef = useRef(false);
-  const reorderTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  // Delayed snapshot of items used for ordering — only updated after REORDER_DELAY_MS
-  const [delayedItems, setDelayedItems] = useState<Item[]>(items);
-
-  useEffect(() => {
-    if (itemsLoading) return;
-    if (reorderTimerRef.current) clearTimeout(reorderTimerRef.current);
-    reorderTimerRef.current = setTimeout(
-      () => setDelayedItems(items),
-      REORDER_DELAY_MS
-    );
-    return () => {
-      if (reorderTimerRef.current) clearTimeout(reorderTimerRef.current);
-    };
-  }, [items, itemsLoading]);
 
   const stableItems = useMemo(() => {
     if (itemsLoading) return items;
     let ids = sortedIds;
-    if (ids === null && delayedItems.length > 0 && !initializedRef.current) {
-      ids = [...delayedItems]
+    if (ids === null && items.length > 0 && !initializedRef.current) {
+      ids = [...items]
         .sort((a, b) => Number(a.done) - Number(b.done))
         .map((i) => i.id);
       initializedRef.current = true;
@@ -64,7 +46,7 @@ export function useItemsFilter({
     });
     const newItems = items.filter((i) => !sortedSet.has(i.id));
     return [...inOrder, ...newItems];
-  }, [items, delayedItems, itemsLoading, sortedIds]);
+  }, [items, itemsLoading, sortedIds]);
 
   const allTags = useMemo(() => {
     const seen = new Set<string>();
