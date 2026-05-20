@@ -23,6 +23,7 @@ import Stripe from "stripe";
 import { z } from "zod";
 import { db } from "../src/db/client.js";
 import {
+  events,
   follows,
   itemProgress,
   items,
@@ -1950,6 +1951,42 @@ app.patch("/notifications/read-all", async (c) => {
 
   return c.body(null, 204);
 });
+
+const eventInputSchema = z.object({
+  type: z.string().min(1).max(64),
+  listId: z.string().optional(),
+  itemId: z.string().optional(),
+  sessionId: z.string().max(64).optional(),
+  metadata: z.record(z.unknown()).optional(),
+});
+
+app.post(
+  "/events",
+  zValidator(
+    "json",
+    z.object({
+      events: z.array(eventInputSchema).min(1).max(50),
+    })
+  ),
+  async (c) => {
+    const authUser = getOptionalUser(c);
+    const userId = authUser?.session?.user?.id ?? null;
+    const { events: batch } = c.req.valid("json");
+
+    await db.insert(events).values(
+      batch.map((e) => ({
+        userId,
+        sessionId: e.sessionId ?? null,
+        type: e.type,
+        listId: e.listId ?? null,
+        itemId: e.itemId ?? null,
+        metadata: e.metadata ?? null,
+      }))
+    );
+
+    return c.body(null, 204);
+  }
+);
 
 app.get("/admin/stats", async (c) => {
   if (!checkAdminAuth(c)) {

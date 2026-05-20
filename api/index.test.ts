@@ -2056,4 +2056,109 @@ describe("GET /api/cron/random-item-nudge", () => {
   });
 });
 
+describe("POST /api/events", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockGetAuthUser.mockRejectedValue(new Error("no session"));
+  });
+
+  it("returns 204 and inserts events for anonymous user", async () => {
+    const valuesMock = vi.fn().mockResolvedValue(undefined);
+    mockDb.insert.mockReturnValue({ values: valuesMock });
+
+    const res = await app.request("/api/events", {
+      method: "POST",
+      body: JSON.stringify({
+        events: [{ type: "explore_view" }, { type: "list_view", listId: "l1" }],
+      }),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    expect(res.status).toBe(204);
+    expect(valuesMock).toHaveBeenCalledWith([
+      expect.objectContaining({ type: "explore_view", userId: null }),
+      expect.objectContaining({
+        type: "list_view",
+        listId: "l1",
+        userId: null,
+      }),
+    ]);
+  });
+
+  it("fills userId from session when authenticated", async () => {
+    mockGetAuthUser.mockResolvedValue({ session: { user: { id: "u1" } } });
+    const valuesMock = vi.fn().mockResolvedValue(undefined);
+    mockDb.insert.mockReturnValue({ values: valuesMock });
+
+    const res = await app.request("/api/events", {
+      method: "POST",
+      body: JSON.stringify({ events: [{ type: "checkout_started" }] }),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    expect(res.status).toBe(204);
+    expect(valuesMock).toHaveBeenCalledWith([
+      expect.objectContaining({ type: "checkout_started", userId: "u1" }),
+    ]);
+  });
+
+  it("accepts sessionId and metadata", async () => {
+    const valuesMock = vi.fn().mockResolvedValue(undefined);
+    mockDb.insert.mockReturnValue({ values: valuesMock });
+
+    const res = await app.request("/api/events", {
+      method: "POST",
+      body: JSON.stringify({
+        events: [
+          {
+            type: "list_view",
+            listId: "l1",
+            sessionId: "s-abc",
+            metadata: { ref: "feed" },
+          },
+        ],
+      }),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    expect(res.status).toBe(204);
+    expect(valuesMock).toHaveBeenCalledWith([
+      expect.objectContaining({
+        type: "list_view",
+        listId: "l1",
+        sessionId: "s-abc",
+        metadata: { ref: "feed" },
+      }),
+    ]);
+  });
+
+  it("returns 400 on empty events array", async () => {
+    const res = await app.request("/api/events", {
+      method: "POST",
+      body: JSON.stringify({ events: [] }),
+      headers: { "Content-Type": "application/json" },
+    });
+    expect(res.status).toBe(400);
+  });
+
+  it("returns 400 when type is empty", async () => {
+    const res = await app.request("/api/events", {
+      method: "POST",
+      body: JSON.stringify({ events: [{ type: "" }] }),
+      headers: { "Content-Type": "application/json" },
+    });
+    expect(res.status).toBe(400);
+  });
+
+  it("returns 400 when batch exceeds 50 events", async () => {
+    const events = Array.from({ length: 51 }, () => ({ type: "explore_view" }));
+    const res = await app.request("/api/events", {
+      method: "POST",
+      body: JSON.stringify({ events }),
+      headers: { "Content-Type": "application/json" },
+    });
+    expect(res.status).toBe(400);
+  });
+});
+
 void _sign;
