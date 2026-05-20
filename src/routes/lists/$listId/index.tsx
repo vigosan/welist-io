@@ -22,6 +22,7 @@ import { ItemRow } from "@/components/items/ItemRow";
 import { ListSettingsPanel } from "@/components/ListSettingsPanel";
 import { ListDropdownMenu } from "@/components/lists/ListDropdownMenu";
 import { ListFilterBar } from "@/components/lists/ListFilterBar";
+import { ListSettingsChip } from "@/components/lists/ListSettingsChip";
 import { ListStatsCard } from "@/components/lists/ListStatsCard";
 import { ParticipantsPanel } from "@/components/lists/ParticipantsPanel";
 import { SignInNudge } from "@/components/SignInNudge";
@@ -799,7 +800,7 @@ function ListDetailPage() {
                 </div>
               )}
 
-              {!itemsLoading && items.length > 0 && (
+              {!itemsLoading && (items.length > 0 || isOwner) && (
                 <ListFilterBar
                   statusFilter={statusFilter}
                   activeTag={activeTag}
@@ -809,6 +810,14 @@ function ListDetailPage() {
                   onStatusFilter={setStatusFilter}
                   onTagFilter={setActiveTag}
                   onPlaceFilter={setActivePlace}
+                  trailingSlot={
+                    isOwner ? (
+                      <ListSettingsChip
+                        active={settingsOpen}
+                        onToggle={() => setSettingsOpen((v) => !v)}
+                      />
+                    ) : undefined
+                  }
                 />
               )}
             </div>

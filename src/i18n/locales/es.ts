@@ -76,6 +76,7 @@ const es = {
     challengeCompleted: "¡Reto completado!",
     canContribute: "Puedes añadir elementos",
     settings: "Ajustes de la lista",
+    settingsChip: "Ajustes",
     deleteMenuItem: "Borrar lista",
     visibility: "Visibilidad",
     access: "Acceso",
