@@ -60,7 +60,7 @@ function SettingsPage() {
       <div className="min-h-dvh bg-canvas dark:bg-canvas-dark flex flex-col">
         <AppNav />
         <main className="flex-1 flex items-center justify-center px-4">
-          <p className="text-sm text-gray-400 dark:text-gray-500">
+          <p className="text-sm text-gray-500 dark:text-[#a0a09c]">
             Inicia sesión para ver la configuración.
           </p>
         </main>
@@ -72,25 +72,25 @@ function SettingsPage() {
     <div className="min-h-dvh bg-canvas dark:bg-canvas-dark flex flex-col">
       <AppNav />
 
-      <main className="flex-1 w-full max-w-3xl mx-auto px-4 py-8 flex flex-col gap-8">
+      <main className="flex-1 w-full max-w-[760px] mx-auto px-4 sm:px-12 py-10 flex flex-col gap-8">
         <div>
           <Link
             to="/lists"
-            className="text-xs text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition"
+            className="text-xs text-gray-500 dark:text-[#a0a09c] hover:text-[#0c0c0b] dark:hover:text-[#f0ede8] transition"
           >
             ← Mis listas
           </Link>
-          <h1 className="mt-4 text-xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
+          <h1 className="mt-4 text-xl font-bold tracking-tight text-[#0c0c0b] dark:text-[#f0ede8]">
             Configuración
           </h1>
         </div>
 
-        <section className="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl p-5 flex flex-col gap-4">
+        <section className="bg-white dark:bg-white/[0.02] border border-black/[0.08] dark:border-white/[0.08] rounded-2xl p-5 flex flex-col gap-4">
           <div>
-            <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+            <p className="text-sm font-semibold text-[#0c0c0b] dark:text-[#f0ede8]">
               Cuenta
             </p>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+            <p className="text-sm text-gray-500 dark:text-[#a0a09c] mt-0.5">
               {session.user.email}
             </p>
           </div>
@@ -104,17 +104,17 @@ function SettingsPage() {
           )}
         </section>
 
-        <section className="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl p-5 flex flex-col gap-4">
+        <section className="bg-white dark:bg-white/[0.02] border border-black/[0.08] dark:border-white/[0.08] rounded-2xl p-5 flex flex-col gap-4">
           <div>
-            <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+            <p className="text-sm font-semibold text-[#0c0c0b] dark:text-[#f0ede8]">
               Perfil
             </p>
-            <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5 leading-relaxed">
+            <p className="text-xs text-gray-500 dark:text-[#a0a09c] mt-0.5 leading-relaxed">
               Controla si apareces en el directorio público de usuarios.
             </p>
           </div>
           <label className="flex items-center justify-between gap-3 cursor-pointer">
-            <span className="text-sm text-gray-700 dark:text-gray-300">
+            <span className="text-sm text-[#0c0c0b] dark:text-[#f0ede8]">
               Aparecer en el directorio de usuarios
             </span>
             <button
@@ -130,12 +130,12 @@ function SettingsPage() {
               disabled={updateProfile.isPending || userMe === undefined}
               className={`cursor-pointer relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors duration-150 focus:outline-none disabled:opacity-40 ${
                 (userMe?.publicProfile ?? true)
-                  ? "bg-gray-900 dark:bg-white"
-                  : "bg-gray-200 dark:bg-gray-700"
+                  ? "bg-[#0c0c0b] dark:bg-[#f0ede8]"
+                  : "bg-black/[0.10] dark:bg-white/[0.10]"
               }`}
             >
               <span
-                className={`inline-block h-3.5 w-3.5 rounded-full bg-white dark:bg-gray-900 shadow transition-transform duration-150 ${
+                className={`inline-block h-3.5 w-3.5 rounded-full bg-white dark:bg-[#0c0c0b] shadow transition-transform duration-150 ${
                   (userMe?.publicProfile ?? true)
                     ? "translate-x-4.5"
                     : "translate-x-0.5"
@@ -145,18 +145,18 @@ function SettingsPage() {
           </label>
         </section>
 
-        <section className="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl p-5 flex flex-col gap-4">
+        <section className="bg-white dark:bg-white/[0.02] border border-black/[0.08] dark:border-white/[0.08] rounded-2xl p-5 flex flex-col gap-4">
           <div>
-            <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+            <p className="text-sm font-semibold text-[#0c0c0b] dark:text-[#f0ede8]">
               Notificaciones por email
             </p>
-            <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5 leading-relaxed">
+            <p className="text-xs text-gray-500 dark:text-[#a0a09c] mt-0.5 leading-relaxed">
               Recibe un recordatorio quincenal con un ítem aleatorio pendiente
               de tus listas para que no se te olvide.
             </p>
           </div>
           <label className="flex items-center justify-between gap-3 cursor-pointer">
-            <span className="text-sm text-gray-700 dark:text-gray-300">
+            <span className="text-sm text-[#0c0c0b] dark:text-[#f0ede8]">
               Recibir recordatorios por email
             </span>
             <button
@@ -172,12 +172,12 @@ function SettingsPage() {
               disabled={updateProfile.isPending || userMe === undefined}
               className={`cursor-pointer relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors duration-150 focus:outline-none disabled:opacity-40 ${
                 (userMe?.emailOptIn ?? true)
-                  ? "bg-gray-900 dark:bg-white"
-                  : "bg-gray-200 dark:bg-gray-700"
+                  ? "bg-[#0c0c0b] dark:bg-[#f0ede8]"
+                  : "bg-black/[0.10] dark:bg-white/[0.10]"
               }`}
             >
               <span
-                className={`inline-block h-3.5 w-3.5 rounded-full bg-white dark:bg-gray-900 shadow transition-transform duration-150 ${
+                className={`inline-block h-3.5 w-3.5 rounded-full bg-white dark:bg-[#0c0c0b] shadow transition-transform duration-150 ${
                   (userMe?.emailOptIn ?? true)
                     ? "translate-x-4.5"
                     : "translate-x-0.5"
@@ -187,36 +187,36 @@ function SettingsPage() {
           </label>
         </section>
 
-        <section className="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl p-5 flex flex-col gap-4">
+        <section className="bg-white dark:bg-white/[0.02] border border-black/[0.08] dark:border-white/[0.08] rounded-2xl p-5 flex flex-col gap-4">
           <div>
-            <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+            <p className="text-sm font-semibold text-[#0c0c0b] dark:text-[#f0ede8]">
               Pagos con Stripe
             </p>
-            <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5 leading-relaxed">
+            <p className="text-xs text-gray-500 dark:text-[#a0a09c] mt-0.5 leading-relaxed">
               Conecta tu cuenta de Stripe para vender el acceso a tus listas. El
               dinero va directo a tu cuenta.
             </p>
           </div>
 
           {stripeParam === "success" && (
-            <div className="px-3 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-xs text-gray-600 dark:text-gray-400">
+            <div className="px-3 py-2 bg-black/[0.03] dark:bg-white/[0.04] border border-black/[0.08] dark:border-white/[0.08] rounded-xl text-xs text-gray-600 dark:text-[#a0a09c]">
               Cuenta conectada correctamente.
             </div>
           )}
           {stripeParam === "refresh" && (
-            <div className="px-3 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-xs text-gray-500 dark:text-gray-400">
+            <div className="px-3 py-2 bg-black/[0.03] dark:bg-white/[0.04] border border-black/[0.08] dark:border-white/[0.08] rounded-xl text-xs text-gray-500 dark:text-[#a0a09c]">
               El proceso fue interrumpido. Vuelve a conectar tu cuenta.
             </div>
           )}
 
           {loading ? (
-            <div className="h-8 w-40 rounded-xl bg-gray-100 dark:bg-gray-800 animate-pulse" />
+            <div className="h-8 w-40 rounded-xl bg-black/[0.04] dark:bg-white/[0.06] animate-pulse" />
           ) : status?.onboardingComplete ? (
             <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-700 dark:text-gray-300 px-3 py-1.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl">
+              <span className="inline-flex items-center gap-1.5 text-xs font-medium text-[#0c0c0b] dark:text-[#f0ede8] px-3 py-1.5 bg-black/[0.03] dark:bg-white/[0.04] border border-black/[0.08] dark:border-white/[0.08] rounded-xl">
                 <svg
                   aria-hidden="true"
-                  className="w-3 h-3 text-gray-500 dark:text-gray-400"
+                  className="w-3 h-3 text-gray-500 dark:text-[#a0a09c]"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -236,7 +236,7 @@ function SettingsPage() {
               type="button"
               onClick={handleConnectStripe}
               disabled={connecting}
-              className="cursor-pointer self-start px-4 py-2 text-sm font-medium bg-gray-900 text-white dark:bg-white dark:text-gray-900 rounded-xl hover:bg-black dark:hover:bg-gray-100 disabled:opacity-40 transition-[background-color,transform] duration-150 active:scale-[0.96]"
+              className="cursor-pointer self-start px-4 py-2 text-sm font-medium bg-[#0c0c0b] text-[#f8f7f5] dark:bg-[#f0ede8] dark:text-[#0c0c0b] rounded-xl hover:opacity-90 disabled:opacity-40 transition-[opacity,transform] duration-150 active:scale-[0.96]"
             >
               {connecting
                 ? "Redirigiendo…"
