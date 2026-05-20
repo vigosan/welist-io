@@ -133,19 +133,6 @@ export function AppNav() {
 
           {/* Desktop nav */}
           <div className="hidden sm:flex items-center gap-7">
-            <NavLink
-              to="/explore"
-              label={t("nav.explore")}
-              testId="nav-explore"
-            />
-            <NavLink
-              to="/users"
-              label={t("directory.nav")}
-              testId="nav-users"
-            />
-            {session?.user && (
-              <NavLink to="/feed" label={t("nav.feed")} testId="nav-feed" />
-            )}
             {session?.user && (
               <NavLink
                 to="/lists"
@@ -153,6 +140,19 @@ export function AppNav() {
                 testId="nav-my-lists"
               />
             )}
+            <NavLink
+              to="/explore"
+              label={t("nav.explore")}
+              testId="nav-explore"
+            />
+            {session?.user && (
+              <NavLink to="/feed" label={t("nav.feed")} testId="nav-feed" />
+            )}
+            <NavLink
+              to="/users"
+              label={t("directory.nav")}
+              testId="nav-users"
+            />
             <NavLink to="/help" label={t("help.nav")} testId="nav-help" />
 
             <div className="w-px h-3.5 bg-black/[0.08] dark:bg-white/[0.08]" />
@@ -285,6 +285,16 @@ export function AppNav() {
             )}
 
             {/* Nav links */}
+            {session?.user && (
+              <Link
+                to="/lists"
+                data-testid="nav-my-lists-mobile"
+                className="block px-6 py-3 text-sm font-medium text-[#0c0c0b] dark:text-[#f0ede8] hover:bg-black/[0.02] dark:hover:bg-white/[0.03] transition-colors duration-150 no-underline"
+                onClick={closeMobile}
+              >
+                {t("nav.myLists")}
+              </Link>
+            )}
             <Link
               to="/explore"
               data-testid="nav-explore-mobile"
@@ -292,14 +302,6 @@ export function AppNav() {
               onClick={closeMobile}
             >
               {t("nav.explore")}
-            </Link>
-            <Link
-              to="/users"
-              data-testid="nav-users-mobile"
-              className="block px-6 py-3 text-sm font-medium text-[#0c0c0b] dark:text-[#f0ede8] hover:bg-black/[0.02] dark:hover:bg-white/[0.03] transition-colors duration-150 no-underline"
-              onClick={closeMobile}
-            >
-              {t("directory.nav")}
             </Link>
             {session?.user && (
               <Link
@@ -311,16 +313,14 @@ export function AppNav() {
                 {t("nav.feed")}
               </Link>
             )}
-            {session?.user && (
-              <Link
-                to="/lists"
-                data-testid="nav-my-lists-mobile"
-                className="block px-6 py-3 text-sm font-medium text-[#0c0c0b] dark:text-[#f0ede8] hover:bg-black/[0.02] dark:hover:bg-white/[0.03] transition-colors duration-150 no-underline"
-                onClick={closeMobile}
-              >
-                {t("nav.myLists")}
-              </Link>
-            )}
+            <Link
+              to="/users"
+              data-testid="nav-users-mobile"
+              className="block px-6 py-3 text-sm font-medium text-[#0c0c0b] dark:text-[#f0ede8] hover:bg-black/[0.02] dark:hover:bg-white/[0.03] transition-colors duration-150 no-underline"
+              onClick={closeMobile}
+            >
+              {t("directory.nav")}
+            </Link>
             <Link
               to="/help"
               data-testid="nav-help-mobile"
