@@ -3,6 +3,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { AppNav } from "@/components/AppNav";
 import { useAcceptChallenge, useExplore } from "@/hooks/useList";
+import { useTrackOnMount } from "@/hooks/useTrackOnMount";
 import { useTranslation } from "@/i18n/service";
 import { LIST_CATEGORIES } from "@/lib/categories";
 import { plainItemText } from "@/lib/item-text";
@@ -213,6 +214,7 @@ function chipClass(active: boolean): string {
 }
 
 function ExplorePage() {
+  useTrackOnMount({ type: "explore_view" });
   const navigate = useNavigate();
   const [q, setQ] = useState("");
   const [search, setSearch] = useState("");

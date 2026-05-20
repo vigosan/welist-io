@@ -6,6 +6,7 @@ import {
   useExploreDetail,
   useExploreItems,
 } from "@/hooks/useList";
+import { useTrackOnMount } from "@/hooks/useTrackOnMount";
 import { useTranslation } from "@/i18n/service";
 import { renderInlineMarkdown } from "@/lib/inline-markdown";
 import { parseTags } from "@/lib/tags";
@@ -16,6 +17,7 @@ export const Route = createFileRoute("/explore/$listId")({
 
 function ExploreDetailPage() {
   const { listId } = Route.useParams();
+  useTrackOnMount({ type: "list_view", listId });
   const { data: detail, isLoading } = useExploreDetail(listId);
   const { data: exploreItems, isLoading: itemsLoading } = useExploreItems(
     listId,
