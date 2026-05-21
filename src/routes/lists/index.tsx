@@ -562,9 +562,18 @@ function MyListsPage() {
 
         <div ref={sentinelRef} className="h-4" />
         {isFetchingNextPage && (
-          <p className="text-xs text-gray-500 text-center py-4">
-            {t("myLists.loading")}
-          </p>
+          <div className="flex flex-col gap-3 pt-3">
+            {["a", "b", "c"].map((k) => (
+              <div
+                key={`next-skeleton-${k}`}
+                className="rounded-2xl border border-black/[0.08] dark:border-white/[0.08] bg-white dark:bg-white/[0.02] p-5 animate-pulse"
+              >
+                <div className="h-3.5 w-2/3 rounded bg-black/[0.06] dark:bg-white/[0.06] mb-2.5" />
+                <div className="h-px w-full rounded bg-black/[0.06] dark:bg-white/[0.06] mb-2.5" />
+                <div className="h-2.5 w-1/4 rounded bg-black/[0.04] dark:bg-white/[0.04]" />
+              </div>
+            ))}
+          </div>
         )}
       </main>
     </div>
