@@ -217,23 +217,33 @@ function computeDayStreak(days: string[], now: Date): number {
   return streak;
 }
 
-async function createNotification(
-  recipientId: string,
-  type: "challenge_accepted" | "challenge_completed",
-  listId: string,
-  listName: string,
-  actorId: string | null,
-  actorName: string | null | undefined,
-  actorImage: string | null | undefined
-) {
+type NotificationType =
+  | "challenge_accepted"
+  | "challenge_completed"
+  | "new_follower"
+  | "list_purchased";
+
+type CreateNotificationInput = {
+  recipientId: string;
+  type: NotificationType;
+  listId?: string | null;
+  listName?: string | null;
+  actorId?: string | null;
+  actorName?: string | null;
+  actorImage?: string | null;
+  actionUrl?: string | null;
+};
+
+async function createNotification(input: CreateNotificationInput) {
   await db.insert(notifications).values({
-    userId: recipientId,
-    type,
-    listId,
-    listName,
-    actorId: actorId ?? null,
-    actorName: actorName ?? null,
-    actorImage: actorImage ?? null,
+    userId: input.recipientId,
+    type: input.type,
+    listId: input.listId ?? null,
+    listName: input.listName ?? null,
+    actorId: input.actorId ?? null,
+    actorName: input.actorName ?? null,
+    actorImage: input.actorImage ?? null,
+    actionUrl: input.actionUrl ?? null,
   });
 }
 
@@ -698,15 +708,15 @@ app.patch("/lists/:listId/items/:itemId/toggle", async (c) => {
           where: eq(lists.id, list.id),
           columns: { name: true },
         });
-        await createNotification(
-          list.ownerId,
-          "challenge_completed",
-          list.id,
-          listMeta?.name ?? "",
-          userId,
-          actor?.name,
-          actor?.image
-        );
+        await createNotification({
+          recipientId: list.ownerId,
+          type: "challenge_completed",
+          listId: list.id,
+          listName: listMeta?.name ?? "",
+          actorId: userId,
+          actorName: actor?.name,
+          actorImage: actor?.image,
+        });
       }
     }
 
@@ -1698,15 +1708,15 @@ app.post("/lists/:listId/accept", async (c) => {
       where: eq(users.id, userId),
       columns: { name: true, image: true },
     });
-    await createNotification(
-      source.ownerId,
-      "challenge_accepted",
-      source.id,
-      source.name,
-      userId,
-      actor?.name,
-      actor?.image
-    );
+    await createNotification({
+      recipientId: source.ownerId,
+      type: "challenge_accepted",
+      listId: source.id,
+      listName: source.name,
+      actorId: userId,
+      actorName: actor?.name,
+      actorImage: actor?.image,
+    });
   }
 
   return c.json(source, 201);
