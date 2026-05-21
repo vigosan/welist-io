@@ -200,6 +200,37 @@ async function getParticipation(sourceListId: string, userId: string) {
   });
 }
 
+async function getListRatingStats(
+  listId: string,
+  userId: string | null
+): Promise<{ avg: number | null; count: number; userValue: number | null }> {
+  const [stats] = await db
+    .select({
+      avg: sql<number | null>`avg(${listRatings.value})::float8`,
+      count: sql<number>`cast(count(*) as int)`,
+    })
+    .from(listRatings)
+    .where(eq(listRatings.listId, listId));
+
+  let userValue: number | null = null;
+  if (userId) {
+    const rows = await db
+      .select({ value: listRatings.value })
+      .from(listRatings)
+      .where(
+        and(eq(listRatings.userId, userId), eq(listRatings.listId, listId))
+      )
+      .limit(1);
+    userValue = rows[0]?.value ?? null;
+  }
+
+  return {
+    avg: stats?.avg ?? null,
+    count: stats?.count ?? 0,
+    userValue,
+  };
+}
+
 function computeDayStreak(days: string[], now: Date): number {
   if (days.length === 0) return 0;
   const DAY_MS = 86_400_000;
@@ -408,10 +439,12 @@ app.get("/lists/:listId", async (c) => {
       .onConflictDoNothing();
   }
   const participation = userId ? await getParticipation(list.id, userId) : null;
+  const rating = await getListRatingStats(list.id, userId);
   return c.json({
     ...list,
     participated: !!participation,
     participationCompletedAt: participation?.completedAt ?? null,
+    rating,
   });
 });
 

@@ -102,7 +102,14 @@ describe("POST /api/lists", () => {
 });
 
 describe("GET /api/lists/:listId", () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockDb.select.mockReturnValue({
+      from: vi.fn().mockReturnValue({
+        where: vi.fn().mockResolvedValue([{ avg: null, count: 0 }]),
+      }),
+    });
+  });
 
   it("returns the list when found", async () => {
     const list = {
@@ -158,6 +165,39 @@ describe("GET /api/lists/:listId", () => {
     mockDb.query.participations.findFirst.mockResolvedValue(null);
     const res = await app.request("/api/lists/abc");
     expect(res.status).toBe(200);
+  });
+
+  it("includes rating aggregate with averages and user value", async () => {
+    mockGetAuthUser.mockResolvedValueOnce({
+      session: { user: { id: "u1" } },
+    });
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "abc",
+      ownerId: "owner",
+      public: true,
+      collaborative: false,
+    });
+    mockDb.query.participations.findFirst.mockResolvedValue(null);
+    mockDb.select
+      .mockReturnValueOnce({
+        from: vi.fn().mockReturnValue({
+          where: vi.fn().mockResolvedValue([{ avg: 4.5, count: 2 }]),
+        }),
+      })
+      .mockReturnValueOnce({
+        from: vi.fn().mockReturnValue({
+          where: vi.fn().mockReturnValue({
+            limit: vi.fn().mockResolvedValue([{ value: 5 }]),
+          }),
+        }),
+      });
+
+    const res = await app.request("/api/lists/abc", {
+      headers: { "x-forwarded-for": "10.3.0.1" },
+    });
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as Record<string, unknown>;
+    expect(body.rating).toEqual({ avg: 4.5, count: 2, userValue: 5 });
   });
 });
 
@@ -1262,7 +1302,14 @@ describe("POST /api/lists/:listId/accept", () => {
 });
 
 describe("GET /api/lists/:listId (participated flag)", () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockDb.select.mockReturnValue({
+      from: vi.fn().mockReturnValue({
+        where: vi.fn().mockResolvedValue([{ avg: null, count: 0 }]),
+      }),
+    });
+  });
 
   it("includes participated: false when not authenticated", async () => {
     const list = {
