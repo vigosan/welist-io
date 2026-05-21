@@ -268,6 +268,7 @@ app.post(
     const authUser = getOptionalUser(c);
     const ownerId = authUser?.session?.user?.id ?? null;
     const [list] = await db.insert(lists).values({ name, ownerId }).returning();
+    await checkAchievements(ownerId);
     return c.json(list, 201);
   }
 );
@@ -448,6 +449,9 @@ app.patch(
         .where(eq(lists.id, list.id))
         .returning();
       if (!updated) return c.json({ error: "Not found" }, 404);
+      if (body.public === true && !list.public) {
+        await checkAchievements(list.ownerId);
+      }
       return c.json(updated);
     } catch (e: unknown) {
       if (isUniqueViolation(e)) return c.json({ error: "slug_taken" }, 409);
@@ -534,6 +538,7 @@ app.post(
     if (list.public && list.collaborative && userId) {
       await logActivity(list.id, userId, "item_added", item.id, null, { text });
     }
+    await checkAchievements(list.ownerId);
     return c.json(item, 201);
   }
 );
@@ -683,7 +688,7 @@ app.patch("/lists/:listId/items/:itemId/toggle", async (c) => {
           )
         );
       await logActivity(list.id, userId, "challenge_completed");
-      await unlockAchievement(userId, "first_list_completed");
+      await checkAchievements(userId);
       if (list.ownerId) {
         const actor = await db.query.users.findFirst({
           where: eq(users.id, userId),
@@ -1136,10 +1141,16 @@ app.get("/users/:userId/profile", async (c) => {
   });
 });
 
-async function unlockAchievement(userId: string, type: AchievementType) {
+async function checkAchievements(userId: string | null | undefined) {
+  if (!userId) return;
+  const metrics = await computeAchievementMetrics(userId);
+  const toUnlock = ACHIEVEMENT_CATALOG.filter(
+    (entry) => metrics[entry.metric] >= entry.target
+  ).map((entry) => ({ userId, type: entry.type }));
+  if (toUnlock.length === 0) return;
   await db
     .insert(achievements)
-    .values({ userId, type })
+    .values(toUnlock)
     .onConflictDoNothing({
       target: [achievements.userId, achievements.type],
     });
@@ -1270,6 +1281,7 @@ app.post("/users/:userId/follow", async (c) => {
     .insert(follows)
     .values({ followerId, followingId })
     .onConflictDoNothing();
+  await checkAchievements(followingId);
   return c.json({ following: true });
 });
 
@@ -1647,13 +1659,7 @@ app.post("/lists/:listId/accept", async (c) => {
   });
   await logActivity(source.id, userId, "challenge_accepted");
 
-  const acceptedCount = await db.$count(
-    participations,
-    eq(participations.userId, userId)
-  );
-  if (acceptedCount >= 10) {
-    await unlockAchievement(userId, "ten_lists_accepted");
-  }
+  await checkAchievements(userId);
 
   if (source.ownerId) {
     const actor = await db.query.users.findFirst({
@@ -2022,6 +2028,11 @@ app.post("/stripe/webhook", async (c) => {
           stripePaymentIntentId: intent.id,
         })
         .onConflictDoNothing();
+      const soldList = await db.query.lists.findFirst({
+        where: eq(lists.id, listId),
+        columns: { ownerId: true },
+      });
+      await checkAchievements(soldList?.ownerId);
     }
   }
 
