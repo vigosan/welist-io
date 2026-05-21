@@ -2,18 +2,34 @@ import { signIn, useSession } from "@hono/auth-js/react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { AppNav } from "@/components/AppNav";
+import { Skeleton } from "@/components/Skeleton";
+import { StarRatingDisplay } from "@/components/StarRating";
 import { useAcceptChallenge, useExplore } from "@/hooks/useList";
 import { useTrackOnMount } from "@/hooks/useTrackOnMount";
 import { useTranslation } from "@/i18n/service";
 import { LIST_CATEGORIES, type ListCategory } from "@/lib/categories";
 import { CategoryIcon } from "@/lib/categoryIcons";
 import { plainItemText } from "@/lib/item-text";
-import { StarRatingDisplay } from "@/components/StarRating";
 import type { ExploreItem } from "@/services/lists.service";
 
 export const Route = createFileRoute("/explore/")({
   component: ExplorePage,
 });
+
+function ExploreCardSkeleton() {
+  return (
+    <div
+      data-testid="explore-card-skeleton"
+      className="rounded-2xl border border-black/[0.08] dark:border-white/[0.08] bg-white dark:bg-white/[0.02] p-5"
+    >
+      <Skeleton variant="text" className="mb-3 h-4 w-20" />
+      <Skeleton variant="text" className="mb-2 h-4 w-2/3" />
+      <Skeleton variant="text" className="mb-2.5 h-3 w-full" />
+      <Skeleton variant="text" className="mb-3 h-3 w-5/6" />
+      <Skeleton variant="text" className="h-3 w-40" />
+    </div>
+  );
+}
 
 function ExploreListCard({
   list,
@@ -477,9 +493,11 @@ function ExplorePage() {
 
         <div className="mt-6">
           {isLoading && (
-            <p className="text-[12px] text-gray-500 text-center py-10">
-              {t("explore.loading")}
-            </p>
+            <div className="flex flex-col gap-3">
+              {["a", "b", "c", "d", "e"].map((k) => (
+                <ExploreCardSkeleton key={k} />
+              ))}
+            </div>
           )}
           {!isLoading && lists.length === 0 && (
             <p className="text-[12px] text-gray-500 text-center py-10">
@@ -500,9 +518,11 @@ function ExplorePage() {
 
         <div ref={sentinelRef} className="h-4" />
         {isFetchingNextPage && (
-          <p className="text-[12px] text-gray-500 text-center py-4">
-            {t("explore.loading")}
-          </p>
+          <div className="flex flex-col gap-3 pt-3">
+            {["a", "b", "c"].map((k) => (
+              <ExploreCardSkeleton key={k} />
+            ))}
+          </div>
         )}
       </main>
     </div>
