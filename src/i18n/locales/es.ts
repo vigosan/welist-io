@@ -361,6 +361,12 @@ const es = {
     followers_other: "{{count}} seguidores",
     roleCreator: "Creador",
     roleChallenger: "Retador",
+    sharesLists_one: "Comparte {{count}} lista",
+    sharesLists_other: "Comparte {{count}} listas",
+    doesChallenges_one: "Hace {{count}} reto",
+    doesChallenges_other: "Hace {{count}} retos",
+    collaboratesIn_one: "Colabora en {{count}} lista",
+    collaboratesIn_other: "Colabora en {{count}} listas",
   },
 } as const;
 

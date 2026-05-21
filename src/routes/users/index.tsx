@@ -1,7 +1,12 @@
+import { useSession } from "@hono/auth-js/react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { AppNav } from "@/components/AppNav";
-import { useUserDirectory } from "@/hooks/useList";
+import {
+  useFollowStatus,
+  useToggleFollow,
+  useUserDirectory,
+} from "@/hooks/useList";
 import { useTranslation } from "@/i18n/service";
 import type { DirectoryUser } from "@/services/lists.service";
 
@@ -23,141 +28,131 @@ function initials(name: string | null): string {
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 }
 
-function StatChip({ label }: { label: string }) {
-  return (
-    <span
-      className="inline-flex items-center rounded-full border border-black/[0.10] dark:border-white/[0.10] px-2.5 py-0.5 text-[11px] text-gray-600 dark:text-[#a0a09c] tabular-nums"
-      style={{ fontFamily: "'Space Mono', monospace" }}
-    >
-      {label}
-    </span>
-  );
-}
-
-function deriveRole(user: DirectoryUser): "creator" | "challenger" | null {
-  const takes = user.challengerCount + user.collaboratorCount;
-  if (user.ownedListsCount === 0 && takes === 0) return null;
-  if (user.ownedListsCount >= takes) return "creator";
-  return "challenger";
-}
-
-function RoleChip({ role }: { role: "creator" | "challenger" }) {
+function SlimFollowButton({ userId }: { userId: string }) {
   const { t } = useTranslation();
-  const label =
-    role === "creator"
-      ? t("directory.roleCreator")
-      : t("directory.roleChallenger");
+  const { data: session } = useSession();
+  const me = session?.user?.id;
+  const enabled = !!me && me !== userId;
+  const { data: status } = useFollowStatus(userId, enabled);
+  const toggle = useToggleFollow(userId);
+  if (!enabled) return null;
+  const isFollowing = !!status?.isFollowing;
   return (
-    <span className="inline-flex items-center rounded-full border border-gray-900 dark:border-[#f0ede8] bg-gray-900 dark:bg-[#f0ede8] px-2 py-0.5 text-[10px] font-semibold tracking-wide text-white dark:text-[#0c0c0b] uppercase">
-      {label}
-    </span>
+    <button
+      type="button"
+      data-testid={`follow-btn-${userId}`}
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        toggle.mutate(isFollowing);
+      }}
+      disabled={toggle.isPending}
+      className={`shrink-0 cursor-pointer rounded-full px-3 py-1 text-xs font-medium transition active:scale-[0.96] disabled:opacity-50 ${
+        isFollowing
+          ? "border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:border-gray-900 hover:text-gray-900 dark:hover:border-gray-300 dark:hover:text-gray-100"
+          : "bg-gray-900 text-white hover:bg-black dark:bg-[#f0ede8] dark:text-[#0c0c0b]"
+      }`}
+    >
+      {isFollowing ? t("profile.following") : t("profile.follow")}
+    </button>
   );
+}
+
+function buildSummary(
+  user: DirectoryUser,
+  t: ReturnType<typeof useTranslation>["t"]
+): string[] {
+  const parts: string[] = [];
+  if (user.ownedListsCount > 0) {
+    parts.push(
+      t("directory.sharesLists_other", { count: user.ownedListsCount })
+    );
+  }
+  if (user.challengerCount > 0) {
+    parts.push(
+      t("directory.doesChallenges_other", { count: user.challengerCount })
+    );
+  }
+  if (user.collaboratorCount > 0) {
+    parts.push(
+      t("directory.collaboratesIn_other", { count: user.collaboratorCount })
+    );
+  }
+  if (user.followerCount > 0) {
+    parts.push(t("directory.followers_other", { count: user.followerCount }));
+  }
+  return parts;
 }
 
 function UserRow({ user }: { user: DirectoryUser }) {
   const { t } = useTranslation();
-  const role = deriveRole(user);
-  const chips: string[] = [];
-  if (user.ownedListsCount > 0) {
-    chips.push(t("directory.owned_other", { count: user.ownedListsCount }));
-  }
-  if (user.challengerCount > 0) {
-    chips.push(
-      t("directory.challenged_other", { count: user.challengerCount })
-    );
-  }
-  if (user.completedChallengesCount > 0) {
-    chips.push(
-      t("directory.completed_other", {
-        count: user.completedChallengesCount,
-      })
-    );
-  }
-  if (user.collaboratorCount > 0) {
-    chips.push(
-      t("directory.collaborated_other", { count: user.collaboratorCount })
-    );
-  }
-  if (user.followerCount > 0) {
-    chips.push(t("directory.followers_other", { count: user.followerCount }));
-  }
-
+  const summary = buildSummary(user, t);
   const achievementsPct = Math.round(
     (user.achievementsUnlocked / Math.max(user.achievementsTotal, 1)) * 100
   );
 
   return (
-    <Link
-      to="/u/$userId"
-      params={{ userId: user.id }}
+    <article
       data-testid={`user-card-${user.id}`}
-      className="group relative flex items-center gap-4 rounded-2xl border border-black/[0.08] dark:border-white/[0.08] bg-white dark:bg-white/[0.02] p-4 transition-colors duration-150 hover:border-black/[0.18] dark:hover:border-white/[0.18] no-underline"
+      className="group relative flex items-center gap-4 rounded-2xl border border-black/[0.08] dark:border-white/[0.08] bg-white dark:bg-white/[0.02] p-4 transition-colors duration-150 hover:border-black/[0.18] dark:hover:border-white/[0.18]"
     >
+      <Link
+        to="/u/$userId"
+        params={{ userId: user.id }}
+        aria-label={privateName(user.name)}
+        className="absolute inset-0 rounded-2xl no-underline"
+      />
       {user.image ? (
         <img
           src={user.image}
           alt=""
-          className="w-12 h-12 rounded-full shrink-0 outline outline-1 outline-black/10 dark:outline-white/10"
+          className="relative w-12 h-12 rounded-full shrink-0 outline outline-1 outline-black/10 dark:outline-white/10"
         />
       ) : (
         <div
-          className="w-12 h-12 rounded-full shrink-0 flex items-center justify-center text-sm font-semibold bg-black/[0.04] dark:bg-white/[0.06] text-[#0c0c0b] dark:text-[#f0ede8] border border-black/[0.08] dark:border-white/[0.10]"
+          className="relative w-12 h-12 rounded-full shrink-0 flex items-center justify-center text-sm font-semibold bg-black/[0.04] dark:bg-white/[0.06] text-[#0c0c0b] dark:text-[#f0ede8] border border-black/[0.08] dark:border-white/[0.10]"
           style={{ fontFamily: "'Space Mono', monospace" }}
         >
           {initials(user.name)}
         </div>
       )}
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 mb-1.5">
-          <p className="text-[15px] font-semibold text-[#0c0c0b] dark:text-[#f0ede8] truncate">
-            {privateName(user.name)}
+      <div className="relative flex-1 min-w-0">
+        <p className="text-[15px] font-semibold text-[#0c0c0b] dark:text-[#f0ede8] truncate mb-0.5">
+          {privateName(user.name)}
+        </p>
+        {summary.length > 0 ? (
+          <p className="text-[12px] text-gray-500 dark:text-[#a0a09c] leading-snug">
+            {summary.join(" · ")}
           </p>
-          {role && <RoleChip role={role} />}
-        </div>
-        {chips.length > 0 ? (
-          <div className="flex flex-wrap gap-1.5">
-            {chips.map((label) => (
-              <StatChip key={label} label={label} />
-            ))}
-          </div>
         ) : (
-          <p className="text-[11px] text-gray-400 dark:text-[#6b6b67] italic">
+          <p className="text-[12px] text-gray-400 dark:text-[#6b6b67] italic">
             {t("directory.noActivity")}
           </p>
         )}
-        <div className="mt-2.5 flex items-center gap-2">
-          <span
-            className="text-[10px] uppercase tracking-wider text-gray-400 dark:text-[#6b6b67] shrink-0"
-            style={{ fontFamily: "'Space Mono', monospace" }}
-          >
-            ★ {user.achievementsUnlocked} / {user.achievementsTotal}
-          </span>
-          <div
-            className="flex-1 h-[2px] rounded-full bg-black/[0.06] dark:bg-white/[0.08] overflow-hidden"
-            aria-hidden="true"
-          >
+        {user.achievementsUnlocked > 0 && (
+          <div className="mt-2 flex items-center gap-2">
+            <span
+              className="text-[10px] uppercase tracking-wider text-gray-400 dark:text-[#6b6b67] shrink-0"
+              style={{ fontFamily: "'Space Mono', monospace" }}
+            >
+              ★ {user.achievementsUnlocked} / {user.achievementsTotal}
+            </span>
             <div
-              className="h-full bg-gray-900 dark:bg-[#f0ede8]"
-              style={{ width: `${achievementsPct}%` }}
-            />
+              className="flex-1 h-[2px] rounded-full bg-black/[0.06] dark:bg-white/[0.08] overflow-hidden"
+              aria-hidden="true"
+            >
+              <div
+                className="h-full bg-gray-900 dark:bg-[#f0ede8]"
+                style={{ width: `${achievementsPct}%` }}
+              />
+            </div>
           </div>
-        </div>
+        )}
       </div>
-      <svg
-        aria-hidden="true"
-        width="14"
-        height="14"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        className="shrink-0 text-gray-300 dark:text-[#6b6b67] group-hover:text-gray-500 dark:group-hover:text-[#a0a09c] transition-colors duration-150"
-      >
-        <polyline points="9 18 15 12 9 6" />
-      </svg>
-    </Link>
+      <div className="relative">
+        <SlimFollowButton userId={user.id} />
+      </div>
+    </article>
   );
 }
 

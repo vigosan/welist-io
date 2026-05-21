@@ -362,6 +362,12 @@ const en: Translations = {
     followers_other: "{{count}} followers",
     roleCreator: "Creator",
     roleChallenger: "Challenger",
+    sharesLists_one: "Shares {{count}} list",
+    sharesLists_other: "Shares {{count}} lists",
+    doesChallenges_one: "Doing {{count}} challenge",
+    doesChallenges_other: "Doing {{count}} challenges",
+    collaboratesIn_one: "Collaborates on {{count}} list",
+    collaboratesIn_other: "Collaborates on {{count}} lists",
   },
 };
 
