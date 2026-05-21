@@ -652,10 +652,8 @@ describe("ListDetailPage category", () => {
     await waitFor(() =>
       expect(screen.getByTestId("category-select")).toBeInTheDocument()
     );
-    await userEvent.selectOptions(
-      screen.getByTestId("category-select"),
-      "books"
-    );
+    await userEvent.click(screen.getByTestId("category-select"));
+    await userEvent.click(screen.getByTestId("category-option-books"));
     expect(categoryMutate).toHaveBeenCalledWith("books");
   });
 });

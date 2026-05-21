@@ -34,21 +34,20 @@ describe("ListSettingsPanel category selector", () => {
 
   it("reflects the current category", () => {
     renderPanel({ category: "movies" });
-    expect(screen.getByTestId("category-select")).toHaveValue("movies");
+    expect(screen.getByTestId("category-select")).toHaveTextContent("Películas");
   });
 
   it("calls onSetCategory with the chosen category", async () => {
     const props = renderPanel({ category: null });
-    await userEvent.selectOptions(
-      screen.getByTestId("category-select"),
-      "books"
-    );
+    await userEvent.click(screen.getByTestId("category-select"));
+    await userEvent.click(screen.getByTestId("category-option-books"));
     expect(props.onSetCategory).toHaveBeenCalledWith("books");
   });
 
   it("calls onSetCategory with null when cleared", async () => {
     const props = renderPanel({ category: "music" });
-    await userEvent.selectOptions(screen.getByTestId("category-select"), "");
+    await userEvent.click(screen.getByTestId("category-select"));
+    await userEvent.click(screen.getByTestId("category-option-none"));
     expect(props.onSetCategory).toHaveBeenCalledWith(null);
   });
 });
