@@ -967,6 +967,64 @@ describe("GET /api/explore", () => {
     expect(body.items).toHaveLength(6);
     expect(body.nextCursor).toBeNull();
   });
+
+  it("exposes isParticipating from the row data for authenticated users", async () => {
+    mockGetAuthUser.mockResolvedValueOnce({ session: { user: { id: "u1" } } });
+    const rows = [
+      {
+        id: "l1",
+        name: "Lista A",
+        slug: null,
+        createdAt: new Date("2024-01-01"),
+        itemCount: 0,
+        isParticipating: true,
+      },
+      {
+        id: "l2",
+        name: "Lista B",
+        slug: null,
+        createdAt: new Date("2024-01-02"),
+        itemCount: 0,
+        isParticipating: false,
+      },
+    ];
+    mockDb.select.mockReturnValue(chainMock(rows));
+
+    const res = await app.request("/api/explore", {
+      headers: { "x-forwarded-for": "10.4.0.1" },
+    });
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as {
+      items: Array<{ id: string; isParticipating: boolean }>;
+    };
+    expect(body.items[0]).toMatchObject({ id: "l1", isParticipating: true });
+    expect(body.items[1]).toMatchObject({ id: "l2", isParticipating: false });
+    expect(mockDb.select).toHaveBeenCalledWith(
+      expect.objectContaining({ isParticipating: expect.anything() })
+    );
+  });
+
+  it("returns isParticipating: false for anonymous viewers", async () => {
+    const rows = [
+      {
+        id: "l1",
+        name: "Lista A",
+        slug: null,
+        createdAt: new Date("2024-01-01"),
+        itemCount: 0,
+        isParticipating: false,
+      },
+    ];
+    mockDb.select.mockReturnValue(chainMock(rows));
+
+    const res = await app.request("/api/explore", {
+      headers: { "x-forwarded-for": "10.4.0.2" },
+    });
+    const body = (await res.json()) as {
+      items: Array<{ isParticipating: boolean }>;
+    };
+    expect(body.items[0].isParticipating).toBe(false);
+  });
 });
 
 describe("GET /api/explore/:listId", () => {

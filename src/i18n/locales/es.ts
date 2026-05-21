@@ -172,6 +172,7 @@ const es = {
     showList: "Ver lista",
     hideList: "Ocultar",
     acceptChallenge: "Aceptar el reto",
+    challengeAccepted: "✓ Reto aceptado",
     signIn: "Iniciar sesión para retar",
     backToExplore: "← Explorar",
     moreParticipants: "+{{count}} más",

@@ -173,6 +173,7 @@ const en: Translations = {
     showList: "Show list",
     hideList: "Hide",
     acceptChallenge: "Accept challenge",
+    challengeAccepted: "✓ Challenge accepted",
     signIn: "Sign in to challenge",
     backToExplore: "← Explore",
     moreParticipants: "+{{count}} more",

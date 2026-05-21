@@ -26,11 +26,12 @@ function ExploreListCard({
 }) {
   const { data: session } = useSession();
   const { t } = useTranslation();
-  const [accepted, setAccepted] = useState(false);
+  const [optimisticAccepted, setOptimisticAccepted] = useState(false);
+  const accepted = list.isParticipating || optimisticAccepted;
 
   function handleAccept() {
     if (session?.user) {
-      setAccepted(true);
+      setOptimisticAccepted(true);
       onAccept(list.id);
     } else {
       signIn("google");
@@ -215,7 +216,7 @@ function ExploreListCard({
       >
         {session?.user
           ? accepted
-            ? "✓ Reto aceptado"
+            ? t("explore.challengeAccepted")
             : t("explore.acceptChallenge")
           : t("explore.signIn")}
       </button>

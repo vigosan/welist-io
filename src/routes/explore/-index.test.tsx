@@ -44,6 +44,7 @@ const EXPLORE_A: ExploreItem = {
     { id: "p1", name: "Ana", image: null },
     { id: "p2", name: "Leo", image: "https://img/leo.jpg" },
   ],
+  isParticipating: false,
   rating: { avg: null, count: 0 },
   owner: { id: "u2", name: "Bob", image: null },
 };
@@ -60,6 +61,7 @@ const EXPLORE_B: ExploreItem = {
   progressDoneTotal: 0,
   previewItems: [],
   participants: [],
+  isParticipating: false,
   rating: { avg: null, count: 0 },
   owner: null,
 };
@@ -248,6 +250,20 @@ describe("ExplorePage", () => {
     );
     await userEvent.click(screen.getByTestId("accept-btn-e1"));
     expect(acceptMutate).toHaveBeenCalledWith("e1", expect.any(Object));
+  });
+
+  it("shows challenge accepted state when isParticipating is true", async () => {
+    setupMocks({
+      sessionUser: { id: "u1" },
+      lists: [{ ...EXPLORE_A, isParticipating: true }],
+    });
+    renderPage();
+    await waitFor(() =>
+      expect(screen.getByTestId("accept-btn-e1")).toBeInTheDocument()
+    );
+    expect(screen.getByTestId("accept-btn-e1")).toHaveTextContent(
+      "Reto aceptado"
+    );
   });
 
   it("accept button calls signIn when not logged in", async () => {

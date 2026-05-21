@@ -863,6 +863,7 @@ app.post(
 );
 
 app.get("/explore", async (c) => {
+  const viewerId = getOptionalUser(c)?.session?.user?.id ?? null;
   const q = c.req.query("q")?.trim();
   const cursor = c.req.query("cursor");
   const sort = c.req.query("sort") ?? "created_desc";
@@ -909,6 +910,9 @@ app.get("/explore", async (c) => {
       participants: sql<
         Array<{ id: string; name: string | null; image: string | null }>
       >`coalesce((select json_agg(s) from (select u.id, u.name, u.image from ${participations} pa join ${users} u on u.id = pa.user_id where pa.source_list_id = ${lists.id} order by pa.created_at desc limit 5) s), '[]'::json)`,
+      isParticipating: viewerId
+        ? sql<boolean>`exists(select 1 from ${participations} where ${participations.sourceListId} = ${lists.id} and ${participations.userId} = ${viewerId})`
+        : sql<boolean>`false`,
       ratingAvg: sql<
         number | null
       >`(select avg(${listRatings.value})::float8 from ${listRatings} where ${listRatings.listId} = ${lists.id})`,
