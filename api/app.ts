@@ -931,7 +931,7 @@ app.get("/stats", async (c) => {
   });
 });
 
-const USERS_PAGE_SIZE = 12;
+const USERS_PAGE_SIZE = 6;
 
 app.get("/users", async (c) => {
   const q = c.req.query("q")?.trim();

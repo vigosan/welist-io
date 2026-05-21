@@ -1654,7 +1654,7 @@ describe("GET /api/users", () => {
   });
 
   it("returns nextCursor when page is full", async () => {
-    const fullPage = Array.from({ length: 12 }, (_, i) => ({
+    const fullPage = Array.from({ length: 6 }, (_, i) => ({
       id: `u${i}`,
       name: `User ${i}`,
       image: null,
@@ -1675,7 +1675,7 @@ describe("GET /api/users", () => {
     const res = await app.request("/api/users");
     expect(res.status).toBe(200);
     const body = (await res.json()) as Record<string, unknown>;
-    expect(body.nextCursor).toBe("u11");
+    expect(body.nextCursor).toBe("u5");
   });
 });
 
