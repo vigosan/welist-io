@@ -1,7 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useTranslation } from "@/i18n/service";
-import { LIST_CATEGORIES } from "@/lib/categories";
+import { LIST_CATEGORIES, type ListCategory } from "@/lib/categories";
+import { CategoryIcon } from "@/lib/categoryIcons";
 
 type Props = {
   isPublic: boolean;
@@ -158,19 +159,28 @@ export function ListSettingsPanel({
 
       <div className="flex items-center justify-between">
         <span className="text-xs text-gray-500">{t("list.category")}</span>
-        <select
-          data-testid="category-select"
-          value={category ?? ""}
-          onChange={(e) => onSetCategory(e.target.value || null)}
-          className="cursor-pointer text-xs text-gray-700 bg-white border border-gray-200 rounded-lg px-2 py-1.5 outline-none focus:border-gray-400 transition"
-        >
-          <option value="">{t("categories.none")}</option>
-          {LIST_CATEGORIES.map((c) => (
-            <option key={c} value={c}>
-              {t(`categories.${c}`)}
-            </option>
-          ))}
-        </select>
+        <div className="flex items-center gap-2">
+          {category && (
+            <CategoryIcon
+              category={category as ListCategory}
+              size={14}
+              className="text-gray-500"
+            />
+          )}
+          <select
+            data-testid="category-select"
+            value={category ?? ""}
+            onChange={(e) => onSetCategory(e.target.value || null)}
+            className="cursor-pointer text-xs text-gray-700 bg-white border border-gray-200 rounded-lg px-2 py-1.5 outline-none focus:border-gray-400 transition"
+          >
+            <option value="">{t("categories.none")}</option>
+            {LIST_CATEGORIES.map((c) => (
+              <option key={c} value={c}>
+                {t(`categories.${c}`)}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       <div className="flex items-center justify-between">

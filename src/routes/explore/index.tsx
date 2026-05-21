@@ -5,7 +5,8 @@ import { AppNav } from "@/components/AppNav";
 import { useAcceptChallenge, useExplore } from "@/hooks/useList";
 import { useTrackOnMount } from "@/hooks/useTrackOnMount";
 import { useTranslation } from "@/i18n/service";
-import { LIST_CATEGORIES } from "@/lib/categories";
+import { LIST_CATEGORIES, type ListCategory } from "@/lib/categories";
+import { CategoryIcon } from "@/lib/categoryIcons";
 import { plainItemText } from "@/lib/item-text";
 import type { ExploreItem } from "@/services/lists.service";
 
@@ -42,8 +43,12 @@ function ExploreListCard({
           {list.category && (
             <span
               data-testid={`explore-card-category-${list.id}`}
-              className="mb-1.5 inline-block text-[10px] font-medium uppercase tracking-wider text-gray-400 dark:text-gray-500"
+              className="mb-1.5 inline-flex items-center gap-1.5 text-[10px] font-medium uppercase tracking-wider text-gray-400 dark:text-gray-500"
             >
+              <CategoryIcon
+                category={list.category as ListCategory}
+                size={11}
+              />
               {t(`categories.${list.category}`)}
             </span>
           )}
@@ -445,8 +450,9 @@ function ExplorePage() {
                     type="button"
                     data-testid={`explore-category-${cat}`}
                     onClick={() => setCategory(active ? undefined : cat)}
-                    className={chipClass(active)}
+                    className={`${chipClass(active)} inline-flex items-center gap-1.5`}
                   >
+                    <CategoryIcon category={cat} size={12} />
                     {t(`categories.${cat}`)}
                   </button>
                 );
