@@ -1323,6 +1323,18 @@ app.post("/users/:userId/follow", async (c) => {
     .insert(follows)
     .values({ followerId, followingId })
     .onConflictDoNothing();
+  const actor = await db.query.users.findFirst({
+    where: eq(users.id, followerId),
+    columns: { name: true, image: true },
+  });
+  await createNotification({
+    recipientId: followingId,
+    type: "new_follower",
+    actorId: followerId,
+    actorName: actor?.name,
+    actorImage: actor?.image,
+    actionUrl: `/u/${followerId}`,
+  });
   await checkAchievements(followingId);
   return c.json({ following: true });
 });

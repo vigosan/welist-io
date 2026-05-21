@@ -255,6 +255,8 @@ const es = {
     someone: "Alguien",
     accepted: "{{name}} ha aceptado tu reto «{{list}}»",
     completed: "{{name}} ha completado tu reto «{{list}}»",
+    newFollower: "{{name}} ha empezado a seguirte",
+    listPurchased: "{{name}} ha comprado tu lista «{{list}}»",
   },
   profile: {
     publicLists: "Listas públicas",

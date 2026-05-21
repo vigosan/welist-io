@@ -9,6 +9,7 @@ const mockDb = {
     users: { findFirst: vi.fn() },
     stripeAccounts: { findFirst: vi.fn() },
     listPurchases: { findFirst: vi.fn() },
+    notifications: { findFirst: vi.fn(), findMany: vi.fn() },
   },
   insert: vi.fn(),
   update: vi.fn(),
@@ -1863,6 +1864,44 @@ describe("follow endpoints", () => {
     expect(res.status).toBe(200);
     expect(await res.json()).toEqual({ following: true });
     expect(onConflict).toHaveBeenCalled();
+  });
+
+  it("POST follow creates a new_follower notification for the target", async () => {
+    mockGetAuthUser.mockResolvedValue({ session: { user: { id: "u1" } } });
+    mockDb.query.users.findFirst
+      .mockResolvedValueOnce({ id: "u2" })
+      .mockResolvedValueOnce({ name: "Alice", image: "img.jpg" });
+    mockDb.query.notifications.findFirst.mockResolvedValue(undefined);
+
+    const valuesCalls: unknown[] = [];
+    mockDb.insert.mockImplementation(() => {
+      const p: Promise<undefined> & {
+        onConflictDoNothing?: ReturnType<typeof vi.fn>;
+      } = Promise.resolve(undefined);
+      p.onConflictDoNothing = vi.fn().mockResolvedValue(undefined);
+      return {
+        values: vi.fn((v: unknown) => {
+          valuesCalls.push(v);
+          return p;
+        }),
+      };
+    });
+
+    const res = await app.request("/api/users/u2/follow", {
+      method: "POST",
+      headers: { "x-forwarded-for": "10.0.0.2" },
+    });
+    expect(res.status).toBe(200);
+    expect(valuesCalls).toContainEqual(
+      expect.objectContaining({
+        userId: "u2",
+        type: "new_follower",
+        actorId: "u1",
+        actorName: "Alice",
+        actorImage: "img.jpg",
+        actionUrl: "/u/u1",
+      })
+    );
   });
 
   it("DELETE follow returns 401 without a session", async () => {

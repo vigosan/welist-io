@@ -256,6 +256,8 @@ const en: Translations = {
     someone: "Someone",
     accepted: "{{name}} accepted your challenge «{{list}}»",
     completed: "{{name}} completed your challenge «{{list}}»",
+    newFollower: "{{name}} started following you",
+    listPurchased: "{{name}} bought your list «{{list}}»",
   },
   profile: {
     publicLists: "Public lists",

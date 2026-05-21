@@ -8,17 +8,19 @@ function NotificationItem({ n }: { n: AppNotification }) {
   const { t } = useTranslation();
   const isUnread = !n.readAt;
   const date = new Date(n.createdAt).toLocaleDateString();
+  const name = n.actorName ?? t("notifications.someone");
+  const list = n.listName ?? "";
 
-  const label =
-    n.type === "challenge_accepted"
-      ? t("notifications.accepted", {
-          name: n.actorName ?? t("notifications.someone"),
-          list: n.listName ?? "",
-        })
-      : t("notifications.completed", {
-          name: n.actorName ?? t("notifications.someone"),
-          list: n.listName ?? "",
-        });
+  let label: string;
+  if (n.type === "challenge_accepted") {
+    label = t("notifications.accepted", { name, list });
+  } else if (n.type === "challenge_completed") {
+    label = t("notifications.completed", { name, list });
+  } else if (n.type === "new_follower") {
+    label = t("notifications.newFollower", { name });
+  } else {
+    label = t("notifications.listPurchased", { name, list });
+  }
 
   const content = (
     <div
@@ -51,11 +53,11 @@ function NotificationItem({ n }: { n: AppNotification }) {
     </div>
   );
 
-  if (n.listId) {
+  const linkTo = n.actionUrl ?? (n.listId ? `/explore/${n.listId}` : null);
+  if (linkTo) {
     return (
       <Link
-        to="/explore/$listId"
-        params={{ listId: n.listId }}
+        to={linkTo}
         className="block hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
       >
         {content}
