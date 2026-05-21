@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { AppFooter } from "@/components/AppFooter";
 import { AppNav } from "@/components/AppNav";
+import { Skeleton } from "@/components/Skeleton";
 import {
   useCreateList,
   useExplore,
@@ -87,8 +88,30 @@ function CreateForm() {
 }
 
 function HeroStats() {
-  const { data } = useStats();
+  const { data, isLoading } = useStats();
   const { t } = useTranslation();
+
+  if (isLoading) {
+    return (
+      <div
+        data-testid="hero-stats-skeleton"
+        className="mt-8 flex flex-wrap items-center justify-center gap-x-7 gap-y-3"
+      >
+        {["lists", "users", "challenges"].map((k, i, arr) => (
+          <div key={k} className="flex items-center gap-2">
+            <Skeleton variant="text" className="h-3.5 w-10" />
+            <Skeleton variant="text" className="h-3 w-24" />
+            {i < arr.length - 1 && (
+              <span aria-hidden className="ml-5 text-muted/40">
+                ·
+              </span>
+            )}
+          </div>
+        ))}
+      </div>
+    );
+  }
+
   if (!data) return null;
   const stats = [
     { value: data.lists, label: t("home.statsLists") },
@@ -288,10 +311,10 @@ function HowItWorks() {
 function ExploreSection() {
   const { t } = useTranslation();
   const ref = useFadeIn();
-  const { data } = useExplore();
+  const { data, isLoading } = useExplore();
   const lists = data?.pages[0]?.items?.slice(0, 3) ?? [];
 
-  if (lists.length === 0) return null;
+  if (!isLoading && lists.length === 0) return null;
 
   return (
     <section className="bg-ink px-4 py-20 sm:px-12 dark:bg-black">
@@ -313,43 +336,63 @@ function ExploreSection() {
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-10">
-          {lists.map((list) => (
-            <Link
-              key={list.id}
-              to="/explore/$listId"
-              params={{ listId: list.slug ?? list.id }}
-              className="no-underline block"
-            >
-              <div className="h-full rounded-2xl border border-paper/[0.07] bg-paper/[0.04] p-6 transition-all duration-200 hover:-translate-y-0.5 hover:border-paper/[0.18] cursor-pointer">
-                <p className="mb-2 text-[14px] font-semibold leading-snug tracking-[-0.01em] text-paper">
-                  {list.name}
-                </p>
-                {list.description && (
-                  <p
-                    className="mb-4 text-[12px] text-paper/30"
-                    style={{ lineHeight: 1.6 }}
-                  >
-                    {list.description}
-                  </p>
-                )}
+        {isLoading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-10">
+            {["a", "b", "c"].map((k) => (
+              <div
+                key={k}
+                data-testid="explore-section-skeleton"
+                className="h-full rounded-2xl border border-paper/[0.07] bg-paper/[0.04] p-6"
+              >
+                <Skeleton variant="text" className="mb-2 h-4 w-2/3" />
+                <Skeleton variant="text" className="mb-2 h-3 w-full" />
+                <Skeleton variant="text" className="mb-4 h-3 w-5/6" />
                 <div className="mt-auto flex gap-4">
-                  {[
-                    { label: list.itemCount, suffix: "items" },
-                    { label: list.participantCount, suffix: "retos" },
-                  ].map(({ label, suffix }) => (
-                    <span
-                      key={suffix}
-                      className="font-mono text-[11px] text-paper/30"
-                    >
-                      {label} {suffix}
-                    </span>
-                  ))}
+                  <Skeleton variant="text" className="h-3 w-16" />
+                  <Skeleton variant="text" className="h-3 w-16" />
                 </div>
               </div>
-            </Link>
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-10">
+            {lists.map((list) => (
+              <Link
+                key={list.id}
+                to="/explore/$listId"
+                params={{ listId: list.slug ?? list.id }}
+                className="no-underline block"
+              >
+                <div className="h-full rounded-2xl border border-paper/[0.07] bg-paper/[0.04] p-6 transition-all duration-200 hover:-translate-y-0.5 hover:border-paper/[0.18] cursor-pointer">
+                  <p className="mb-2 text-[14px] font-semibold leading-snug tracking-[-0.01em] text-paper">
+                    {list.name}
+                  </p>
+                  {list.description && (
+                    <p
+                      className="mb-4 text-[12px] text-paper/30"
+                      style={{ lineHeight: 1.6 }}
+                    >
+                      {list.description}
+                    </p>
+                  )}
+                  <div className="mt-auto flex gap-4">
+                    {[
+                      { label: list.itemCount, suffix: "items" },
+                      { label: list.participantCount, suffix: "retos" },
+                    ].map(({ label, suffix }) => (
+                      <span
+                        key={suffix}
+                        className="font-mono text-[11px] text-paper/30"
+                      >
+                        {label} {suffix}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
 
         <Link
           to="/explore"
@@ -458,13 +501,13 @@ function CreatorsSection() {
 
 function CommunitySection() {
   const ref = useFadeIn();
-  const { data } = useUserDirectory();
+  const { data, isLoading } = useUserDirectory();
   const users = (data?.pages[0]?.users ?? [])
     .filter((u) => u.image)
     .slice(0, 9);
   const total = data?.pages[0]?.users.length ?? 0;
 
-  if (users.length === 0) return null;
+  if (!isLoading && users.length === 0) return null;
 
   return (
     <section className="border-t border-ink/[0.08] dark:border-paper/[0.08]">
@@ -472,25 +515,48 @@ function CommunitySection() {
         ref={ref}
         className="mx-auto flex w-full max-w-[1100px] flex-col items-start gap-5 px-4 py-14 sm:flex-row sm:items-center sm:px-12"
       >
-        <div className="flex -space-x-2.5">
-          {users.map((u) => (
-            <img
-              key={u.id}
-              src={u.image ?? ""}
-              alt={u.name ?? ""}
-              title={u.name ?? ""}
-              className="h-9 w-9 rounded-full object-cover outline outline-2 outline-canvas dark:outline-canvas-dark"
-            />
-          ))}
-        </div>
-        <div className="flex flex-1 flex-col gap-0.5">
-          <p className="text-[13px] font-medium text-ink dark:text-paper">
-            Únete a {total > 9 ? `${total}+` : total} personas
-          </p>
-          <p className="text-[12px] text-muted">
-            que ya crean y completan listas en welist
-          </p>
-        </div>
+        {isLoading ? (
+          <>
+            <div
+              data-testid="community-avatars-skeleton"
+              className="flex -space-x-2.5"
+            >
+              {["a", "b", "c", "d", "e", "f", "g", "h", "i"].map((k) => (
+                <Skeleton
+                  key={k}
+                  variant="circle"
+                  className="h-9 w-9 outline outline-2 outline-canvas dark:outline-canvas-dark"
+                />
+              ))}
+            </div>
+            <div className="flex flex-1 flex-col gap-1.5">
+              <Skeleton variant="text" className="h-3.5 w-44" />
+              <Skeleton variant="text" className="h-3 w-64" />
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="flex -space-x-2.5">
+              {users.map((u) => (
+                <img
+                  key={u.id}
+                  src={u.image ?? ""}
+                  alt={u.name ?? ""}
+                  title={u.name ?? ""}
+                  className="h-9 w-9 rounded-full object-cover outline outline-2 outline-canvas dark:outline-canvas-dark"
+                />
+              ))}
+            </div>
+            <div className="flex flex-1 flex-col gap-0.5">
+              <p className="text-[13px] font-medium text-ink dark:text-paper">
+                Únete a {total > 9 ? `${total}+` : total} personas
+              </p>
+              <p className="text-[12px] text-muted">
+                que ya crean y completan listas en welist
+              </p>
+            </div>
+          </>
+        )}
         <Link
           to="/users"
           className="font-mono text-[11px] uppercase tracking-[0.14em] text-muted no-underline transition-colors hover:text-ink dark:hover:text-paper"
