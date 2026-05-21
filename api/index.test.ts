@@ -1594,6 +1594,53 @@ describe("GET /api/users", () => {
     expect(Array.isArray(body.users)).toBe(true);
   });
 
+  it("includes achievementsUnlocked, achievementsTotal and followerCount per user", async () => {
+    const usersChain = {
+      from: vi.fn().mockReturnThis(),
+      where: vi.fn().mockReturnThis(),
+      orderBy: vi.fn().mockReturnThis(),
+      limit: vi
+        .fn()
+        .mockResolvedValue([{ id: "u1", name: "Alice", image: null }]),
+    };
+    const emptyChain = {
+      from: vi.fn().mockReturnThis(),
+      where: vi.fn().mockReturnThis(),
+      groupBy: vi.fn().mockResolvedValue([]),
+    };
+    const achievementsChain = {
+      from: vi.fn().mockReturnThis(),
+      where: vi.fn().mockReturnThis(),
+      groupBy: vi.fn().mockResolvedValue([{ userId: "u1", count: 4 }]),
+    };
+    const followersChain = {
+      from: vi.fn().mockReturnThis(),
+      where: vi.fn().mockReturnThis(),
+      groupBy: vi.fn().mockResolvedValue([{ followingId: "u1", count: 7 }]),
+    };
+    mockDb.select
+      .mockReturnValueOnce(usersChain)
+      .mockReturnValueOnce(emptyChain) // listCounts
+      .mockReturnValueOnce(emptyChain) // challengerCounts
+      .mockReturnValueOnce(emptyChain) // completedCounts
+      .mockReturnValueOnce(emptyChain) // collaboratorCounts
+      .mockReturnValueOnce(achievementsChain)
+      .mockReturnValueOnce(followersChain);
+
+    const res = await app.request("/api/users");
+    const body = (await res.json()) as {
+      users: {
+        id: string;
+        achievementsUnlocked: number;
+        achievementsTotal: number;
+        followerCount: number;
+      }[];
+    };
+    expect(body.users[0].achievementsUnlocked).toBe(4);
+    expect(body.users[0].achievementsTotal).toBeGreaterThan(0);
+    expect(body.users[0].followerCount).toBe(7);
+  });
+
   it("returns nextCursor when page is full", async () => {
     const fullPage = Array.from({ length: 12 }, (_, i) => ({
       id: `u${i}`,

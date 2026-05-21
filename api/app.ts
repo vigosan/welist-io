@@ -945,9 +945,16 @@ app.get("/users", async (c) => {
 
   const userIds = rows.map((r) => r.id);
 
-  const [listCounts, challengerCounts, completedCounts, collaboratorCounts] =
+  const [
+    listCounts,
+    challengerCounts,
+    completedCounts,
+    collaboratorCounts,
+    achievementCounts,
+    followerCounts,
+  ] =
     userIds.length === 0
-      ? [[], [], [], []]
+      ? [[], [], [], [], [], []]
       : await Promise.all([
           db
             .select({ ownerId: lists.ownerId, count: countDistinct(lists.id) })
@@ -994,6 +1001,22 @@ app.get("/users", async (c) => {
               )
             )
             .groupBy(participations.userId),
+          db
+            .select({
+              userId: achievements.userId,
+              count: countDistinct(achievements.id),
+            })
+            .from(achievements)
+            .where(inArray(achievements.userId, userIds))
+            .groupBy(achievements.userId),
+          db
+            .select({
+              followingId: follows.followingId,
+              count: countDistinct(follows.id),
+            })
+            .from(follows)
+            .where(inArray(follows.followingId, userIds))
+            .groupBy(follows.followingId),
         ]);
 
   const listCountMap = new Map(listCounts.map((r) => [r.ownerId, r.count]));
@@ -1006,6 +1029,12 @@ app.get("/users", async (c) => {
   const collaboratorCountMap = new Map(
     collaboratorCounts.map((r) => [r.userId, r.count])
   );
+  const achievementCountMap = new Map(
+    achievementCounts.map((r) => [r.userId, r.count])
+  );
+  const followerCountMap = new Map(
+    followerCounts.map((r) => [r.followingId, r.count])
+  );
 
   return c.json({
     users: rows.map((u) => ({
@@ -1014,6 +1043,9 @@ app.get("/users", async (c) => {
       challengerCount: challengerCountMap.get(u.id) ?? 0,
       completedChallengesCount: completedCountMap.get(u.id) ?? 0,
       collaboratorCount: collaboratorCountMap.get(u.id) ?? 0,
+      achievementsUnlocked: achievementCountMap.get(u.id) ?? 0,
+      achievementsTotal: ACHIEVEMENT_CATALOG.length,
+      followerCount: followerCountMap.get(u.id) ?? 0,
     })),
     nextCursor,
   });

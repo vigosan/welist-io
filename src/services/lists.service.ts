@@ -120,6 +120,9 @@ export type DirectoryUser = {
   challengerCount: number;
   completedChallengesCount: number;
   collaboratorCount: number;
+  achievementsUnlocked: number;
+  achievementsTotal: number;
+  followerCount: number;
 };
 
 export type AppStats = { users: number; lists: number; challenges: number };
