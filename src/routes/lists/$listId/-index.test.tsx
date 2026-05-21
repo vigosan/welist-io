@@ -41,7 +41,9 @@ import {
 import { useItemsFilter } from "@/hooks/useItemsFilter";
 import {
   useCollaborators,
+  useRateList,
   useToggleCollaborative,
+  useUnrateList,
   useUpdateCategory,
 } from "@/hooks/useList";
 import { useListHeader } from "@/hooks/useListHeader";
@@ -248,6 +250,14 @@ function setupMocks({
   } as never);
   vi.mocked(useUpdateCategory).mockReturnValue({
     mutate: categoryMutate,
+    isPending: false,
+  } as never);
+  vi.mocked(useRateList).mockReturnValue({
+    mutate: vi.fn(),
+    isPending: false,
+  } as never);
+  vi.mocked(useUnrateList).mockReturnValue({
+    mutate: vi.fn(),
     isPending: false,
   } as never);
   vi.mocked(useCollaborators).mockReturnValue({

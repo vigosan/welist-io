@@ -26,6 +26,7 @@ import { ListSettingsChip } from "@/components/lists/ListSettingsChip";
 import { ListStatsCard } from "@/components/lists/ListStatsCard";
 import { ParticipantsPanel } from "@/components/lists/ParticipantsPanel";
 import { SignInNudge } from "@/components/SignInNudge";
+import { StarRatingDisplay, StarRatingInput } from "@/components/StarRating";
 
 const ListMap = lazy(() =>
   import("@/components/maps/ListMap").then((m) => ({ default: m.ListMap }))
@@ -46,7 +47,9 @@ import { useItemsFilter } from "@/hooks/useItemsFilter";
 import {
   useCollaborators,
   useDeleteList,
+  useRateList,
   useToggleCollaborative,
+  useUnrateList,
   useUpdateCategory,
 } from "@/hooks/useList";
 import { useListHeader } from "@/hooks/useListHeader";
@@ -168,6 +171,8 @@ function ListDetailPage() {
 
   const toggleCollaborative = useToggleCollaborative(listId);
   const updateCategory = useUpdateCategory(listId);
+  const rateList = useRateList(listId);
+  const unrateList = useUnrateList(listId);
   const { data: session } = useSession();
 
   const { data: listPrice } = useListPrice(listId, settingsOpen);
@@ -760,6 +765,23 @@ function ListDetailPage() {
                   </>
                 )}
               </div>
+
+              {!listLoading && (
+                <div className="mt-3 flex flex-wrap items-center gap-3 order-6">
+                  {session?.user ? (
+                    <StarRatingInput
+                      value={list?.rating?.userValue ?? null}
+                      onChange={(v) => rateList.mutate(v)}
+                      onClear={() => unrateList.mutate()}
+                      disabled={rateList.isPending || unrateList.isPending}
+                    />
+                  ) : null}
+                  <StarRatingDisplay
+                    avg={list?.rating?.avg ?? null}
+                    count={list?.rating?.count ?? 0}
+                  />
+                </div>
+              )}
 
               {!listLoading && isOwner && participantsPanel && (
                 <ParticipantsPanel
