@@ -34,6 +34,17 @@ vi.mock("./email", () => ({
   sendEmail: vi.fn().mockResolvedValue({ skipped: false, id: "test-msg" }),
 }));
 
+const mockStripeConstructEvent = vi.fn();
+vi.mock("stripe", () => {
+  const StripeMock = vi.fn().mockImplementation(() => ({
+    webhooks: { constructEventAsync: mockStripeConstructEvent },
+    paymentIntents: { create: vi.fn() },
+    accounts: { create: vi.fn(), retrieve: vi.fn() },
+    accountLinks: { create: vi.fn() },
+  }));
+  return { default: StripeMock };
+});
+
 const { app } = await import("./app");
 const { sendEmail: mockSendEmail } = await import("./email");
 const { achievements } = await import("../src/db/schema/index");
@@ -2477,6 +2488,72 @@ describe("POST /api/events", () => {
       headers: { "Content-Type": "application/json" },
     });
     expect(res.status).toBe(400);
+  });
+});
+
+describe("POST /api/stripe/webhook payment_intent.succeeded", () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it("creates a list_purchased notification for the list owner", async () => {
+    mockStripeConstructEvent.mockResolvedValue({
+      type: "payment_intent.succeeded",
+      data: {
+        object: {
+          id: "pi_123",
+          metadata: { listId: "list-1", buyerId: "buyer-1" },
+        },
+      },
+    });
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      ownerId: "owner-1",
+      name: "Best Cinemas",
+    });
+    mockDb.query.users.findFirst.mockResolvedValue({
+      name: "Bob",
+      image: "bob.jpg",
+    });
+    mockDb.select.mockReturnValue({
+      from: vi.fn().mockReturnThis(),
+      where: vi.fn().mockResolvedValue([]),
+    });
+    mockDb.$count.mockResolvedValue(0);
+
+    const valuesCalls: unknown[] = [];
+    mockDb.insert.mockImplementation(() => {
+      const p: Promise<undefined> & {
+        onConflictDoNothing?: ReturnType<typeof vi.fn>;
+      } = Promise.resolve(undefined);
+      p.onConflictDoNothing = vi.fn().mockResolvedValue(undefined);
+      return {
+        values: vi.fn((v: unknown) => {
+          valuesCalls.push(v);
+          return p;
+        }),
+      };
+    });
+
+    const res = await app.request("/api/stripe/webhook", {
+      method: "POST",
+      headers: {
+        "stripe-signature": "test-sig",
+        "x-forwarded-for": "10.0.0.3",
+      },
+      body: "{}",
+    });
+
+    expect(res.status).toBe(200);
+    expect(valuesCalls).toContainEqual(
+      expect.objectContaining({
+        userId: "owner-1",
+        type: "list_purchased",
+        listId: "list-1",
+        listName: "Best Cinemas",
+        actorId: "buyer-1",
+        actorName: "Bob",
+        actorImage: "bob.jpg",
+        actionUrl: "/lists/list-1",
+      })
+    );
   });
 });
 

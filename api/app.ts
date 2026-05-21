@@ -2084,8 +2084,24 @@ app.post("/stripe/webhook", async (c) => {
         .onConflictDoNothing();
       const soldList = await db.query.lists.findFirst({
         where: eq(lists.id, listId),
-        columns: { ownerId: true },
+        columns: { ownerId: true, name: true },
       });
+      if (soldList?.ownerId) {
+        const buyer = await db.query.users.findFirst({
+          where: eq(users.id, buyerId),
+          columns: { name: true, image: true },
+        });
+        await createNotification({
+          recipientId: soldList.ownerId,
+          type: "list_purchased",
+          listId,
+          listName: soldList.name,
+          actorId: buyerId,
+          actorName: buyer?.name,
+          actorImage: buyer?.image,
+          actionUrl: `/lists/${listId}`,
+        });
+      }
       await checkAchievements(soldList?.ownerId);
     }
   }
