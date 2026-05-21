@@ -356,6 +356,11 @@ const es = {
     noActivity: "sin actividad pública",
     backToUsers: "← Comunidad",
     nav: "Comunidad",
+    achievementsLabel: "Logros",
+    followers_one: "{{count}} seguidor",
+    followers_other: "{{count}} seguidores",
+    roleCreator: "Creador",
+    roleChallenger: "Retador",
   },
 } as const;
 

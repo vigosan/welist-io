@@ -34,8 +34,29 @@ function StatChip({ label }: { label: string }) {
   );
 }
 
+function deriveRole(user: DirectoryUser): "creator" | "challenger" | null {
+  const takes = user.challengerCount + user.collaboratorCount;
+  if (user.ownedListsCount === 0 && takes === 0) return null;
+  if (user.ownedListsCount >= takes) return "creator";
+  return "challenger";
+}
+
+function RoleChip({ role }: { role: "creator" | "challenger" }) {
+  const { t } = useTranslation();
+  const label =
+    role === "creator"
+      ? t("directory.roleCreator")
+      : t("directory.roleChallenger");
+  return (
+    <span className="inline-flex items-center rounded-full border border-gray-900 dark:border-[#f0ede8] bg-gray-900 dark:bg-[#f0ede8] px-2 py-0.5 text-[10px] font-semibold tracking-wide text-white dark:text-[#0c0c0b] uppercase">
+      {label}
+    </span>
+  );
+}
+
 function UserRow({ user }: { user: DirectoryUser }) {
   const { t } = useTranslation();
+  const role = deriveRole(user);
   const chips: string[] = [];
   if (user.ownedListsCount > 0) {
     chips.push(t("directory.owned_other", { count: user.ownedListsCount }));
@@ -57,6 +78,13 @@ function UserRow({ user }: { user: DirectoryUser }) {
       t("directory.collaborated_other", { count: user.collaboratorCount })
     );
   }
+  if (user.followerCount > 0) {
+    chips.push(t("directory.followers_other", { count: user.followerCount }));
+  }
+
+  const achievementsPct = Math.round(
+    (user.achievementsUnlocked / Math.max(user.achievementsTotal, 1)) * 100
+  );
 
   return (
     <Link
@@ -80,9 +108,12 @@ function UserRow({ user }: { user: DirectoryUser }) {
         </div>
       )}
       <div className="flex-1 min-w-0">
-        <p className="text-[15px] font-semibold text-[#0c0c0b] dark:text-[#f0ede8] mb-1.5 truncate">
-          {privateName(user.name)}
-        </p>
+        <div className="flex items-center gap-2 mb-1.5">
+          <p className="text-[15px] font-semibold text-[#0c0c0b] dark:text-[#f0ede8] truncate">
+            {privateName(user.name)}
+          </p>
+          {role && <RoleChip role={role} />}
+        </div>
         {chips.length > 0 ? (
           <div className="flex flex-wrap gap-1.5">
             {chips.map((label) => (
@@ -94,6 +125,23 @@ function UserRow({ user }: { user: DirectoryUser }) {
             {t("directory.noActivity")}
           </p>
         )}
+        <div className="mt-2.5 flex items-center gap-2">
+          <span
+            className="text-[10px] uppercase tracking-wider text-gray-400 dark:text-[#6b6b67] shrink-0"
+            style={{ fontFamily: "'Space Mono', monospace" }}
+          >
+            ★ {user.achievementsUnlocked} / {user.achievementsTotal}
+          </span>
+          <div
+            className="flex-1 h-[2px] rounded-full bg-black/[0.06] dark:bg-white/[0.08] overflow-hidden"
+            aria-hidden="true"
+          >
+            <div
+              className="h-full bg-gray-900 dark:bg-[#f0ede8]"
+              style={{ width: `${achievementsPct}%` }}
+            />
+          </div>
+        </div>
       </div>
       <svg
         aria-hidden="true"

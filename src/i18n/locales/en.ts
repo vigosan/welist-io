@@ -357,6 +357,11 @@ const en: Translations = {
     noActivity: "no public activity",
     backToUsers: "← Community",
     nav: "Community",
+    achievementsLabel: "Achievements",
+    followers_one: "{{count}} follower",
+    followers_other: "{{count}} followers",
+    roleCreator: "Creator",
+    roleChallenger: "Challenger",
   },
 };
 
