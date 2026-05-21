@@ -2,6 +2,7 @@ import { useSession } from "@hono/auth-js/react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { AppNav } from "@/components/AppNav";
+import { Skeleton } from "@/components/Skeleton";
 import { useToggleFollow, useUserDirectory } from "@/hooks/useList";
 import { useTranslation } from "@/i18n/service";
 import type { DirectoryUser } from "@/services/lists.service";
@@ -82,6 +83,22 @@ function buildSummary(
     parts.push(t("directory.followers_other", { count: user.followerCount }));
   }
   return parts;
+}
+
+function UserRowSkeleton() {
+  return (
+    <div
+      data-testid="user-row-skeleton"
+      className="flex items-center gap-4 rounded-2xl border border-black/[0.08] dark:border-white/[0.08] bg-white dark:bg-white/[0.02] p-4"
+    >
+      <Skeleton variant="circle" className="w-12 h-12 shrink-0" />
+      <div className="flex-1 min-w-0 flex flex-col gap-2">
+        <Skeleton variant="text" className="h-3.5 w-40" />
+        <Skeleton variant="text" className="h-3 w-56" />
+      </div>
+      <Skeleton className="h-7 w-20 rounded-full" />
+    </div>
+  );
 }
 
 function UserRow({ user }: { user: DirectoryUser }) {
@@ -222,9 +239,11 @@ function UsersDirectoryPage() {
 
         <div className="mt-7">
           {isLoading && (
-            <p className="text-xs text-gray-500 text-center py-10">
-              {t("directory.loading")}
-            </p>
+            <div className="flex flex-col gap-2.5">
+              {["a", "b", "c", "d", "e", "f"].map((k) => (
+                <UserRowSkeleton key={k} />
+              ))}
+            </div>
           )}
           {!isLoading && userList.length === 0 && (
             <p className="text-xs text-gray-500 text-center py-10">
@@ -240,9 +259,11 @@ function UsersDirectoryPage() {
 
         <div ref={sentinelRef} className="h-4" />
         {isFetchingNextPage && (
-          <p className="text-xs text-gray-500 text-center py-4">
-            {t("directory.loading")}
-          </p>
+          <div className="flex flex-col gap-2.5 pt-2.5">
+            {["a", "b", "c"].map((k) => (
+              <UserRowSkeleton key={k} />
+            ))}
+          </div>
         )}
       </main>
     </div>
