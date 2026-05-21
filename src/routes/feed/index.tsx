@@ -1,8 +1,25 @@
 import { signIn, useSession } from "@hono/auth-js/react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppNav } from "@/components/AppNav";
+import { Skeleton } from "@/components/Skeleton";
 import { useFeed } from "@/hooks/useList";
 import { useTranslation } from "@/i18n/service";
+
+function FeedItemSkeleton() {
+  return (
+    <div
+      data-testid="feed-item-skeleton"
+      className="flex items-start justify-between gap-4 border-b border-black/[0.08] dark:border-white/[0.08] py-4.5"
+    >
+      <div className="flex-1 min-w-0 flex flex-col gap-2">
+        <Skeleton variant="text" className="h-4 w-2/3" />
+        <Skeleton variant="text" className="h-3 w-full" />
+        <Skeleton variant="text" className="h-3 w-32" />
+      </div>
+      <Skeleton variant="circle" className="w-9 h-9 shrink-0" />
+    </div>
+  );
+}
 
 export const Route = createFileRoute("/feed/")({
   component: FeedPage,
@@ -44,9 +61,11 @@ function FeedPage() {
         )}
 
         {loggedIn && isLoading && (
-          <p className="text-[12px] text-gray-500 text-center py-10">
-            {t("feed.loading")}
-          </p>
+          <div>
+            {["a", "b", "c", "d", "e"].map((k) => (
+              <FeedItemSkeleton key={k} />
+            ))}
+          </div>
         )}
 
         {loggedIn && !isLoading && items.length === 0 && (
