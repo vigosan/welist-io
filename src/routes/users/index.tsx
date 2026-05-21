@@ -106,17 +106,17 @@ function UserRow({ user }: { user: DirectoryUser }) {
         <img
           src={user.image}
           alt=""
-          className="relative w-12 h-12 rounded-full shrink-0 outline outline-1 outline-black/10 dark:outline-white/10"
+          className="pointer-events-none w-12 h-12 rounded-full shrink-0 outline outline-1 outline-black/10 dark:outline-white/10"
         />
       ) : (
         <div
-          className="relative w-12 h-12 rounded-full shrink-0 flex items-center justify-center text-sm font-semibold bg-black/[0.04] dark:bg-white/[0.06] text-[#0c0c0b] dark:text-[#f0ede8] border border-black/[0.08] dark:border-white/[0.10]"
+          className="pointer-events-none w-12 h-12 rounded-full shrink-0 flex items-center justify-center text-sm font-semibold bg-black/[0.04] dark:bg-white/[0.06] text-[#0c0c0b] dark:text-[#f0ede8] border border-black/[0.08] dark:border-white/[0.10]"
           style={{ fontFamily: "'Space Mono', monospace" }}
         >
           {initials(user.name)}
         </div>
       )}
-      <div className="relative flex-1 min-w-0">
+      <div className="pointer-events-none flex-1 min-w-0">
         <p className="text-[15px] font-semibold text-[#0c0c0b] dark:text-[#f0ede8] truncate mb-0.5">
           {privateName(user.name)}
         </p>
