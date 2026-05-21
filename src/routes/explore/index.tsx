@@ -43,11 +43,12 @@ function ExploreListCard({
           {list.category && (
             <span
               data-testid={`explore-card-category-${list.id}`}
-              className="mb-1.5 inline-flex items-center gap-1.5 text-[10px] font-medium uppercase tracking-wider text-gray-400 dark:text-gray-500"
+              className="mb-2 inline-flex items-center gap-1.5 rounded-full border border-black/[0.10] dark:border-white/[0.10] bg-black/[0.03] dark:bg-white/[0.04] px-2 py-0.5 text-[11px] font-medium text-gray-600 dark:text-gray-400"
             >
               <CategoryIcon
                 category={list.category as ListCategory}
-                size={11}
+                size={13}
+                className="text-gray-500 dark:text-gray-400"
               />
               {t(`categories.${list.category}`)}
             </span>
