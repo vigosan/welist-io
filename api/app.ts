@@ -1187,7 +1187,7 @@ app.get("/users/:userId/profile", async (c) => {
   });
   if (!user) return c.json({ error: "Not found" }, 404);
 
-  const publicLists = await db
+  const publicListRows = await db
     .select({
       id: lists.id,
       name: lists.name,
@@ -1197,11 +1197,22 @@ app.get("/users/:userId/profile", async (c) => {
       itemCount: sql<number>`cast((select count(*) from ${items} where ${items.listId} = ${lists.id}) as int)`,
       participantCount: sql<number>`cast((select count(*) from ${participations} where ${participations.sourceListId} = ${lists.id}) as int)`,
       completedCount: sql<number>`cast((select count(*) from ${participations} where ${participations.sourceListId} = ${lists.id} and ${participations.completedAt} is not null) as int)`,
+      ratingAvg: sql<
+        number | null
+      >`(select avg(${listRatings.value})::float8 from ${listRatings} where ${listRatings.listId} = ${lists.id})`,
+      ratingCount: sql<number>`cast((select count(*) from ${listRatings} where ${listRatings.listId} = ${lists.id}) as int)`,
     })
     .from(lists)
     .where(and(eq(lists.ownerId, userId), eq(lists.public, true)))
     .orderBy(desc(lists.createdAt))
     .limit(20);
+
+  const publicLists = publicListRows.map(
+    ({ ratingAvg, ratingCount, ...row }) => ({
+      ...row,
+      rating: { avg: ratingAvg, count: ratingCount },
+    })
+  );
 
   const completedChallenges = await db
     .select({

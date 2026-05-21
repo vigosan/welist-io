@@ -82,6 +82,7 @@ export type UserProfile = {
     itemCount: number;
     participantCount: number;
     completedCount: number;
+    rating: { avg: number | null; count: number };
   }>;
   completedChallenges: Array<{
     id: string;

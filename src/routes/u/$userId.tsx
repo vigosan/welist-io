@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppNav } from "@/components/AppNav";
 import { FollowButton } from "@/components/FollowButton";
+import { StarRatingDisplay } from "@/components/StarRating";
 import { useUserAchievements, useUserProfile } from "@/hooks/useList";
 import { useTranslation } from "@/i18n/service";
 import type { UserAchievement } from "@/services/lists.service";
@@ -221,6 +222,15 @@ function UserProfilePage() {
                             count: String(list.participantCount),
                           })}
                         </span>
+                      </>
+                    )}
+                    {list.rating.count > 0 && (
+                      <>
+                        <span>·</span>
+                        <StarRatingDisplay
+                          avg={list.rating.avg}
+                          count={list.rating.count}
+                        />
                       </>
                     )}
                   </div>
