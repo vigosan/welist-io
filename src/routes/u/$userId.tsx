@@ -98,28 +98,68 @@ function UserProfilePage() {
           <h2 className="text-[11px] font-semibold text-gray-500 dark:text-[#a0a09c] uppercase tracking-wider">
             {t("profile.achievements")}
           </h2>
-          {achievements.every((a: UserAchievement) => a.unlockedAt === null) ? (
+          {achievements.length === 0 ? (
             <p className="text-sm text-gray-500 dark:text-[#a0a09c]">
               {t("profile.noAchievements")}
             </p>
           ) : (
             <ul
               data-testid="achievements-list"
-              className="flex flex-wrap gap-2"
+              className="grid grid-cols-1 sm:grid-cols-2 gap-2"
             >
-              {achievements
-                .filter((a: UserAchievement) => a.unlockedAt !== null)
-                .map((a: UserAchievement) => (
+              {achievements.map((a: UserAchievement) => {
+                const unlocked = a.unlockedAt !== null;
+                const pct = Math.round((a.progress / a.target) * 100);
+                return (
                   <li
                     key={a.type}
                     data-testid={`achievement-${a.type}`}
+                    data-unlocked={unlocked ? "true" : "false"}
                     title={t(`achievements.${a.type}.description`)}
-                    className="inline-flex items-center gap-2 rounded-full border border-black/[0.08] dark:border-white/[0.08] bg-white dark:bg-white/[0.02] px-3 py-1.5 text-xs font-medium text-[#0c0c0b] dark:text-[#f0ede8]"
+                    className={`flex flex-col gap-1.5 rounded-2xl border p-3 ${
+                      unlocked
+                        ? "border-black/[0.12] dark:border-white/[0.14] bg-white dark:bg-white/[0.04]"
+                        : "border-black/[0.06] dark:border-white/[0.06] bg-transparent opacity-70"
+                    }`}
                   >
-                    <span aria-hidden="true">★</span>
-                    <span>{t(`achievements.${a.type}.title`)}</span>
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-sm font-medium text-[#0c0c0b] dark:text-[#f0ede8]">
+                        {t(`achievements.${a.type}.title`)}
+                      </span>
+                      {unlocked && (
+                        <span
+                          aria-hidden="true"
+                          className="text-[#0c0c0b] dark:text-[#f0ede8]"
+                        >
+                          ★
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs text-gray-500 dark:text-[#a0a09c] leading-snug">
+                      {t(`achievements.${a.type}.description`)}
+                    </p>
+                    {!unlocked && (
+                      <div className="flex flex-col gap-1 mt-0.5">
+                        <div
+                          className="h-1 rounded-full bg-black/[0.06] dark:bg-white/[0.08] overflow-hidden"
+                          aria-hidden="true"
+                        >
+                          <div
+                            className="h-full bg-gray-900 dark:bg-[#f0ede8]"
+                            style={{ width: `${pct}%` }}
+                          />
+                        </div>
+                        <span
+                          data-testid={`achievement-progress-${a.type}`}
+                          className="text-[11px] tabular-nums text-gray-500 dark:text-[#a0a09c]"
+                        >
+                          {a.progress} / {a.target}
+                        </span>
+                      </div>
+                    )}
                   </li>
-                ))}
+                );
+              })}
             </ul>
           )}
         </section>
