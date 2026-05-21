@@ -2441,4 +2441,35 @@ describe("POST /api/events", () => {
   });
 });
 
+describe("PATCH /api/notifications/:id/read", () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it("returns 401 without a session", async () => {
+    mockGetAuthUser.mockRejectedValue(new Error("no session"));
+    const res = await app.request("/api/notifications/n1/read", {
+      method: "PATCH",
+      headers: { "x-forwarded-for": "10.0.0.1" },
+    });
+    expect(res.status).toBe(401);
+  });
+
+  it("marks the notification as read and returns 204", async () => {
+    mockGetAuthUser.mockResolvedValue({ session: { user: { id: "u1" } } });
+    const where = vi.fn().mockResolvedValue(undefined);
+    const set = vi.fn().mockReturnValue({ where });
+    mockDb.update.mockReturnValue({ set });
+
+    const res = await app.request("/api/notifications/n1/read", {
+      method: "PATCH",
+      headers: { "x-forwarded-for": "10.0.0.1" },
+    });
+
+    expect(res.status).toBe(204);
+    expect(set).toHaveBeenCalledWith(
+      expect.objectContaining({ readAt: expect.any(Date) })
+    );
+    expect(where).toHaveBeenCalled();
+  });
+});
+
 void _sign;

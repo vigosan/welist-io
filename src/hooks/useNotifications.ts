@@ -23,3 +23,12 @@ export function useMarkAllRead() {
       qc.invalidateQueries({ queryKey: queryKeys.notifications() }),
   });
 }
+
+export function useMarkRead() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: notificationsService.markRead,
+    onSuccess: () =>
+      qc.invalidateQueries({ queryKey: queryKeys.notifications() }),
+  });
+}

@@ -96,12 +96,17 @@ export type FeedItem = {
 export type AppNotification = {
   id: string;
   userId: string;
-  type: "challenge_accepted" | "challenge_completed";
+  type:
+    | "challenge_accepted"
+    | "challenge_completed"
+    | "new_follower"
+    | "list_purchased";
   listId: string | null;
   listName: string | null;
   actorId: string | null;
   actorName: string | null;
   actorImage: string | null;
+  actionUrl: string | null;
   readAt: string | null;
   createdAt: string;
 };
@@ -110,6 +115,8 @@ export const notificationsService = {
   getAll: () => apiClient<AppNotification[]>("/api/notifications"),
   readAll: () =>
     apiClient<void>("/api/notifications/read-all", { method: "PATCH" }),
+  markRead: (id: string) =>
+    apiClient<void>(`/api/notifications/${id}/read`, { method: "PATCH" }),
 };
 
 export type DirectoryUser = {

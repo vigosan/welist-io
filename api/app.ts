@@ -2116,6 +2116,24 @@ app.get("/notifications", async (c) => {
   return c.json(rows);
 });
 
+app.patch("/notifications/:id/read", async (c) => {
+  const authUser = getOptionalUser(c);
+  const userId = authUser?.session?.user?.id;
+  if (!userId) return c.json({ error: "Unauthorized" }, 401);
+
+  await db
+    .update(notifications)
+    .set({ readAt: new Date() })
+    .where(
+      and(
+        eq(notifications.id, c.req.param("id")),
+        eq(notifications.userId, userId)
+      )
+    );
+
+  return c.body(null, 204);
+});
+
 app.patch("/notifications/read-all", async (c) => {
   const authUser = getOptionalUser(c);
   const userId = authUser?.session?.user?.id;
