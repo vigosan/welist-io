@@ -38,6 +38,46 @@ const en: Translations = {
     exploreHeadline: "Explore what others are already completing.",
     exploreSubline: "Public lists created by the community.",
     exploreCtaAll: "Browse all lists →",
+    heroOr: "or",
+    heroExploreCta: "Explore challenges",
+    heroExploreHint: "Take on lists created by others.",
+    statsLists: "lists created",
+    statsUsers: "people on welist",
+    statsChallenges: "challenges completed",
+    featuresKicker: "All in one tool",
+    featuresHeadline: "Lists that come alive.",
+    featuresSubline:
+      "More than checklists: share, collaborate, challenge and monetize — all in one place.",
+    feature1Title: "Lists for anything",
+    feature1Desc:
+      "Movies, books, travel, restaurants, courses. 22 categories and counting.",
+    feature2Title: "Places on the map",
+    feature2Desc:
+      "Add addresses and view your travel lists on an interactive map.",
+    feature3Title: "Collaborate live",
+    feature3Desc:
+      "Share the link and edit in real time with your team, partner or friends.",
+    feature4Title: "Challenge the community",
+    feature4Desc:
+      "Publish your list. Others accept it as a challenge and compete on the Hall of Fame.",
+    feature5Title: "Ratings & feedback",
+    feature5Desc:
+      "Get stars from people who complete your challenge. See what works.",
+    feature6Title: "Charge for access",
+    feature6Desc:
+      "Connect Stripe in one click and sell access to your premium lists.",
+    creatorsKicker: "For creators",
+    creatorsHeadline: "Turn your knowledge into income.",
+    creatorsDesc:
+      "Price your lists, connect Stripe and start earning. No hidden fees, no code.",
+    creatorsBullet1: "Connect Stripe in one click",
+    creatorsBullet2: "Charge once for lifetime access",
+    creatorsBullet3: "Get ratings and build reputation",
+    creatorsCta: "Create your first list",
+    finalKicker: "Get started",
+    finalHeadline: "Your next list, in 5 seconds.",
+    finalDesc: "No sign-up. Free. With everything you need.",
+    finalCta: "Create list",
   },
   list: {
     back: "← My lists",

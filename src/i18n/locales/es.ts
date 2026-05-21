@@ -36,6 +36,46 @@ const es = {
     exploreHeadline: "Explora lo que otros ya están completando.",
     exploreSubline: "Listas públicas creadas por la comunidad.",
     exploreCtaAll: "Ver todas las listas →",
+    heroOr: "o",
+    heroExploreCta: "Explora retos",
+    heroExploreHint: "Acepta listas creadas por otros.",
+    statsLists: "listas creadas",
+    statsUsers: "personas en welist",
+    statsChallenges: "retos completados",
+    featuresKicker: "Todo en una herramienta",
+    featuresHeadline: "Listas que cobran vida.",
+    featuresSubline:
+      "Más que checklist: comparte, colabora, reta y monetiza desde un solo sitio.",
+    feature1Title: "Listas de cualquier cosa",
+    feature1Desc:
+      "Pelis, libros, viajes, restaurantes, cursos. 22 categorías y subiendo.",
+    feature2Title: "Lugares en el mapa",
+    feature2Desc:
+      "Añade direcciones y visualiza tus listas de viajes en un mapa interactivo.",
+    feature3Title: "Colabora en directo",
+    feature3Desc:
+      "Comparte el link y edita en tiempo real con tu equipo, pareja o amigos.",
+    feature4Title: "Reta a la comunidad",
+    feature4Desc:
+      "Publica tu lista. Otros la aceptan como reto y compiten en el Hall of Fame.",
+    feature5Title: "Ratings y feedback",
+    feature5Desc:
+      "Recibe estrellas de quienes completan tu reto. Mide qué listas funcionan.",
+    feature6Title: "Cobra por el acceso",
+    feature6Desc:
+      "Conecta Stripe en un clic y vende acceso a tus listas premium.",
+    creatorsKicker: "Para creadores",
+    creatorsHeadline: "Convierte tu conocimiento en ingresos.",
+    creatorsDesc:
+      "Pon precio a tus listas, conecta Stripe y empieza a cobrar. Sin comisiones ocultas, sin código.",
+    creatorsBullet1: "Conecta Stripe en un clic",
+    creatorsBullet2: "Cobra una sola vez por acceso de por vida",
+    creatorsBullet3: "Recibe ratings y construye reputación",
+    creatorsCta: "Crea tu primera lista",
+    finalKicker: "Empieza ya",
+    finalHeadline: "Tu próxima lista, en 5 segundos.",
+    finalDesc: "Sin registro. Gratuito. Con todo lo que necesitas.",
+    finalCta: "Crear lista",
   },
   list: {
     back: "← Mis listas",
