@@ -218,10 +218,16 @@ describe("useTogglePublic", () => {
 
 describe("useUserAchievements", () => {
   it("returns the achievements array for a user", async () => {
+    const payload = [
+      {
+        type: "ten_lists_accepted" as const,
+        target: 10,
+        progress: 10,
+        unlockedAt: "2026-05-20T00:00:00Z",
+      },
+    ];
     vi.mocked(usersService.getAchievements).mockResolvedValue({
-      achievements: [
-        { type: "ten_lists_accepted", unlockedAt: "2026-05-20T00:00:00Z" },
-      ],
+      achievements: payload,
     });
     const { Wrapper } = makeWrapper();
 
@@ -231,9 +237,7 @@ describe("useUserAchievements", () => {
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
     expect(usersService.getAchievements).toHaveBeenCalledWith("u1");
-    expect(result.current.data).toEqual([
-      { type: "ten_lists_accepted", unlockedAt: "2026-05-20T00:00:00Z" },
-    ]);
+    expect(result.current.data).toEqual(payload);
   });
 });
 

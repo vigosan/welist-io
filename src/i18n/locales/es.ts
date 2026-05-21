@@ -259,13 +259,53 @@ const es = {
     noAchievements: "Aún no ha desbloqueado logros.",
   },
   achievements: {
-    first_list_completed: {
-      title: "Primer reto completado",
-      description: "Terminaste tu primera lista de retos.",
+    first_list_created: {
+      title: "Primera lista creada",
+      description: "Creaste tu primera lista.",
+    },
+    five_lists_created: {
+      title: "Cinco listas creadas",
+      description: "Creaste cinco listas.",
+    },
+    first_item_added: {
+      title: "Primer elemento",
+      description: "Añadiste tu primer elemento a una lista.",
+    },
+    hundred_items_created: {
+      title: "Cien elementos",
+      description: "Has añadido 100 elementos a tus listas.",
+    },
+    first_public_list: {
+      title: "Primera lista pública",
+      description: "Publicaste tu primera lista.",
+    },
+    first_list_accepted: {
+      title: "Primer reto aceptado",
+      description: "Aceptaste tu primer reto.",
     },
     ten_lists_accepted: {
       title: "Diez retos aceptados",
       description: "Aceptaste 10 retos de otras personas.",
+    },
+    first_list_completed: {
+      title: "Primer reto completado",
+      description: "Terminaste tu primera lista de retos.",
+    },
+    five_lists_completed: {
+      title: "Cinco retos completados",
+      description: "Completaste cinco retos.",
+    },
+    ten_lists_completed: {
+      title: "Diez retos completados",
+      description: "Completaste diez retos.",
+    },
+    first_follower: {
+      title: "Primer seguidor",
+      description: "Conseguiste tu primer seguidor.",
+    },
+    ten_followers: {
+      title: "Diez seguidores",
+      description: "Tienes diez seguidores.",
     },
     first_sale: {
       title: "Primera venta",

@@ -2147,34 +2147,69 @@ describe("achievement unlock triggers", () => {
 describe("GET /api/users/:userId/achievements", () => {
   beforeEach(() => vi.clearAllMocks());
 
-  it("returns the user's unlocked achievements", async () => {
-    const rows = [
-      { type: "ten_lists_accepted", unlockedAt: new Date().toISOString() },
-      { type: "first_list_completed", unlockedAt: new Date().toISOString() },
-    ];
+  it("returns the full catalog with progress and unlocked state for each badge", async () => {
+    mockDb.$count.mockResolvedValue(0);
     mockDb.select.mockReturnValue({
       from: vi.fn().mockReturnThis(),
-      where: vi.fn().mockReturnThis(),
-      orderBy: vi.fn().mockResolvedValue(rows),
+      where: vi.fn().mockResolvedValue([]),
     });
 
     const res = await app.request("/api/users/u1/achievements");
     expect(res.status).toBe(200);
-    const body = (await res.json()) as { achievements: unknown[] };
-    expect(body.achievements).toHaveLength(2);
+    const body = (await res.json()) as {
+      achievements: {
+        type: string;
+        target: number;
+        progress: number;
+        unlockedAt: string | null;
+      }[];
+    };
+    expect(body.achievements.length).toBeGreaterThanOrEqual(13);
+    const types = body.achievements.map((a) => a.type);
+    expect(types).toContain("first_list_created");
+    expect(types).toContain("ten_lists_accepted");
+    expect(types).toContain("first_sale");
+    for (const a of body.achievements) {
+      expect(a.target).toBeGreaterThan(0);
+      expect(a.progress).toBe(0);
+      expect(a.unlockedAt).toBeNull();
+    }
   });
 
-  it("returns an empty array when the user has none", async () => {
+  it("marks an achievement as unlocked when it has a row in the achievements table", async () => {
+    mockDb.$count.mockResolvedValue(0);
+    const date = new Date().toISOString();
     mockDb.select.mockReturnValue({
       from: vi.fn().mockReturnThis(),
-      where: vi.fn().mockReturnThis(),
-      orderBy: vi.fn().mockResolvedValue([]),
+      where: vi
+        .fn()
+        .mockResolvedValue([{ type: "first_list_created", unlockedAt: date }]),
     });
 
-    const res = await app.request("/api/users/ghost/achievements");
-    expect(res.status).toBe(200);
-    const body = (await res.json()) as { achievements: unknown[] };
-    expect(body.achievements).toEqual([]);
+    const res = await app.request("/api/users/u1/achievements");
+    const body = (await res.json()) as {
+      achievements: { type: string; unlockedAt: string | null }[];
+    };
+    const unlocked = body.achievements.find(
+      (a) => a.type === "first_list_created"
+    );
+    expect(unlocked?.unlockedAt).toBe(date);
+  });
+
+  it("caps progress at target", async () => {
+    mockDb.$count.mockResolvedValue(50);
+    mockDb.select.mockReturnValue({
+      from: vi.fn().mockReturnThis(),
+      where: vi.fn().mockResolvedValue([]),
+    });
+
+    const res = await app.request("/api/users/u1/achievements");
+    const body = (await res.json()) as {
+      achievements: { type: string; target: number; progress: number }[];
+    };
+    for (const a of body.achievements) {
+      expect(a.progress).toBeLessThanOrEqual(a.target);
+    }
   });
 });
 

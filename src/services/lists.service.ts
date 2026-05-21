@@ -124,9 +124,26 @@ export type DirectoryUser = {
 
 export type AppStats = { users: number; lists: number; challenges: number };
 
+export type AchievementType =
+  | "first_list_created"
+  | "five_lists_created"
+  | "first_item_added"
+  | "hundred_items_created"
+  | "first_public_list"
+  | "first_list_accepted"
+  | "ten_lists_accepted"
+  | "first_list_completed"
+  | "five_lists_completed"
+  | "ten_lists_completed"
+  | "first_follower"
+  | "ten_followers"
+  | "first_sale";
+
 export type UserAchievement = {
-  type: "first_list_completed" | "ten_lists_accepted" | "first_sale";
-  unlockedAt: string;
+  type: AchievementType;
+  target: number;
+  progress: number;
+  unlockedAt: string | null;
 };
 
 export const statsService = {

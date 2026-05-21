@@ -1145,17 +1145,113 @@ async function unlockAchievement(userId: string, type: AchievementType) {
     });
 }
 
+type AchievementMetric =
+  | "listsOwned"
+  | "itemsInOwned"
+  | "publicListsOwned"
+  | "participations"
+  | "participationsCompleted"
+  | "followers"
+  | "sales";
+
+const ACHIEVEMENT_CATALOG: {
+  type: AchievementType;
+  target: number;
+  metric: AchievementMetric;
+}[] = [
+  { type: "first_list_created", target: 1, metric: "listsOwned" },
+  { type: "five_lists_created", target: 5, metric: "listsOwned" },
+  { type: "first_item_added", target: 1, metric: "itemsInOwned" },
+  { type: "hundred_items_created", target: 100, metric: "itemsInOwned" },
+  { type: "first_public_list", target: 1, metric: "publicListsOwned" },
+  { type: "first_list_accepted", target: 1, metric: "participations" },
+  { type: "ten_lists_accepted", target: 10, metric: "participations" },
+  {
+    type: "first_list_completed",
+    target: 1,
+    metric: "participationsCompleted",
+  },
+  {
+    type: "five_lists_completed",
+    target: 5,
+    metric: "participationsCompleted",
+  },
+  {
+    type: "ten_lists_completed",
+    target: 10,
+    metric: "participationsCompleted",
+  },
+  { type: "first_follower", target: 1, metric: "followers" },
+  { type: "ten_followers", target: 10, metric: "followers" },
+  { type: "first_sale", target: 1, metric: "sales" },
+];
+
+async function computeAchievementMetrics(
+  userId: string
+): Promise<Record<AchievementMetric, number>> {
+  const ownedListIds = db
+    .select({ id: lists.id })
+    .from(lists)
+    .where(eq(lists.ownerId, userId));
+  const [
+    listsOwned,
+    itemsInOwned,
+    publicListsOwned,
+    participationsCount,
+    participationsCompleted,
+    followers,
+    sales,
+  ] = await Promise.all([
+    db.$count(lists, eq(lists.ownerId, userId)),
+    db.$count(items, inArray(items.listId, ownedListIds)),
+    db.$count(lists, and(eq(lists.ownerId, userId), eq(lists.public, true))),
+    db.$count(participations, eq(participations.userId, userId)),
+    db.$count(
+      participations,
+      and(
+        eq(participations.userId, userId),
+        isNotNull(participations.completedAt)
+      )
+    ),
+    db.$count(follows, eq(follows.followingId, userId)),
+    db.$count(listPurchases, inArray(listPurchases.listId, ownedListIds)),
+  ]);
+  return {
+    listsOwned,
+    itemsInOwned,
+    publicListsOwned,
+    participations: participationsCount,
+    participationsCompleted,
+    followers,
+    sales,
+  };
+}
+
 app.get("/users/:userId/achievements", async (c) => {
   const userId = c.req.param("userId");
-  const rows = await db
-    .select({
-      type: achievements.type,
-      unlockedAt: achievements.unlockedAt,
-    })
-    .from(achievements)
-    .where(eq(achievements.userId, userId))
-    .orderBy(desc(achievements.unlockedAt));
-  return c.json({ achievements: rows });
+  const [metrics, unlockedRows] = await Promise.all([
+    computeAchievementMetrics(userId),
+    db
+      .select({
+        type: achievements.type,
+        unlockedAt: achievements.unlockedAt,
+      })
+      .from(achievements)
+      .where(eq(achievements.userId, userId)),
+  ]);
+  const unlockedMap = new Map(
+    unlockedRows.map((r) => [r.type, r.unlockedAt as Date | string])
+  );
+  const result = ACHIEVEMENT_CATALOG.map((entry) => {
+    const raw = metrics[entry.metric];
+    return {
+      type: entry.type,
+      target: entry.target,
+      progress: Math.min(raw, entry.target),
+      unlockedAt: unlockedMap.get(entry.type) ?? null,
+    };
+  });
+  return c.json({ achievements: result });
 });
 
 app.post("/users/:userId/follow", async (c) => {

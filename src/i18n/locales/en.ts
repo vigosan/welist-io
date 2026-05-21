@@ -260,13 +260,53 @@ const en: Translations = {
     noAchievements: "No achievements unlocked yet.",
   },
   achievements: {
-    first_list_completed: {
-      title: "First challenge completed",
-      description: "You finished your first challenge list.",
+    first_list_created: {
+      title: "First list created",
+      description: "You created your first list.",
+    },
+    five_lists_created: {
+      title: "Five lists created",
+      description: "You created five lists.",
+    },
+    first_item_added: {
+      title: "First item",
+      description: "You added your first item to a list.",
+    },
+    hundred_items_created: {
+      title: "One hundred items",
+      description: "You added 100 items to your lists.",
+    },
+    first_public_list: {
+      title: "First public list",
+      description: "You published your first list.",
+    },
+    first_list_accepted: {
+      title: "First challenge accepted",
+      description: "You accepted your first challenge.",
     },
     ten_lists_accepted: {
       title: "Ten challenges accepted",
       description: "You accepted 10 challenges from other people.",
+    },
+    first_list_completed: {
+      title: "First challenge completed",
+      description: "You finished your first challenge list.",
+    },
+    five_lists_completed: {
+      title: "Five challenges completed",
+      description: "You completed five challenges.",
+    },
+    ten_lists_completed: {
+      title: "Ten challenges completed",
+      description: "You completed ten challenges.",
+    },
+    first_follower: {
+      title: "First follower",
+      description: "You got your first follower.",
+    },
+    ten_followers: {
+      title: "Ten followers",
+      description: "You have ten followers.",
     },
     first_sale: {
       title: "First sale",

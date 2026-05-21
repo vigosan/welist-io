@@ -98,7 +98,7 @@ function UserProfilePage() {
           <h2 className="text-[11px] font-semibold text-gray-500 dark:text-[#a0a09c] uppercase tracking-wider">
             {t("profile.achievements")}
           </h2>
-          {achievements.length === 0 ? (
+          {achievements.every((a: UserAchievement) => a.unlockedAt === null) ? (
             <p className="text-sm text-gray-500 dark:text-[#a0a09c]">
               {t("profile.noAchievements")}
             </p>
@@ -107,17 +107,19 @@ function UserProfilePage() {
               data-testid="achievements-list"
               className="flex flex-wrap gap-2"
             >
-              {achievements.map((a: UserAchievement) => (
-                <li
-                  key={a.type}
-                  data-testid={`achievement-${a.type}`}
-                  title={t(`achievements.${a.type}.description`)}
-                  className="inline-flex items-center gap-2 rounded-full border border-black/[0.08] dark:border-white/[0.08] bg-white dark:bg-white/[0.02] px-3 py-1.5 text-xs font-medium text-[#0c0c0b] dark:text-[#f0ede8]"
-                >
-                  <span aria-hidden="true">★</span>
-                  <span>{t(`achievements.${a.type}.title`)}</span>
-                </li>
-              ))}
+              {achievements
+                .filter((a: UserAchievement) => a.unlockedAt !== null)
+                .map((a: UserAchievement) => (
+                  <li
+                    key={a.type}
+                    data-testid={`achievement-${a.type}`}
+                    title={t(`achievements.${a.type}.description`)}
+                    className="inline-flex items-center gap-2 rounded-full border border-black/[0.08] dark:border-white/[0.08] bg-white dark:bg-white/[0.02] px-3 py-1.5 text-xs font-medium text-[#0c0c0b] dark:text-[#f0ede8]"
+                  >
+                    <span aria-hidden="true">★</span>
+                    <span>{t(`achievements.${a.type}.title`)}</span>
+                  </li>
+                ))}
             </ul>
           )}
         </section>
