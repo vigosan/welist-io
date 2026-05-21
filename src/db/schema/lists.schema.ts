@@ -199,6 +199,8 @@ export const listPurchases = pgTable(
 export const notificationTypeEnum = pgEnum("notification_type", [
   "challenge_accepted",
   "challenge_completed",
+  "new_follower",
+  "list_purchased",
 ]);
 
 export const notifications = pgTable(
@@ -216,6 +218,7 @@ export const notifications = pgTable(
     }),
     actorName: text("actor_name"),
     actorImage: text("actor_image"),
+    actionUrl: text("action_url"),
     readAt: timestamp("read_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true })
       .defaultNow()
