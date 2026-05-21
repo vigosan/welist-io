@@ -68,6 +68,7 @@ const LIST: ListWithParticipation = {
   createdAt: new Date(),
   participated: false,
   participationCompletedAt: null,
+  rating: { avg: null, count: 0, userValue: null },
 };
 
 function makeItem(id: string, text: string, done = false): Item {

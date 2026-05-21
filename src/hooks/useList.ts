@@ -362,3 +362,67 @@ export function useToggleFollow(userId: string) {
     },
   });
 }
+
+function applyRatingChange(
+  rating: ListWithParticipation["rating"] | undefined,
+  next: number | null
+): ListWithParticipation["rating"] {
+  const base = rating ?? { avg: null, count: 0, userValue: null };
+  const sum = (base.avg ?? 0) * base.count;
+  const previousValue = base.userValue;
+  const sumWithoutPrev = previousValue != null ? sum - previousValue : sum;
+  const countWithoutPrev = previousValue != null ? base.count - 1 : base.count;
+  const newCount = next != null ? countWithoutPrev + 1 : countWithoutPrev;
+  const newSum = next != null ? sumWithoutPrev + next : sumWithoutPrev;
+  return {
+    avg: newCount > 0 ? newSum / newCount : null,
+    count: newCount,
+    userValue: next,
+  };
+}
+
+export function useRateList(listId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (value: number) => listsService.rate(listId, value),
+    onMutate: async (value) => {
+      await qc.cancelQueries({ queryKey: queryKeys.list(listId) });
+      const previous = qc.getQueryData<ListWithParticipation>(
+        queryKeys.list(listId)
+      );
+      qc.setQueryData<ListWithParticipation>(queryKeys.list(listId), (old) =>
+        old ? { ...old, rating: applyRatingChange(old.rating, value) } : old
+      );
+      return { previous };
+    },
+    onError: (_err, _val, ctx) => {
+      qc.setQueryData(queryKeys.list(listId), ctx?.previous);
+    },
+    onSettled: () => {
+      qc.invalidateQueries({ queryKey: queryKeys.list(listId) });
+    },
+  });
+}
+
+export function useUnrateList(listId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: () => listsService.unrate(listId),
+    onMutate: async () => {
+      await qc.cancelQueries({ queryKey: queryKeys.list(listId) });
+      const previous = qc.getQueryData<ListWithParticipation>(
+        queryKeys.list(listId)
+      );
+      qc.setQueryData<ListWithParticipation>(queryKeys.list(listId), (old) =>
+        old ? { ...old, rating: applyRatingChange(old.rating, null) } : old
+      );
+      return { previous };
+    },
+    onError: (_err, _val, ctx) => {
+      qc.setQueryData(queryKeys.list(listId), ctx?.previous);
+    },
+    onSettled: () => {
+      qc.invalidateQueries({ queryKey: queryKeys.list(listId) });
+    },
+  });
+}
