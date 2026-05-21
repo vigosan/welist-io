@@ -987,6 +987,7 @@ const USERS_PAGE_SIZE = 6;
 app.get("/users", async (c) => {
   const q = c.req.query("q")?.trim();
   const cursor = c.req.query("cursor");
+  const viewerId = getOptionalUser(c)?.session?.user?.id ?? null;
 
   const baseWhere = and(
     eq(users.publicProfile, true),
@@ -1097,6 +1098,23 @@ app.get("/users", async (c) => {
     followerCounts.map((r) => [r.followingId, r.count])
   );
 
+  const followingSet =
+    viewerId && userIds.length > 0
+      ? new Set(
+          (
+            await db
+              .select({ followingId: follows.followingId })
+              .from(follows)
+              .where(
+                and(
+                  eq(follows.followerId, viewerId),
+                  inArray(follows.followingId, userIds)
+                )
+              )
+          ).map((r) => r.followingId)
+        )
+      : new Set<string>();
+
   return c.json({
     users: rows.map((u) => ({
       ...u,
@@ -1107,6 +1125,7 @@ app.get("/users", async (c) => {
       achievementsUnlocked: achievementCountMap.get(u.id) ?? 0,
       achievementsTotal: ACHIEVEMENT_CATALOG.length,
       followerCount: followerCountMap.get(u.id) ?? 0,
+      isFollowing: followingSet.has(u.id),
     })),
     nextCursor,
   });

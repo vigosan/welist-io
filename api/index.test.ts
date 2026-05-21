@@ -1782,6 +1782,71 @@ describe("GET /api/users", () => {
     const body = (await res.json()) as Record<string, unknown>;
     expect(body.nextCursor).toBe("u5");
   });
+
+  it("returns isFollowing=false for everyone when unauthenticated", async () => {
+    mockGetAuthUser.mockRejectedValue(new Error("no session"));
+    const usersChain = {
+      from: vi.fn().mockReturnThis(),
+      where: vi.fn().mockReturnThis(),
+      orderBy: vi.fn().mockReturnThis(),
+      limit: vi
+        .fn()
+        .mockResolvedValue([{ id: "u1", name: "Alice", image: null }]),
+    };
+    const emptyChain = {
+      from: vi.fn().mockReturnThis(),
+      where: vi.fn().mockReturnThis(),
+      groupBy: vi.fn().mockResolvedValue([]),
+    };
+    mockDb.select.mockReturnValueOnce(usersChain).mockReturnValue(emptyChain);
+
+    const res = await app.request("/api/users");
+    const body = (await res.json()) as {
+      users: { id: string; isFollowing: boolean }[];
+    };
+    expect(body.users[0].isFollowing).toBe(false);
+  });
+
+  it("returns isFollowing=true for users the viewer follows", async () => {
+    mockGetAuthUser.mockResolvedValue({ session: { user: { id: "me" } } });
+    const usersChain = {
+      from: vi.fn().mockReturnThis(),
+      where: vi.fn().mockReturnThis(),
+      orderBy: vi.fn().mockReturnThis(),
+      limit: vi.fn().mockResolvedValue([
+        { id: "u1", name: "Alice", image: null },
+        { id: "u2", name: "Bob", image: null },
+      ]),
+    };
+    const emptyChain = {
+      from: vi.fn().mockReturnThis(),
+      where: vi.fn().mockReturnThis(),
+      groupBy: vi.fn().mockResolvedValue([]),
+    };
+    const followsChain = {
+      from: vi.fn().mockReturnThis(),
+      where: vi.fn().mockResolvedValue([{ followingId: "u1" }]),
+    };
+    mockDb.select
+      .mockReturnValueOnce(usersChain)
+      .mockReturnValueOnce(emptyChain) // listCounts
+      .mockReturnValueOnce(emptyChain) // challengerCounts
+      .mockReturnValueOnce(emptyChain) // completedCounts
+      .mockReturnValueOnce(emptyChain) // collaboratorCounts
+      .mockReturnValueOnce(emptyChain) // achievementCounts
+      .mockReturnValueOnce(emptyChain) // followerCounts
+      .mockReturnValueOnce(followsChain); // viewer follows
+
+    const res = await app.request("/api/users");
+    const body = (await res.json()) as {
+      users: { id: string; isFollowing: boolean }[];
+    };
+    const map = Object.fromEntries(
+      body.users.map((u) => [u.id, u.isFollowing])
+    );
+    expect(map.u1).toBe(true);
+    expect(map.u2).toBe(false);
+  });
 });
 
 describe("PATCH /api/users/me", () => {

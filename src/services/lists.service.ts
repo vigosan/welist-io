@@ -140,6 +140,7 @@ export type DirectoryUser = {
   achievementsUnlocked: number;
   achievementsTotal: number;
   followerCount: number;
+  isFollowing: boolean;
 };
 
 export type AppStats = { users: number; lists: number; challenges: number };
