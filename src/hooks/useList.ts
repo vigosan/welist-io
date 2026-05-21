@@ -7,12 +7,18 @@ import {
 import { notFound } from "@tanstack/react-router";
 import { queryKeys } from "@/lib/query-keys";
 import { eventsService } from "@/services/events.service";
-import type { ListWithParticipation } from "@/services/lists.service";
+import type {
+  DirectoryUser,
+  ListWithParticipation,
+} from "@/services/lists.service";
 import {
   listsService,
   statsService,
   usersService,
 } from "@/services/lists.service";
+
+type DirectoryPage = { users: DirectoryUser[]; nextCursor: string | null };
+type DirectoryInfiniteData = { pages: DirectoryPage[]; pageParams: unknown[] };
 
 export function useCollaborators(listId: string, enabled: boolean) {
   return useQuery({
@@ -349,6 +355,28 @@ export function useToggleFollow(userId: string) {
               followerCount: old.followerCount + (isFollowing ? -1 : 1),
             }
           : old
+      );
+      qc.setQueriesData<DirectoryInfiniteData>(
+        { queryKey: ["user-directory"] },
+        (old) =>
+          old
+            ? {
+                ...old,
+                pages: old.pages.map((page) => ({
+                  ...page,
+                  users: page.users.map((u) =>
+                    u.id === userId
+                      ? {
+                          ...u,
+                          isFollowing: !isFollowing,
+                          followerCount:
+                            u.followerCount + (isFollowing ? -1 : 1),
+                        }
+                      : u
+                  ),
+                })),
+              }
+            : old
       );
       return { previous };
     },

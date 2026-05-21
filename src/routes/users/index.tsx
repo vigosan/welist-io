@@ -2,11 +2,7 @@ import { useSession } from "@hono/auth-js/react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { AppNav } from "@/components/AppNav";
-import {
-  useFollowStatus,
-  useToggleFollow,
-  useUserDirectory,
-} from "@/hooks/useList";
+import { useToggleFollow, useUserDirectory } from "@/hooks/useList";
 import { useTranslation } from "@/i18n/service";
 import type { DirectoryUser } from "@/services/lists.service";
 
@@ -28,15 +24,19 @@ function initials(name: string | null): string {
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 }
 
-function SlimFollowButton({ userId }: { userId: string }) {
+function SlimFollowButton({
+  userId,
+  isFollowing,
+}: {
+  userId: string;
+  isFollowing: boolean;
+}) {
   const { t } = useTranslation();
   const { data: session } = useSession();
   const me = session?.user?.id;
   const enabled = !!me && me !== userId;
-  const { data: status } = useFollowStatus(userId, enabled);
   const toggle = useToggleFollow(userId);
   if (!enabled) return null;
-  const isFollowing = !!status?.isFollowing;
   return (
     <button
       type="button"
@@ -150,7 +150,7 @@ function UserRow({ user }: { user: DirectoryUser }) {
         )}
       </div>
       <div className="relative">
-        <SlimFollowButton userId={user.id} />
+        <SlimFollowButton userId={user.id} isFollowing={user.isFollowing} />
       </div>
     </article>
   );

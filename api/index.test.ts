@@ -1686,7 +1686,10 @@ describe("GET /api/admin/stats", () => {
 });
 
 describe("GET /api/users", () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockGetAuthUser.mockRejectedValue(new Error("no session"));
+  });
 
   it("returns public users with nextCursor null when fewer than page size", async () => {
     const usersChain = {
