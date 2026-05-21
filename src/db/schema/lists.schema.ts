@@ -228,8 +228,18 @@ export const notifications = pgTable(
 );
 
 export const achievementTypeEnum = pgEnum("achievement_type", [
-  "first_list_completed",
+  "first_list_created",
+  "five_lists_created",
+  "first_item_added",
+  "hundred_items_created",
+  "first_list_accepted",
   "ten_lists_accepted",
+  "first_list_completed",
+  "five_lists_completed",
+  "ten_lists_completed",
+  "first_public_list",
+  "first_follower",
+  "ten_followers",
   "first_sale",
 ]);
 

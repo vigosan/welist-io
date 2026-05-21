@@ -1,0 +1,4 @@
+ALTER TABLE "public"."achievements" ALTER COLUMN "type" SET DATA TYPE text;--> statement-breakpoint
+DROP TYPE "public"."achievement_type";--> statement-breakpoint
+CREATE TYPE "public"."achievement_type" AS ENUM('first_list_created', 'five_lists_created', 'first_item_added', 'hundred_items_created', 'first_list_accepted', 'ten_lists_accepted', 'first_list_completed', 'five_lists_completed', 'ten_lists_completed', 'first_public_list', 'first_follower', 'ten_followers', 'first_sale');--> statement-breakpoint
+ALTER TABLE "public"."achievements" ALTER COLUMN "type" SET DATA TYPE "public"."achievement_type" USING "type"::"public"."achievement_type";
