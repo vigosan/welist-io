@@ -1877,6 +1877,38 @@ describe("follow endpoints", () => {
     expect(onConflict).toHaveBeenCalled();
   });
 
+  it("POST follow skips notification when one already exists within the dedupe window", async () => {
+    mockGetAuthUser.mockResolvedValue({ session: { user: { id: "u1" } } });
+    mockDb.query.users.findFirst.mockResolvedValueOnce({ id: "u2" });
+    mockDb.query.notifications.findFirst.mockResolvedValue({
+      id: "existing-notif",
+    });
+
+    const valuesCalls: Record<string, unknown>[] = [];
+    mockDb.insert.mockImplementation(() => {
+      const p: Promise<undefined> & {
+        onConflictDoNothing?: ReturnType<typeof vi.fn>;
+      } = Promise.resolve(undefined);
+      p.onConflictDoNothing = vi.fn().mockResolvedValue(undefined);
+      return {
+        values: vi.fn((v: Record<string, unknown>) => {
+          valuesCalls.push(v);
+          return p;
+        }),
+      };
+    });
+
+    await app.request("/api/users/u2/follow", {
+      method: "POST",
+      headers: { "x-forwarded-for": "10.0.0.5" },
+    });
+
+    const notifInserts = valuesCalls.filter(
+      (v) => v.type === "new_follower"
+    );
+    expect(notifInserts).toHaveLength(0);
+  });
+
   it("POST follow creates a new_follower notification for the target", async () => {
     mockGetAuthUser.mockResolvedValue({ session: { user: { id: "u1" } } });
     mockDb.query.users.findFirst
