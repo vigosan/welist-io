@@ -194,13 +194,12 @@ function UsersDirectoryPage() {
       <main className="flex-1 w-full max-w-[760px] mx-auto px-4 sm:px-12 py-10">
         <form
           onSubmit={handleSearch}
-          className="flex overflow-hidden rounded-lg transition-all duration-200"
-          style={{
-            border: `1px solid ${focused ? "rgba(255,255,255,0.3)" : "rgba(255,255,255,0.15)"}`,
-            background: focused
-              ? "rgba(255,255,255,0.06)"
-              : "rgba(255,255,255,0.03)",
-          }}
+          className={[
+            "flex overflow-hidden rounded-lg transition-all duration-200",
+            focused
+              ? "bg-black/[0.06] dark:bg-white/[0.07] border border-black/[0.20] dark:border-white/[0.18]"
+              : "bg-black/[0.03] dark:bg-white/[0.04] border border-black/[0.08] dark:border-white/[0.08]",
+          ].join(" ")}
         >
           <input
             value={q}
@@ -210,11 +209,11 @@ function UsersDirectoryPage() {
             placeholder={t("directory.searchPlaceholder")}
             aria-label={t("directory.searchAriaLabel")}
             data-testid="directory-search-input"
-            className="flex-1 px-4 py-2.5 text-sm text-[#0c0c0b] dark:text-[#f0ede8] placeholder-[#a0a09c] bg-transparent outline-none"
+            className="flex-1 px-4 py-2.5 text-sm text-[#0c0c0b] dark:text-[#f0ede8] placeholder-[#a0a09c] dark:placeholder-[#6b6b67] bg-transparent outline-none"
           />
           <button
             type="submit"
-            className="px-5 py-2.5 text-xs font-semibold tracking-[0.04em] bg-[#0c0c0b] text-[#f8f7f5] dark:bg-[#f0ede8] dark:text-[#0c0c0b] border-none cursor-pointer transition-opacity duration-150"
+            className="px-5 py-2.5 text-[12px] font-semibold tracking-[0.04em] bg-[#0c0c0b] dark:bg-[#f0ede8] text-[#f8f7f5] dark:text-[#0c0c0b] border-none cursor-pointer"
             style={{ borderRadius: 0 }}
           >
             {t("directory.search")}
