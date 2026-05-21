@@ -32,6 +32,7 @@ import {
   listActivity,
   listPrices,
   listPurchases,
+  listRatings,
   lists,
   notifications,
   participations,
@@ -2009,6 +2010,60 @@ app.delete("/lists/:listId/price", async (c) => {
   if (list.ownerId !== userId) return c.json({ error: "Forbidden" }, 403);
 
   await db.delete(listPrices).where(eq(listPrices.listId, list.id));
+  return c.body(null, 204);
+});
+
+app.post(
+  "/lists/:listId/rating",
+  zValidator("json", z.object({ value: z.number().int().min(1).max(5) })),
+  async (c) => {
+    const authUser = getOptionalUser(c);
+    const userId = authUser?.session?.user?.id;
+    if (!userId) return c.json({ error: "Unauthorized" }, 401);
+
+    const list = await db.query.lists.findFirst({
+      where: listWhere(c.req.param("listId")),
+      columns: {
+        id: true,
+        ownerId: true,
+        public: true,
+        collaborative: true,
+      },
+    });
+    if (!list) return c.json({ error: "Not found" }, 404);
+    if (!(await canViewList(list, userId)))
+      return c.json({ error: "Not found" }, 404);
+
+    const { value } = c.req.valid("json");
+    const [rating] = await db
+      .insert(listRatings)
+      .values({ userId, listId: list.id, value })
+      .onConflictDoUpdate({
+        target: [listRatings.userId, listRatings.listId],
+        set: { value, updatedAt: new Date() },
+      })
+      .returning();
+
+    return c.json(rating);
+  }
+);
+
+app.delete("/lists/:listId/rating", async (c) => {
+  const authUser = getOptionalUser(c);
+  const userId = authUser?.session?.user?.id;
+  if (!userId) return c.json({ error: "Unauthorized" }, 401);
+
+  const list = await db.query.lists.findFirst({
+    where: listWhere(c.req.param("listId")),
+    columns: { id: true },
+  });
+  if (!list) return c.body(null, 204);
+
+  await db
+    .delete(listRatings)
+    .where(
+      and(eq(listRatings.userId, userId), eq(listRatings.listId, list.id))
+    );
   return c.body(null, 204);
 });
 
