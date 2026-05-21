@@ -309,7 +309,7 @@ function ExplorePage() {
             ? t(`categories.${category}`)
             : null;
           return (
-            <div className="mt-4 flex items-center gap-2 flex-wrap">
+            <div className="mt-3 flex items-center gap-2 flex-wrap">
               <button
                 type="button"
                 data-testid="filter-toggle"
