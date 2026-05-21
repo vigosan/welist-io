@@ -105,7 +105,7 @@ function UserProfilePage() {
           ) : (
             <ul
               data-testid="achievements-list"
-              className="grid grid-cols-1 sm:grid-cols-2 gap-2"
+              className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1.5"
             >
               {achievements.map((a: UserAchievement) => {
                 const unlocked = a.unlockedAt !== null;
@@ -116,47 +116,50 @@ function UserProfilePage() {
                     data-testid={`achievement-${a.type}`}
                     data-unlocked={unlocked ? "true" : "false"}
                     title={t(`achievements.${a.type}.description`)}
-                    className={`flex flex-col gap-1.5 rounded-2xl border p-3 ${
-                      unlocked
-                        ? "border-black/[0.12] dark:border-white/[0.14] bg-white dark:bg-white/[0.04]"
-                        : "border-black/[0.06] dark:border-white/[0.06] bg-transparent opacity-70"
-                    }`}
+                    className="flex items-center gap-3 py-1"
                   >
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="text-sm font-medium text-[#0c0c0b] dark:text-[#f0ede8]">
-                        {t(`achievements.${a.type}.title`)}
-                      </span>
-                      {unlocked && (
+                    <span
+                      aria-hidden="true"
+                      className={`text-sm shrink-0 ${
+                        unlocked
+                          ? "text-[#0c0c0b] dark:text-[#f0ede8]"
+                          : "text-gray-300 dark:text-[#52524e]"
+                      }`}
+                    >
+                      ★
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-baseline justify-between gap-2">
                         <span
-                          aria-hidden="true"
-                          className="text-[#0c0c0b] dark:text-[#f0ede8]"
+                          className={`text-sm truncate ${
+                            unlocked
+                              ? "text-[#0c0c0b] dark:text-[#f0ede8] font-medium"
+                              : "text-gray-500 dark:text-[#a0a09c]"
+                          }`}
                         >
-                          ★
+                          {t(`achievements.${a.type}.title`)}
                         </span>
-                      )}
-                    </div>
-                    <p className="text-xs text-gray-500 dark:text-[#a0a09c] leading-snug">
-                      {t(`achievements.${a.type}.description`)}
-                    </p>
-                    {!unlocked && (
-                      <div className="flex flex-col gap-1 mt-0.5">
-                        <div
-                          className="h-1 rounded-full bg-black/[0.06] dark:bg-white/[0.08] overflow-hidden"
-                          aria-hidden="true"
-                        >
-                          <div
-                            className="h-full bg-gray-900 dark:bg-[#f0ede8]"
-                            style={{ width: `${pct}%` }}
-                          />
-                        </div>
                         <span
                           data-testid={`achievement-progress-${a.type}`}
-                          className="text-[11px] tabular-nums text-gray-500 dark:text-[#a0a09c]"
+                          className="text-[11px] tabular-nums text-gray-400 dark:text-[#6b6b67] shrink-0"
                         >
                           {a.progress} / {a.target}
                         </span>
                       </div>
-                    )}
+                      <div
+                        className="mt-1 h-[2px] rounded-full bg-black/[0.06] dark:bg-white/[0.08] overflow-hidden"
+                        aria-hidden="true"
+                      >
+                        <div
+                          className={`h-full ${
+                            unlocked
+                              ? "bg-gray-900 dark:bg-[#f0ede8]"
+                              : "bg-gray-400 dark:bg-[#6b6b67]"
+                          }`}
+                          style={{ width: `${pct}%` }}
+                        />
+                      </div>
+                    </div>
                   </li>
                 );
               })}
