@@ -36,6 +36,7 @@ export type ExploreItem = Pick<
     name: string | null;
     image: string | null;
   }>;
+  rating: { avg: number | null; count: number };
   owner: {
     id: string | null;
     name: string | null;

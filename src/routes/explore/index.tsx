@@ -8,6 +8,7 @@ import { useTranslation } from "@/i18n/service";
 import { LIST_CATEGORIES, type ListCategory } from "@/lib/categories";
 import { CategoryIcon } from "@/lib/categoryIcons";
 import { plainItemText } from "@/lib/item-text";
+import { StarRatingDisplay } from "@/components/StarRating";
 import type { ExploreItem } from "@/services/lists.service";
 
 export const Route = createFileRoute("/explore/")({
@@ -78,21 +79,32 @@ function ExploreListCard({
           )}
           <div
             data-testid={`explore-card-meta-${list.id}`}
-            className="text-[11px] tabular-nums text-gray-500 dark:text-[#6b6b67]"
+            className="flex items-center gap-2 text-[11px] tabular-nums text-gray-500 dark:text-[#6b6b67]"
           >
-            {[
-              t("explore.metaItems", { count: list.itemCount }),
-              list.participantCount > 0
-                ? t("explore.metaParticipants", {
-                    count: list.participantCount,
-                  })
-                : null,
-              list.completedCount > 0
-                ? t("explore.metaCompleted", { count: list.completedCount })
-                : null,
-            ]
-              .filter(Boolean)
-              .join(" · ")}
+            <span>
+              {[
+                t("explore.metaItems", { count: list.itemCount }),
+                list.participantCount > 0
+                  ? t("explore.metaParticipants", {
+                      count: list.participantCount,
+                    })
+                  : null,
+                list.completedCount > 0
+                  ? t("explore.metaCompleted", { count: list.completedCount })
+                  : null,
+              ]
+                .filter(Boolean)
+                .join(" · ")}
+            </span>
+            {list.rating.count > 0 && (
+              <>
+                <span className="text-gray-300 dark:text-gray-600">·</span>
+                <StarRatingDisplay
+                  avg={list.rating.avg}
+                  count={list.rating.count}
+                />
+              </>
+            )}
           </div>
           {list.participantCount > 0 && list.itemCount > 0 && (
             <div

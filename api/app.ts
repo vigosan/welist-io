@@ -909,6 +909,10 @@ app.get("/explore", async (c) => {
       participants: sql<
         Array<{ id: string; name: string | null; image: string | null }>
       >`coalesce((select json_agg(s) from (select u.id, u.name, u.image from ${participations} pa join ${users} u on u.id = pa.user_id where pa.source_list_id = ${lists.id} order by pa.created_at desc limit 5) s), '[]'::json)`,
+      ratingAvg: sql<
+        number | null
+      >`(select avg(${listRatings.value})::float8 from ${listRatings} where ${listRatings.listId} = ${lists.id})`,
+      ratingCount: sql<number>`cast((select count(*) from ${listRatings} where ${listRatings.listId} = ${lists.id}) as int)`,
       ownerId: users.id,
       ownerName: users.name,
       ownerImage: users.image,
@@ -929,9 +933,18 @@ app.get("/explore", async (c) => {
       : null;
 
   const exploreItems = rows.map(
-    ({ ownerId, ownerName, ownerImage, completedCount, ...row }) => ({
+    ({
+      ownerId,
+      ownerName,
+      ownerImage,
+      completedCount,
+      ratingAvg,
+      ratingCount,
+      ...row
+    }) => ({
       ...row,
       completedCount,
+      rating: { avg: ratingAvg, count: ratingCount },
       owner: ownerId
         ? { id: ownerId, name: ownerName, image: ownerImage }
         : null,
