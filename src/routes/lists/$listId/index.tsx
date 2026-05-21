@@ -761,27 +761,40 @@ function ListDetailPage() {
                           </span>
                         </>
                       )}
+
+                      {!isOwner &&
+                        (session?.user || (list?.rating?.count ?? 0) > 0) && (
+                          <>
+                            <span className="text-gray-200 text-xs shrink-0">
+                              ·
+                            </span>
+                            {session?.user && (
+                              <span className="shrink-0">
+                                <StarRatingInput
+                                  value={list?.rating?.userValue ?? null}
+                                  onChange={(v) => rateList.mutate(v)}
+                                  onClear={() => unrateList.mutate()}
+                                  disabled={
+                                    rateList.isPending || unrateList.isPending
+                                  }
+                                  size="sm"
+                                />
+                              </span>
+                            )}
+                            {(list?.rating?.count ?? 0) > 0 && (
+                              <span className="shrink-0">
+                                <StarRatingDisplay
+                                  avg={list?.rating?.avg ?? null}
+                                  count={list?.rating?.count ?? 0}
+                                />
+                              </span>
+                            )}
+                          </>
+                        )}
                     </div>
                   </>
                 )}
               </div>
-
-              {!listLoading && (
-                <div className="mt-3 flex flex-wrap items-center gap-3 order-6">
-                  {session?.user ? (
-                    <StarRatingInput
-                      value={list?.rating?.userValue ?? null}
-                      onChange={(v) => rateList.mutate(v)}
-                      onClear={() => unrateList.mutate()}
-                      disabled={rateList.isPending || unrateList.isPending}
-                    />
-                  ) : null}
-                  <StarRatingDisplay
-                    avg={list?.rating?.avg ?? null}
-                    count={list?.rating?.count ?? 0}
-                  />
-                </div>
-              )}
 
               {!listLoading && isOwner && participantsPanel && (
                 <ParticipantsPanel
