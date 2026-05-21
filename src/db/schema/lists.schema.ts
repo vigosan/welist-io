@@ -196,6 +196,30 @@ export const listPurchases = pgTable(
   ]
 );
 
+export const listRatings = pgTable(
+  "list_ratings",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    listId: uuid("list_id")
+      .notNull()
+      .references(() => lists.id, { onDelete: "cascade" }),
+    value: integer("value").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => [
+    unique("list_ratings_user_list_uidx").on(t.userId, t.listId),
+    index("list_ratings_list_idx").on(t.listId),
+  ]
+);
+
 export const notificationTypeEnum = pgEnum("notification_type", [
   "challenge_accepted",
   "challenge_completed",
@@ -319,6 +343,7 @@ export type ListActivity = typeof listActivity.$inferSelect;
 export type StripeAccount = typeof stripeAccounts.$inferSelect;
 export type ListPrice = typeof listPrices.$inferSelect;
 export type ListPurchase = typeof listPurchases.$inferSelect;
+export type ListRating = typeof listRatings.$inferSelect;
 export type Notification = typeof notifications.$inferSelect;
 export type Event = typeof events.$inferSelect;
 export type Achievement = typeof achievements.$inferSelect;

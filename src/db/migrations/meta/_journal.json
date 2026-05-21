@@ -162,6 +162,13 @@
       "when": 1779377434352,
       "tag": "0022_numerous_lenny_balinger",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1779377539629,
+      "tag": "0023_chief_wildside",
+      "breakpoints": true
     }
   ]
 }
