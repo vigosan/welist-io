@@ -28,6 +28,7 @@ import {
   events,
   follows,
   itemProgress,
+  itemReactions,
   items,
   listActivity,
   listPrices,
@@ -41,6 +42,7 @@ import {
 } from "../src/db/schema/index.js";
 import { LIST_CATEGORIES } from "../src/lib/categories.js";
 import { plainItemText } from "../src/lib/item-text.js";
+import { REACTION_EMOJIS } from "../src/lib/reactions.js";
 import { sendEmail } from "./email.js";
 import { signUnsubscribeToken, verifyUnsubscribeToken } from "./email-token.js";
 import { rateLimit } from "./rate-limit.js";
@@ -2146,6 +2148,52 @@ app.delete("/lists/:listId/rating", async (c) => {
     );
   return c.body(null, 204);
 });
+
+app.post(
+  "/lists/:listId/items/:itemId/reactions",
+  zValidator("json", z.object({ emoji: z.enum(REACTION_EMOJIS) })),
+  async (c) => {
+    const authUser = getOptionalUser(c);
+    const userId = authUser?.session?.user?.id;
+    if (!userId) return c.json({ error: "Unauthorized" }, 401);
+
+    const list = await db.query.lists.findFirst({
+      where: listWhere(c.req.param("listId")),
+      columns: {
+        id: true,
+        ownerId: true,
+        public: true,
+        collaborative: true,
+      },
+    });
+    if (!list) return c.json({ error: "Not found" }, 404);
+    if (!(await canViewList(list, userId)))
+      return c.json({ error: "Not found" }, 404);
+
+    const itemId = c.req.param("itemId");
+    const item = await db.query.items.findFirst({
+      where: and(eq(items.id, itemId), eq(items.listId, list.id)),
+      columns: { id: true },
+    });
+    if (!item) return c.json({ error: "Not found" }, 404);
+
+    const { emoji } = c.req.valid("json");
+    const existing = await db.query.itemReactions.findFirst({
+      where: and(
+        eq(itemReactions.itemId, item.id),
+        eq(itemReactions.userId, userId),
+        eq(itemReactions.emoji, emoji)
+      ),
+      columns: { id: true },
+    });
+    if (existing) {
+      await db.delete(itemReactions).where(eq(itemReactions.id, existing.id));
+      return c.json({ added: false, emoji });
+    }
+    await db.insert(itemReactions).values({ itemId: item.id, userId, emoji });
+    return c.json({ added: true, emoji });
+  }
+);
 
 app.post("/lists/:listId/checkout", async (c) => {
   const authUser = getOptionalUser(c);

@@ -10,6 +10,7 @@ const mockDb = {
     stripeAccounts: { findFirst: vi.fn() },
     listPurchases: { findFirst: vi.fn() },
     notifications: { findFirst: vi.fn(), findMany: vi.fn() },
+    itemReactions: { findFirst: vi.fn(), findMany: vi.fn() },
   },
   insert: vi.fn(),
   update: vi.fn(),
@@ -2678,7 +2679,10 @@ describe("POST /api/events", () => {
     const res = await app.request("/api/events", {
       method: "POST",
       body: JSON.stringify({ events: [{ type: "" }] }),
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "x-forwarded-for": "10.0.4.1",
+      },
     });
     expect(res.status).toBe(400);
   });
@@ -2688,7 +2692,10 @@ describe("POST /api/events", () => {
     const res = await app.request("/api/events", {
       method: "POST",
       body: JSON.stringify({ events }),
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "x-forwarded-for": "10.0.4.2",
+      },
     });
     expect(res.status).toBe(400);
   });
@@ -2913,6 +2920,133 @@ describe("DELETE /api/lists/:listId/rating", () => {
     });
 
     expect(res.status).toBe(204);
+    expect(where).toHaveBeenCalled();
+  });
+});
+
+describe("POST /api/lists/:listId/items/:itemId/reactions", () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it("returns 401 without a session", async () => {
+    mockGetAuthUser.mockRejectedValue(new Error("no session"));
+    const res = await app.request("/api/lists/abc/items/i1/reactions", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "x-forwarded-for": "10.0.3.1",
+      },
+      body: JSON.stringify({ emoji: "👏" }),
+    });
+    expect(res.status).toBe(401);
+  });
+
+  it("returns 400 for an unsupported emoji", async () => {
+    mockGetAuthUser.mockResolvedValue({ session: { user: { id: "u1" } } });
+    const res = await app.request("/api/lists/abc/items/i1/reactions", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "x-forwarded-for": "10.0.3.2",
+      },
+      body: JSON.stringify({ emoji: "🤡" }),
+    });
+    expect(res.status).toBe(400);
+  });
+
+  it("returns 404 when the list does not exist", async () => {
+    mockGetAuthUser.mockResolvedValue({ session: { user: { id: "u1" } } });
+    mockDb.query.lists.findFirst.mockResolvedValue(undefined);
+    const res = await app.request("/api/lists/abc/items/i1/reactions", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "x-forwarded-for": "10.0.3.3",
+      },
+      body: JSON.stringify({ emoji: "👏" }),
+    });
+    expect(res.status).toBe(404);
+  });
+
+  it("returns 404 when the item is not in the list", async () => {
+    mockGetAuthUser.mockResolvedValue({ session: { user: { id: "u1" } } });
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "abc",
+      ownerId: "u1",
+      public: true,
+      collaborative: false,
+    });
+    mockDb.query.items.findFirst.mockResolvedValue(undefined);
+    const res = await app.request("/api/lists/abc/items/i1/reactions", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "x-forwarded-for": "10.0.3.4",
+      },
+      body: JSON.stringify({ emoji: "👏" }),
+    });
+    expect(res.status).toBe(404);
+  });
+
+  it("adds the reaction when none exists and returns added:true", async () => {
+    mockGetAuthUser.mockResolvedValue({ session: { user: { id: "u1" } } });
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "abc",
+      ownerId: "owner",
+      public: true,
+      collaborative: false,
+    });
+    mockDb.query.items.findFirst.mockResolvedValue({ id: "i1", listId: "abc" });
+    mockDb.query.itemReactions.findFirst.mockResolvedValue(undefined);
+    const values = vi.fn().mockResolvedValue(undefined);
+    mockDb.insert.mockReturnValue({ values });
+
+    const res = await app.request("/api/lists/abc/items/i1/reactions", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "x-forwarded-for": "10.0.3.5",
+      },
+      body: JSON.stringify({ emoji: "🔥" }),
+    });
+
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as Record<string, unknown>;
+    expect(body).toEqual({ added: true, emoji: "🔥" });
+    expect(values).toHaveBeenCalledWith(
+      expect.objectContaining({ itemId: "i1", userId: "u1", emoji: "🔥" })
+    );
+  });
+
+  it("removes the reaction when it exists and returns added:false", async () => {
+    mockGetAuthUser.mockResolvedValue({ session: { user: { id: "u1" } } });
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "abc",
+      ownerId: "owner",
+      public: true,
+      collaborative: false,
+    });
+    mockDb.query.items.findFirst.mockResolvedValue({ id: "i1", listId: "abc" });
+    mockDb.query.itemReactions.findFirst.mockResolvedValue({
+      id: "r1",
+      itemId: "i1",
+      userId: "u1",
+      emoji: "💡",
+    });
+    const where = vi.fn().mockResolvedValue(undefined);
+    mockDb.delete.mockReturnValue({ where });
+
+    const res = await app.request("/api/lists/abc/items/i1/reactions", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "x-forwarded-for": "10.0.3.6",
+      },
+      body: JSON.stringify({ emoji: "💡" }),
+    });
+
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as Record<string, unknown>;
+    expect(body).toEqual({ added: false, emoji: "💡" });
     expect(where).toHaveBeenCalled();
   });
 });
