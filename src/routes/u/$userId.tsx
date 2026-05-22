@@ -1,13 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ActivityHeatmap } from "@/components/ActivityHeatmap";
 import { AppNav } from "@/components/AppNav";
 import { FollowButton } from "@/components/FollowButton";
 import { StarRatingDisplay } from "@/components/StarRating";
-import {
-  useUserAchievements,
-  useUserActivity,
-  useUserProfile,
-} from "@/hooks/useList";
+import { useUserAchievements, useUserProfile } from "@/hooks/useList";
 import { useTranslation } from "@/i18n/service";
 import type { UserAchievement } from "@/services/lists.service";
 
@@ -19,7 +14,6 @@ function UserProfilePage() {
   const { userId } = Route.useParams();
   const { data: profile, isLoading } = useUserProfile(userId);
   const { data: achievements = [] } = useUserAchievements(userId);
-  const { data: activity = [] } = useUserActivity(userId);
   const { t } = useTranslation();
 
   if (isLoading) {
@@ -100,13 +94,6 @@ function UserProfilePage() {
         </div>
 
         <FollowButton userId={userId} />
-
-        <section className="flex flex-col gap-3">
-          <h2 className="text-[11px] font-semibold text-gray-500 dark:text-[#a0a09c] uppercase tracking-wider">
-            {t("profile.activity")}
-          </h2>
-          <ActivityHeatmap days={activity} />
-        </section>
 
         <section className="flex flex-col gap-3">
           <h2 className="text-[11px] font-semibold text-gray-500 dark:text-[#a0a09c] uppercase tracking-wider">

@@ -326,8 +326,6 @@ const en: Translations = {
     followers_other: "{{count}} followers",
     achievements: "Achievements",
     noAchievements: "No achievements unlocked yet.",
-    activity: "Activity in the last year",
-    activityCell: "{{date}}: {{count}} events",
   },
   achievements: {
     first_list_created: {

@@ -180,11 +180,6 @@ export const usersService = {
       `/api/users/${userId}/achievements`
     ),
 
-  getActivity: (userId: string) =>
-    apiClient<{ days: { date: string; count: number }[] }>(
-      `/api/users/${userId}/activity`
-    ),
-
   directory: (q?: string, cursor?: string) => {
     const params = new URLSearchParams();
     if (q) params.set("q", q);

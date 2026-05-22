@@ -300,14 +300,6 @@ export function useUserAchievements(userId: string) {
   });
 }
 
-export function useUserActivity(userId: string) {
-  return useQuery({
-    queryKey: queryKeys.userActivity(userId),
-    queryFn: async () => (await usersService.getActivity(userId)).days,
-    staleTime: 60_000,
-  });
-}
-
 export function useUserDirectory(q?: string) {
   return useInfiniteQuery({
     queryKey: queryKeys.userDirectory(q),

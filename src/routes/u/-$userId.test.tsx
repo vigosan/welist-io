@@ -18,7 +18,6 @@ import {
   useFollowStatus,
   useToggleFollow,
   useUserAchievements,
-  useUserActivity,
   useUserProfile,
 } from "@/hooks/useList";
 
@@ -64,9 +63,6 @@ describe("UserProfilePage achievements", () => {
       mutate: vi.fn(),
       isPending: false,
     } as unknown as ReturnType<typeof useToggleFollow>);
-    vi.mocked(useUserActivity).mockReturnValue({
-      data: [],
-    } as unknown as ReturnType<typeof useUserActivity>);
   });
 
   it("renders every badge in the catalog with its progress", async () => {

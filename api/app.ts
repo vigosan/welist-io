@@ -1442,31 +1442,6 @@ app.get("/users/:userId/achievements", async (c) => {
   return c.json({ achievements: result });
 });
 
-app.get("/users/:userId/activity", async (c) => {
-  const userId = c.req.param("userId");
-  const daysParam = Number(c.req.query("days") ?? 365);
-  const days =
-    Number.isFinite(daysParam) && daysParam > 0 && daysParam <= 730
-      ? Math.floor(daysParam)
-      : 365;
-
-  const rows = await db
-    .select({
-      date: sql<string>`to_char(date_trunc('day', ${events.createdAt}), 'YYYY-MM-DD')`,
-      count: sql<number>`cast(count(*) as int)`,
-    })
-    .from(events)
-    .where(
-      and(
-        eq(events.userId, userId),
-        gt(events.createdAt, sql`now() - (${days} || ' days')::interval`)
-      )
-    )
-    .groupBy(sql`date_trunc('day', ${events.createdAt})`);
-
-  return c.json({ days: rows });
-});
-
 app.post("/users/:userId/follow", async (c) => {
   const authUser = getOptionalUser(c);
   const followerId = authUser?.session?.user?.id;
