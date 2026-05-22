@@ -229,12 +229,55 @@ describe("GET /api/lists/:listId/items", () => {
       public: true,
     });
     mockDb.query.items.findMany.mockResolvedValue(rows);
+    mockDb.select.mockReturnValue({
+      from: vi.fn().mockReturnValue({
+        where: vi.fn().mockReturnValue({
+          groupBy: vi.fn().mockResolvedValue([]),
+        }),
+      }),
+    });
 
     const res = await app.request("/api/lists/abc/items");
     expect(res.status).toBe(200);
     const body = (await res.json()) as Array<Record<string, unknown>>;
     expect(body).toHaveLength(2);
     expect(body[0].text).toBe("Primero");
+  });
+
+  it("embeds reactions per item with counts and mine flag", async () => {
+    const rows = [
+      { id: "i1", listId: "abc", text: "A", done: false, position: 0 },
+      { id: "i2", listId: "abc", text: "B", done: false, position: 1 },
+    ];
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "abc",
+      ownerId: null,
+      collaborative: false,
+      public: true,
+    });
+    mockDb.query.items.findMany.mockResolvedValue(rows);
+    mockDb.select.mockReturnValue({
+      from: vi.fn().mockReturnValue({
+        where: vi.fn().mockReturnValue({
+          groupBy: vi.fn().mockResolvedValue([
+            { itemId: "i1", emoji: "🔥", count: 3, mine: false },
+            { itemId: "i1", emoji: "💡", count: 1, mine: true },
+          ]),
+        }),
+      }),
+    });
+
+    const res = await app.request("/api/lists/abc/items");
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as Array<{
+      id: string;
+      reactions: unknown[];
+    }>;
+    expect(body[0].reactions).toEqual([
+      { emoji: "🔥", count: 3, mine: false },
+      { emoji: "💡", count: 1, mine: true },
+    ]);
+    expect(body[1].reactions).toEqual([]);
   });
 
   it("returns 404 for private list when unauthenticated", async () => {
@@ -1518,6 +1561,13 @@ describe("GET /api/lists/:listId/items (participant item_progress)", () => {
       public: true,
     });
     mockDb.query.items.findMany.mockResolvedValue(rows);
+    mockDb.select.mockReturnValue({
+      from: vi.fn().mockReturnValue({
+        where: vi.fn().mockReturnValue({
+          groupBy: vi.fn().mockResolvedValue([]),
+        }),
+      }),
+    });
 
     const res = await app.request("/api/lists/abc/items");
     expect(res.status).toBe(200);
@@ -2670,7 +2720,10 @@ describe("POST /api/events", () => {
     const res = await app.request("/api/events", {
       method: "POST",
       body: JSON.stringify({ events: [] }),
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "x-forwarded-for": "10.0.4.3",
+      },
     });
     expect(res.status).toBe(400);
   });

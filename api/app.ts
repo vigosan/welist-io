@@ -522,10 +522,18 @@ app.get("/lists/:listId/items", async (c) => {
     orderBy: (t, { asc }) => [asc(t.position), asc(t.createdAt)],
   });
 
-  if (!participation || participation.role !== "challenger")
-    return c.json(rows);
-
   const itemIds = rows.map((r) => r.id);
+  const reactionsByItem = await fetchReactionsByItem(itemIds, userId);
+
+  if (!participation || participation.role !== "challenger") {
+    return c.json(
+      rows.map((item) => ({
+        ...item,
+        reactions: reactionsByItem.get(item.id) ?? [],
+      }))
+    );
+  }
+
   const progressRows =
     itemIds.length === 0
       ? []
@@ -542,9 +550,38 @@ app.get("/lists/:listId/items", async (c) => {
     rows.map((item) => ({
       ...item,
       done: progressMap.get(item.id) ?? false,
+      reactions: reactionsByItem.get(item.id) ?? [],
     }))
   );
 });
+
+type ReactionAggregate = { emoji: string; count: number; mine: boolean };
+
+async function fetchReactionsByItem(
+  itemIds: string[],
+  userId: string | null
+): Promise<Map<string, ReactionAggregate[]>> {
+  const byItem = new Map<string, ReactionAggregate[]>();
+  if (itemIds.length === 0) return byItem;
+  const rows = await db
+    .select({
+      itemId: itemReactions.itemId,
+      emoji: itemReactions.emoji,
+      count: sql<number>`cast(count(*) as int)`,
+      mine: userId
+        ? sql<boolean>`bool_or(${itemReactions.userId} = ${userId})`
+        : sql<boolean>`false`,
+    })
+    .from(itemReactions)
+    .where(inUuids(itemReactions.itemId, itemIds))
+    .groupBy(itemReactions.itemId, itemReactions.emoji);
+  for (const r of rows) {
+    const arr = byItem.get(r.itemId) ?? [];
+    arr.push({ emoji: r.emoji, count: r.count, mine: r.mine });
+    byItem.set(r.itemId, arr);
+  }
+  return byItem;
+}
 
 app.post(
   "/lists/:listId/items",
