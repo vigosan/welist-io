@@ -2,13 +2,14 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act, renderHook, waitFor } from "@testing-library/react";
 import type React from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { Item } from "./useItems";
+import type { ItemWithReactions } from "./useItems";
 import {
   useAddItem,
   useBulkAddItems,
   useDeleteItem,
   useItems,
   useToggleItem,
+  useToggleReaction,
   useUpdateItem,
 } from "./useItems";
 
@@ -17,6 +18,7 @@ vi.mock("@/services/items.service", () => ({
     list: vi.fn(),
     add: vi.fn(),
     toggle: vi.fn(),
+    toggleReaction: vi.fn(),
     update: vi.fn(),
     delete: vi.fn(),
     bulkAdd: vi.fn(),
@@ -27,7 +29,7 @@ import { itemsService } from "@/services/items.service";
 
 const LIST_ID = "list-1";
 
-const ITEM_A: Item = {
+const ITEM_A: ItemWithReactions = {
   id: "i1",
   listId: LIST_ID,
   text: "Tarea A",
@@ -38,8 +40,9 @@ const ITEM_A: Item = {
   placeName: null,
   createdAt: new Date(),
   updatedAt: new Date(),
+  reactions: [],
 };
-const ITEM_B: Item = {
+const ITEM_B: ItemWithReactions = {
   id: "i2",
   listId: LIST_ID,
   text: "Tarea B",
@@ -50,6 +53,7 @@ const ITEM_B: Item = {
   placeName: null,
   createdAt: new Date(),
   updatedAt: new Date(),
+  reactions: [],
 };
 
 function makeWrapper() {
@@ -98,7 +102,7 @@ describe("useToggleItem", () => {
       result.current.mutate(ITEM_A.id);
     });
 
-    const cached = qc.getQueryData<Item[]>(["items", LIST_ID]);
+    const cached = qc.getQueryData<ItemWithReactions[]>(["items", LIST_ID]);
     expect(cached?.find((i) => i.id === ITEM_A.id)?.done).toBe(true);
   });
 
@@ -117,7 +121,7 @@ describe("useToggleItem", () => {
     });
 
     await waitFor(() => expect(result.current.isError).toBe(true));
-    const cached = qc.getQueryData<Item[]>(["items", LIST_ID]);
+    const cached = qc.getQueryData<ItemWithReactions[]>(["items", LIST_ID]);
     expect(cached?.find((i) => i.id === ITEM_A.id)?.done).toBe(false);
   });
 });
@@ -135,7 +139,7 @@ describe("useDeleteItem", () => {
       result.current.mutate(ITEM_A.id);
     });
 
-    const cached = qc.getQueryData<Item[]>(["items", LIST_ID]);
+    const cached = qc.getQueryData<ItemWithReactions[]>(["items", LIST_ID]);
     expect(cached?.map((i) => i.id)).not.toContain(ITEM_A.id);
   });
 
@@ -152,7 +156,7 @@ describe("useDeleteItem", () => {
     });
 
     await waitFor(() => expect(result.current.isError).toBe(true));
-    const cached = qc.getQueryData<Item[]>(["items", LIST_ID]);
+    const cached = qc.getQueryData<ItemWithReactions[]>(["items", LIST_ID]);
     expect(cached?.map((i) => i.id)).toContain(ITEM_A.id);
   });
 });
@@ -176,7 +180,7 @@ describe("useUpdateItem", () => {
       });
     });
 
-    const cached = qc.getQueryData<Item[]>(["items", LIST_ID]);
+    const cached = qc.getQueryData<ItemWithReactions[]>(["items", LIST_ID]);
     expect(cached?.find((i) => i.id === ITEM_A.id)?.text).toBe("Nuevo texto");
   });
 
@@ -196,7 +200,7 @@ describe("useUpdateItem", () => {
     });
 
     await waitFor(() => expect(result.current.isError).toBe(true));
-    const cached = qc.getQueryData<Item[]>(["items", LIST_ID]);
+    const cached = qc.getQueryData<ItemWithReactions[]>(["items", LIST_ID]);
     expect(cached?.find((i) => i.id === ITEM_A.id)?.text).toBe("Tarea A");
   });
 });
@@ -240,5 +244,72 @@ describe("useBulkAddItems", () => {
         queryKey: ["items", LIST_ID],
       })
     );
+  });
+});
+
+describe("useToggleReaction", () => {
+  it("optimistically adds a new reaction when none exists", async () => {
+    vi.mocked(itemsService.toggleReaction).mockResolvedValue({
+      added: true,
+      emoji: "🔥",
+    });
+    const { qc, Wrapper } = makeWrapper();
+    qc.setQueryData(["items", LIST_ID], [ITEM_A, ITEM_B]);
+
+    const { result } = renderHook(() => useToggleReaction(LIST_ID), {
+      wrapper: Wrapper,
+    });
+    await act(async () => {
+      result.current.mutate({ itemId: ITEM_A.id, emoji: "🔥" });
+    });
+
+    const cached = qc.getQueryData<ItemWithReactions[]>(["items", LIST_ID]);
+    expect(cached?.find((i) => i.id === ITEM_A.id)?.reactions).toEqual([
+      { emoji: "🔥", count: 1, mine: true },
+    ]);
+  });
+
+  it("optimistically removes own reaction when count drops to zero", async () => {
+    vi.mocked(itemsService.toggleReaction).mockResolvedValue({
+      added: false,
+      emoji: "🔥",
+    });
+    const { qc, Wrapper } = makeWrapper();
+    qc.setQueryData(
+      ["items", LIST_ID],
+      [
+        { ...ITEM_A, reactions: [{ emoji: "🔥", count: 1, mine: true }] },
+        ITEM_B,
+      ]
+    );
+
+    const { result } = renderHook(() => useToggleReaction(LIST_ID), {
+      wrapper: Wrapper,
+    });
+    await act(async () => {
+      result.current.mutate({ itemId: ITEM_A.id, emoji: "🔥" });
+    });
+
+    const cached = qc.getQueryData<ItemWithReactions[]>(["items", LIST_ID]);
+    expect(cached?.find((i) => i.id === ITEM_A.id)?.reactions).toEqual([]);
+  });
+
+  it("rolls back on error", async () => {
+    vi.mocked(itemsService.toggleReaction).mockRejectedValue(
+      new Error("Network error")
+    );
+    const { qc, Wrapper } = makeWrapper();
+    qc.setQueryData(["items", LIST_ID], [ITEM_A]);
+
+    const { result } = renderHook(() => useToggleReaction(LIST_ID), {
+      wrapper: Wrapper,
+    });
+    act(() => {
+      result.current.mutate({ itemId: ITEM_A.id, emoji: "🔥" });
+    });
+
+    await waitFor(() => expect(result.current.isError).toBe(true));
+    const cached = qc.getQueryData<ItemWithReactions[]>(["items", LIST_ID]);
+    expect(cached?.find((i) => i.id === ITEM_A.id)?.reactions).toEqual([]);
   });
 });

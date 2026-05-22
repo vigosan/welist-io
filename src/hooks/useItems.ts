@@ -3,12 +3,17 @@ import { toast } from "sonner";
 import type { Item } from "@/db/schema";
 import { t } from "@/i18n/service";
 import { queryKeys } from "@/lib/query-keys";
-import { type Coords, itemsService } from "@/services/items.service";
+import type { ReactionEmoji } from "@/lib/reactions";
+import {
+  type Coords,
+  type ItemWithReactions,
+  itemsService,
+} from "@/services/items.service";
 
-export type { Item };
+export type { Item, ItemWithReactions };
 
 interface MutationContext {
-  previous: Item[] | undefined;
+  previous: ItemWithReactions[] | undefined;
 }
 
 export function useItems(listId: string) {
@@ -39,8 +44,10 @@ export function useToggleItem(listId: string) {
       await qc.cancelQueries({
         queryKey: queryKeys.items(listId),
       });
-      const previous = qc.getQueryData<Item[]>(queryKeys.items(listId));
-      qc.setQueryData<Item[]>(queryKeys.items(listId), (old) =>
+      const previous = qc.getQueryData<ItemWithReactions[]>(
+        queryKeys.items(listId)
+      );
+      qc.setQueryData<ItemWithReactions[]>(queryKeys.items(listId), (old) =>
         old?.map((i) => (i.id === itemId ? { ...i, done: !i.done } : i))
       );
       return { previous };
@@ -77,8 +84,10 @@ export function useUpdateItem(listId: string) {
       await qc.cancelQueries({
         queryKey: queryKeys.items(listId),
       });
-      const previous = qc.getQueryData<Item[]>(queryKeys.items(listId));
-      qc.setQueryData<Item[]>(queryKeys.items(listId), (old) =>
+      const previous = qc.getQueryData<ItemWithReactions[]>(
+        queryKeys.items(listId)
+      );
+      qc.setQueryData<ItemWithReactions[]>(queryKeys.items(listId), (old) =>
         old?.map((i) => (i.id === id ? { ...i, text } : i))
       );
       return { previous };
@@ -113,8 +122,10 @@ export function useBulkDeleteItems(listId: string) {
       await qc.cancelQueries({
         queryKey: queryKeys.items(listId),
       });
-      const previous = qc.getQueryData<Item[]>(queryKeys.items(listId));
-      qc.setQueryData<Item[]>(queryKeys.items(listId), (old) =>
+      const previous = qc.getQueryData<ItemWithReactions[]>(
+        queryKeys.items(listId)
+      );
+      qc.setQueryData<ItemWithReactions[]>(queryKeys.items(listId), (old) =>
         old?.filter((i) => !ids.includes(i.id))
       );
       return { previous };
@@ -127,14 +138,21 @@ export function useBulkDeleteItems(listId: string) {
 
 export function useReorderItems(listId: string) {
   const qc = useQueryClient();
-  return useMutation<void, Error, string[], { previous: Item[] | undefined }>({
+  return useMutation<
+    void,
+    Error,
+    string[],
+    { previous: ItemWithReactions[] | undefined }
+  >({
     mutationFn: (ids) => itemsService.reorder(listId, ids),
     onMutate: async (ids) => {
       await qc.cancelQueries({
         queryKey: queryKeys.items(listId),
       });
-      const previous = qc.getQueryData<Item[]>(queryKeys.items(listId));
-      qc.setQueryData<Item[]>(queryKeys.items(listId), (old) => {
+      const previous = qc.getQueryData<ItemWithReactions[]>(
+        queryKeys.items(listId)
+      );
+      qc.setQueryData<ItemWithReactions[]>(queryKeys.items(listId), (old) => {
         if (!old) return old;
         const map = new Map(old.map((i) => [i.id, i]));
         return ids.map((id, pos) => ({
@@ -163,8 +181,10 @@ export function useDeleteItem(listId: string) {
       await qc.cancelQueries({
         queryKey: queryKeys.items(listId),
       });
-      const previous = qc.getQueryData<Item[]>(queryKeys.items(listId));
-      qc.setQueryData<Item[]>(queryKeys.items(listId), (old) =>
+      const previous = qc.getQueryData<ItemWithReactions[]>(
+        queryKeys.items(listId)
+      );
+      qc.setQueryData<ItemWithReactions[]>(queryKeys.items(listId), (old) =>
         old?.filter((i) => i.id !== itemId)
       );
       return { previous };
@@ -174,4 +194,56 @@ export function useDeleteItem(listId: string) {
       toast.error(t("items.errorDelete"));
     },
   });
+}
+
+export function useToggleReaction(listId: string) {
+  const qc = useQueryClient();
+  return useMutation<
+    { added: boolean; emoji: ReactionEmoji },
+    Error,
+    { itemId: string; emoji: ReactionEmoji },
+    MutationContext
+  >({
+    mutationFn: ({ itemId, emoji }) =>
+      itemsService.toggleReaction(listId, itemId, emoji),
+    onMutate: async ({ itemId, emoji }) => {
+      await qc.cancelQueries({ queryKey: queryKeys.items(listId) });
+      const previous = qc.getQueryData<ItemWithReactions[]>(
+        queryKeys.items(listId)
+      );
+      qc.setQueryData<ItemWithReactions[]>(queryKeys.items(listId), (old) =>
+        old?.map((item) =>
+          item.id === itemId
+            ? { ...item, reactions: applyReactionToggle(item.reactions, emoji) }
+            : item
+        )
+      );
+      return { previous };
+    },
+    onError: (_err, _vars, ctx) => {
+      qc.setQueryData(queryKeys.items(listId), ctx?.previous);
+      toast.error(t("items.errorToggle"));
+    },
+    onSettled: () =>
+      qc.invalidateQueries({ queryKey: queryKeys.items(listId) }),
+  });
+}
+
+function applyReactionToggle(
+  reactions: ItemWithReactions["reactions"],
+  emoji: ReactionEmoji
+): ItemWithReactions["reactions"] {
+  const existing = reactions.find((r) => r.emoji === emoji);
+  if (!existing) return [...reactions, { emoji, count: 1, mine: true }];
+  if (existing.mine) {
+    const nextCount = existing.count - 1;
+    return nextCount === 0
+      ? reactions.filter((r) => r.emoji !== emoji)
+      : reactions.map((r) =>
+          r.emoji === emoji ? { ...r, count: nextCount, mine: false } : r
+        );
+  }
+  return reactions.map((r) =>
+    r.emoji === emoji ? { ...r, count: r.count + 1, mine: true } : r
+  );
 }

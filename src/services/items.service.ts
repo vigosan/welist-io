@@ -1,5 +1,6 @@
 import type { Item } from "@/db/schema";
 import { apiClient } from "@/lib/api-client";
+import type { ReactionEmoji } from "@/lib/reactions";
 
 export interface Coords {
   latitude: string;
@@ -7,8 +8,26 @@ export interface Coords {
   placeName: string;
 }
 
+export interface ReactionAggregate {
+  emoji: string;
+  count: number;
+  mine: boolean;
+}
+
+export type ItemWithReactions = Item & { reactions: ReactionAggregate[] };
+
 export const itemsService = {
-  list: (listId: string) => apiClient<Item[]>(`/api/lists/${listId}/items`),
+  list: (listId: string) =>
+    apiClient<ItemWithReactions[]>(`/api/lists/${listId}/items`),
+
+  toggleReaction: (listId: string, itemId: string, emoji: ReactionEmoji) =>
+    apiClient<{ added: boolean; emoji: ReactionEmoji }>(
+      `/api/lists/${listId}/items/${itemId}/reactions`,
+      {
+        method: "POST",
+        body: JSON.stringify({ emoji }),
+      }
+    ),
 
   add: (listId: string, text: string, coords?: Coords) =>
     apiClient<Item>(`/api/lists/${listId}/items`, {
