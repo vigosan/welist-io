@@ -80,6 +80,8 @@ const es = {
   list: {
     back: "← Mis listas",
     addDescriptionPlaceholder: "Añade una descripción…",
+    activeParticipants_one: "{{count}} persona haciendo este reto",
+    activeParticipants_other: "{{count}} personas haciendo este reto",
     progress: "{{done}} / {{total}} completados",
     filterPending: "#pendientes",
     filterDone: "#hechos",

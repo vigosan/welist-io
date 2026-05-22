@@ -82,6 +82,8 @@ const en: Translations = {
   list: {
     back: "← My lists",
     addDescriptionPlaceholder: "Add a description…",
+    activeParticipants_one: "{{count}} person doing this challenge",
+    activeParticipants_other: "{{count}} people doing this challenge",
     progress: "{{done}} / {{total}} completed",
     filterPending: "#pending",
     filterDone: "#done",

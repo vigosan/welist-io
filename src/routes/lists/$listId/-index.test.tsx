@@ -41,6 +41,7 @@ import {
 } from "@/hooks/useItems";
 import { useItemsFilter } from "@/hooks/useItemsFilter";
 import {
+  useActiveParticipants,
   useCollaborators,
   useRateList,
   useToggleCollaborative,
@@ -267,6 +268,10 @@ function setupMocks({
   } as never);
   vi.mocked(useCollaborators).mockReturnValue({
     data: { collaborators: [], challengers: [] },
+    isLoading: false,
+  } as never);
+  vi.mocked(useActiveParticipants).mockReturnValue({
+    data: { participants: [], total: 0 },
     isLoading: false,
   } as never);
   vi.mocked(useListPrice).mockReturnValue({

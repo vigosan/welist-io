@@ -20,6 +20,7 @@ import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { BulkPastePreview } from "@/components/items/BulkPastePreview";
 import { ItemRow } from "@/components/items/ItemRow";
 import { ListSettingsPanel } from "@/components/ListSettingsPanel";
+import { ActiveParticipants } from "@/components/lists/ActiveParticipants";
 import { ListDropdownMenu } from "@/components/lists/ListDropdownMenu";
 import { ListFilterBar } from "@/components/lists/ListFilterBar";
 import { ListSettingsChip } from "@/components/lists/ListSettingsChip";
@@ -46,6 +47,7 @@ import {
 } from "@/hooks/useItems";
 import { useItemsFilter } from "@/hooks/useItemsFilter";
 import {
+  useActiveParticipants,
   useCollaborators,
   useDeleteList,
   useRateList,
@@ -239,6 +241,7 @@ function ListDetailPage() {
   );
   const collaborators = participantData?.collaborators ?? [];
   const challengers = participantData?.challengers ?? [];
+  const { data: activeParticipantsData } = useActiveParticipants(listId);
 
   const { data: items = [], isLoading: itemsLoading } = useItems(listId);
 
@@ -664,6 +667,18 @@ function ListDetailPage() {
                           </p>
                         )}
                       </div>
+
+                      {!isOwner && activeParticipantsData && (
+                        <>
+                          <span className="text-gray-200 text-xs shrink-0">
+                            ·
+                          </span>
+                          <ActiveParticipants
+                            participants={activeParticipantsData.participants}
+                            total={activeParticipantsData.total}
+                          />
+                        </>
+                      )}
 
                       {isOwner && challengers.length > 0 && (
                         <>
