@@ -28,7 +28,6 @@ import {
   events,
   follows,
   itemProgress,
-  itemReactions,
   items,
   listActivity,
   listPrices,
@@ -43,7 +42,6 @@ import {
 import { LIST_CATEGORIES } from "../src/lib/categories.js";
 import { plainItemText } from "../src/lib/item-text.js";
 import { currentWeekStartUtc } from "../src/lib/missions.js";
-import { REACTION_EMOJIS } from "../src/lib/reactions.js";
 import { sendEmail } from "./email.js";
 import { signUnsubscribeToken, verifyUnsubscribeToken } from "./email-token.js";
 import { rateLimit } from "./rate-limit.js";
@@ -523,18 +521,10 @@ app.get("/lists/:listId/items", async (c) => {
     orderBy: (t, { asc }) => [asc(t.position), asc(t.createdAt)],
   });
 
+  if (!participation || participation.role !== "challenger")
+    return c.json(rows);
+
   const itemIds = rows.map((r) => r.id);
-  const reactionsByItem = await fetchReactionsByItem(itemIds, userId);
-
-  if (!participation || participation.role !== "challenger") {
-    return c.json(
-      rows.map((item) => ({
-        ...item,
-        reactions: reactionsByItem.get(item.id) ?? [],
-      }))
-    );
-  }
-
   const progressRows =
     itemIds.length === 0
       ? []
@@ -551,38 +541,9 @@ app.get("/lists/:listId/items", async (c) => {
     rows.map((item) => ({
       ...item,
       done: progressMap.get(item.id) ?? false,
-      reactions: reactionsByItem.get(item.id) ?? [],
     }))
   );
 });
-
-type ReactionAggregate = { emoji: string; count: number; mine: boolean };
-
-async function fetchReactionsByItem(
-  itemIds: string[],
-  userId: string | null
-): Promise<Map<string, ReactionAggregate[]>> {
-  const byItem = new Map<string, ReactionAggregate[]>();
-  if (itemIds.length === 0) return byItem;
-  const rows = await db
-    .select({
-      itemId: itemReactions.itemId,
-      emoji: itemReactions.emoji,
-      count: sql<number>`cast(count(*) as int)`,
-      mine: userId
-        ? sql<boolean>`bool_or(${itemReactions.userId} = ${userId})`
-        : sql<boolean>`false`,
-    })
-    .from(itemReactions)
-    .where(inUuids(itemReactions.itemId, itemIds))
-    .groupBy(itemReactions.itemId, itemReactions.emoji);
-  for (const r of rows) {
-    const arr = byItem.get(r.itemId) ?? [];
-    arr.push({ emoji: r.emoji, count: r.count, mine: r.mine });
-    byItem.set(r.itemId, arr);
-  }
-  return byItem;
-}
 
 app.post(
   "/lists/:listId/items",
@@ -1268,7 +1229,7 @@ app.get("/me/missions", async (c) => {
   const userId = authUser?.session?.user?.id;
   if (!userId) return c.json({ error: "Unauthorized" }, 401);
   const weekStart = currentWeekStartUtc();
-  const [completedItems, acceptedLists, reactionCount] = await Promise.all([
+  const [completedItems, acceptedLists] = await Promise.all([
     db.$count(
       itemProgress,
       and(
@@ -1284,20 +1245,12 @@ app.get("/me/missions", async (c) => {
         gt(participations.createdAt, weekStart)
       )
     ),
-    db.$count(
-      itemReactions,
-      and(
-        eq(itemReactions.userId, userId),
-        gt(itemReactions.createdAt, weekStart)
-      )
-    ),
   ]);
   return c.json({
     weekStart: weekStart.toISOString(),
     missions: [
       { type: "complete_5_items", progress: completedItems, target: 5 },
       { type: "accept_2_lists", progress: acceptedLists, target: 2 },
-      { type: "react_3_times", progress: reactionCount, target: 3 },
     ],
   });
 });
@@ -2298,52 +2251,6 @@ app.delete("/lists/:listId/rating", async (c) => {
     );
   return c.body(null, 204);
 });
-
-app.post(
-  "/lists/:listId/items/:itemId/reactions",
-  zValidator("json", z.object({ emoji: z.enum(REACTION_EMOJIS) })),
-  async (c) => {
-    const authUser = getOptionalUser(c);
-    const userId = authUser?.session?.user?.id;
-    if (!userId) return c.json({ error: "Unauthorized" }, 401);
-
-    const list = await db.query.lists.findFirst({
-      where: listWhere(c.req.param("listId")),
-      columns: {
-        id: true,
-        ownerId: true,
-        public: true,
-        collaborative: true,
-      },
-    });
-    if (!list) return c.json({ error: "Not found" }, 404);
-    if (!(await canViewList(list, userId)))
-      return c.json({ error: "Not found" }, 404);
-
-    const itemId = c.req.param("itemId");
-    const item = await db.query.items.findFirst({
-      where: and(eq(items.id, itemId), eq(items.listId, list.id)),
-      columns: { id: true },
-    });
-    if (!item) return c.json({ error: "Not found" }, 404);
-
-    const { emoji } = c.req.valid("json");
-    const existing = await db.query.itemReactions.findFirst({
-      where: and(
-        eq(itemReactions.itemId, item.id),
-        eq(itemReactions.userId, userId),
-        eq(itemReactions.emoji, emoji)
-      ),
-      columns: { id: true },
-    });
-    if (existing) {
-      await db.delete(itemReactions).where(eq(itemReactions.id, existing.id));
-      return c.json({ added: false, emoji });
-    }
-    await db.insert(itemReactions).values({ itemId: item.id, userId, emoji });
-    return c.json({ added: true, emoji });
-  }
-);
 
 app.post("/lists/:listId/checkout", async (c) => {
   const authUser = getOptionalUser(c);

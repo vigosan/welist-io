@@ -42,7 +42,6 @@ import {
   useItems,
   useReorderItems,
   useToggleItem,
-  useToggleReaction,
   useUpdateItem,
 } from "@/hooks/useItems";
 import { useItemsFilter } from "@/hooks/useItemsFilter";
@@ -293,7 +292,6 @@ function ListDetailPage() {
   const toggleItem = useToggleItem(listId);
   const deleteItem = useDeleteItem(listId);
   const updateItem = useUpdateItem(listId);
-  const toggleReaction = useToggleReaction(listId);
   const reorderItems = useReorderItems(listId);
   const deleteList = useDeleteList();
 
@@ -1009,15 +1007,6 @@ function ListDetailPage() {
                             text,
                             coords,
                           })
-                        }
-                        onReact={
-                          session?.user?.id
-                            ? (emoji) =>
-                                toggleReaction.mutate({
-                                  itemId: item.id,
-                                  emoji,
-                                })
-                            : undefined
                         }
                         onTagClick={handleTagClick}
                         activeTag={activeTag}

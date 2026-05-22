@@ -9,7 +9,6 @@ describe("WeeklyMissions", () => {
         missions={[
           { type: "complete_5_items", progress: 4, target: 5 },
           { type: "accept_2_lists", progress: 0, target: 2 },
-          { type: "react_3_times", progress: 3, target: 3 },
         ]}
       />
     );
@@ -18,9 +17,6 @@ describe("WeeklyMissions", () => {
     ).toContain("4 / 5");
     expect(screen.getByTestId("mission-accept_2_lists").textContent).toContain(
       "0 / 2"
-    );
-    expect(screen.getByTestId("mission-react_3_times").textContent).toContain(
-      "3 / 3"
     );
   });
 
@@ -38,11 +34,13 @@ describe("WeeklyMissions", () => {
   it("marks completed missions with data-completed", () => {
     render(
       <WeeklyMissions
-        missions={[{ type: "react_3_times", progress: 3, target: 3 }]}
+        missions={[{ type: "accept_2_lists", progress: 2, target: 2 }]}
       />
     );
     expect(
-      screen.getByTestId("mission-react_3_times").getAttribute("data-completed")
+      screen
+        .getByTestId("mission-accept_2_lists")
+        .getAttribute("data-completed")
     ).toBe("true");
   });
 });

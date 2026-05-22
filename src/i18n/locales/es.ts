@@ -270,14 +270,11 @@ const es = {
     errorUpdate: "No se pudieron guardar los cambios",
     errorDelete: "No se pudo eliminar el elemento",
     errorAdd: "No se pudo añadir el elemento",
-    reactionAdd: "Reaccionar con {{emoji}}",
-    reactionRemove: "Quitar reacción {{emoji}}",
   },
   missions: {
     title: "Misiones de esta semana",
     complete_5_items: { title: "Completa 5 ítems" },
     accept_2_lists: { title: "Únete a 2 retos" },
-    react_3_times: { title: "Reacciona en 3 ítems" },
   },
   bulk: {
     header_one: "{{count}} elemento para añadir",

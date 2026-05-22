@@ -10,7 +10,6 @@ const mockDb = {
     stripeAccounts: { findFirst: vi.fn() },
     listPurchases: { findFirst: vi.fn() },
     notifications: { findFirst: vi.fn(), findMany: vi.fn() },
-    itemReactions: { findFirst: vi.fn(), findMany: vi.fn() },
   },
   insert: vi.fn(),
   update: vi.fn(),
@@ -229,55 +228,12 @@ describe("GET /api/lists/:listId/items", () => {
       public: true,
     });
     mockDb.query.items.findMany.mockResolvedValue(rows);
-    mockDb.select.mockReturnValue({
-      from: vi.fn().mockReturnValue({
-        where: vi.fn().mockReturnValue({
-          groupBy: vi.fn().mockResolvedValue([]),
-        }),
-      }),
-    });
 
     const res = await app.request("/api/lists/abc/items");
     expect(res.status).toBe(200);
     const body = (await res.json()) as Array<Record<string, unknown>>;
     expect(body).toHaveLength(2);
     expect(body[0].text).toBe("Primero");
-  });
-
-  it("embeds reactions per item with counts and mine flag", async () => {
-    const rows = [
-      { id: "i1", listId: "abc", text: "A", done: false, position: 0 },
-      { id: "i2", listId: "abc", text: "B", done: false, position: 1 },
-    ];
-    mockDb.query.lists.findFirst.mockResolvedValue({
-      id: "abc",
-      ownerId: null,
-      collaborative: false,
-      public: true,
-    });
-    mockDb.query.items.findMany.mockResolvedValue(rows);
-    mockDb.select.mockReturnValue({
-      from: vi.fn().mockReturnValue({
-        where: vi.fn().mockReturnValue({
-          groupBy: vi.fn().mockResolvedValue([
-            { itemId: "i1", emoji: "🔥", count: 3, mine: false },
-            { itemId: "i1", emoji: "💡", count: 1, mine: true },
-          ]),
-        }),
-      }),
-    });
-
-    const res = await app.request("/api/lists/abc/items");
-    expect(res.status).toBe(200);
-    const body = (await res.json()) as Array<{
-      id: string;
-      reactions: unknown[];
-    }>;
-    expect(body[0].reactions).toEqual([
-      { emoji: "🔥", count: 3, mine: false },
-      { emoji: "💡", count: 1, mine: true },
-    ]);
-    expect(body[1].reactions).toEqual([]);
   });
 
   it("returns 404 for private list when unauthenticated", async () => {
@@ -1561,13 +1517,6 @@ describe("GET /api/lists/:listId/items (participant item_progress)", () => {
       public: true,
     });
     mockDb.query.items.findMany.mockResolvedValue(rows);
-    mockDb.select.mockReturnValue({
-      from: vi.fn().mockReturnValue({
-        where: vi.fn().mockReturnValue({
-          groupBy: vi.fn().mockResolvedValue([]),
-        }),
-      }),
-    });
 
     const res = await app.request("/api/lists/abc/items");
     expect(res.status).toBe(200);
@@ -2977,133 +2926,6 @@ describe("DELETE /api/lists/:listId/rating", () => {
   });
 });
 
-describe("POST /api/lists/:listId/items/:itemId/reactions", () => {
-  beforeEach(() => vi.clearAllMocks());
-
-  it("returns 401 without a session", async () => {
-    mockGetAuthUser.mockRejectedValue(new Error("no session"));
-    const res = await app.request("/api/lists/abc/items/i1/reactions", {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-        "x-forwarded-for": "10.0.3.1",
-      },
-      body: JSON.stringify({ emoji: "👏" }),
-    });
-    expect(res.status).toBe(401);
-  });
-
-  it("returns 400 for an unsupported emoji", async () => {
-    mockGetAuthUser.mockResolvedValue({ session: { user: { id: "u1" } } });
-    const res = await app.request("/api/lists/abc/items/i1/reactions", {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-        "x-forwarded-for": "10.0.3.2",
-      },
-      body: JSON.stringify({ emoji: "🤡" }),
-    });
-    expect(res.status).toBe(400);
-  });
-
-  it("returns 404 when the list does not exist", async () => {
-    mockGetAuthUser.mockResolvedValue({ session: { user: { id: "u1" } } });
-    mockDb.query.lists.findFirst.mockResolvedValue(undefined);
-    const res = await app.request("/api/lists/abc/items/i1/reactions", {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-        "x-forwarded-for": "10.0.3.3",
-      },
-      body: JSON.stringify({ emoji: "👏" }),
-    });
-    expect(res.status).toBe(404);
-  });
-
-  it("returns 404 when the item is not in the list", async () => {
-    mockGetAuthUser.mockResolvedValue({ session: { user: { id: "u1" } } });
-    mockDb.query.lists.findFirst.mockResolvedValue({
-      id: "abc",
-      ownerId: "u1",
-      public: true,
-      collaborative: false,
-    });
-    mockDb.query.items.findFirst.mockResolvedValue(undefined);
-    const res = await app.request("/api/lists/abc/items/i1/reactions", {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-        "x-forwarded-for": "10.0.3.4",
-      },
-      body: JSON.stringify({ emoji: "👏" }),
-    });
-    expect(res.status).toBe(404);
-  });
-
-  it("adds the reaction when none exists and returns added:true", async () => {
-    mockGetAuthUser.mockResolvedValue({ session: { user: { id: "u1" } } });
-    mockDb.query.lists.findFirst.mockResolvedValue({
-      id: "abc",
-      ownerId: "owner",
-      public: true,
-      collaborative: false,
-    });
-    mockDb.query.items.findFirst.mockResolvedValue({ id: "i1", listId: "abc" });
-    mockDb.query.itemReactions.findFirst.mockResolvedValue(undefined);
-    const values = vi.fn().mockResolvedValue(undefined);
-    mockDb.insert.mockReturnValue({ values });
-
-    const res = await app.request("/api/lists/abc/items/i1/reactions", {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-        "x-forwarded-for": "10.0.3.5",
-      },
-      body: JSON.stringify({ emoji: "🔥" }),
-    });
-
-    expect(res.status).toBe(200);
-    const body = (await res.json()) as Record<string, unknown>;
-    expect(body).toEqual({ added: true, emoji: "🔥" });
-    expect(values).toHaveBeenCalledWith(
-      expect.objectContaining({ itemId: "i1", userId: "u1", emoji: "🔥" })
-    );
-  });
-
-  it("removes the reaction when it exists and returns added:false", async () => {
-    mockGetAuthUser.mockResolvedValue({ session: { user: { id: "u1" } } });
-    mockDb.query.lists.findFirst.mockResolvedValue({
-      id: "abc",
-      ownerId: "owner",
-      public: true,
-      collaborative: false,
-    });
-    mockDb.query.items.findFirst.mockResolvedValue({ id: "i1", listId: "abc" });
-    mockDb.query.itemReactions.findFirst.mockResolvedValue({
-      id: "r1",
-      itemId: "i1",
-      userId: "u1",
-      emoji: "💡",
-    });
-    const where = vi.fn().mockResolvedValue(undefined);
-    mockDb.delete.mockReturnValue({ where });
-
-    const res = await app.request("/api/lists/abc/items/i1/reactions", {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-        "x-forwarded-for": "10.0.3.6",
-      },
-      body: JSON.stringify({ emoji: "💡" }),
-    });
-
-    expect(res.status).toBe(200);
-    const body = (await res.json()) as Record<string, unknown>;
-    expect(body).toEqual({ added: false, emoji: "💡" });
-    expect(where).toHaveBeenCalled();
-  });
-});
-
 describe("GET /api/users/:userId/activity", () => {
   beforeEach(() => vi.clearAllMocks());
 
@@ -3283,12 +3105,9 @@ describe("GET /api/me/missions", () => {
     expect(res.status).toBe(401);
   });
 
-  it("returns 3 missions with progress from current week", async () => {
+  it("returns missions with progress from current week", async () => {
     mockGetAuthUser.mockResolvedValue({ session: { user: { id: "u1" } } });
-    mockDb.$count
-      .mockResolvedValueOnce(4)
-      .mockResolvedValueOnce(1)
-      .mockResolvedValueOnce(2);
+    mockDb.$count.mockResolvedValueOnce(4).mockResolvedValueOnce(1);
 
     const res = await app.request("/api/me/missions", {
       headers: { "x-forwarded-for": "10.0.8.2" },
@@ -3302,7 +3121,6 @@ describe("GET /api/me/missions", () => {
     expect(body.missions).toEqual([
       { type: "complete_5_items", progress: 4, target: 5 },
       { type: "accept_2_lists", progress: 1, target: 2 },
-      { type: "react_3_times", progress: 2, target: 3 },
     ]);
   });
 });

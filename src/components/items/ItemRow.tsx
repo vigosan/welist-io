@@ -1,20 +1,17 @@
 import { memo, useRef, useState } from "react";
 import { useGeocodingSearch } from "@/hooks/useGeocodingSearch";
-import type { ItemWithReactions } from "@/hooks/useItems";
+import type { Item } from "@/hooks/useItems";
 import { useTranslation } from "@/i18n/service";
 import { renderInlineMarkdown } from "@/lib/inline-markdown";
 import { parseItemText } from "@/lib/item-text";
 import { PARTIAL_PLACE_REGEX } from "@/lib/places";
-import type { ReactionEmoji } from "@/lib/reactions";
 import type { Coords } from "@/services/items.service";
-import { ItemReactions } from "./ItemReactions";
 
 interface Props {
-  item: ItemWithReactions;
+  item: Item;
   onToggle: () => void;
   onDelete: () => void;
   onEdit: (text: string, coords?: Coords | null) => void;
-  onReact?: (emoji: ReactionEmoji) => void;
   onTagClick?: (tag: string) => void;
   activeTag?: string;
   onPlaceClick?: (place: string) => void;
@@ -35,7 +32,6 @@ export const ItemRow = memo(
     onToggle,
     onDelete,
     onEdit,
-    onReact,
     onTagClick,
     activeTag,
     onPlaceClick,
@@ -334,9 +330,6 @@ export const ItemRow = memo(
                 ))}
             </div>
           )}
-          {!editing && onReact && (
-            <ItemReactions reactions={item.reactions} onReact={onReact} />
-          )}
         </div>
 
         {canWrite && (
@@ -398,30 +391,11 @@ export const ItemRow = memo(
     prev.item.id === next.item.id &&
     prev.item.done === next.item.done &&
     prev.item.text === next.item.text &&
-    reactionsEqual(prev.item.reactions, next.item.reactions) &&
     prev.highlighted === next.highlighted &&
     prev.activeTag === next.activeTag &&
     prev.activePlace === next.activePlace &&
     prev.canWrite === next.canWrite &&
     prev.canToggle === next.canToggle &&
     prev.isDragOver === next.isDragOver &&
-    !!prev.onDragStart === !!next.onDragStart &&
-    !!prev.onReact === !!next.onReact
+    !!prev.onDragStart === !!next.onDragStart
 );
-
-function reactionsEqual(
-  a: ItemWithReactions["reactions"],
-  b: ItemWithReactions["reactions"]
-): boolean {
-  if (a.length !== b.length) return false;
-  for (let i = 0; i < a.length; i++) {
-    if (
-      a[i].emoji !== b[i].emoji ||
-      a[i].count !== b[i].count ||
-      a[i].mine !== b[i].mine
-    ) {
-      return false;
-    }
-  }
-  return true;
-}

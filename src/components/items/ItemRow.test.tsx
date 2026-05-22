@@ -18,7 +18,6 @@ const baseItem = {
   placeName: null,
   createdAt: new Date(),
   updatedAt: new Date(),
-  reactions: [],
 };
 const taggedItem = {
   ...baseItem,

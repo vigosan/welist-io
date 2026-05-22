@@ -1,15 +1,10 @@
-export const MISSION_TYPES = [
-  "complete_5_items",
-  "accept_2_lists",
-  "react_3_times",
-] as const;
+export const MISSION_TYPES = ["complete_5_items", "accept_2_lists"] as const;
 
 export type MissionType = (typeof MISSION_TYPES)[number];
 
 export const MISSION_TARGETS: Record<MissionType, number> = {
   complete_5_items: 5,
   accept_2_lists: 2,
-  react_3_times: 3,
 };
 
 export function currentWeekStartUtc(now: Date = new Date()): Date {

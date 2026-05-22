@@ -1,11 +1,11 @@
 import { useMemo, useRef, useState } from "react";
-import type { ItemWithReactions } from "@/hooks/useItems";
+import type { Item } from "@/db/schema";
 import { parseItemText } from "@/lib/item-text";
 import { getPartialPlace, parsePlaces } from "@/lib/places";
 import { getPartialTag, parseTags } from "@/lib/tags";
 
 interface Options {
-  items: ItemWithReactions[];
+  items: Item[];
   itemsLoading: boolean;
   statusFilter: "all" | "pending" | "done" | undefined;
   activeTag: string | undefined;
