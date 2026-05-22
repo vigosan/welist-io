@@ -337,31 +337,6 @@ export const listsService = {
       total: number;
     }>(`/api/lists/${listId}/active-participants`),
 
-  surpriseOfTheDay: () =>
-    apiClient<{
-      list: {
-        id: string;
-        name: string;
-        slug: string | null;
-        description: string | null;
-        category: string | null;
-        itemCount: number;
-        ownerId: string | null;
-        ownerName: string | null;
-        ownerImage: string | null;
-      } | null;
-    }>("/api/surprise-of-the-day"),
-
-  myMissions: () =>
-    apiClient<{
-      weekStart: string;
-      missions: {
-        type: import("@/lib/missions").MissionType;
-        progress: number;
-        target: number;
-      }[];
-    }>("/api/me/missions"),
-
   myLists: (
     cursor?: string,
     q?: string,

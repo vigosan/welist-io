@@ -35,11 +35,6 @@ const es = {
       "Pon precio a tu lista y cobra directamente. Conecta Stripe y empieza a ganar.",
     exploreHeadline: "Explora lo que otros ya están completando.",
     exploreSubline: "Listas públicas creadas por la comunidad.",
-    surpriseLabel: "Sorpresa del día",
-    surpriseCta: "Ver lista",
-    surpriseAuthor: "por {{name}}",
-    surpriseItems_one: "{{count}} elemento",
-    surpriseItems_other: "{{count}} elementos",
     exploreCtaAll: "Ver todas las listas →",
     heroOr: "o",
     heroExploreCta: "Explora retos",
@@ -270,11 +265,6 @@ const es = {
     errorUpdate: "No se pudieron guardar los cambios",
     errorDelete: "No se pudo eliminar el elemento",
     errorAdd: "No se pudo añadir el elemento",
-  },
-  missions: {
-    title: "Misiones de esta semana",
-    complete_5_items: { title: "Completa 5 ítems" },
-    accept_2_lists: { title: "Únete a 2 retos" },
   },
   bulk: {
     header_one: "{{count}} elemento para añadir",

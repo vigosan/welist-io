@@ -37,11 +37,6 @@ const en: Translations = {
       "Set a price and get paid directly. Connect Stripe and start earning.",
     exploreHeadline: "Explore what others are already completing.",
     exploreSubline: "Public lists created by the community.",
-    surpriseLabel: "Surprise of the day",
-    surpriseCta: "Open list",
-    surpriseAuthor: "by {{name}}",
-    surpriseItems_one: "{{count}} item",
-    surpriseItems_other: "{{count}} items",
     exploreCtaAll: "Browse all lists →",
     heroOr: "or",
     heroExploreCta: "Explore challenges",
@@ -271,11 +266,6 @@ const en: Translations = {
     errorUpdate: "Failed to save changes",
     errorDelete: "Failed to delete item",
     errorAdd: "Failed to add item",
-  },
-  missions: {
-    title: "Missions this week",
-    complete_5_items: { title: "Complete 5 items" },
-    accept_2_lists: { title: "Join 2 challenges" },
   },
   bulk: {
     header_one: "{{count}} item to add",

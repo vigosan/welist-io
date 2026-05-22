@@ -41,7 +41,6 @@ import {
 } from "../src/db/schema/index.js";
 import { LIST_CATEGORIES } from "../src/lib/categories.js";
 import { plainItemText } from "../src/lib/item-text.js";
-import { currentWeekStartUtc } from "../src/lib/missions.js";
 import { sendEmail } from "./email.js";
 import { signUnsubscribeToken, verifyUnsubscribeToken } from "./email-token.js";
 import { rateLimit } from "./rate-limit.js";
@@ -863,28 +862,6 @@ app.post(
   }
 );
 
-app.get("/surprise-of-the-day", async (c) => {
-  const today = new Date().toISOString().slice(0, 10);
-  const rows = await db
-    .select({
-      id: lists.id,
-      name: lists.name,
-      slug: lists.slug,
-      description: lists.description,
-      category: lists.category,
-      itemCount: sql<number>`cast((select count(*) from ${items} where ${items.listId} = ${lists.id}) as int)`,
-      ownerId: users.id,
-      ownerName: users.name,
-      ownerImage: users.image,
-    })
-    .from(lists)
-    .leftJoin(users, eq(users.id, lists.ownerId))
-    .where(eq(lists.public, true))
-    .orderBy(sql`md5(${lists.id}::text || ${today})`)
-    .limit(1);
-  return c.json({ list: rows[0] ?? null });
-});
-
 app.get("/explore", async (c) => {
   const viewerId = getOptionalUser(c)?.session?.user?.id ?? null;
   const q = c.req.query("q")?.trim();
@@ -1221,37 +1198,6 @@ app.get("/me/streak", async (c) => {
       rows.map((r) => r.day),
       new Date()
     ),
-  });
-});
-
-app.get("/me/missions", async (c) => {
-  const authUser = getOptionalUser(c);
-  const userId = authUser?.session?.user?.id;
-  if (!userId) return c.json({ error: "Unauthorized" }, 401);
-  const weekStart = currentWeekStartUtc();
-  const [completedItems, acceptedLists] = await Promise.all([
-    db.$count(
-      itemProgress,
-      and(
-        eq(itemProgress.userId, userId),
-        eq(itemProgress.done, true),
-        gt(itemProgress.updatedAt, weekStart)
-      )
-    ),
-    db.$count(
-      participations,
-      and(
-        eq(participations.userId, userId),
-        gt(participations.createdAt, weekStart)
-      )
-    ),
-  ]);
-  return c.json({
-    weekStart: weekStart.toISOString(),
-    missions: [
-      { type: "complete_5_items", progress: completedItems, target: 5 },
-      { type: "accept_2_lists", progress: acceptedLists, target: 2 },
-    ],
   });
 });
 
