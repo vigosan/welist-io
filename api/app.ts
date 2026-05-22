@@ -901,6 +901,28 @@ app.post(
   }
 );
 
+app.get("/surprise-of-the-day", async (c) => {
+  const today = new Date().toISOString().slice(0, 10);
+  const rows = await db
+    .select({
+      id: lists.id,
+      name: lists.name,
+      slug: lists.slug,
+      description: lists.description,
+      category: lists.category,
+      itemCount: sql<number>`cast((select count(*) from ${items} where ${items.listId} = ${lists.id}) as int)`,
+      ownerId: users.id,
+      ownerName: users.name,
+      ownerImage: users.image,
+    })
+    .from(lists)
+    .leftJoin(users, eq(users.id, lists.ownerId))
+    .where(eq(lists.public, true))
+    .orderBy(sql`md5(${lists.id}::text || ${today})`)
+    .limit(1);
+  return c.json({ list: rows[0] ?? null });
+});
+
 app.get("/explore", async (c) => {
   const viewerId = getOptionalUser(c)?.session?.user?.id ?? null;
   const q = c.req.query("q")?.trim();

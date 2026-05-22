@@ -3222,4 +3222,54 @@ describe("GET /api/lists/:listId/active-participants", () => {
   });
 });
 
+describe("GET /api/surprise-of-the-day", () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it("returns one public list wrapped in {list}", async () => {
+    mockDb.select.mockReturnValue({
+      from: vi.fn().mockReturnThis(),
+      leftJoin: vi.fn().mockReturnThis(),
+      where: vi.fn().mockReturnThis(),
+      orderBy: vi.fn().mockReturnThis(),
+      limit: vi.fn().mockResolvedValue([
+        {
+          id: "l1",
+          name: "Top 50 películas",
+          slug: null,
+          description: null,
+          category: "movies",
+          itemCount: 50,
+          ownerId: "u1",
+          ownerName: "Alice",
+          ownerImage: null,
+        },
+      ]),
+    });
+
+    const res = await app.request("/api/surprise-of-the-day", {
+      headers: { "x-forwarded-for": "10.0.7.1" },
+    });
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as { list: { id: string } | null };
+    expect(body.list?.id).toBe("l1");
+  });
+
+  it("returns {list: null} when there are no public lists", async () => {
+    mockDb.select.mockReturnValue({
+      from: vi.fn().mockReturnThis(),
+      leftJoin: vi.fn().mockReturnThis(),
+      where: vi.fn().mockReturnThis(),
+      orderBy: vi.fn().mockReturnThis(),
+      limit: vi.fn().mockResolvedValue([]),
+    });
+
+    const res = await app.request("/api/surprise-of-the-day", {
+      headers: { "x-forwarded-for": "10.0.7.2" },
+    });
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as { list: unknown };
+    expect(body.list).toBeNull();
+  });
+});
+
 void _sign;
