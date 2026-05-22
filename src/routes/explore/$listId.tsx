@@ -131,7 +131,7 @@ function ExploreDetailPage() {
           )}
         </div>
 
-        <div className="flex items-center gap-1.5 flex-wrap">
+        <div className="flex items-center gap-2 flex-wrap">
           <div className="flex items-center gap-1 px-2 py-1 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700">
             <svg
               aria-hidden="true"
@@ -151,82 +151,62 @@ function ExploreDetailPage() {
               {itemCount}
             </span>
           </div>
-          <div className="flex items-center gap-1 px-2 py-1 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700">
-            <svg
-              aria-hidden="true"
-              className="w-3 h-3 text-gray-400 dark:text-gray-500"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"
-              />
-            </svg>
-            <span className="text-xs font-medium text-gray-500 dark:text-gray-400 tabular-nums">
-              {totalParticipants}
-            </span>
-          </div>
-        </div>
-
-        {shownParticipants.length > 0 && (
-          <div className="flex items-center gap-2">
-            <div className="flex -space-x-1.5">
-              {shownParticipants.map((p, i) =>
-                p.userId ? (
-                  <Link
+          {shownParticipants.length > 0 && (
+            <div className="flex items-center gap-1.5">
+              <div className="flex -space-x-1.5">
+                {shownParticipants.map((p, i) =>
+                  p.userId ? (
+                    <Link
+                      // biome-ignore lint/suspicious/noArrayIndexKey: participants have no stable ID; names/images may be duplicate
+                      key={i}
+                      to="/u/$userId"
+                      params={{ userId: p.userId }}
+                      className="hover:opacity-80 transition-opacity"
+                    >
+                      {p.image ? (
+                        <img
+                          src={p.image}
+                          alt={p.name ?? ""}
+                          className="w-6 h-6 rounded-full outline outline-2 outline-canvas dark:outline-canvas-dark"
+                        />
+                      ) : (
+                        <div className="w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-700 outline outline-2 outline-canvas dark:outline-canvas-dark flex items-center justify-center">
+                          <span className="text-[8px] text-gray-500 dark:text-gray-400 font-medium">
+                            {(p.name ?? "?")[0]?.toUpperCase()}
+                          </span>
+                        </div>
+                      )}
+                    </Link>
+                  ) : (
                     // biome-ignore lint/suspicious/noArrayIndexKey: participants have no stable ID; names/images may be duplicate
-                    key={i}
-                    to="/u/$userId"
-                    params={{ userId: p.userId }}
-                    className="hover:opacity-80 transition-opacity"
-                  >
-                    {p.image ? (
-                      <img
-                        src={p.image}
-                        alt={p.name ?? ""}
-                        className="w-6 h-6 rounded-full outline outline-2 outline-white dark:outline-gray-900"
-                      />
-                    ) : (
-                      <div className="w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-700 outline outline-2 outline-white dark:outline-gray-900 flex items-center justify-center">
-                        <span className="text-[8px] text-gray-500 dark:text-gray-400 font-medium">
-                          {(p.name ?? "?")[0]?.toUpperCase()}
-                        </span>
-                      </div>
-                    )}
-                  </Link>
-                ) : (
-                  // biome-ignore lint/suspicious/noArrayIndexKey: participants have no stable ID; names/images may be duplicate
-                  <span key={i}>
-                    {p.image ? (
-                      <img
-                        src={p.image}
-                        alt={p.name ?? ""}
-                        className="w-6 h-6 rounded-full outline outline-2 outline-white dark:outline-gray-900"
-                      />
-                    ) : (
-                      <div className="w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-700 outline outline-2 outline-white dark:outline-gray-900 flex items-center justify-center">
-                        <span className="text-[8px] text-gray-500 dark:text-gray-400 font-medium">
-                          {(p.name ?? "?")[0]?.toUpperCase()}
-                        </span>
-                      </div>
-                    )}
-                  </span>
-                )
+                    <span key={i}>
+                      {p.image ? (
+                        <img
+                          src={p.image}
+                          alt={p.name ?? ""}
+                          className="w-6 h-6 rounded-full outline outline-2 outline-canvas dark:outline-canvas-dark"
+                        />
+                      ) : (
+                        <div className="w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-700 outline outline-2 outline-canvas dark:outline-canvas-dark flex items-center justify-center">
+                          <span className="text-[8px] text-gray-500 dark:text-gray-400 font-medium">
+                            {(p.name ?? "?")[0]?.toUpperCase()}
+                          </span>
+                        </div>
+                      )}
+                    </span>
+                  )
+                )}
+              </div>
+              {extraParticipants > 0 && (
+                <span className="text-xs text-gray-400 dark:text-gray-500 tabular-nums">
+                  {t("explore.moreParticipants", {
+                    count: String(extraParticipants),
+                  })}
+                </span>
               )}
             </div>
-            {extraParticipants > 0 && (
-              <span className="text-xs text-gray-400 dark:text-gray-500 tabular-nums">
-                {t("explore.moreParticipants", {
-                  count: String(extraParticipants),
-                })}
-              </span>
-            )}
-          </div>
-        )}
+          )}
+        </div>
 
         <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 overflow-hidden">
           <div className="px-4 py-3">
