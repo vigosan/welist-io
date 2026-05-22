@@ -3148,4 +3148,78 @@ describe("GET /api/users/:userId/activity", () => {
   });
 });
 
+describe("GET /api/lists/:listId/active-participants", () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it("returns 404 when the list does not exist", async () => {
+    mockDb.query.lists.findFirst.mockResolvedValue(undefined);
+    const res = await app.request("/api/lists/abc/active-participants", {
+      headers: { "x-forwarded-for": "10.0.6.1" },
+    });
+    expect(res.status).toBe(404);
+  });
+
+  it("returns up to 5 participants ordered by createdAt desc with total", async () => {
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "abc",
+      ownerId: "owner",
+      public: true,
+      collaborative: false,
+    });
+    mockDb.$count.mockResolvedValue(7);
+    mockDb.select.mockReturnValue({
+      from: vi.fn().mockReturnThis(),
+      innerJoin: vi.fn().mockReturnThis(),
+      where: vi.fn().mockReturnThis(),
+      orderBy: vi.fn().mockReturnThis(),
+      limit: vi.fn().mockResolvedValue([
+        { id: "u1", name: "Alice", image: null },
+        { id: "u2", name: "Bob", image: "https://x/y.png" },
+      ]),
+    });
+
+    const res = await app.request("/api/lists/abc/active-participants", {
+      headers: { "x-forwarded-for": "10.0.6.2" },
+    });
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as {
+      participants: unknown[];
+      total: number;
+    };
+    expect(body.total).toBe(7);
+    expect(body.participants).toEqual([
+      { id: "u1", name: "Alice", image: null },
+      { id: "u2", name: "Bob", image: "https://x/y.png" },
+    ]);
+  });
+
+  it("returns empty participants when none", async () => {
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "abc",
+      ownerId: "owner",
+      public: true,
+      collaborative: false,
+    });
+    mockDb.$count.mockResolvedValue(0);
+    mockDb.select.mockReturnValue({
+      from: vi.fn().mockReturnThis(),
+      innerJoin: vi.fn().mockReturnThis(),
+      where: vi.fn().mockReturnThis(),
+      orderBy: vi.fn().mockReturnThis(),
+      limit: vi.fn().mockResolvedValue([]),
+    });
+
+    const res = await app.request("/api/lists/abc/active-participants", {
+      headers: { "x-forwarded-for": "10.0.6.3" },
+    });
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as {
+      participants: unknown[];
+      total: number;
+    };
+    expect(body.total).toBe(0);
+    expect(body.participants).toEqual([]);
+  });
+});
+
 void _sign;

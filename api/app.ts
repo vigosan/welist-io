@@ -1890,6 +1890,32 @@ app.post("/lists/:listId/accept", async (c) => {
   return c.json(source, 201);
 });
 
+app.get("/lists/:listId/active-participants", async (c) => {
+  const list = await resolveList(c.req.param("listId"));
+  if (!list) return c.json({ error: "Not found" }, 404);
+  const authUser = getOptionalUser(c);
+  const userId = authUser?.session?.user?.id ?? null;
+  if (!(await canViewList(list, userId)))
+    return c.json({ error: "Not found" }, 404);
+
+  const total = await db.$count(
+    participations,
+    eq(participations.sourceListId, list.id)
+  );
+  const participantsRows = await db
+    .select({
+      id: users.id,
+      name: users.name,
+      image: users.image,
+    })
+    .from(participations)
+    .innerJoin(users, eq(participations.userId, users.id))
+    .where(eq(participations.sourceListId, list.id))
+    .orderBy(desc(participations.createdAt))
+    .limit(5);
+  return c.json({ participants: participantsRows, total });
+});
+
 app.get("/lists/:listId/collaborators", async (c) => {
   const authUser = getOptionalUser(c);
   const userId = authUser?.session?.user?.id;
