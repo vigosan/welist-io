@@ -169,6 +169,13 @@
       "when": 1779377539629,
       "tag": "0023_chief_wildside",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1779429962741,
+      "tag": "0024_windy_virginia_dare",
+      "breakpoints": true
     }
   ]
 }

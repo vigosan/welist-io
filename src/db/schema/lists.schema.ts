@@ -117,6 +117,33 @@ export const itemProgress = pgTable(
   ]
 );
 
+export const itemReactions = pgTable(
+  "item_reactions",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    itemId: uuid("item_id")
+      .notNull()
+      .references(() => items.id, { onDelete: "cascade" }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    emoji: text("emoji").notNull(),
+    createdAt: timestamp("created_at", {
+      withTimezone: true,
+    })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => [
+    unique("item_reactions_item_user_emoji_uidx").on(
+      t.itemId,
+      t.userId,
+      t.emoji
+    ),
+    index("item_reactions_item_idx").on(t.itemId),
+  ]
+);
+
 export const listActivityActionEnum = pgEnum("list_activity_action", [
   "item_added",
   "item_edited",
@@ -339,6 +366,7 @@ export type Follow = typeof follows.$inferSelect;
 export type Item = typeof items.$inferSelect;
 export type Participation = typeof participations.$inferSelect;
 export type ItemProgress = typeof itemProgress.$inferSelect;
+export type ItemReaction = typeof itemReactions.$inferSelect;
 export type ListActivity = typeof listActivity.$inferSelect;
 export type StripeAccount = typeof stripeAccounts.$inferSelect;
 export type ListPrice = typeof listPrices.$inferSelect;
