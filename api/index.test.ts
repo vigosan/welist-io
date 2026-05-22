@@ -3104,4 +3104,48 @@ describe("POST /api/lists/:listId/items/:itemId/reactions", () => {
   });
 });
 
+describe("GET /api/users/:userId/activity", () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it("returns aggregated activity by day for the user", async () => {
+    mockDb.select.mockReturnValue({
+      from: vi.fn().mockReturnValue({
+        where: vi.fn().mockReturnValue({
+          groupBy: vi.fn().mockResolvedValue([
+            { date: "2026-05-21", count: 3 },
+            { date: "2026-05-22", count: 1 },
+          ]),
+        }),
+      }),
+    });
+
+    const res = await app.request("/api/users/u1/activity", {
+      headers: { "x-forwarded-for": "10.0.5.1" },
+    });
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as { days: unknown[] };
+    expect(body.days).toEqual([
+      { date: "2026-05-21", count: 3 },
+      { date: "2026-05-22", count: 1 },
+    ]);
+  });
+
+  it("returns empty days array when user has no activity", async () => {
+    mockDb.select.mockReturnValue({
+      from: vi.fn().mockReturnValue({
+        where: vi.fn().mockReturnValue({
+          groupBy: vi.fn().mockResolvedValue([]),
+        }),
+      }),
+    });
+
+    const res = await app.request("/api/users/u1/activity", {
+      headers: { "x-forwarded-for": "10.0.5.2" },
+    });
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as { days: unknown[] };
+    expect(body.days).toEqual([]);
+  });
+});
+
 void _sign;
