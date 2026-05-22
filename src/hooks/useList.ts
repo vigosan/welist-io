@@ -37,6 +37,14 @@ export function useActiveParticipants(listId: string) {
   });
 }
 
+export function useSurpriseOfTheDay() {
+  return useQuery({
+    queryKey: queryKeys.surpriseOfTheDay(),
+    queryFn: () => listsService.surpriseOfTheDay(),
+    staleTime: 5 * 60_000,
+  });
+}
+
 export function useList(listId: string) {
   return useQuery<ListWithParticipation>({
     queryKey: queryKeys.list(listId),

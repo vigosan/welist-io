@@ -23,4 +23,5 @@ export const queryKeys = {
   notifications: () => ["notifications"] as const,
   stats: () => ["stats"] as const,
   streak: () => ["streak"] as const,
+  surpriseOfTheDay: () => ["surprise-of-the-day"] as const,
 };
