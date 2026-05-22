@@ -28,7 +28,7 @@ vi.mock("@hono/auth-js/react", () => ({
 }));
 
 import { useSession } from "@hono/auth-js/react";
-import type { Item } from "@/hooks/useItems";
+import type { ItemWithReactions } from "@/hooks/useItems";
 import {
   useAddItem,
   useBulkAddItems,
@@ -36,6 +36,7 @@ import {
   useItems,
   useReorderItems,
   useToggleItem,
+  useToggleReaction,
   useUpdateItem,
 } from "@/hooks/useItems";
 import { useItemsFilter } from "@/hooks/useItemsFilter";
@@ -73,7 +74,7 @@ const LIST: ListWithParticipation = {
   rating: { avg: null, count: 0, userValue: null },
 };
 
-function makeItem(id: string, text: string, done = false): Item {
+function makeItem(id: string, text: string, done = false): ItemWithReactions {
   return {
     id,
     listId: "test-list",
@@ -85,10 +86,11 @@ function makeItem(id: string, text: string, done = false): Item {
     placeName: null,
     createdAt: new Date(),
     updatedAt: new Date(),
+    reactions: [],
   };
 }
 
-const ITEMS: Item[] = [
+const ITEMS: ItemWithReactions[] = [
   makeItem("i1", "Tarea A"),
   makeItem("i2", "Tarea B", true),
 ];
@@ -140,9 +142,9 @@ function setupMocks({
   bulkIsPending = false,
   sessionUser = null as SessionUser | null,
 }: {
-  items?: Item[];
+  items?: ItemWithReactions[];
   list?: ListWithParticipation;
-  filteredItems?: Item[];
+  filteredItems?: ItemWithReactions[];
   addMutate?: ReturnType<typeof vi.fn>;
   toggleMutate?: ReturnType<typeof vi.fn>;
   deleteMutate?: ReturnType<typeof vi.fn>;
@@ -183,6 +185,9 @@ function setupMocks({
   } as never);
   vi.mocked(useReorderItems).mockReturnValue({
     mutate: reorderMutate,
+  } as never);
+  vi.mocked(useToggleReaction).mockReturnValue({
+    mutate: vi.fn(),
   } as never);
 
   vi.mocked(useListHeader).mockReturnValue({

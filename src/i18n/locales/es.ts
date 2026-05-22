@@ -263,6 +263,8 @@ const es = {
     errorUpdate: "No se pudieron guardar los cambios",
     errorDelete: "No se pudo eliminar el elemento",
     errorAdd: "No se pudo añadir el elemento",
+    reactionAdd: "Reaccionar con {{emoji}}",
+    reactionRemove: "Quitar reacción {{emoji}}",
   },
   bulk: {
     header_one: "{{count}} elemento para añadir",

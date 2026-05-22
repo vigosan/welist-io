@@ -1,9 +1,9 @@
 import { act, renderHook } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import type { Item } from "@/db/schema";
+import type { ItemWithReactions } from "@/hooks/useItems";
 import { useItemsFilter } from "./useItemsFilter";
 
-function makeItem(id: string, text: string, done = false): Item {
+function makeItem(id: string, text: string, done = false): ItemWithReactions {
   return {
     id,
     listId: "l1",
@@ -15,6 +15,7 @@ function makeItem(id: string, text: string, done = false): Item {
     placeName: null,
     createdAt: new Date(),
     updatedAt: new Date(),
+    reactions: [],
   };
 }
 
@@ -121,9 +122,14 @@ describe("useItemsFilter", () => {
 
   it("sorts immediately when items finish loading (no reorder lag)", () => {
     const { result, rerender } = renderHook(
-      ({ items, itemsLoading }: { items: Item[]; itemsLoading: boolean }) =>
-        useItemsFilter({ ...BASE_OPTS, items, itemsLoading }),
-      { initialProps: { items: [] as Item[], itemsLoading: true } }
+      ({
+        items,
+        itemsLoading,
+      }: {
+        items: ItemWithReactions[];
+        itemsLoading: boolean;
+      }) => useItemsFilter({ ...BASE_OPTS, items, itemsLoading }),
+      { initialProps: { items: [] as ItemWithReactions[], itemsLoading: true } }
     );
     rerender({ items: [DONE, PENDING, PLAIN], itemsLoading: false });
     const ids = result.current.stableItems.map((i) => i.id);

@@ -264,6 +264,8 @@ const en: Translations = {
     errorUpdate: "Failed to save changes",
     errorDelete: "Failed to delete item",
     errorAdd: "Failed to add item",
+    reactionAdd: "React with {{emoji}}",
+    reactionRemove: "Remove {{emoji}} reaction",
   },
   bulk: {
     header_one: "{{count}} item to add",
