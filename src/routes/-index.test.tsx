@@ -18,6 +18,7 @@ import { useSession } from "@hono/auth-js/react";
 import {
   useCreateList,
   useExplore,
+  useMyMissions,
   useStats,
   useSurpriseOfTheDay,
   useUserDirectory,
@@ -65,6 +66,10 @@ function setupMocks(mutateFn = vi.fn()) {
   vi.mocked(useStats).mockReturnValue({ data: undefined } as never);
   vi.mocked(useSurpriseOfTheDay).mockReturnValue({
     data: { list: null },
+    isLoading: false,
+  } as never);
+  vi.mocked(useMyMissions).mockReturnValue({
+    data: undefined,
     isLoading: false,
   } as never);
   vi.mocked(useUserDirectory).mockReturnValue({

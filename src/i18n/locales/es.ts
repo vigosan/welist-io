@@ -273,6 +273,12 @@ const es = {
     reactionAdd: "Reaccionar con {{emoji}}",
     reactionRemove: "Quitar reacción {{emoji}}",
   },
+  missions: {
+    title: "Misiones de esta semana",
+    complete_5_items: { title: "Completa 5 ítems" },
+    accept_2_lists: { title: "Únete a 2 retos" },
+    react_3_times: { title: "Reacciona en 3 ítems" },
+  },
   bulk: {
     header_one: "{{count}} elemento para añadir",
     header_other: "{{count}} elementos para añadir",

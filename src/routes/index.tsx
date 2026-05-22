@@ -1,11 +1,14 @@
+import { useSession } from "@hono/auth-js/react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { AppFooter } from "@/components/AppFooter";
 import { AppNav } from "@/components/AppNav";
 import { Skeleton } from "@/components/Skeleton";
+import { WeeklyMissions } from "@/components/WeeklyMissions";
 import {
   useCreateList,
   useExplore,
+  useMyMissions,
   useStats,
   useSurpriseOfTheDay,
   useUserDirectory,
@@ -621,6 +624,26 @@ function FinalCta() {
   );
 }
 
+function MissionsSection() {
+  const ref = useFadeIn();
+  const { data: session } = useSession();
+  const userId = session?.user?.id;
+  const { data } = useMyMissions(!!userId);
+
+  if (!userId || !data) return null;
+
+  return (
+    <section
+      data-testid="missions-section"
+      className="px-4 pt-12 sm:px-12 sm:pt-16"
+    >
+      <div ref={ref} className="mx-auto max-w-[760px]">
+        <WeeklyMissions missions={data.missions} />
+      </div>
+    </section>
+  );
+}
+
 function SurpriseSection() {
   const { t } = useTranslation();
   const ref = useFadeIn();
@@ -682,6 +705,7 @@ function HomePage() {
 
       <main className="flex-1 flex flex-col">
         <Hero />
+        <MissionsSection />
         <SurpriseSection />
         <FeaturesGrid />
         <HowItWorks />

@@ -274,6 +274,12 @@ const en: Translations = {
     reactionAdd: "React with {{emoji}}",
     reactionRemove: "Remove {{emoji}} reaction",
   },
+  missions: {
+    title: "Missions this week",
+    complete_5_items: { title: "Complete 5 items" },
+    accept_2_lists: { title: "Join 2 challenges" },
+    react_3_times: { title: "React on 3 items" },
+  },
   bulk: {
     header_one: "{{count}} item to add",
     header_other: "{{count}} items to add",
