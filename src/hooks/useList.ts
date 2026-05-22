@@ -45,6 +45,15 @@ export function useSurpriseOfTheDay() {
   });
 }
 
+export function useMyMissions(enabled: boolean) {
+  return useQuery({
+    queryKey: queryKeys.myMissions(),
+    queryFn: () => listsService.myMissions(),
+    enabled,
+    staleTime: 5 * 60_000,
+  });
+}
+
 export function useList(listId: string) {
   return useQuery<ListWithParticipation>({
     queryKey: queryKeys.list(listId),

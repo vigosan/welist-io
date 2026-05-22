@@ -24,4 +24,5 @@ export const queryKeys = {
   stats: () => ["stats"] as const,
   streak: () => ["streak"] as const,
   surpriseOfTheDay: () => ["surprise-of-the-day"] as const,
+  myMissions: () => ["my-missions"] as const,
 };

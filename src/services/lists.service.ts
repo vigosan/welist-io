@@ -357,6 +357,16 @@ export const listsService = {
       } | null;
     }>("/api/surprise-of-the-day"),
 
+  myMissions: () =>
+    apiClient<{
+      weekStart: string;
+      missions: {
+        type: import("@/lib/missions").MissionType;
+        progress: number;
+        target: number;
+      }[];
+    }>("/api/me/missions"),
+
   myLists: (
     cursor?: string,
     q?: string,
