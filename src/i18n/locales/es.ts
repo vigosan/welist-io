@@ -315,6 +315,8 @@ const es = {
     followers_other: "{{count}} seguidores",
     achievements: "Logros",
     noAchievements: "Aún no ha desbloqueado logros.",
+    activity: "Actividad del último año",
+    activityCell: "{{date}}: {{count}} eventos",
   },
   achievements: {
     first_list_created: {
