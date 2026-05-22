@@ -7,6 +7,7 @@ import {
   useCreateList,
   useExplore,
   useStats,
+  useSurpriseOfTheDay,
   useUserDirectory,
 } from "@/hooks/useList";
 import { useTranslation } from "@/i18n/service";
@@ -620,6 +621,60 @@ function FinalCta() {
   );
 }
 
+function SurpriseSection() {
+  const { t } = useTranslation();
+  const ref = useFadeIn();
+  const { data, isLoading } = useSurpriseOfTheDay();
+  const list = data?.list;
+
+  if (isLoading || !list) return null;
+
+  return (
+    <section
+      data-testid="surprise-section"
+      className="px-4 py-12 sm:px-12 sm:py-16"
+    >
+      <div ref={ref} className="mx-auto max-w-[760px]">
+        <Link
+          to="/explore/$listId"
+          params={{ listId: list.slug ?? list.id }}
+          className="no-underline group block rounded-2xl border border-ink/[0.08] bg-ink/[0.02] p-6 transition-all duration-200 hover:-translate-y-0.5 hover:border-ink/20 hover:bg-ink/[0.04] dark:border-paper/[0.08] dark:bg-paper/[0.03] dark:hover:border-paper/20 dark:hover:bg-paper/[0.05]"
+        >
+          <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.14em] text-ink/40 dark:text-paper/40">
+            {t("home.surpriseLabel")}
+          </p>
+          <h3
+            className="mb-2 text-[22px] font-bold leading-tight tracking-[-0.02em] text-ink dark:text-paper"
+            data-testid="surprise-title"
+          >
+            {list.name}
+          </h3>
+          {list.description && (
+            <p className="mb-4 line-clamp-2 text-sm text-ink/60 dark:text-paper/60">
+              {list.description}
+            </p>
+          )}
+          <div className="flex items-center gap-3 text-xs text-ink/50 dark:text-paper/50">
+            {list.ownerName && (
+              <span>{t("home.surpriseAuthor", { name: list.ownerName })}</span>
+            )}
+            <span aria-hidden="true">·</span>
+            <span className="tabular-nums">
+              {t("home.surpriseItems", { count: list.itemCount })}
+            </span>
+            <span
+              aria-hidden="true"
+              className="ml-auto font-medium text-ink/70 transition-transform group-hover:translate-x-0.5 dark:text-paper/70"
+            >
+              {t("home.surpriseCta")} →
+            </span>
+          </div>
+        </Link>
+      </div>
+    </section>
+  );
+}
+
 function HomePage() {
   return (
     <div className="min-h-dvh bg-canvas text-ink flex flex-col dark:bg-canvas-dark dark:text-paper">
@@ -627,6 +682,7 @@ function HomePage() {
 
       <main className="flex-1 flex flex-col">
         <Hero />
+        <SurpriseSection />
         <FeaturesGrid />
         <HowItWorks />
         <ExploreSection />
