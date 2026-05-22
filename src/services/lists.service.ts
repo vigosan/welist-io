@@ -336,6 +336,12 @@ export const listsService = {
       }[];
     }>(`/api/lists/${listId}/collaborators`),
 
+  activeParticipants: (listId: string) =>
+    apiClient<{
+      participants: { id: string; name: string | null; image: string | null }[];
+      total: number;
+    }>(`/api/lists/${listId}/active-participants`),
+
   myLists: (
     cursor?: string,
     q?: string,

@@ -10,6 +10,8 @@ export const queryKeys = {
   listPrice: (listId: string) => ["list-price", listId] as const,
   listCollaborators: (listId: string) =>
     ["list-collaborators", listId] as const,
+  listActiveParticipants: (listId: string) =>
+    ["list-active-participants", listId] as const,
   stripeAccountStatus: () => ["stripe-account-status"] as const,
   userProfile: (userId: string) => ["user-profile", userId] as const,
   userAchievements: (userId: string) => ["user-achievements", userId] as const,

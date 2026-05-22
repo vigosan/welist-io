@@ -29,6 +29,14 @@ export function useCollaborators(listId: string, enabled: boolean) {
   });
 }
 
+export function useActiveParticipants(listId: string) {
+  return useQuery({
+    queryKey: queryKeys.listActiveParticipants(listId),
+    queryFn: () => listsService.activeParticipants(listId),
+    staleTime: 30_000,
+  });
+}
+
 export function useList(listId: string) {
   return useQuery<ListWithParticipation>({
     queryKey: queryKeys.list(listId),
