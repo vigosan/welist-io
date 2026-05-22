@@ -42,6 +42,7 @@ import {
 } from "../src/db/schema/index.js";
 import { LIST_CATEGORIES } from "../src/lib/categories.js";
 import { plainItemText } from "../src/lib/item-text.js";
+import { currentWeekStartUtc } from "../src/lib/missions.js";
 import { REACTION_EMOJIS } from "../src/lib/reactions.js";
 import { sendEmail } from "./email.js";
 import { signUnsubscribeToken, verifyUnsubscribeToken } from "./email-token.js";
@@ -1259,6 +1260,45 @@ app.get("/me/streak", async (c) => {
       rows.map((r) => r.day),
       new Date()
     ),
+  });
+});
+
+app.get("/me/missions", async (c) => {
+  const authUser = getOptionalUser(c);
+  const userId = authUser?.session?.user?.id;
+  if (!userId) return c.json({ error: "Unauthorized" }, 401);
+  const weekStart = currentWeekStartUtc();
+  const [completedItems, acceptedLists, reactionCount] = await Promise.all([
+    db.$count(
+      itemProgress,
+      and(
+        eq(itemProgress.userId, userId),
+        eq(itemProgress.done, true),
+        gt(itemProgress.updatedAt, weekStart)
+      )
+    ),
+    db.$count(
+      participations,
+      and(
+        eq(participations.userId, userId),
+        gt(participations.createdAt, weekStart)
+      )
+    ),
+    db.$count(
+      itemReactions,
+      and(
+        eq(itemReactions.userId, userId),
+        gt(itemReactions.createdAt, weekStart)
+      )
+    ),
+  ]);
+  return c.json({
+    weekStart: weekStart.toISOString(),
+    missions: [
+      { type: "complete_5_items", progress: completedItems, target: 5 },
+      { type: "accept_2_lists", progress: acceptedLists, target: 2 },
+      { type: "react_3_times", progress: reactionCount, target: 3 },
+    ],
   });
 });
 

@@ -3272,4 +3272,39 @@ describe("GET /api/surprise-of-the-day", () => {
   });
 });
 
+describe("GET /api/me/missions", () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it("returns 401 without a session", async () => {
+    mockGetAuthUser.mockRejectedValue(new Error("no session"));
+    const res = await app.request("/api/me/missions", {
+      headers: { "x-forwarded-for": "10.0.8.1" },
+    });
+    expect(res.status).toBe(401);
+  });
+
+  it("returns 3 missions with progress from current week", async () => {
+    mockGetAuthUser.mockResolvedValue({ session: { user: { id: "u1" } } });
+    mockDb.$count
+      .mockResolvedValueOnce(4)
+      .mockResolvedValueOnce(1)
+      .mockResolvedValueOnce(2);
+
+    const res = await app.request("/api/me/missions", {
+      headers: { "x-forwarded-for": "10.0.8.2" },
+    });
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as {
+      weekStart: string;
+      missions: { type: string; progress: number; target: number }[];
+    };
+    expect(body.weekStart).toMatch(/T00:00:00\.000Z$/);
+    expect(body.missions).toEqual([
+      { type: "complete_5_items", progress: 4, target: 5 },
+      { type: "accept_2_lists", progress: 1, target: 2 },
+      { type: "react_3_times", progress: 2, target: 3 },
+    ]);
+  });
+});
+
 void _sign;
