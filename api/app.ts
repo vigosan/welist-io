@@ -953,14 +953,16 @@ app.patch("/lists/:listId/items/:itemId/toggle", async (c) => {
       await logActivity(list.id, userId, "challenge_completed");
       await checkAchievements(userId);
       if (list.ownerId) {
-        const actor = await db.query.users.findFirst({
-          where: eq(users.id, userId),
-          columns: { name: true, image: true },
-        });
-        const listMeta = await db.query.lists.findFirst({
-          where: eq(lists.id, list.id),
-          columns: { name: true },
-        });
+        const [actor, listMeta] = await Promise.all([
+          db.query.users.findFirst({
+            where: eq(users.id, userId),
+            columns: { name: true, image: true },
+          }),
+          db.query.lists.findFirst({
+            where: eq(lists.id, list.id),
+            columns: { name: true },
+          }),
+        ]);
         await createNotification({
           recipientId: list.ownerId,
           type: "challenge_completed",
