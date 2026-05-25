@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Avatar } from "@/components/Avatar";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { useUserDirectory } from "@/hooks/users";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
@@ -22,10 +23,16 @@ export default function UsersScreen() {
   const debouncedQ = useDebouncedValue(q, 300);
   const query = useUserDirectory(debouncedQ || undefined);
 
-  const users = useMemo(
-    () => query.data?.pages.flatMap((p) => p.users) ?? [],
-    [query.data]
-  );
+  const users = useMemo(() => {
+    const list = query.data?.pages.flatMap((p) => p.users) ?? [];
+    return [...list].sort((a, b) => {
+      const an = a.name?.toLocaleLowerCase() ?? "";
+      const bn = b.name?.toLocaleLowerCase() ?? "";
+      if (!an && bn) return 1;
+      if (an && !bn) return -1;
+      return an.localeCompare(bn);
+    });
+  }, [query.data]);
 
   return (
     <SafeAreaView className="flex-1 bg-canvas dark:bg-canvas-dark" edges={["top"]}>
@@ -76,21 +83,24 @@ export default function UsersScreen() {
                 params: { userId: item.id },
               })
             }
-            className="mb-2 rounded-2xl border border-gray-200 bg-white p-4 active:opacity-80 dark:border-gray-700 dark:bg-gray-900"
+            className="mb-2 flex-row items-center gap-3 rounded-2xl border border-gray-200 bg-white p-4 active:opacity-80 dark:border-gray-700 dark:bg-gray-900"
           >
-            <Text
-              numberOfLines={1}
-              className="text-base font-medium text-gray-900 dark:text-gray-100"
-            >
-              {item.name ?? t("common.anonymous")}
-            </Text>
-            <Text className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-              {item.ownedListsCount} lists · {item.completedChallengesCount}{" "}
-              completed · {item.followerCount} followers
-              {item.achievementsTotal > 0
-                ? ` · ${item.achievementsUnlocked}/${item.achievementsTotal} achievements`
-                : ""}
-            </Text>
+            <Avatar name={item.name} image={item.image} />
+            <View className="flex-1">
+              <Text
+                numberOfLines={1}
+                className="text-base font-medium text-gray-900 dark:text-gray-100"
+              >
+                {item.name ?? t("common.anonymous")}
+              </Text>
+              <Text
+                numberOfLines={1}
+                className="mt-0.5 text-xs text-gray-500 dark:text-gray-400"
+              >
+                {item.ownedListsCount} lists · {item.completedChallengesCount}{" "}
+                completed · {item.followerCount} followers
+              </Text>
+            </View>
           </Pressable>
         )}
       />
