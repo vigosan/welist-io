@@ -2060,7 +2060,10 @@ describe("DELETE /api/lists/:listId/collaborators/:userId", () => {
   });
 
   const url = (userId: string) => `/api/lists/abc/collaborators/${userId}`;
-  const opts = { method: "DELETE" };
+  const opts = {
+    method: "DELETE",
+    headers: { "x-forwarded-for": "10.0.7.2" },
+  };
 
   it("returns 401 when unauthenticated", async () => {
     mockGetAuthUser.mockRejectedValue(new Error("no session"));
