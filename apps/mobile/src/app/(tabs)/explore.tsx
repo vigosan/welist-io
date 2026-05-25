@@ -50,7 +50,7 @@ export default function ExploreScreen() {
         />
       </View>
 
-      <View className="mx-6 mb-3 flex-row gap-2">
+      <View className="mx-6 mb-3 flex-row gap-1 rounded-xl bg-gray-100 p-1 dark:bg-gray-800">
         {SORTS.map((s) => {
           const active = sort === s;
           const label = s === "trending" ? t("explore.trending") : t("explore.recent");
@@ -58,16 +58,27 @@ export default function ExploreScreen() {
             <Pressable
               key={s}
               onPress={() => setSort(s)}
-              className={`rounded-full border px-3 py-1.5 ${
+              className={`flex-1 items-center rounded-lg py-1.5 ${
                 active
-                  ? "border-gray-900 bg-gray-900 dark:border-gray-100 dark:bg-gray-100"
-                  : "border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900"
+                  ? "bg-white dark:bg-gray-900"
+                  : ""
               }`}
+              style={
+                active
+                  ? {
+                      shadowColor: "#000",
+                      shadowOpacity: 0.06,
+                      shadowRadius: 2,
+                      shadowOffset: { width: 0, height: 1 },
+                      elevation: 1,
+                    }
+                  : undefined
+              }
             >
               <Text
                 className={`text-xs font-medium ${
                   active
-                    ? "text-white dark:text-gray-900"
+                    ? "text-gray-900 dark:text-gray-100"
                     : "text-gray-500 dark:text-gray-400"
                 }`}
               >
@@ -81,22 +92,22 @@ export default function ExploreScreen() {
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        contentContainerClassName="px-6 gap-2"
-        style={{ flexGrow: 0, flexShrink: 0, height: 44, marginBottom: 12 }}
+        contentContainerClassName="px-6 gap-1.5"
+        style={{ flexGrow: 0, flexShrink: 0, marginBottom: 12 }}
       >
         <Pressable
           onPress={() => setCategory("")}
-          className={`rounded-full border px-3 py-1.5 ${
+          className={`rounded-full px-3 py-1 ${
             category === ""
-              ? "border-gray-900 bg-gray-900 dark:border-gray-100 dark:bg-gray-100"
-              : "border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900"
+              ? "bg-gray-900 dark:bg-gray-100"
+              : "bg-gray-100 dark:bg-gray-800"
           }`}
         >
           <Text
             className={`text-xs font-medium ${
               category === ""
                 ? "text-white dark:text-gray-900"
-                : "text-gray-500 dark:text-gray-400"
+                : "text-gray-700 dark:text-gray-300"
             }`}
           >
             {t("explore.all")}
@@ -108,17 +119,17 @@ export default function ExploreScreen() {
             <Pressable
               key={c}
               onPress={() => setCategory(active ? "" : c)}
-              className={`rounded-full border px-3 py-1.5 ${
+              className={`rounded-full px-3 py-1 ${
                 active
-                  ? "border-gray-900 bg-gray-900 dark:border-gray-100 dark:bg-gray-100"
-                  : "border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900"
+                  ? "bg-gray-900 dark:bg-gray-100"
+                  : "bg-gray-100 dark:bg-gray-800"
               }`}
             >
               <Text
                 className={`text-xs font-medium ${
                   active
                     ? "text-white dark:text-gray-900"
-                    : "text-gray-500 dark:text-gray-400"
+                    : "text-gray-700 dark:text-gray-300"
                 }`}
               >
                 {t(`categories.${c}`)}
