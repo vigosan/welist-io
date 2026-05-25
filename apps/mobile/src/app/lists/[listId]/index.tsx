@@ -1,9 +1,10 @@
-import { Stack, useLocalSearchParams } from "expo-router";
-import { useState } from "react";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+import { useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
   FlatList,
+  Modal,
   Pressable,
   Text,
   TextInput,
@@ -15,19 +16,33 @@ import {
   useDeleteItem,
   useItems,
   useToggleItem,
+  useUpdateItem,
 } from "@/hooks/items";
 import { useList } from "@/hooks/lists";
+import { type FilterMode, filterItems } from "@/lib/items-filter";
 import type { Item } from "@/types";
+
+const FILTERS: FilterMode[] = ["all", "pending", "done"];
 
 export default function ListDetailScreen() {
   const { listId } = useLocalSearchParams<{ listId: string }>();
+  const router = useRouter();
   const [newText, setNewText] = useState("");
+  const [filter, setFilter] = useState<FilterMode>("all");
+  const [editing, setEditing] = useState<Item | null>(null);
+  const [editingText, setEditingText] = useState("");
 
   const list = useList(listId);
   const items = useItems(listId);
   const add = useAddItem(listId);
   const toggle = useToggleItem(listId);
+  const update = useUpdateItem(listId);
   const remove = useDeleteItem(listId);
+
+  const visible = useMemo(
+    () => filterItems(items.data ?? [], filter),
+    [items.data, filter]
+  );
 
   const submitAdd = () => {
     const text = newText.trim();
@@ -39,20 +54,75 @@ export default function ListDetailScreen() {
     });
   };
 
-  const confirmDelete = (item: Item) =>
-    Alert.alert("Delete item", `Delete "${item.text}"?`, [
-      { text: "Cancel", style: "cancel" },
+  const openItemMenu = (item: Item) =>
+    Alert.alert(item.text, undefined, [
+      {
+        text: "Edit",
+        onPress: () => {
+          setEditingText(item.text);
+          setEditing(item);
+        },
+      },
       {
         text: "Delete",
         style: "destructive",
         onPress: () => remove.mutate(item.id),
       },
+      { text: "Cancel", style: "cancel" },
     ]);
+
+  const saveEdit = () => {
+    if (!editing) return;
+    const text = editingText.trim();
+    if (!text || text === editing.text) {
+      setEditing(null);
+      return;
+    }
+    update.mutate(
+      { itemId: editing.id, text },
+      {
+        onSettled: () => setEditing(null),
+        onError: (e) =>
+          Alert.alert("Could not save", String((e as Error).message)),
+      }
+    );
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-canvas dark:bg-canvas-dark">
       <Stack.Screen
-        options={{ title: list.data?.name ?? "List", headerShown: true }}
+        options={{
+          title: list.data?.name ?? "List",
+          headerShown: true,
+          headerRight: () => (
+            <View className="flex-row gap-3 pr-3">
+              <Pressable
+                onPress={() =>
+                  router.push({
+                    pathname: "/lists/[listId]/bulk-add",
+                    params: { listId },
+                  })
+                }
+              >
+                <Text className="text-sm text-gray-900 dark:text-gray-100">
+                  Bulk
+                </Text>
+              </Pressable>
+              <Pressable
+                onPress={() =>
+                  router.push({
+                    pathname: "/lists/[listId]/settings",
+                    params: { listId },
+                  })
+                }
+              >
+                <Text className="text-sm text-gray-900 dark:text-gray-100">
+                  Settings
+                </Text>
+              </Pressable>
+            </View>
+          ),
+        }}
       />
 
       <View className="mx-6 mt-3 mb-3 flex-row items-center gap-2 rounded-2xl border border-gray-200 bg-white p-1.5 dark:border-gray-700 dark:bg-gray-900">
@@ -76,8 +146,35 @@ export default function ListDetailScreen() {
         </Pressable>
       </View>
 
+      <View className="mx-6 mb-3 flex-row gap-2">
+        {FILTERS.map((f) => {
+          const active = filter === f;
+          return (
+            <Pressable
+              key={f}
+              onPress={() => setFilter(f)}
+              className={`rounded-full border px-3 py-1.5 ${
+                active
+                  ? "border-gray-900 bg-gray-900 dark:border-gray-100 dark:bg-gray-100"
+                  : "border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900"
+              }`}
+            >
+              <Text
+                className={`text-xs font-medium capitalize ${
+                  active
+                    ? "text-white dark:text-gray-900"
+                    : "text-gray-500 dark:text-gray-400"
+                }`}
+              >
+                {f}
+              </Text>
+            </Pressable>
+          );
+        })}
+      </View>
+
       <FlatList
-        data={items.data ?? []}
+        data={visible}
         keyExtractor={(it) => it.id}
         contentContainerClassName="px-6 pb-10"
         ListEmptyComponent={
@@ -85,14 +182,14 @@ export default function ListDetailScreen() {
             <ActivityIndicator className="mt-10" />
           ) : (
             <Text className="mt-10 text-center text-sm text-gray-500 dark:text-gray-400">
-              No items yet.
+              No items.
             </Text>
           )
         }
         renderItem={({ item }) => (
           <Pressable
             onPress={() => toggle.mutate(item.id)}
-            onLongPress={() => confirmDelete(item)}
+            onLongPress={() => openItemMenu(item)}
             className="mb-2 flex-row items-center gap-3 rounded-2xl border border-gray-200 bg-white p-4 active:opacity-80 dark:border-gray-700 dark:bg-gray-900"
           >
             <View
@@ -120,6 +217,45 @@ export default function ListDetailScreen() {
           </Pressable>
         )}
       />
+
+      <Modal
+        animationType="fade"
+        transparent
+        visible={editing !== null}
+        onRequestClose={() => setEditing(null)}
+      >
+        <View className="flex-1 items-center justify-center bg-black/40 px-8">
+          <View className="w-full rounded-2xl bg-white p-5 dark:bg-gray-900">
+            <Text className="mb-3 text-base font-medium text-gray-900 dark:text-gray-100">
+              Edit item
+            </Text>
+            <TextInput
+              value={editingText}
+              onChangeText={setEditingText}
+              autoFocus
+              className="rounded-xl border border-gray-200 px-3 py-2 text-base text-gray-900 dark:border-gray-700 dark:text-gray-100"
+            />
+            <View className="mt-4 flex-row justify-end gap-3">
+              <Pressable
+                onPress={() => setEditing(null)}
+                className="px-4 py-2"
+              >
+                <Text className="text-sm text-gray-500 dark:text-gray-400">
+                  Cancel
+                </Text>
+              </Pressable>
+              <Pressable
+                onPress={saveEdit}
+                className="rounded-xl bg-gray-900 px-4 py-2 active:opacity-80 dark:bg-gray-100"
+              >
+                <Text className="text-sm font-medium text-white dark:text-gray-900">
+                  Save
+                </Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
