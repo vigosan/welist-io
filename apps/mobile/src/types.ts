@@ -21,7 +21,7 @@ export type ListWithParticipation = List & {
     role: "challenger" | "collaborator";
     completedAt: string | null;
   } | null;
-  rating: { avg: number; count: number; mine: number | null };
+  rating: { avg: number | null; count: number; mine: number | null };
 };
 
 export type Item = {

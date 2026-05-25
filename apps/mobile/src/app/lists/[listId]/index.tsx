@@ -23,8 +23,11 @@ import {
   useUpdateItem,
 } from "@/hooks/items";
 import { useList } from "@/hooks/lists";
+import { useRateList } from "@/hooks/rating";
+import { useSession } from "@/lib/auth";
 import { type FilterMode, filterItems } from "@/lib/items-filter";
 import type { Item } from "@/types";
+import { StarRating } from "@/components/StarRating";
 
 const FILTERS: FilterMode[] = ["all", "pending", "done"];
 
@@ -36,6 +39,7 @@ export default function ListDetailScreen() {
   const [editing, setEditing] = useState<Item | null>(null);
   const [editingText, setEditingText] = useState("");
 
+  const { session } = useSession();
   const list = useList(listId);
   const items = useItems(listId);
   const add = useAddItem(listId);
@@ -43,6 +47,12 @@ export default function ListDetailScreen() {
   const update = useUpdateItem(listId);
   const remove = useDeleteItem(listId);
   const reorder = useReorderItems(listId);
+  const rate = useRateList(listId);
+
+  const isOwner =
+    session.status === "signed-in" &&
+    !!list.data?.ownerId &&
+    session.user.id === list.data.ownerId;
 
   const visible = useMemo(
     () => filterItems(items.data ?? [], filter),
@@ -205,6 +215,17 @@ export default function ListDetailScreen() {
           </Text>
         </Pressable>
       </View>
+
+      {list.data && (list.data.rating.count > 0 || !isOwner) && (
+        <View className="mx-6 mb-3">
+          <StarRating
+            value={list.data.rating.mine}
+            avg={list.data.rating.avg}
+            count={list.data.rating.count}
+            onChange={isOwner ? undefined : (v) => rate.mutate(v)}
+          />
+        </View>
+      )}
 
       <View className="mx-6 mb-3 flex-row gap-2">
         {FILTERS.map((f) => {
