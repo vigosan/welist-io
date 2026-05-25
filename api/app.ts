@@ -22,6 +22,7 @@ import { type Context, Hono } from "hono";
 import Stripe from "stripe";
 import { z } from "zod";
 import { db } from "../src/db/client.js";
+import { users } from "../src/db/schema/auth.schema.js";
 import {
   type AchievementType,
   achievements,
@@ -38,8 +39,7 @@ import {
   notifications,
   participations,
   stripeAccounts,
-  users,
-} from "../src/db/schema/index.js";
+} from "../src/db/schema/lists.schema.js";
 import { LIST_CATEGORIES } from "../src/lib/categories.js";
 import { plainItemText } from "../src/lib/item-text.js";
 import { cleanName, slugify } from "../src/lib/slug.js";
