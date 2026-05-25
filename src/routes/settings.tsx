@@ -6,7 +6,11 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
 import { AppNav } from "@/components/AppNav";
-import { useUpdateProfile, useUserMe } from "@/hooks/useList";
+import {
+  useSetPassword,
+  useUpdateProfile,
+  useUserMe,
+} from "@/hooks/useList";
 import { useStripeAccountStatus } from "@/hooks/useStripeAccount";
 import { queryKeys } from "@/lib/query-keys";
 
@@ -36,10 +40,8 @@ function SettingsPage() {
   const [connecting, setConnecting] = useState(false);
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
-  const [passwordState, setPasswordState] = useState<
-    "idle" | "saving" | "saved" | "error"
-  >("idle");
   const [passwordError, setPasswordError] = useState<string | null>(null);
+  const setPasswordMutation = useSetPassword();
 
   async function handleSavePassword(e: React.FormEvent) {
     e.preventDefault();
@@ -52,20 +54,11 @@ function SettingsPage() {
       setPasswordError(t("settings.password.notMatch"));
       return;
     }
-    setPasswordState("saving");
     try {
-      const res = await fetch("/api/auth/set-password", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password }),
-      });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      await setPasswordMutation.mutateAsync(password);
       setPassword("");
       setPasswordConfirm("");
-      setPasswordState("saved");
-    } catch {
-      setPasswordState("error");
-    }
+    } catch {}
   }
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: intentional — qc and refetch are stable
@@ -260,23 +253,23 @@ function SettingsPage() {
                 {passwordError}
               </p>
             )}
-            {passwordState === "saved" && (
+            {setPasswordMutation.isSuccess && (
               <p className="text-xs text-gray-500 dark:text-[#a0a09c]">
                 {t("settings.password.saved")}
               </p>
             )}
-            {passwordState === "error" && !passwordError && (
+            {setPasswordMutation.isError && !passwordError && (
               <p className="text-xs text-red-600 dark:text-red-400">
                 {t("settings.password.genericError")}
               </p>
             )}
             <button
               type="submit"
-              disabled={passwordState === "saving" || !password}
+              disabled={setPasswordMutation.isPending || !password}
               data-testid="save-password-button"
               className="cursor-pointer self-start px-4 py-2 text-sm font-medium bg-[#0c0c0b] text-[#f8f7f5] dark:bg-[#f0ede8] dark:text-[#0c0c0b] rounded-xl hover:opacity-90 disabled:opacity-40 transition-[opacity,transform] duration-150 active:scale-[0.96]"
             >
-              {passwordState === "saving"
+              {setPasswordMutation.isPending
                 ? t("settings.password.saving")
                 : t("settings.password.save")}
             </button>

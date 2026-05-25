@@ -343,6 +343,12 @@ export function useUpdateProfile() {
   });
 }
 
+export function useSetPassword() {
+  return useMutation({
+    mutationFn: (password: string) => usersService.setPassword(password),
+  });
+}
+
 export function useStats() {
   return useQuery({
     queryKey: queryKeys.stats(),
