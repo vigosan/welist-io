@@ -18,6 +18,25 @@ export const listsService = {
       body: JSON.stringify({ name }),
     }),
 
+  update: (
+    listId: string,
+    patch: {
+      name?: string;
+      slug?: string | null;
+      description?: string | null;
+      category?: string | null;
+      public?: boolean;
+      collaborative?: boolean;
+    }
+  ) =>
+    apiFetch<List>(`/lists/${listId}`, {
+      method: "PATCH",
+      body: JSON.stringify(patch),
+    }),
+
+  clone: (listId: string) =>
+    apiFetch<List>(`/lists/${listId}/clone`, { method: "POST" }),
+
   delete: (listId: string) =>
     apiFetch<void>(`/lists/${listId}`, { method: "DELETE" }),
 };

@@ -32,6 +32,27 @@ export function useCreateList() {
   });
 }
 
+export function useUpdateList(listId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (
+      patch: Parameters<typeof listsService.update>[1]
+    ) => listsService.update(listId, patch),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["list", listId] });
+      qc.invalidateQueries({ queryKey: ["my-lists"] });
+    },
+  });
+}
+
+export function useCloneList() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (listId: string) => listsService.clone(listId),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["my-lists"] }),
+  });
+}
+
 export function useDeleteList() {
   const qc = useQueryClient();
   return useMutation({
