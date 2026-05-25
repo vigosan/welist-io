@@ -4,6 +4,7 @@ import { FollowButton } from "@/components/FollowButton";
 import { StarRatingDisplay } from "@/components/StarRating";
 import { useUserAchievements, useUserProfile } from "@/hooks/useList";
 import { useTranslation } from "@/i18n/service";
+import { privateName } from "@/lib/private-name";
 import type { UserAchievement } from "@/services/lists.service";
 
 export const Route = createFileRoute("/u/$userId")({
@@ -82,7 +83,7 @@ function UserProfilePage() {
           )}
           <div>
             <h1 className="text-xl font-bold tracking-tight text-[#0c0c0b] dark:text-[#f0ede8]">
-              {profile.name ?? "Anonymous"}
+              {profile.name ? privateName(profile.name) : "Anonymous"}
             </h1>
             <p className="text-sm text-gray-500 dark:text-[#a0a09c]">
               {profile.publicLists.length}{" "}

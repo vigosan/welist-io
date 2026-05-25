@@ -5,18 +5,12 @@ import { AppNav } from "@/components/AppNav";
 import { Skeleton } from "@/components/Skeleton";
 import { useToggleFollow, useUserDirectory } from "@/hooks/useList";
 import { useTranslation } from "@/i18n/service";
+import { privateName } from "@/lib/private-name";
 import type { DirectoryUser } from "@/services/lists.service";
 
 export const Route = createFileRoute("/users/")({
   component: UsersDirectoryPage,
 });
-
-function privateName(name: string | null): string {
-  if (!name) return "—";
-  const parts = name.trim().split(/\s+/);
-  if (parts.length === 1) return parts[0];
-  return `${parts[0]} ${parts[parts.length - 1][0]}.`;
-}
 
 function initials(name: string | null): string {
   if (!name) return "?";

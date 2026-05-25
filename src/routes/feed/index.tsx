@@ -4,6 +4,7 @@ import { AppNav } from "@/components/AppNav";
 import { Skeleton } from "@/components/Skeleton";
 import { useFeed } from "@/hooks/useList";
 import { useTranslation } from "@/i18n/service";
+import { privateName } from "@/lib/private-name";
 
 function FeedItemSkeleton() {
   return (
@@ -114,7 +115,7 @@ function FeedPage() {
                       {item.owner.name && (
                         <>
                           <span>·</span>
-                          <span>{item.owner.name}</span>
+                          <span>{privateName(item.owner.name)}</span>
                         </>
                       )}
                     </div>

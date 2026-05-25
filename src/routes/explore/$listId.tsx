@@ -9,6 +9,7 @@ import {
 import { useTrackOnMount } from "@/hooks/useTrackOnMount";
 import { useTranslation } from "@/i18n/service";
 import { renderInlineMarkdown } from "@/lib/inline-markdown";
+import { privateName } from "@/lib/private-name";
 import { parseTags } from "@/lib/tags";
 
 export const Route = createFileRoute("/explore/$listId")({
@@ -109,10 +110,14 @@ function ExploreDetailPage() {
                     params={{ userId: detail.ownerId }}
                     className="hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
                   >
-                    {t("explore.createdBy", { name: detail.owner.name })}
+                    {t("explore.createdBy", {
+                      name: privateName(detail.owner.name),
+                    })}
                   </Link>
                 ) : (
-                  t("explore.createdBy", { name: detail.owner.name })
+                  t("explore.createdBy", {
+                    name: privateName(detail.owner.name),
+                  })
                 )}
               </p>
             )}

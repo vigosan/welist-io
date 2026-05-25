@@ -1,3 +1,5 @@
+import { privateName } from "@/lib/private-name";
+
 type Challenger = {
   id: string;
   name: string | null;
@@ -64,7 +66,7 @@ export function ParticipantsPanel({
               <Avatar name={c.name} image={c.image} />
               <div className="flex-1 min-w-0 flex flex-col gap-1">
                 <span className="text-xs text-gray-700 truncate">
-                  {c.name ?? "—"}
+                  {privateName(c.name)}
                 </span>
                 {!c.completedAt && c.totalItems > 0 && (
                   <div className="h-1 w-full bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
@@ -101,7 +103,7 @@ export function ParticipantsPanel({
             <li key={c.id} className="flex items-center gap-3 px-3 py-2.5">
               <Avatar name={c.name} image={c.image} />
               <span className="text-xs text-gray-700 flex-1 truncate">
-                {c.name ?? "—"}
+                {privateName(c.name)}
               </span>
             </li>
           ))}

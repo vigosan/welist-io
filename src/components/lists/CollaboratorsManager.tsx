@@ -8,6 +8,7 @@ import {
   useUserSearch,
 } from "@/hooks/useList";
 import { useTranslation } from "@/i18n/service";
+import { privateName } from "@/lib/private-name";
 
 interface Props {
   listId: string;
@@ -101,7 +102,7 @@ export function CollaboratorsManager({ listId, isCollaborative }: Props) {
                         <Avatar name={u.name} image={u.image} />
                         <div className="flex-1 min-w-0">
                           <div className="text-xs text-gray-900 truncate">
-                            {u.name ?? "—"}
+                            {privateName(u.name)}
                           </div>
                           {u.email && (
                             <div className="text-[11px] text-gray-400 truncate">
@@ -133,7 +134,7 @@ export function CollaboratorsManager({ listId, isCollaborative }: Props) {
             >
               <Avatar name={owner.name ?? null} image={owner.image ?? null} />
               <span className="text-xs text-gray-700 flex-1 truncate">
-                {owner.name ?? "—"}
+                {privateName(owner.name)}
               </span>
               <span className="text-[10px] uppercase tracking-wide text-gray-400">
                 {t("list.collaboratorsOwnerBadge")}
@@ -148,7 +149,7 @@ export function CollaboratorsManager({ listId, isCollaborative }: Props) {
             >
               <Avatar name={c.name} image={c.image} />
               <span className="text-xs text-gray-700 flex-1 truncate">
-                {c.name ?? "—"}
+                {privateName(c.name)}
               </span>
               <button
                 type="button"
