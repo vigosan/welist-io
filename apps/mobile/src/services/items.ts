@@ -29,4 +29,10 @@ export const itemsService = {
       method: "POST",
       body: JSON.stringify({ texts }),
     }),
+
+  reorder: (listId: string, ids: string[]) =>
+    apiFetch<void>(`/lists/${listId}/items/reorder`, {
+      method: "PATCH",
+      body: JSON.stringify({ ids }),
+    }),
 };

@@ -3,18 +3,22 @@ import { useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
-  FlatList,
   Modal,
   Pressable,
   Text,
   TextInput,
   View,
 } from "react-native";
+import DraggableFlatList, {
+  type RenderItemParams,
+  ScaleDecorator,
+} from "react-native-draggable-flatlist";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
   useAddItem,
   useDeleteItem,
   useItems,
+  useReorderItems,
   useToggleItem,
   useUpdateItem,
 } from "@/hooks/items";
@@ -38,6 +42,7 @@ export default function ListDetailScreen() {
   const toggle = useToggleItem(listId);
   const update = useUpdateItem(listId);
   const remove = useDeleteItem(listId);
+  const reorder = useReorderItems(listId);
 
   const visible = useMemo(
     () => filterItems(items.data ?? [], filter),
@@ -85,6 +90,61 @@ export default function ListDetailScreen() {
         onError: (e) =>
           Alert.alert("Could not save", String((e as Error).message)),
       }
+    );
+  };
+
+  const renderRow = ({ item, drag, isActive }: RenderItemParams<Item>) => {
+    const dragEnabled = filter === "all";
+    return (
+      <ScaleDecorator>
+        <View
+          className={`mb-2 flex-row items-center gap-3 rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-900 ${
+            isActive ? "opacity-80" : ""
+          }`}
+        >
+          <Pressable
+            onPress={() => toggle.mutate(item.id)}
+            onLongPress={() => openItemMenu(item)}
+            disabled={isActive}
+            className="flex-1 flex-row items-center gap-3 active:opacity-80"
+          >
+            <View
+              className={`h-5 w-5 items-center justify-center rounded-md border ${
+                item.done
+                  ? "border-gray-900 bg-gray-900 dark:border-gray-100 dark:bg-gray-100"
+                  : "border-gray-300 dark:border-gray-600"
+              }`}
+            >
+              {item.done && (
+                <Text className="text-xs font-bold text-white dark:text-gray-900">
+                  ✓
+                </Text>
+              )}
+            </View>
+            <Text
+              className={`flex-1 text-base ${
+                item.done
+                  ? "text-gray-400 line-through dark:text-gray-600"
+                  : "text-gray-900 dark:text-gray-100"
+              }`}
+            >
+              {item.text}
+            </Text>
+          </Pressable>
+
+          {dragEnabled && (
+            <Pressable
+              onLongPress={drag}
+              delayLongPress={150}
+              disabled={isActive}
+              hitSlop={8}
+              className="px-1"
+            >
+              <Text className="text-base text-gray-400">≡</Text>
+            </Pressable>
+          )}
+        </View>
+      </ScaleDecorator>
     );
   };
 
@@ -173,10 +233,14 @@ export default function ListDetailScreen() {
         })}
       </View>
 
-      <FlatList
+      <DraggableFlatList
         data={visible}
         keyExtractor={(it) => it.id}
-        contentContainerClassName="px-6 pb-10"
+        contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 40 }}
+        onDragEnd={({ data }) => {
+          if (filter !== "all") return;
+          reorder.mutate(data);
+        }}
         ListEmptyComponent={
           items.isLoading ? (
             <ActivityIndicator className="mt-10" />
@@ -186,36 +250,7 @@ export default function ListDetailScreen() {
             </Text>
           )
         }
-        renderItem={({ item }) => (
-          <Pressable
-            onPress={() => toggle.mutate(item.id)}
-            onLongPress={() => openItemMenu(item)}
-            className="mb-2 flex-row items-center gap-3 rounded-2xl border border-gray-200 bg-white p-4 active:opacity-80 dark:border-gray-700 dark:bg-gray-900"
-          >
-            <View
-              className={`h-5 w-5 items-center justify-center rounded-md border ${
-                item.done
-                  ? "border-gray-900 bg-gray-900 dark:border-gray-100 dark:bg-gray-100"
-                  : "border-gray-300 dark:border-gray-600"
-              }`}
-            >
-              {item.done && (
-                <Text className="text-xs font-bold text-white dark:text-gray-900">
-                  ✓
-                </Text>
-              )}
-            </View>
-            <Text
-              className={`flex-1 text-base ${
-                item.done
-                  ? "text-gray-400 line-through dark:text-gray-600"
-                  : "text-gray-900 dark:text-gray-100"
-              }`}
-            >
-              {item.text}
-            </Text>
-          </Pressable>
-        )}
+        renderItem={renderRow}
       />
 
       <Modal

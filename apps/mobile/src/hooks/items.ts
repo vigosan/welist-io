@@ -67,6 +67,27 @@ export function useBulkAddItems(listId: string) {
   });
 }
 
+export function useReorderItems(listId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (ordered: Item[]) =>
+      itemsService.reorder(
+        listId,
+        ordered.map((i) => i.id)
+      ),
+    onMutate: async (ordered) => {
+      await qc.cancelQueries({ queryKey: ["items", listId] });
+      const previous = qc.getQueryData<Item[]>(["items", listId]);
+      qc.setQueryData<Item[]>(["items", listId], ordered);
+      return { previous };
+    },
+    onError: (_err, _vars, ctx) => {
+      if (ctx?.previous) qc.setQueryData(["items", listId], ctx.previous);
+    },
+    onSettled: () => qc.invalidateQueries({ queryKey: ["items", listId] }),
+  });
+}
+
 export function useDeleteItem(listId: string) {
   const qc = useQueryClient();
   return useMutation({
