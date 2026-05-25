@@ -57,6 +57,75 @@ export type ExploreItem = {
   owner: { id: string | null; name: string | null; image: string | null } | null;
 };
 
+export type FeedItem = {
+  id: string;
+  name: string;
+  slug: string | null;
+  description: string | null;
+  createdAt: string;
+  itemCount: number;
+  owner: { id: string | null; name: string | null; image: string | null };
+};
+
+export type DirectoryUser = {
+  id: string;
+  name: string | null;
+  image: string | null;
+  ownedListsCount: number;
+  challengerCount: number;
+  completedChallengesCount: number;
+  collaboratorCount: number;
+  achievementsUnlocked: number;
+  achievementsTotal: number;
+  followerCount: number;
+  isFollowing: boolean;
+};
+
+export type UserProfile = {
+  id: string;
+  name: string | null;
+  image: string | null;
+  publicLists: {
+    id: string;
+    name: string;
+    slug: string | null;
+    description: string | null;
+    createdAt: string;
+    itemCount: number;
+    participantCount: number;
+    completedCount: number;
+    rating: { avg: number | null; count: number };
+  }[];
+  completedChallenges: {
+    id: string;
+    name: string;
+    slug: string | null;
+    completedAt: string | null;
+  }[];
+};
+
+export type AchievementType =
+  | "first_list_created"
+  | "five_lists_created"
+  | "first_item_added"
+  | "hundred_items_created"
+  | "first_public_list"
+  | "first_list_accepted"
+  | "ten_lists_accepted"
+  | "first_list_completed"
+  | "five_lists_completed"
+  | "ten_lists_completed"
+  | "first_follower"
+  | "ten_followers"
+  | "first_sale";
+
+export type UserAchievement = {
+  type: AchievementType;
+  target: number;
+  progress: number;
+  unlockedAt: string | null;
+};
+
 export type ExploreDetail = {
   id: string;
   name: string;
