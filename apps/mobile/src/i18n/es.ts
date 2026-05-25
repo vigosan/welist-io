@@ -11,6 +11,7 @@ export const es = {
     by: "por",
     noItems: "Sin items.",
     error: "Algo ha ido mal",
+    retry: "Reintentar",
   },
   auth: {
     continueGoogle: "Continuar con Google",
