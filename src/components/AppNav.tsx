@@ -69,8 +69,8 @@ function NavLink({
         "cursor-pointer text-[13px] transition-colors duration-150",
         "no-underline",
         isActive
-          ? "text-[#0c0c0b] dark:text-[#f0ede8] font-semibold"
-          : "text-gray-500 dark:text-[#a0a09c] font-normal hover:text-[#0c0c0b] dark:hover:text-[#f0ede8]",
+          ? "text-ink dark:text-paper font-semibold"
+          : "text-gray-500 dark:text-muted font-normal hover:text-ink dark:hover:text-paper",
       ].join(" ")}
       style={{
         letterSpacing: "0.01em",
@@ -118,14 +118,14 @@ export function AppNav() {
         onClose={() => setGlobalSearchOpen(false)}
       />
       <nav
-        className="shrink-0 sticky top-0 z-50 bg-[#f8f7f5] dark:bg-[#0c0c0b] border-b border-black/[0.08] dark:border-white/[0.08]"
+        className="shrink-0 sticky top-0 z-50 bg-canvas dark:bg-canvas-dark border-b border-black/[0.08] dark:border-white/[0.08]"
         style={{ height: 52 }}
       >
         <div className="flex items-center justify-between px-4 sm:px-12 h-full">
           <Link
             to="/"
             data-testid="nav-logo"
-            className="cursor-pointer text-[15px] font-bold text-[#0c0c0b] dark:text-[#f0ede8] hover:opacity-70 transition-opacity duration-150 no-underline"
+            className="cursor-pointer text-[15px] font-bold text-ink dark:text-paper hover:opacity-70 transition-opacity duration-150 no-underline"
             style={{ letterSpacing: "-0.01em" }}
           >
             welist
@@ -163,7 +163,7 @@ export function AppNav() {
                   ? "Switch to light mode"
                   : "Switch to dark mode"
               }
-              className="cursor-pointer text-gray-500 dark:text-[#a0a09c] hover:text-[#0c0c0b] dark:hover:text-[#f0ede8] transition-colors duration-150"
+              className="cursor-pointer text-gray-500 dark:text-muted hover:text-ink dark:hover:text-paper transition-colors duration-150"
             >
               {theme === "dark" ? <SunIcon /> : <MoonIcon />}
             </button>
@@ -171,7 +171,7 @@ export function AppNav() {
               type="button"
               onClick={() => setLanguage(language === "es" ? "en" : "es")}
               data-testid="lang-switcher"
-              className="cursor-pointer text-[11px] font-medium text-gray-500 dark:text-[#a0a09c] hover:text-[#0c0c0b] dark:hover:text-[#f0ede8] transition-colors duration-150 tabular-nums"
+              className="cursor-pointer text-[11px] font-medium text-gray-500 dark:text-muted hover:text-ink dark:hover:text-paper transition-colors duration-150 tabular-nums"
               style={{ fontFamily: "'Space Mono', monospace" }}
             >
               {language === "es" ? "EN" : "ES"}
@@ -225,7 +225,7 @@ export function AppNav() {
               onClick={() => setMobileOpen((o) => !o)}
               data-testid="nav-burger"
               aria-label="Toggle menu"
-              className="cursor-pointer h-8 w-8 flex items-center justify-center rounded-md text-gray-500 dark:text-[#a0a09c] hover:text-[#0c0c0b] dark:hover:text-[#f0ede8] transition-colors duration-150"
+              className="cursor-pointer h-8 w-8 flex items-center justify-center rounded-md text-gray-500 dark:text-muted hover:text-ink dark:hover:text-paper transition-colors duration-150"
             >
               {mobileOpen ? (
                 <svg
@@ -263,7 +263,7 @@ export function AppNav() {
 
         {/* Mobile dropdown */}
         {mobileOpen && (
-          <div className="sm:hidden absolute top-[52px] left-0 right-0 z-50 bg-[#f8f7f5] dark:bg-[#0c0c0b] border-t border-black/[0.08] dark:border-white/[0.08]">
+          <div className="sm:hidden absolute top-[52px] left-0 right-0 z-50 bg-canvas dark:bg-canvas-dark border-t border-black/[0.08] dark:border-white/[0.08]">
             {/* User identity row */}
             {session?.user && (
               <div className="px-6 py-3 flex items-center gap-3">
@@ -274,7 +274,7 @@ export function AppNav() {
                     className="w-7 h-7 rounded-full outline outline-1 outline-black/10 dark:outline-white/10 shrink-0"
                   />
                 )}
-                <span className="text-sm font-medium text-[#0c0c0b] dark:text-[#f0ede8] truncate">
+                <span className="text-sm font-medium text-ink dark:text-paper truncate">
                   {session.user.name}
                 </span>
                 <div className="ml-auto">
@@ -288,7 +288,7 @@ export function AppNav() {
               <Link
                 to="/lists"
                 data-testid="nav-my-lists-mobile"
-                className="block px-6 py-3 text-sm font-medium text-[#0c0c0b] dark:text-[#f0ede8] hover:bg-black/[0.02] dark:hover:bg-white/[0.03] transition-colors duration-150 no-underline"
+                className="block px-6 py-3 text-sm font-medium text-ink dark:text-paper hover:bg-black/[0.02] dark:hover:bg-white/[0.03] transition-colors duration-150 no-underline"
                 onClick={closeMobile}
               >
                 {t("nav.myLists")}
@@ -297,7 +297,7 @@ export function AppNav() {
             <Link
               to="/explore"
               data-testid="nav-explore-mobile"
-              className="block px-6 py-3 text-sm font-medium text-[#0c0c0b] dark:text-[#f0ede8] hover:bg-black/[0.02] dark:hover:bg-white/[0.03] transition-colors duration-150 no-underline"
+              className="block px-6 py-3 text-sm font-medium text-ink dark:text-paper hover:bg-black/[0.02] dark:hover:bg-white/[0.03] transition-colors duration-150 no-underline"
               onClick={closeMobile}
             >
               {t("nav.explore")}
@@ -305,7 +305,7 @@ export function AppNav() {
             <Link
               to="/users"
               data-testid="nav-users-mobile"
-              className="block px-6 py-3 text-sm font-medium text-[#0c0c0b] dark:text-[#f0ede8] hover:bg-black/[0.02] dark:hover:bg-white/[0.03] transition-colors duration-150 no-underline"
+              className="block px-6 py-3 text-sm font-medium text-ink dark:text-paper hover:bg-black/[0.02] dark:hover:bg-white/[0.03] transition-colors duration-150 no-underline"
               onClick={closeMobile}
             >
               {t("directory.nav")}
@@ -313,7 +313,7 @@ export function AppNav() {
             <Link
               to="/help"
               data-testid="nav-help-mobile"
-              className="block px-6 py-3 text-sm font-medium text-[#0c0c0b] dark:text-[#f0ede8] hover:bg-black/[0.02] dark:hover:bg-white/[0.03] transition-colors duration-150 no-underline"
+              className="block px-6 py-3 text-sm font-medium text-ink dark:text-paper hover:bg-black/[0.02] dark:hover:bg-white/[0.03] transition-colors duration-150 no-underline"
               onClick={closeMobile}
             >
               {t("help.nav")}
@@ -325,14 +325,14 @@ export function AppNav() {
                 <Link
                   to="/feed"
                   data-testid="user-menu-feed-mobile"
-                  className="block px-6 py-3 text-sm font-medium text-[#0c0c0b] dark:text-[#f0ede8] hover:bg-black/[0.02] dark:hover:bg-white/[0.03] transition-colors duration-150 no-underline"
+                  className="block px-6 py-3 text-sm font-medium text-ink dark:text-paper hover:bg-black/[0.02] dark:hover:bg-white/[0.03] transition-colors duration-150 no-underline"
                   onClick={closeMobile}
                 >
                   {t("nav.feed")}
                 </Link>
                 <Link
                   to="/settings"
-                  className="block px-6 py-3 text-sm font-medium text-[#0c0c0b] dark:text-[#f0ede8] hover:bg-black/[0.02] dark:hover:bg-white/[0.03] transition-colors duration-150 no-underline"
+                  className="block px-6 py-3 text-sm font-medium text-ink dark:text-paper hover:bg-black/[0.02] dark:hover:bg-white/[0.03] transition-colors duration-150 no-underline"
                   onClick={closeMobile}
                 >
                   {t("user.settings")}
@@ -344,7 +344,7 @@ export function AppNav() {
                     signOut();
                   }}
                   data-testid="sign-out-btn-mobile"
-                  className="cursor-pointer block w-full text-left px-6 py-3 text-sm font-medium text-[#0c0c0b] dark:text-[#f0ede8] hover:bg-black/[0.02] dark:hover:bg-white/[0.03] transition-colors duration-150"
+                  className="cursor-pointer block w-full text-left px-6 py-3 text-sm font-medium text-ink dark:text-paper hover:bg-black/[0.02] dark:hover:bg-white/[0.03] transition-colors duration-150"
                 >
                   {t("user.signOut")}
                 </button>
@@ -358,7 +358,7 @@ export function AppNav() {
                       closeMobile();
                       signIn("google");
                     }}
-                    className="cursor-pointer text-sm font-medium text-[#0c0c0b] dark:text-[#f0ede8]"
+                    className="cursor-pointer text-sm font-medium text-ink dark:text-paper"
                   >
                     {t("user.signIn")}
                   </button>
@@ -378,7 +378,7 @@ export function AppNav() {
                     ? "Switch to light mode"
                     : "Switch to dark mode"
                 }
-                className="cursor-pointer p-1.5 text-gray-500 dark:text-[#a0a09c] hover:text-[#0c0c0b] dark:hover:text-[#f0ede8] transition-colors duration-150"
+                className="cursor-pointer p-1.5 text-gray-500 dark:text-muted hover:text-ink dark:hover:text-paper transition-colors duration-150"
               >
                 {theme === "dark" ? <SunIcon /> : <MoonIcon />}
               </button>
@@ -389,7 +389,7 @@ export function AppNav() {
                   closeMobile();
                 }}
                 data-testid="lang-switcher-mobile"
-                className="cursor-pointer text-[11px] font-medium text-gray-500 dark:text-[#a0a09c] hover:text-[#0c0c0b] dark:hover:text-[#f0ede8] transition-colors duration-150 tabular-nums"
+                className="cursor-pointer text-[11px] font-medium text-gray-500 dark:text-muted hover:text-ink dark:hover:text-paper transition-colors duration-150 tabular-nums"
                 style={{ fontFamily: "'Space Mono', monospace" }}
               >
                 {language === "es" ? "EN" : "ES"}
