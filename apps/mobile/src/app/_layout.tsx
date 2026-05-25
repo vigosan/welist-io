@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Stack, useRouter, useSegments } from "expo-router";
-import { useEffect } from "react";
+import { type Href, Stack, useRouter, useSegments } from "expo-router";
+import { useEffect, useRef } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "../global.css";
 import { SessionProvider, useSession } from "@/lib/auth";
@@ -11,12 +11,20 @@ function AuthGate({ children }: { children: React.ReactNode }) {
   const { session } = useSession();
   const router = useRouter();
   const segments = useSegments();
+  const pendingPath = useRef<string | null>(null);
 
   useEffect(() => {
     if (session.status === "loading") return;
     const onSignIn = segments[0] === "sign-in";
-    if (session.status === "signed-out" && !onSignIn) router.replace("/sign-in");
-    else if (session.status === "signed-in" && onSignIn) router.replace("/");
+    if (session.status === "signed-out" && !onSignIn) {
+      const path = segments.filter((s) => !s.startsWith("(")).join("/");
+      pendingPath.current = path ? `/${path}` : null;
+      router.replace("/sign-in");
+    } else if (session.status === "signed-in" && onSignIn) {
+      const target = pendingPath.current;
+      pendingPath.current = null;
+      router.replace((target ?? "/") as Href);
+    }
   }, [session, segments, router]);
 
   return <>{children}</>;
