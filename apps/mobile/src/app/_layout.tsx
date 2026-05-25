@@ -86,6 +86,8 @@ export default function RootLayout() {
                 animation: "slide_from_right",
                 animationDuration: 250,
                 gestureEnabled: true,
+                gestureDirection: "horizontal",
+                fullScreenGestureEnabled: true,
               }}
             />
           </AuthGate>

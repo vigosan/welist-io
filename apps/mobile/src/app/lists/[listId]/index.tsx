@@ -1,5 +1,6 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { Settings } from "lucide-react-native";
+import { MoreVertical } from "lucide-react-native";
+import * as Clipboard from "expo-clipboard";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
@@ -10,6 +11,7 @@ import {
   Modal,
   Platform,
   Pressable,
+  Share,
   Text,
   TextInput,
   View,
@@ -22,6 +24,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { LocationPickerModal } from "@/components/LocationPickerModal";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import {
+  renderInlineMarkdown,
+  stripInlineMarkdown,
+} from "@/lib/inline-markdown";
+import {
   useAddItem,
   useBulkAddItems,
   useDeleteItem,
@@ -31,7 +37,11 @@ import {
   useToggleItem,
   useUpdateItem,
 } from "@/hooks/items";
-import { useActiveParticipants, useList } from "@/hooks/lists";
+import {
+  useActiveParticipants,
+  useDeleteList,
+  useList,
+} from "@/hooks/lists";
 import { useRateList } from "@/hooks/rating";
 import { useSession } from "@/lib/auth";
 import { type FilterMode, filterItems } from "@/lib/items-filter";
@@ -63,6 +73,7 @@ export default function ListDetailScreen() {
   const setLocation = useSetItemLocation(listId);
   const rate = useRateList(listId);
   const participants = useActiveParticipants(listId);
+  const deleteList = useDeleteList();
 
   const isOwner =
     session.status === "signed-in" &&
@@ -193,7 +204,7 @@ export default function ListDetailScreen() {
                     : "text-gray-900 dark:text-gray-100"
                 }`}
               >
-                {item.text}
+                {renderInlineMarkdown(item.text)}
               </Text>
               {item.placeName && (
                 <Text
@@ -222,6 +233,73 @@ export default function ListDetailScreen() {
     );
   };
 
+  const handleRandom = () => {
+    const all = items.data ?? [];
+    const pending = all.filter((it) => !it.done);
+    const pool = pending.length > 0 ? pending : all;
+    if (pool.length === 0) return;
+    const pick = pool[Math.floor(Math.random() * pool.length)];
+    Alert.alert(t("list.randomPick"), stripInlineMarkdown(pick.text));
+  };
+
+  const handleShare = async () => {
+    if (!list.data) return;
+    const slug = list.data.slug ?? list.data.id;
+    const url = `https://welist.io/lists/${slug}`;
+    try {
+      await Share.share({
+        message: `${list.data.name}\n${url}`,
+        url,
+        title: list.data.name,
+      });
+    } catch {}
+  };
+
+  const handleCopyPlain = async () => {
+    if (!items.data) return;
+    const text = items.data
+      .map((it) => `• ${stripInlineMarkdown(it.text)}`)
+      .join("\n");
+    await Clipboard.setStringAsync(text);
+    Alert.alert(t("list.copied"));
+  };
+
+  const handleDelete = () => {
+    Alert.alert(t("list.deleteListTitle"), list.data?.name ?? "", [
+      { text: t("common.cancel"), style: "cancel" },
+      {
+        text: t("common.delete"),
+        style: "destructive",
+        onPress: () =>
+          deleteList.mutate(listId, {
+            onSuccess: () => router.back(),
+          }),
+      },
+    ]);
+  };
+
+  const openActions = () => {
+    Alert.alert(list.data?.name ?? "", undefined, [
+      { text: t("list.randomItem"), onPress: handleRandom },
+      { text: t("list.shareLink"), onPress: handleShare },
+      { text: t("list.copyPlain"), onPress: handleCopyPlain },
+      {
+        text: t("list.settings"),
+        onPress: () =>
+          router.push({
+            pathname: "/lists/[listId]/settings",
+            params: { listId },
+          }),
+      },
+      {
+        text: t("list.deleteList"),
+        style: "destructive",
+        onPress: handleDelete,
+      },
+      { text: t("common.cancel"), style: "cancel" },
+    ]);
+  };
+
   return (
     <SafeAreaView className="flex-1 bg-canvas dark:bg-canvas-dark" edges={["top"]}>
       <ScreenHeader
@@ -229,17 +307,12 @@ export default function ListDetailScreen() {
         back
         right={
           <Pressable
-            onPress={() =>
-              router.push({
-                pathname: "/lists/[listId]/settings",
-                params: { listId },
-              })
-            }
-            accessibilityLabel={t("list.settings")}
+            onPress={openActions}
+            accessibilityLabel={t("list.actions")}
             hitSlop={8}
             className="h-9 w-9 items-center justify-center rounded-full active:bg-black/[0.05] dark:active:bg-white/[0.06]"
           >
-            <Settings color="#0c0c0b" size={20} />
+            <MoreVertical color="#0c0c0b" size={22} />
           </Pressable>
         }
       />
