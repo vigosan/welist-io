@@ -58,10 +58,13 @@ export type ExploreDetail = {
   } | null;
   itemCount: number;
   participantCount: number;
-  participants: Array<{
-    image: string | null;
+  challengers: Array<{
+    id: string;
     name: string | null;
-    userId: string | null;
+    image: string | null;
+    completedAt: string | null;
+    doneCount: number;
+    totalItems: number;
   }>;
   completedParticipants: Array<{
     name: string | null;

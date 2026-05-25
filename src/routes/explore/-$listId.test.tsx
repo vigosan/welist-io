@@ -88,7 +88,7 @@ describe("ExploreDetailPage", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("renders detail page with participants", async () => {
+  it("renders detail page with challengers panel", async () => {
     setupBaseMocks();
     vi.mocked(useExploreDetail).mockReturnValue({
       data: {
@@ -100,10 +100,25 @@ describe("ExploreDetailPage", () => {
         participantCount: 2,
         ownerId: "owner-1",
         owner: { name: "Ana", image: "https://example.com/ana.jpg" },
-        participants: [
-          { name: "Ana", image: "https://example.com/ana.jpg" },
-          { name: "Bob", image: null },
+        challengers: [
+          {
+            id: "ana",
+            name: "Ana",
+            image: "https://example.com/ana.jpg",
+            completedAt: null,
+            doneCount: 1,
+            totalItems: 3,
+          },
+          {
+            id: "bob",
+            name: "Bob",
+            image: null,
+            completedAt: null,
+            doneCount: 0,
+            totalItems: 3,
+          },
         ],
+        completedParticipants: [],
       },
       isLoading: false,
     } as never);
@@ -115,34 +130,8 @@ describe("ExploreDetailPage", () => {
     );
     expect(screen.getByText("Una descripción")).toBeInTheDocument();
     expect(screen.getByTestId("accept-challenge-btn")).toBeInTheDocument();
-  });
-
-  it("renders participant avatars with index-based keys (no duplicate key warnings)", async () => {
-    setupBaseMocks();
-    vi.mocked(useExploreDetail).mockReturnValue({
-      data: {
-        id: "list-detail-1",
-        name: "Lista Detalle",
-        slug: null,
-        description: null,
-        itemCount: 2,
-        participantCount: 3,
-        ownerId: "owner-1",
-        owner: null,
-        participants: [
-          { name: "Ana", image: "https://example.com/img.jpg" },
-          { name: "Ana", image: "https://example.com/img.jpg" },
-        ],
-      },
-      isLoading: false,
-    } as never);
-
-    renderDetailPage();
-
-    await waitFor(() =>
-      expect(screen.getByText("Lista Detalle")).toBeInTheDocument()
-    );
-    const avatars = document.querySelectorAll("img.w-6.h-6.rounded-full");
-    expect(avatars).toHaveLength(2);
+    expect(screen.getByText("2 challengers")).toBeInTheDocument();
+    expect(screen.getByText("1/3")).toBeInTheDocument();
+    expect(screen.getByText("0/3")).toBeInTheDocument();
   });
 });

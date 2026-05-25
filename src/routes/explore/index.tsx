@@ -176,39 +176,6 @@ function ExploreListCard({
           />
         </div>
       )}
-      {list.participants.length > 0 && (
-        <div
-          data-testid={`explore-card-participants-${list.id}`}
-          className="mt-2.5 flex items-center gap-2"
-        >
-          <div className="flex -space-x-2">
-            {list.participants.map((p) =>
-              p.image ? (
-                <img
-                  key={p.id}
-                  src={p.image}
-                  alt={p.name ?? ""}
-                  title={p.name ?? ""}
-                  className="h-6 w-6 rounded-full object-cover outline outline-2 outline-[#f8f7f5] dark:outline-[#0d0d0d]"
-                />
-              ) : (
-                <div
-                  key={p.id}
-                  title={p.name ?? ""}
-                  className="flex h-6 w-6 items-center justify-center rounded-full bg-black/[0.06] text-[9px] font-semibold text-gray-500 outline outline-2 outline-[#f8f7f5] dark:bg-white/[0.08] dark:text-[#6b6b67] dark:outline-[#0d0d0d]"
-                >
-                  {(p.name ?? "?")[0]?.toUpperCase()}
-                </div>
-              )
-            )}
-          </div>
-          {list.participantCount > list.participants.length && (
-            <span className="text-[11px] tabular-nums text-gray-400 dark:text-gray-500">
-              +{list.participantCount - list.participants.length}
-            </span>
-          )}
-        </div>
-      )}
       <button
         type="button"
         onClick={handleAccept}

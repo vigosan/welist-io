@@ -151,22 +151,6 @@ describe("ExplorePage", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("shows participant avatars with an overflow count, only when there are participants", async () => {
-    setupMocks();
-    renderPage();
-    await waitFor(() =>
-      expect(
-        screen.getByTestId("explore-card-participants-e1")
-      ).toBeInTheDocument()
-    );
-    const participants = screen.getByTestId("explore-card-participants-e1");
-    expect(participants).toHaveTextContent("+1");
-    expect(participants).toHaveTextContent("A");
-    expect(
-      screen.queryByTestId("explore-card-participants-e2")
-    ).not.toBeInTheDocument();
-  });
-
   it("shows the author linking to their profile, only when there is an owner", async () => {
     setupMocks();
     renderPage();

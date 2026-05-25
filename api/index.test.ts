@@ -1047,12 +1047,10 @@ describe("GET /api/explore/:listId", () => {
     groupBy: vi.fn().mockResolvedValue([row]),
   });
 
-  const simpleChain = (rows: unknown[]) => ({
+  const challengersChain = (rows: unknown[]) => ({
     from: vi.fn().mockReturnThis(),
-    leftJoin: vi.fn().mockReturnThis(),
-    where: vi.fn().mockReturnThis(),
-    groupBy: vi.fn().mockReturnThis(),
-    limit: vi.fn().mockResolvedValue(rows),
+    innerJoin: vi.fn().mockReturnThis(),
+    where: vi.fn().mockResolvedValue(rows),
   });
 
   const countChain = (count: number) => ({
@@ -1060,28 +1058,40 @@ describe("GET /api/explore/:listId", () => {
     where: vi.fn().mockResolvedValue([{ count }]),
   });
 
+  const completedChain = (rows: unknown[]) => ({
+    from: vi.fn().mockReturnThis(),
+    leftJoin: vi.fn().mockReturnThis(),
+    where: vi.fn().mockReturnThis(),
+    orderBy: vi.fn().mockReturnThis(),
+    limit: vi.fn().mockResolvedValue(rows),
+  });
+
   beforeEach(() => vi.clearAllMocks());
 
   it("returns 200 with full detail for a public list", async () => {
     mockDb.query.lists.findFirst.mockResolvedValue(publicList);
+    mockDb.$count.mockResolvedValue(3);
     mockDb.select
       .mockReturnValueOnce(
         statsChain({
           itemCount: 3,
-          participantCount: 5,
           ownerName: "Alice",
           ownerImage: "https://example.com/a.jpg",
         })
       )
       .mockReturnValueOnce(
-        simpleChain([
+        challengersChain([
           {
-            image: "https://example.com/b.jpg",
+            id: "u-bob",
             name: "Bob",
+            image: "https://example.com/b.jpg",
+            completedAt: null,
+            doneCount: 1,
           },
         ])
       )
-      .mockReturnValueOnce(countChain(5));
+      .mockReturnValueOnce(countChain(5))
+      .mockReturnValueOnce(completedChain([]));
 
     const res = await app.request("/api/explore/l1");
     expect(res.status).toBe(200);
@@ -1091,7 +1101,15 @@ describe("GET /api/explore/:listId", () => {
     expect(body.participantCount).toBe(5);
     expect(body.completedCount).toBeUndefined();
     expect((body.owner as Record<string, unknown>)?.name).toBe("Alice");
-    expect(Array.isArray(body.participants)).toBe(true);
+    const challengers = body.challengers as Array<Record<string, unknown>>;
+    expect(Array.isArray(challengers)).toBe(true);
+    expect(challengers[0]).toMatchObject({
+      id: "u-bob",
+      name: "Bob",
+      doneCount: 1,
+      totalItems: 3,
+      completedAt: null,
+    });
   });
 
   it("returns 404 for a non-public list", async () => {
@@ -1109,28 +1127,34 @@ describe("GET /api/explore/:listId", () => {
     expect(res.status).toBe(404);
   });
 
-  it("includes participant avatars limited to 6", async () => {
+  it("returns all challengers with per-user progress", async () => {
     mockDb.query.lists.findFirst.mockResolvedValue(publicList);
-    const participants = Array.from({ length: 6 }, (_, i) => ({
-      image: `https://example.com/${i}.jpg`,
+    mockDb.$count.mockResolvedValue(4);
+    const rows = Array.from({ length: 10 }, (_, i) => ({
+      id: `u${i}`,
       name: `User ${i}`,
+      image: null,
+      completedAt: null,
+      doneCount: i,
     }));
     mockDb.select
       .mockReturnValueOnce(
         statsChain({
-          itemCount: 1,
-          participantCount: 10,
+          itemCount: 4,
           ownerName: null,
           ownerImage: null,
         })
       )
-      .mockReturnValueOnce(simpleChain(participants))
-      .mockReturnValueOnce(countChain(10));
+      .mockReturnValueOnce(challengersChain(rows))
+      .mockReturnValueOnce(countChain(10))
+      .mockReturnValueOnce(completedChain([]));
 
     const res = await app.request("/api/explore/l1");
     expect(res.status).toBe(200);
     const body = (await res.json()) as Record<string, unknown>;
-    expect((body.participants as unknown[]).length).toBe(6);
+    const challengers = body.challengers as Array<Record<string, unknown>>;
+    expect(challengers.length).toBe(10);
+    expect(challengers[0].totalItems).toBe(4);
   });
 });
 

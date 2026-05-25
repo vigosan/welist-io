@@ -1779,17 +1779,26 @@ app.get("/explore/:listId", async (c) => {
     .where(eq(lists.id, list.id))
     .groupBy(lists.id, users.name, users.image);
 
-  const participantRows = await db
+  const totalItems = await db.$count(items, eq(items.listId, list.id));
+
+  const challengerRows = await db
     .select({
-      image: users.image,
+      id: users.id,
       name: users.name,
-      userId: participations.userId,
+      image: users.image,
+      completedAt: participations.completedAt,
+      doneCount: sql<number>`cast(coalesce((select count(*) from ${itemProgress} where ${itemProgress.userId} = ${users.id} and ${itemProgress.itemId} in (select id from ${items} where ${items.listId} = ${list.id}) and ${itemProgress.done} = true), 0) as int)`,
     })
     .from(participations)
-    .leftJoin(users, eq(users.id, participations.userId))
-    .where(eq(participations.sourceListId, list.id))
-    .groupBy(participations.userId, users.image, users.name)
-    .limit(6);
+    .innerJoin(users, eq(users.id, participations.userId))
+    .where(
+      and(
+        eq(participations.sourceListId, list.id),
+        eq(participations.role, "challenger")
+      )
+    );
+
+  const challengers = challengerRows.map((r) => ({ ...r, totalItems }));
 
   const totalParticipants = await db
     .select({ count: countDistinct(participations.userId) })
@@ -1828,7 +1837,7 @@ app.get("/explore/:listId", async (c) => {
     owner,
     itemCount: stats?.itemCount ?? 0,
     participantCount: totalParticipants[0]?.count ?? 0,
-    participants: participantRows,
+    challengers,
     completedParticipants: completedRows,
   });
 });

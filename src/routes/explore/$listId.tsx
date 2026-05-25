@@ -1,6 +1,7 @@
 import { signIn, useSession } from "@hono/auth-js/react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { AppNav } from "@/components/AppNav";
+import { ParticipantsPanel } from "@/components/lists/ParticipantsPanel";
 import {
   useAcceptChallenge,
   useExploreDetail,
@@ -50,7 +51,8 @@ function ExploreDetailPage() {
   }
 
   const totalParticipants = detail?.participantCount ?? 0;
-  const shownParticipants = detail?.participants ?? [];
+  const challengers = detail?.challengers ?? [];
+  const shownParticipants = challengers.slice(0, 6);
   const extraParticipants = totalParticipants - shownParticipants.length;
   const completedParticipants = detail?.completedParticipants ?? [];
 
@@ -159,48 +161,28 @@ function ExploreDetailPage() {
           {shownParticipants.length > 0 && (
             <div className="flex items-center gap-1.5">
               <div className="flex -space-x-1.5">
-                {shownParticipants.map((p, i) =>
-                  p.userId ? (
-                    <Link
-                      // biome-ignore lint/suspicious/noArrayIndexKey: participants have no stable ID; names/images may be duplicate
-                      key={i}
-                      to="/u/$userId"
-                      params={{ userId: p.userId }}
-                      className="hover:opacity-80 transition-opacity"
-                    >
-                      {p.image ? (
-                        <img
-                          src={p.image}
-                          alt={p.name ?? ""}
-                          className="w-6 h-6 rounded-full outline outline-2 outline-canvas dark:outline-canvas-dark"
-                        />
-                      ) : (
-                        <div className="w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-700 outline outline-2 outline-canvas dark:outline-canvas-dark flex items-center justify-center">
-                          <span className="text-[8px] text-gray-500 dark:text-gray-400 font-medium">
-                            {(p.name ?? "?")[0]?.toUpperCase()}
-                          </span>
-                        </div>
-                      )}
-                    </Link>
-                  ) : (
-                    // biome-ignore lint/suspicious/noArrayIndexKey: participants have no stable ID; names/images may be duplicate
-                    <span key={i}>
-                      {p.image ? (
-                        <img
-                          src={p.image}
-                          alt={p.name ?? ""}
-                          className="w-6 h-6 rounded-full outline outline-2 outline-canvas dark:outline-canvas-dark"
-                        />
-                      ) : (
-                        <div className="w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-700 outline outline-2 outline-canvas dark:outline-canvas-dark flex items-center justify-center">
-                          <span className="text-[8px] text-gray-500 dark:text-gray-400 font-medium">
-                            {(p.name ?? "?")[0]?.toUpperCase()}
-                          </span>
-                        </div>
-                      )}
-                    </span>
-                  )
-                )}
+                {shownParticipants.map((p) => (
+                  <Link
+                    key={p.id}
+                    to="/u/$userId"
+                    params={{ userId: p.id }}
+                    className="hover:opacity-80 transition-opacity"
+                  >
+                    {p.image ? (
+                      <img
+                        src={p.image}
+                        alt={p.name ?? ""}
+                        className="w-6 h-6 rounded-full outline outline-2 outline-canvas dark:outline-canvas-dark"
+                      />
+                    ) : (
+                      <div className="w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-700 outline outline-2 outline-canvas dark:outline-canvas-dark flex items-center justify-center">
+                        <span className="text-[8px] text-gray-500 dark:text-gray-400 font-medium">
+                          {(p.name ?? "?")[0]?.toUpperCase()}
+                        </span>
+                      </div>
+                    )}
+                  </Link>
+                ))}
               </div>
               {extraParticipants > 0 && (
                 <span className="text-xs text-gray-400 dark:text-gray-500 tabular-nums">
@@ -212,6 +194,14 @@ function ExploreDetailPage() {
             </div>
           )}
         </div>
+
+        {challengers.length > 0 && (
+          <ParticipantsPanel
+            panel="challengers"
+            challengers={challengers}
+            collaborators={[]}
+          />
+        )}
 
         <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 overflow-hidden">
           <div className="px-4 py-3">
