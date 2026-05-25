@@ -360,14 +360,6 @@ export function useAcceptChallenge() {
   });
 }
 
-export function useFeed(enabled = true) {
-  return useQuery({
-    queryKey: queryKeys.feed(),
-    queryFn: () => usersService.getFeed(),
-    enabled,
-    staleTime: 60_000,
-  });
-}
 
 export function useUserProfile(userId: string) {
   return useQuery({

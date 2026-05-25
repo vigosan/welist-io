@@ -2,14 +2,6 @@ const es = {
   nav: {
     explore: "Explorar",
     myLists: "Mis listas",
-    feed: "Feed",
-  },
-  feed: {
-    title: "Tu feed",
-    empty: "Sigue a otras personas para ver aquí sus listas públicas.",
-    emptyCta: "Explorar listas",
-    signIn: "Inicia sesión para ver tu feed.",
-    loading: "Cargando…",
   },
   home: {
     badge: "Listas colaborativas → v2.0",

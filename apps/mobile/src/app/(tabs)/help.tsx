@@ -42,5 +42,5 @@ const SECTIONS = [
   { key: "lists", items: ["create", "addItems", "reorder", "markDone", "tag"] },
   { key: "challenges", items: ["makePublic", "track", "complete"] },
   { key: "collaboration", items: ["enable", "edit", "leave"] },
-  { key: "social", items: ["follow", "feed", "directory"] },
+  { key: "social", items: ["follow", "directory"] },
 ] as const;

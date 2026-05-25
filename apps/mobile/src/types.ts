@@ -78,16 +78,6 @@ export type AppNotification = {
   createdAt: string;
 };
 
-export type FeedItem = {
-  id: string;
-  name: string;
-  slug: string | null;
-  description: string | null;
-  createdAt: string;
-  itemCount: number;
-  owner: { id: string | null; name: string | null; image: string | null };
-};
-
 export type DirectoryUser = {
   id: string;
   name: string | null;

@@ -60,14 +60,6 @@ export function UserMenu() {
               {t("user.myLists")}
             </Link>
             <Link
-              to="/feed"
-              onClick={() => setOpen(false)}
-              data-testid="user-menu-feed"
-              className="block w-full px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors"
-            >
-              {t("nav.feed")}
-            </Link>
-            <Link
               to="/settings"
               onClick={() => setOpen(false)}
               className="block w-full px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors"

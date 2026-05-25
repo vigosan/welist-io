@@ -21,7 +21,6 @@ export const queryKeys = {
   userSearch: (q: string) => ["user-search", q] as const,
   userMe: () => ["user-me"] as const,
   followStatus: (userId: string) => ["follow-status", userId] as const,
-  feed: () => ["feed"] as const,
   notifications: () => ["notifications"] as const,
   stats: () => ["stats"] as const,
   streak: () => ["streak"] as const,

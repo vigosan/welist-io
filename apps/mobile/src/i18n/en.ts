@@ -26,7 +26,6 @@ export const en = {
   nav: {
     home: "Home",
     explore: "Explore",
-    feed: "Feed",
     lists: "My lists",
     community: "Community",
     help: "Help",
@@ -66,7 +65,6 @@ export const en = {
         title: "Social",
         items: {
           follow: "Follow other users",
-          feed: "See activity from people you follow",
           directory: "Discover people in the community",
         },
       },
@@ -89,13 +87,6 @@ export const en = {
     accept: "Accept challenge",
     preview: "Preview",
     itemsAndParticipants: "{{items}} items · {{participants}} participants",
-  },
-  feed: {
-    title: "Feed",
-    subtitle: "Public lists from people you follow.",
-    empty: "Nothing in your feed yet.",
-    browseUsers: "Browse users",
-    itemsCount: "{{count}} items",
   },
   lists: {
     title: "My lists",

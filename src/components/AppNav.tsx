@@ -296,14 +296,6 @@ export function AppNav() {
             {session?.user ? (
               <>
                 <Link
-                  to="/feed"
-                  data-testid="user-menu-feed-mobile"
-                  className="block px-6 py-3 text-sm font-medium text-ink dark:text-paper hover:bg-black/[0.02] dark:hover:bg-white/[0.03] transition-colors duration-150 no-underline"
-                  onClick={closeMobile}
-                >
-                  {t("nav.feed")}
-                </Link>
-                <Link
                   to="/settings"
                   className="block px-6 py-3 text-sm font-medium text-ink dark:text-paper hover:bg-black/[0.02] dark:hover:bg-white/[0.03] transition-colors duration-150 no-underline"
                   onClick={closeMobile}

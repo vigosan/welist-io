@@ -1753,40 +1753,6 @@ app.get("/users/:userId/follow-status", async (c) => {
   return c.json({ isFollowing, followerCount, followingCount });
 });
 
-app.get("/feed", async (c) => {
-  const authUser = getOptionalUser(c);
-  const viewerId = authUser?.session?.user?.id;
-  if (!viewerId) return c.json({ error: "Unauthorized" }, 401);
-  const followed = await db
-    .select({ id: follows.followingId })
-    .from(follows)
-    .where(eq(follows.followerId, viewerId));
-  const ids = followed.map((f) => f.id);
-  if (ids.length === 0) return c.json({ items: [] });
-  const rows = await db
-    .select({
-      id: lists.id,
-      name: lists.name,
-      slug: lists.slug,
-      description: lists.description,
-      createdAt: lists.createdAt,
-      itemCount: sql<number>`cast((select count(*) from ${items} where ${items.listId} = ${lists.id}) as int)`,
-      ownerId: users.id,
-      ownerName: users.name,
-      ownerImage: users.image,
-    })
-    .from(lists)
-    .leftJoin(users, eq(users.id, lists.ownerId))
-    .where(and(eq(lists.public, true), inArray(lists.ownerId, ids)))
-    .orderBy(desc(lists.createdAt))
-    .limit(20);
-  const feedItems = rows.map(({ ownerId, ownerName, ownerImage, ...row }) => ({
-    ...row,
-    owner: { id: ownerId, name: ownerName, image: ownerImage },
-  }));
-  return c.json({ items: feedItems });
-});
-
 async function handleUnsubscribe(c: Context<{ Variables: Variables }>) {
   const token = c.req.query("token");
   if (!token) return c.json({ error: "missing_token" }, 400);
