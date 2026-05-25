@@ -80,8 +80,7 @@ describe("ExploreDetailPage", () => {
     renderDetailPage();
 
     await waitFor(() => {
-      const skeletons = document.querySelectorAll(".animate-pulse");
-      expect(skeletons.length).toBeGreaterThan(0);
+      expect(screen.getAllByTestId("skeleton").length).toBeGreaterThan(0);
     });
     expect(
       screen.queryByTestId("accept-challenge-btn")
