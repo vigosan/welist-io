@@ -1864,10 +1864,17 @@ app.get("/lists/:listId/active-participants", async (c) => {
   if (!(await canViewList(list, userId)))
     return c.json({ error: "Not found" }, 404);
 
-  const total = await db.$count(
+  const participationsCount = await db.$count(
     participations,
     eq(participations.sourceListId, list.id)
   );
+  const owner = list.ownerId
+    ? await db.query.users.findFirst({
+        where: eq(users.id, list.ownerId),
+        columns: { id: true, name: true, image: true },
+      })
+    : null;
+  const ownerSlots = owner ? 1 : 0;
   const participantsRows = await db
     .select({
       id: users.id,
@@ -1878,8 +1885,15 @@ app.get("/lists/:listId/active-participants", async (c) => {
     .innerJoin(users, eq(participations.userId, users.id))
     .where(eq(participations.sourceListId, list.id))
     .orderBy(desc(participations.createdAt))
-    .limit(5);
-  return c.json({ participants: participantsRows, total });
+    .limit(5 - ownerSlots);
+  const filteredParticipants = owner
+    ? participantsRows.filter((p) => p.id !== owner.id)
+    : participantsRows;
+  const total = participationsCount + ownerSlots;
+  const participantsList = owner
+    ? [owner, ...filteredParticipants].slice(0, 5)
+    : participantsRows;
+  return c.json({ participants: participantsList, total });
 });
 
 app.get("/lists/:listId/collaborators", async (c) => {

@@ -3202,10 +3202,10 @@ describe("GET /api/lists/:listId/active-participants", () => {
     expect(res.status).toBe(404);
   });
 
-  it("returns up to 5 participants ordered by createdAt desc with total", async () => {
+  it("returns participants ordered by createdAt desc with total when list has no owner", async () => {
     mockDb.query.lists.findFirst.mockResolvedValue({
       id: "abc",
-      ownerId: "owner",
+      ownerId: null,
       public: true,
       collaborative: false,
     });
@@ -3236,10 +3236,84 @@ describe("GET /api/lists/:listId/active-participants", () => {
     ]);
   });
 
-  it("returns empty participants when none", async () => {
+  it("prepends the owner avatar and counts them in total", async () => {
     mockDb.query.lists.findFirst.mockResolvedValue({
       id: "abc",
       ownerId: "owner",
+      public: true,
+      collaborative: false,
+    });
+    mockDb.query.users.findFirst.mockResolvedValue({
+      id: "owner",
+      name: "Owner",
+      image: "/o.png",
+    });
+    mockDb.$count.mockResolvedValue(2);
+    mockDb.select.mockReturnValue({
+      from: vi.fn().mockReturnThis(),
+      innerJoin: vi.fn().mockReturnThis(),
+      where: vi.fn().mockReturnThis(),
+      orderBy: vi.fn().mockReturnThis(),
+      limit: vi.fn().mockResolvedValue([
+        { id: "u1", name: "Alice", image: null },
+        { id: "u2", name: "Bob", image: null },
+      ]),
+    });
+
+    const res = await app.request("/api/lists/abc/active-participants", {
+      headers: { "x-forwarded-for": "10.0.6.4" },
+    });
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as {
+      participants: { id: string }[];
+      total: number;
+    };
+    expect(body.total).toBe(3);
+    expect(body.participants[0]).toEqual({
+      id: "owner",
+      name: "Owner",
+      image: "/o.png",
+    });
+    expect(body.participants.map((p) => p.id)).toEqual(["owner", "u1", "u2"]);
+  });
+
+  it("does not duplicate the owner when they also have a participation row", async () => {
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "abc",
+      ownerId: "owner",
+      public: true,
+      collaborative: false,
+    });
+    mockDb.query.users.findFirst.mockResolvedValue({
+      id: "owner",
+      name: "Owner",
+      image: null,
+    });
+    mockDb.$count.mockResolvedValue(2);
+    mockDb.select.mockReturnValue({
+      from: vi.fn().mockReturnThis(),
+      innerJoin: vi.fn().mockReturnThis(),
+      where: vi.fn().mockReturnThis(),
+      orderBy: vi.fn().mockReturnThis(),
+      limit: vi.fn().mockResolvedValue([
+        { id: "owner", name: "Owner", image: null },
+        { id: "u1", name: "Alice", image: null },
+      ]),
+    });
+
+    const res = await app.request("/api/lists/abc/active-participants", {
+      headers: { "x-forwarded-for": "10.0.6.5" },
+    });
+    const body = (await res.json()) as {
+      participants: { id: string }[];
+    };
+    expect(body.participants.map((p) => p.id)).toEqual(["owner", "u1"]);
+  });
+
+  it("returns empty participants when none and no owner", async () => {
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "abc",
+      ownerId: null,
       public: true,
       collaborative: false,
     });
