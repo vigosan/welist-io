@@ -67,18 +67,11 @@ function NavLink({
       data-testid={testId}
       className={[
         "cursor-pointer text-[13px] transition-colors duration-150",
-        "no-underline",
+        "no-underline tracking-[0.01em] pb-[2px] border-b",
         isActive
-          ? "text-ink dark:text-paper font-semibold"
-          : "text-gray-500 dark:text-muted font-normal hover:text-ink dark:hover:text-paper",
+          ? "text-ink dark:text-paper font-semibold border-current"
+          : "text-gray-500 dark:text-muted font-normal border-transparent hover:text-ink dark:hover:text-paper",
       ].join(" ")}
-      style={{
-        letterSpacing: "0.01em",
-        borderBottom: isActive
-          ? "1px solid currentColor"
-          : "1px solid transparent",
-        paddingBottom: 2,
-      }}
     >
       {label}
     </Link>
@@ -92,7 +85,6 @@ export function AppNav() {
   const { theme, toggle } = useTheme();
   const [globalSearchOpen, setGlobalSearchOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [loginHov, setLoginHov] = useState(false);
 
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
@@ -118,15 +110,13 @@ export function AppNav() {
         onClose={() => setGlobalSearchOpen(false)}
       />
       <nav
-        className="shrink-0 sticky top-0 z-50 bg-canvas dark:bg-canvas-dark border-b border-black/[0.08] dark:border-white/[0.08]"
-        style={{ height: 52 }}
+        className="shrink-0 sticky top-0 z-50 h-[52px] bg-canvas dark:bg-canvas-dark border-b border-black/[0.08] dark:border-white/[0.08]"
       >
         <div className="flex items-center justify-between px-4 sm:px-12 h-full">
           <Link
             to="/"
             data-testid="nav-logo"
-            className="cursor-pointer text-[15px] font-bold text-ink dark:text-paper hover:opacity-70 transition-opacity duration-150 no-underline"
-            style={{ letterSpacing: "-0.01em" }}
+            className="cursor-pointer text-[15px] font-bold text-ink dark:text-paper hover:opacity-70 transition-opacity duration-150 no-underline tracking-[-0.01em]"
           >
             welist
           </Link>
@@ -171,8 +161,7 @@ export function AppNav() {
               type="button"
               onClick={() => setLanguage(language === "es" ? "en" : "es")}
               data-testid="lang-switcher"
-              className="cursor-pointer text-[11px] font-medium text-gray-500 dark:text-muted hover:text-ink dark:hover:text-paper transition-colors duration-150 tabular-nums"
-              style={{ fontFamily: "'Space Mono', monospace" }}
+              className="cursor-pointer text-[11px] font-medium font-mono text-gray-500 dark:text-muted hover:text-ink dark:hover:text-paper transition-colors duration-150 tabular-nums"
             >
               {language === "es" ? "EN" : "ES"}
             </button>
@@ -188,30 +177,8 @@ export function AppNav() {
               <button
                 type="button"
                 onClick={() => signIn("google")}
-                onMouseEnter={() => setLoginHov(true)}
-                onMouseLeave={() => setLoginHov(false)}
                 data-testid="sign-in-btn"
-                className="cursor-pointer text-[12px] font-medium transition-all duration-150"
-                style={{
-                  padding: "5px 14px",
-                  borderRadius: 6,
-                  border: loginHov
-                    ? "none"
-                    : `1px solid ${theme === "dark" ? "rgba(255,255,255,0.18)" : "rgba(0,0,0,0.20)"}`,
-                  background: loginHov
-                    ? theme === "dark"
-                      ? "#f0ede8"
-                      : "#0c0c0b"
-                    : "transparent",
-                  color: loginHov
-                    ? theme === "dark"
-                      ? "#0c0c0b"
-                      : "#f8f7f5"
-                    : theme === "dark"
-                      ? "#f0ede8"
-                      : "#0c0c0b",
-                  fontWeight: 500,
-                }}
+                className="cursor-pointer text-[12px] font-medium px-3.5 py-[5px] rounded-md border border-black/20 dark:border-white/[0.18] text-ink dark:text-paper bg-transparent hover:bg-ink dark:hover:bg-paper hover:text-canvas dark:hover:text-ink hover:border-transparent transition-all duration-150"
               >
                 {t("user.signIn")}
               </button>
@@ -389,8 +356,7 @@ export function AppNav() {
                   closeMobile();
                 }}
                 data-testid="lang-switcher-mobile"
-                className="cursor-pointer text-[11px] font-medium text-gray-500 dark:text-muted hover:text-ink dark:hover:text-paper transition-colors duration-150 tabular-nums"
-                style={{ fontFamily: "'Space Mono', monospace" }}
+                className="cursor-pointer text-[11px] font-medium font-mono text-gray-500 dark:text-muted hover:text-ink dark:hover:text-paper transition-colors duration-150 tabular-nums"
               >
                 {language === "es" ? "EN" : "ES"}
               </button>
