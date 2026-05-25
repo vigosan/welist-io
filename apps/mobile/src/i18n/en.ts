@@ -12,6 +12,7 @@ export const en = {
     noItems: "No items.",
     error: "Something went wrong",
     retry: "Try again",
+    back: "Back",
   },
   auth: {
     continueGoogle: "Continue with Google",
@@ -113,6 +114,7 @@ export const en = {
     filterDone: "done",
     bulk: "Bulk",
     settings: "Settings",
+    actions: "Actions",
     editItem: "Edit item",
     setLocation: "Set location",
     changeLocation: "Change location",

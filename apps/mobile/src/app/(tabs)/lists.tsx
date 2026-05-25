@@ -1,4 +1,5 @@
 import { useRouter } from "expo-router";
+import { User } from "lucide-react-native";
 import { useMemo, useState } from "react";
 import {
   ActivityIndicator,
@@ -54,10 +55,18 @@ export default function MyListsScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-canvas dark:bg-canvas-dark">
-      <View className="px-6 pt-6 pb-3">
+      <View className="flex-row items-center justify-between px-6 pt-6 pb-3">
         <Text className="text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
           {t("lists.title")}
         </Text>
+        <Pressable
+          onPress={() => router.push("/profile")}
+          accessibilityLabel={t("nav.profile")}
+          hitSlop={8}
+          className="h-9 w-9 items-center justify-center rounded-full border border-gray-200 active:bg-black/[0.05] dark:border-gray-700 dark:active:bg-white/[0.06]"
+        >
+          <User color="#0c0c0b" size={18} />
+        </Pressable>
       </View>
 
       <View className="mx-6 mb-3 flex-row items-center gap-2 rounded-2xl border border-gray-200 bg-white p-1.5 dark:border-gray-700 dark:bg-gray-900">

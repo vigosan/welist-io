@@ -1,4 +1,5 @@
-import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { ChevronLeft, MoreVertical } from "lucide-react-native";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
@@ -206,42 +207,54 @@ export default function ListDetailScreen() {
     );
   };
 
+  const openActions = () => {
+    Alert.alert(list.data?.name ?? "", undefined, [
+      {
+        text: t("list.bulk"),
+        onPress: () =>
+          router.push({
+            pathname: "/lists/[listId]/bulk-add",
+            params: { listId },
+          }),
+      },
+      {
+        text: t("list.settings"),
+        onPress: () =>
+          router.push({
+            pathname: "/lists/[listId]/settings",
+            params: { listId },
+          }),
+      },
+      { text: t("common.cancel"), style: "cancel" },
+    ]);
+  };
+
   return (
     <SafeAreaView className="flex-1 bg-canvas dark:bg-canvas-dark">
-      <Stack.Screen
-        options={{
-          title: list.data?.name ?? "List",
-          headerShown: true,
-          headerRight: () => (
-            <View className="flex-row gap-3 pr-3">
-              <Pressable
-                onPress={() =>
-                  router.push({
-                    pathname: "/lists/[listId]/bulk-add",
-                    params: { listId },
-                  })
-                }
-              >
-                <Text className="text-sm text-gray-900 dark:text-gray-100">
-                  {t("list.bulk")}
-                </Text>
-              </Pressable>
-              <Pressable
-                onPress={() =>
-                  router.push({
-                    pathname: "/lists/[listId]/settings",
-                    params: { listId },
-                  })
-                }
-              >
-                <Text className="text-sm text-gray-900 dark:text-gray-100">
-                  {t("list.settings")}
-                </Text>
-              </Pressable>
-            </View>
-          ),
-        }}
-      />
+      <View className="flex-row items-center justify-between px-2 py-1">
+        <Pressable
+          onPress={() => router.back()}
+          accessibilityLabel={t("common.back")}
+          hitSlop={8}
+          className="h-9 w-9 items-center justify-center rounded-full active:bg-black/[0.05] dark:active:bg-white/[0.06]"
+        >
+          <ChevronLeft color="#0c0c0b" size={24} />
+        </Pressable>
+        <Text
+          numberOfLines={1}
+          className="mx-2 flex-1 text-center text-base font-semibold text-gray-900 dark:text-gray-100"
+        >
+          {list.data?.name ?? ""}
+        </Text>
+        <Pressable
+          onPress={openActions}
+          accessibilityLabel={t("list.actions")}
+          hitSlop={8}
+          className="h-9 w-9 items-center justify-center rounded-full active:bg-black/[0.05] dark:active:bg-white/[0.06]"
+        >
+          <MoreVertical color="#0c0c0b" size={22} />
+        </Pressable>
+      </View>
 
       <View className="mx-6 mt-3 mb-3 flex-row items-center gap-2 rounded-2xl border border-gray-200 bg-white p-1.5 dark:border-gray-700 dark:bg-gray-900">
         <TextInput

@@ -187,19 +187,6 @@ export default function ExploreScreen() {
                 ? ` · ★ ${item.rating.avg?.toFixed(1)} (${item.rating.count})`
                 : ""}
             </Text>
-            {item.previewItems.length > 0 && (
-              <View className="mt-2">
-                {item.previewItems.slice(0, 3).map((t) => (
-                  <Text
-                    key={t}
-                    numberOfLines={1}
-                    className="text-xs text-gray-500 dark:text-gray-400"
-                  >
-                    · {t}
-                  </Text>
-                ))}
-              </View>
-            )}
           </Pressable>
         )}
       />
