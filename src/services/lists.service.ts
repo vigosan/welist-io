@@ -228,7 +228,7 @@ export const usersService = {
     ),
 
   setPassword: (password: string) =>
-    apiClient<{ ok: true }>("/api/auth/set-password", {
+    apiClient<{ ok: true }>("/api/me/password", {
       method: "POST",
       body: JSON.stringify({ password }),
     }),

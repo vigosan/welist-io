@@ -227,7 +227,7 @@ const setPasswordSchema = z.object({
 });
 
 app.post(
-  "/auth/set-password",
+  "/me/password",
   zValidator("json", setPasswordSchema),
   async (c) => {
     const authUser = getOptionalUser(c);
