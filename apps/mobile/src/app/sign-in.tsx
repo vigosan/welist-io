@@ -149,7 +149,7 @@ export default function SignInScreen() {
         <Pressable
           onPress={handleEmailSubmit}
           disabled={submitDisabled}
-          className="mb-6 w-full items-center rounded-xl bg-gray-900 px-6 py-4 active:opacity-80 disabled:opacity-40 dark:bg-gray-100"
+          className="mb-2 w-full items-center rounded-xl bg-gray-900 px-6 py-4 active:opacity-80 disabled:opacity-40 dark:bg-gray-100"
         >
           <Text className="font-medium text-white dark:text-gray-900">
             {submitting
@@ -162,11 +162,19 @@ export default function SignInScreen() {
           </Text>
         </Pressable>
 
+        <View className="my-4 w-full flex-row items-center">
+          <View className="h-px flex-1 bg-gray-200 dark:bg-gray-700" />
+          <Text className="mx-3 text-xs uppercase text-gray-500 dark:text-gray-400">
+            {t("auth.or")}
+          </Text>
+          <View className="h-px flex-1 bg-gray-200 dark:bg-gray-700" />
+        </View>
+
         <Pressable
           onPress={() => handle(signInWithGoogle)}
-          className="mb-3 w-full items-center rounded-xl bg-gray-900 px-6 py-4 active:opacity-80 dark:bg-gray-100"
+          className="mb-3 w-full items-center rounded-xl border border-gray-200 bg-white px-6 py-4 active:opacity-80 dark:border-gray-700 dark:bg-gray-900"
         >
-          <Text className="font-medium text-white dark:text-gray-900">
+          <Text className="font-medium text-gray-900 dark:text-gray-100">
             {t("auth.continueGoogle")}
           </Text>
         </Pressable>

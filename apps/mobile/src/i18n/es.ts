@@ -29,6 +29,7 @@ export const es = {
     createAccount: "Crear cuenta",
     creating: "Creando…",
     emailInUse: "Este email ya está registrado",
+    or: "o",
   },
   nav: {
     home: "Inicio",

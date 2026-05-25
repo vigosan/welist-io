@@ -29,6 +29,7 @@ export const en = {
     createAccount: "Create account",
     creating: "Creating…",
     emailInUse: "Email already in use",
+    or: "or",
   },
   nav: {
     home: "Home",
