@@ -84,7 +84,7 @@ export default function ExploreDetailScreen() {
         {items.isLoading ? (
           <ActivityIndicator />
         ) : items.data?.length ? (
-          items.data.slice(0, 8).map((it) => (
+          items.data.map((it) => (
             <View
               key={it.id}
               className="mb-2 rounded-2xl border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-900"

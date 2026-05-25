@@ -92,7 +92,7 @@ export const es = {
     all: "Todas",
     empty: "Ninguna lista pública coincide.",
     accept: "Aceptar reto",
-    preview: "Vista previa",
+    preview: "Ítems",
     itemsAndParticipants: "{{items}} items · {{participants}} participantes",
   },
   lists: {

@@ -92,7 +92,7 @@ export const en = {
     all: "All",
     empty: "No public lists match.",
     accept: "Accept challenge",
-    preview: "Preview",
+    preview: "Items",
     itemsAndParticipants: "{{items}} items · {{participants}} participants",
   },
   lists: {
