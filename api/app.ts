@@ -2163,26 +2163,40 @@ app.get("/lists/:listId/collaborators", async (c) => {
   });
   if (!list) return c.json({ error: "Not found" }, 404);
   if (list.ownerId !== userId) return c.json({ error: "Forbidden" }, 403);
-  const totalItems = await db.$count(items, eq(items.listId, list.id));
-  const rows = await db
-    .select({
-      id: users.id,
-      name: users.name,
-      image: users.image,
-      role: participations.role,
-      completedAt: participations.completedAt,
-      doneCount: sql<number>`cast(coalesce((select count(*) from ${itemProgress} where ${itemProgress.userId} = ${users.id} and ${itemProgress.itemId} in (select id from ${items} where ${items.listId} = ${list.id}) and ${itemProgress.done} = true), 0) as int)`,
-    })
-    .from(participations)
-    .innerJoin(users, eq(participations.userId, users.id))
-    .where(eq(participations.sourceListId, list.id));
+  const [totalItems, rows, progressCounts] = await Promise.all([
+    db.$count(items, eq(items.listId, list.id)),
+    db
+      .select({
+        id: users.id,
+        name: users.name,
+        image: users.image,
+        role: participations.role,
+        completedAt: participations.completedAt,
+      })
+      .from(participations)
+      .innerJoin(users, eq(participations.userId, users.id))
+      .where(eq(participations.sourceListId, list.id)),
+    db
+      .select({
+        userId: itemProgress.userId,
+        count: sql<number>`cast(count(*) as int)`,
+      })
+      .from(itemProgress)
+      .innerJoin(items, eq(items.id, itemProgress.itemId))
+      .where(and(eq(items.listId, list.id), eq(itemProgress.done, true)))
+      .groupBy(itemProgress.userId),
+  ]);
+  const doneCountByUser = new Map(
+    progressCounts.map((p) => [p.userId, p.count])
+  );
   const collaborators = rows
     .filter((r) => r.role === "collaborator")
-    .map(({ role: _, completedAt: __, doneCount: ___, ...rest }) => rest);
+    .map(({ role: _, completedAt: __, ...rest }) => rest);
   const challengers = rows
     .filter((r) => r.role === "challenger")
     .map(({ role: _, ...rest }) => ({
       ...rest,
+      doneCount: doneCountByUser.get(rest.id) ?? 0,
       totalItems,
     }));
   return c.json({ collaborators, challengers });
