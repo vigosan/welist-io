@@ -59,8 +59,7 @@ export function CollaboratorsManager({ listId, isCollaborative }: Props) {
     ...(ownerId ? [ownerId] : []),
     ...collaborators.map((c) => c.id),
   ]);
-  const results =
-    searchData?.users.filter((u) => !existingIds.has(u.id)) ?? [];
+  const results = searchData?.users.filter((u) => !existingIds.has(u.id)) ?? [];
 
   function handleAdd(userId: string) {
     addCollaborator.mutate(userId, {

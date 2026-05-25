@@ -207,10 +207,7 @@ export function ListSettingsPanel({
         </div>
       )}
 
-      <CollaboratorsManager
-        listId={listId}
-        isCollaborative={isCollaborative}
-      />
+      <CollaboratorsManager listId={listId} isCollaborative={isCollaborative} />
     </div>
   );
 }

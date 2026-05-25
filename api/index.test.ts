@@ -1892,7 +1892,12 @@ describe("GET /api/users/search", () => {
     const res = await app.request("/api/users/search?q=ali", { headers });
     expect(res.status).toBe(200);
     const body = (await res.json()) as {
-      users: { id: string; name: string; email: string; image: string | null }[];
+      users: {
+        id: string;
+        name: string;
+        email: string;
+        image: string | null;
+      }[];
     };
     expect(body.users).toHaveLength(2);
     expect(body.users[0].email).toBe("alice@example.com");

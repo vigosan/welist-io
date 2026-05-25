@@ -55,7 +55,9 @@ describe("ListSettingsPanel category selector", () => {
 
   it("reflects the current category", () => {
     renderPanel({ category: "movies" });
-    expect(screen.getByTestId("category-select")).toHaveTextContent("Películas");
+    expect(screen.getByTestId("category-select")).toHaveTextContent(
+      "Películas"
+    );
   });
 
   it("calls onSetCategory with the chosen category", async () => {
