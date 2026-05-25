@@ -1131,6 +1131,35 @@ app.get("/users", async (c) => {
   });
 });
 
+app.get("/users/search", async (c) => {
+  const authUser = getOptionalUser(c);
+  const viewerId = authUser?.session?.user?.id;
+  if (!viewerId) return c.json({ error: "Unauthorized" }, 401);
+
+  const q = c.req.query("q")?.trim();
+  if (!q || q.length < 2) return c.json({ error: "invalid_query" }, 400);
+
+  const pattern = `%${q}%`;
+  const rows = await db
+    .select({
+      id: users.id,
+      name: users.name,
+      email: users.email,
+      image: users.image,
+    })
+    .from(users)
+    .where(
+      and(
+        eq(users.publicProfile, true),
+        sql`${users.id} <> ${viewerId}`,
+        or(ilike(users.name, pattern), ilike(users.email, pattern))
+      )
+    )
+    .limit(8);
+
+  return c.json({ users: rows });
+});
+
 app.patch(
   "/users/me",
   zValidator(

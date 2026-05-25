@@ -1852,6 +1852,61 @@ describe("GET /api/users", () => {
   });
 });
 
+describe("GET /api/users/search", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockGetAuthUser.mockResolvedValue({ session: { user: { id: "me" } } });
+  });
+
+  it("returns 401 when unauthenticated", async () => {
+    mockGetAuthUser.mockRejectedValue(new Error("no session"));
+    const res = await app.request("/api/users/search?q=ali");
+    expect(res.status).toBe(401);
+  });
+
+  it("returns 400 when q is missing", async () => {
+    const res = await app.request("/api/users/search");
+    expect(res.status).toBe(400);
+  });
+
+  it("returns 400 when q is shorter than 2 characters", async () => {
+    const res = await app.request("/api/users/search?q=a");
+    expect(res.status).toBe(400);
+  });
+
+  it("returns matching public users excluding self", async () => {
+    const chain = {
+      from: vi.fn().mockReturnThis(),
+      where: vi.fn().mockReturnThis(),
+      limit: vi.fn().mockResolvedValue([
+        { id: "u1", name: "Alice", email: "alice@example.com", image: null },
+        { id: "u2", name: "Bob", email: "bob@example.com", image: null },
+      ]),
+    };
+    mockDb.select.mockReturnValue(chain);
+
+    const res = await app.request("/api/users/search?q=ali");
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as {
+      users: { id: string; name: string; email: string; image: string | null }[];
+    };
+    expect(body.users).toHaveLength(2);
+    expect(body.users[0].email).toBe("alice@example.com");
+  });
+
+  it("limits results to 8", async () => {
+    const chain = {
+      from: vi.fn().mockReturnThis(),
+      where: vi.fn().mockReturnThis(),
+      limit: vi.fn().mockResolvedValue([]),
+    };
+    mockDb.select.mockReturnValue(chain);
+
+    await app.request("/api/users/search?q=al");
+    expect(chain.limit).toHaveBeenCalledWith(8);
+  });
+});
+
 describe("PATCH /api/users/me", () => {
   beforeEach(() => {
     vi.clearAllMocks();
