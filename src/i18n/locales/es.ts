@@ -142,7 +142,8 @@ const es = {
     collaborators: "Colaboradores",
     collaboratorsSearchPlaceholder: "Buscar por nombre o correo…",
     collaboratorsEmptySearch: "No se encontraron usuarios",
-    collaboratorsRequireCollaborative: "Activa Acceso = Colaborativa para invitar colaboradores",
+    collaboratorsRequireCollaborative:
+      "Activa Acceso = Colaborativa para invitar colaboradores",
     collaboratorsOwnerBadge: "Propietario",
     collaboratorsRemove: "Quitar colaborador",
   },
@@ -306,6 +307,7 @@ const es = {
     completed: "{{name}} ha completado tu reto «{{list}}»",
     newFollower: "{{name}} ha empezado a seguirte",
     listPurchased: "{{name}} ha comprado tu lista «{{list}}»",
+    addedAsCollaborator: "{{name}} te ha añadido como colaborador a «{{list}}»",
   },
   profile: {
     publicLists: "Listas públicas",

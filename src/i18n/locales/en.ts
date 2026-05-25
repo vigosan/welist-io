@@ -143,7 +143,8 @@ const en: Translations = {
     collaborators: "Collaborators",
     collaboratorsSearchPlaceholder: "Search by name or email…",
     collaboratorsEmptySearch: "No users found",
-    collaboratorsRequireCollaborative: "Set Access = Collaborative to invite collaborators",
+    collaboratorsRequireCollaborative:
+      "Set Access = Collaborative to invite collaborators",
     collaboratorsOwnerBadge: "Owner",
     collaboratorsRemove: "Remove collaborator",
   },
@@ -307,6 +308,7 @@ const en: Translations = {
     completed: "{{name}} completed your challenge «{{list}}»",
     newFollower: "{{name}} started following you",
     listPurchased: "{{name}} bought your list «{{list}}»",
+    addedAsCollaborator: "{{name}} added you as a collaborator to «{{list}}»",
   },
   profile: {
     publicLists: "Public lists",

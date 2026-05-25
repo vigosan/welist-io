@@ -18,6 +18,8 @@ function NotificationItem({ n }: { n: AppNotification }) {
     label = t("notifications.completed", { name, list });
   } else if (n.type === "new_follower") {
     label = t("notifications.newFollower", { name });
+  } else if (n.type === "added_as_collaborator") {
+    label = t("notifications.addedAsCollaborator", { name, list });
   } else {
     label = t("notifications.listPurchased", { name, list });
   }
@@ -53,7 +55,12 @@ function NotificationItem({ n }: { n: AppNotification }) {
     </div>
   );
 
-  const linkTo = n.actionUrl ?? (n.listId ? `/explore/${n.listId}` : null);
+  const defaultLink = n.listId
+    ? n.type === "added_as_collaborator"
+      ? `/lists/${n.listId}`
+      : `/explore/${n.listId}`
+    : null;
+  const linkTo = n.actionUrl ?? defaultLink;
   if (linkTo) {
     return (
       <Link
