@@ -40,8 +40,8 @@ export const en = {
     settings: "Settings",
   },
   help: {
-    title: "How Wilist works",
-    subtitle: "Everything you can do with Wilist, explained.",
+    title: "How Welist works",
+    subtitle: "Everything you can do with Welist, explained.",
     sections: {
       lists: {
         title: "Lists",

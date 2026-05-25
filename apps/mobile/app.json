@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Wilist",
+    "name": "Welist",
     "slug": "wilist",
     "owner": "vigosan",
     "version": "0.1.0",
@@ -11,7 +11,9 @@
     "ios": {
       "bundleIdentifier": "io.wilist.app",
       "supportsTablet": true,
-      "associatedDomains": ["applinks:wilist.io"],
+      "associatedDomains": [
+        "applinks:wilist.io"
+      ],
       "usesAppleSignIn": true
     },
     "android": {
@@ -28,11 +30,26 @@
           "action": "VIEW",
           "autoVerify": true,
           "data": [
-            { "scheme": "https", "host": "wilist.io", "pathPrefix": "/lists/" },
-            { "scheme": "https", "host": "wilist.io", "pathPrefix": "/explore/" },
-            { "scheme": "https", "host": "wilist.io", "pathPrefix": "/u/" }
+            {
+              "scheme": "https",
+              "host": "welist.io",
+              "pathPrefix": "/lists/"
+            },
+            {
+              "scheme": "https",
+              "host": "welist.io",
+              "pathPrefix": "/explore/"
+            },
+            {
+              "scheme": "https",
+              "host": "welist.io",
+              "pathPrefix": "/u/"
+            }
           ],
-          "category": ["BROWSABLE", "DEFAULT"]
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
         }
       ]
     },
@@ -59,6 +76,12 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "90e514a5-f5d0-4c1f-aa05-fda9c93f317c"
+      }
     }
   }
 }

@@ -1,4 +1,3 @@
-import Constants from "expo-constants";
 import * as AppleAuthentication from "expo-apple-authentication";
 import { useState } from "react";
 import {
@@ -12,8 +11,6 @@ import {
 import { useTranslation } from "react-i18next";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useSession } from "@/lib/auth";
-
-const isExpoGo = Constants.appOwnership === "expo";
 
 type Mode = "signIn" | "signUp";
 
@@ -77,7 +74,7 @@ export default function SignInScreen() {
     <SafeAreaView className="flex-1 bg-canvas dark:bg-canvas-dark">
       <View className="flex-1 items-center justify-center px-8">
         <Text className="mb-10 text-5xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
-          Wilist
+          Welist
         </Text>
 
         <View className="mb-5 flex-row rounded-xl border border-gray-200 bg-white p-1 dark:border-gray-700 dark:bg-gray-900">
@@ -165,16 +162,14 @@ export default function SignInScreen() {
           </Text>
         </Pressable>
 
-        {!isExpoGo && (
-          <Pressable
-            onPress={() => handle(signInWithGoogle)}
-            className="mb-3 w-full items-center rounded-xl bg-gray-900 px-6 py-4 active:opacity-80 dark:bg-gray-100"
-          >
-            <Text className="font-medium text-white dark:text-gray-900">
-              {t("auth.continueGoogle")}
-            </Text>
-          </Pressable>
-        )}
+        <Pressable
+          onPress={() => handle(signInWithGoogle)}
+          className="mb-3 w-full items-center rounded-xl bg-gray-900 px-6 py-4 active:opacity-80 dark:bg-gray-100"
+        >
+          <Text className="font-medium text-white dark:text-gray-900">
+            {t("auth.continueGoogle")}
+          </Text>
+        </Pressable>
 
         {Platform.OS === "ios" && (
           <AppleAuthentication.AppleAuthenticationButton
