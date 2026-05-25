@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import { HelpCircle, Settings } from "lucide-react-native";
+import { HelpCircle } from "lucide-react-native";
 import { useMemo, useState } from "react";
 import {
   ActivityIndicator,
@@ -60,24 +60,14 @@ export default function MyListsScreen() {
       <ScreenHeader
         title={t("lists.title")}
         right={
-          <View className="flex-row items-center gap-1">
-            <Pressable
-              onPress={() => router.push("/help")}
-              accessibilityLabel={t("nav.help")}
-              hitSlop={8}
-              className="h-9 w-9 items-center justify-center rounded-full active:bg-black/[0.05] dark:active:bg-white/[0.06]"
-            >
-              <HelpCircle color="#0c0c0b" size={20} />
-            </Pressable>
-            <Pressable
-              onPress={() => router.push("/profile")}
-              accessibilityLabel={t("nav.profile")}
-              hitSlop={8}
-              className="h-9 w-9 items-center justify-center rounded-full active:bg-black/[0.05] dark:active:bg-white/[0.06]"
-            >
-              <Settings color="#0c0c0b" size={20} />
-            </Pressable>
-          </View>
+          <Pressable
+            onPress={() => router.push("/help")}
+            accessibilityLabel={t("nav.help")}
+            hitSlop={8}
+            className="h-9 w-9 items-center justify-center rounded-full active:bg-black/[0.05] dark:active:bg-white/[0.06]"
+          >
+            <HelpCircle color="#0c0c0b" size={20} />
+          </Pressable>
         }
       />
 

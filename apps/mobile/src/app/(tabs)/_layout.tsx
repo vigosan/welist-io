@@ -1,5 +1,10 @@
 import { Tabs } from "expo-router";
-import { Compass, List as ListIcon, Users } from "lucide-react-native";
+import {
+  Compass,
+  List as ListIcon,
+  Settings,
+  Users,
+} from "lucide-react-native";
 import type { ComponentType } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -55,6 +60,19 @@ export default function TabsLayout() {
           tabBarIcon: ({ color, size }) => (
             <TabIcon
               Icon={Users as unknown as ComponentType<IconProps>}
+              color={color}
+              size={size}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="settings"
+        options={{
+          title: t("nav.settings"),
+          tabBarIcon: ({ color, size }) => (
+            <TabIcon
+              Icon={Settings as unknown as ComponentType<IconProps>}
               color={color}
               size={size}
             />

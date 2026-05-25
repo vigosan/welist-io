@@ -81,8 +81,8 @@ export default function ExploreScreen() {
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        contentContainerClassName="px-6 gap-2 pb-3"
-        style={{ flexGrow: 0 }}
+        contentContainerClassName="px-6 gap-2"
+        style={{ flexGrow: 0, flexShrink: 0, height: 44, marginBottom: 12 }}
       >
         <Pressable
           onPress={() => setCategory("")}

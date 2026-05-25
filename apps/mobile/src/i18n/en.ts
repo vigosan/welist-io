@@ -36,6 +36,7 @@ export const en = {
     community: "Community",
     help: "Help",
     profile: "Profile",
+    settings: "Settings",
   },
   help: {
     title: "How Wilist works",

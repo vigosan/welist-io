@@ -14,7 +14,7 @@ import { setStoredTheme, type ThemePreference } from "@/lib/theme";
 const LANGS: SupportedLanguage[] = ["en", "es"];
 const THEMES: ThemePreference[] = ["system", "light", "dark"];
 
-export default function ProfileScreen() {
+export default function SettingsScreen() {
   const { t, i18n } = useTranslation();
   const { session, signOut } = useSession();
   const { colorScheme, setColorScheme } = useColorScheme();
@@ -36,7 +36,7 @@ export default function ProfileScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-canvas dark:bg-canvas-dark" edges={["top"]}>
-      <ScreenHeader title={t("profile.title")} back />
+      <ScreenHeader title={t("nav.settings")} />
       <View className="flex-1 px-5">
         <Text className="text-base text-gray-900 dark:text-gray-100">
           {session.user.name ?? "—"}
