@@ -13,6 +13,7 @@ import {
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { ProgressDonut } from "@/components/ProgressDonut";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { useCreateList, useDeleteList, useMyLists } from "@/hooks/lists";
 import type { MyListItem } from "@/types";
@@ -126,23 +127,26 @@ export default function MyListsScreen() {
               })
             }
             onLongPress={() => confirmDelete(item)}
-            className="mb-2 rounded-2xl border border-gray-200 bg-white p-4 active:opacity-80 dark:border-gray-700 dark:bg-gray-900"
+            className="mb-2 flex-row items-center gap-3 rounded-2xl border border-gray-200 bg-white p-4 active:opacity-80 dark:border-gray-700 dark:bg-gray-900"
           >
-            <Text
-              numberOfLines={1}
-              className="text-base font-medium text-gray-900 dark:text-gray-100"
-            >
-              {item.name}
-            </Text>
-            <Text className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-              {t("lists.progress", {
-                done: item.doneCount,
-                total: item.itemCount,
-              })}
-              {item.participantCount > 0
-                ? ` · ${t("lists.participants", { count: item.participantCount })}`
-                : ""}
-            </Text>
+            <ProgressDonut done={item.doneCount} total={item.itemCount} />
+            <View className="flex-1">
+              <Text
+                numberOfLines={1}
+                className="text-base font-medium text-gray-900 dark:text-gray-100"
+              >
+                {item.name}
+              </Text>
+              <Text className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
+                {t("lists.progress", {
+                  done: item.doneCount,
+                  total: item.itemCount,
+                })}
+                {item.participantCount > 0
+                  ? ` · ${t("lists.participants", { count: item.participantCount })}`
+                  : ""}
+              </Text>
+            </View>
           </Pressable>
         )}
       />
