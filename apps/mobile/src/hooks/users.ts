@@ -119,3 +119,9 @@ export function useSetPassword() {
     },
   });
 }
+
+export function useDeleteAccount() {
+  return useMutation({
+    mutationFn: () => usersService.deleteAccount(),
+  });
+}

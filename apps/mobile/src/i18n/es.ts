@@ -201,6 +201,11 @@ export const es = {
     saving: "Guardando…",
     show: "Mostrar contraseña",
     hide: "Ocultar contraseña",
+    deleteAccount: "Eliminar mi cuenta",
+    deleteAccountConfirmTitle: "¿Eliminar tu cuenta?",
+    deleteAccountConfirmBody:
+      "Se borrarán tu cuenta, tus listas y todos tus datos. Esta acción no se puede deshacer.",
+    deleteAccountFailed: "No se pudo eliminar la cuenta.",
   },
   u: {
     follow: "Seguir",

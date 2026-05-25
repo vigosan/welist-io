@@ -418,6 +418,16 @@ const es = {
       show: "Mostrar contraseña",
       hide: "Ocultar contraseña",
     },
+    dangerZone: {
+      title: "Zona de peligro",
+      deleteAccount: "Eliminar mi cuenta",
+      deleteAccountDescription:
+        "Se borrarán tu cuenta, tus listas y todos tus datos. Esta acción no se puede deshacer.",
+      deleteAccountConfirm:
+        "¿Seguro que quieres eliminar tu cuenta? Esto no se puede deshacer.",
+      deleting: "Eliminando…",
+      failed: "No se pudo eliminar la cuenta.",
+    },
   },
   directory: {
     searchPlaceholder: "Buscar personas…",

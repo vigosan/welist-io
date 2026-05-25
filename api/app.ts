@@ -1504,6 +1504,14 @@ app.get("/users/me", async (c) => {
   });
 });
 
+app.delete("/me", async (c) => {
+  const authUser = getOptionalUser(c);
+  const userId = authUser?.session?.user?.id;
+  if (!userId) return c.json({ error: "Unauthorized" }, 401);
+  await db.delete(users).where(eq(users.id, userId));
+  return c.json({ ok: true });
+});
+
 app.get("/me/streak", async (c) => {
   const authUser = getOptionalUser(c);
   const userId = authUser?.session?.user?.id;

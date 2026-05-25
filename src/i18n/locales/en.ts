@@ -419,6 +419,16 @@ const en: Translations = {
       show: "Show password",
       hide: "Hide password",
     },
+    dangerZone: {
+      title: "Danger zone",
+      deleteAccount: "Delete my account",
+      deleteAccountDescription:
+        "Your account, your lists and all your data will be removed. This cannot be undone.",
+      deleteAccountConfirm:
+        "Are you sure you want to delete your account? This cannot be undone.",
+      deleting: "Deleting…",
+      failed: "Could not delete account.",
+    },
   },
   directory: {
     searchPlaceholder: "Search people…",

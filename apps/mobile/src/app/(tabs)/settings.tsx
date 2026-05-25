@@ -2,6 +2,7 @@ import { Eye, EyeOff } from "lucide-react-native";
 import { useColorScheme } from "nativewind";
 import { useState } from "react";
 import {
+  Alert,
   Pressable,
   ScrollView,
   Switch,
@@ -14,6 +15,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Avatar } from "@/components/Avatar";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import {
+  useDeleteAccount,
   useSetPassword,
   useUpdateProfile,
   useUserMe,
@@ -37,6 +39,7 @@ export default function SettingsScreen() {
   const me = useUserMe(enabled);
   const updateProfile = useUpdateProfile();
   const setPasswordMutation = useSetPassword();
+  const deleteAccount = useDeleteAccount();
 
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
@@ -247,13 +250,39 @@ export default function SettingsScreen() {
           </View>
         </Card>
 
-        <View className="mt-6">
+        <View className="mt-6 gap-3">
           <Pressable
             onPress={signOut}
             className="items-center rounded-2xl border border-red-200 bg-white px-4 py-3 active:bg-red-50 dark:border-red-900 dark:bg-gray-900 dark:active:bg-red-950"
           >
             <Text className="text-sm font-medium text-red-600 dark:text-red-400">
               {t("common.signOut")}
+            </Text>
+          </Pressable>
+          <Pressable
+            onPress={() =>
+              Alert.alert(
+                t("profile.deleteAccountConfirmTitle"),
+                t("profile.deleteAccountConfirmBody"),
+                [
+                  { text: t("common.cancel"), style: "cancel" },
+                  {
+                    text: t("profile.deleteAccount"),
+                    style: "destructive",
+                    onPress: () =>
+                      deleteAccount.mutate(undefined, {
+                        onSuccess: () => signOut(),
+                        onError: () =>
+                          Alert.alert(t("profile.deleteAccountFailed")),
+                      }),
+                  },
+                ]
+              )
+            }
+            className="items-center rounded-2xl px-4 py-3"
+          >
+            <Text className="text-xs font-medium text-red-600 dark:text-red-400">
+              {t("profile.deleteAccount")}
             </Text>
           </Pressable>
         </View>

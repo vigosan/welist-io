@@ -58,4 +58,7 @@ export const usersService = {
       method: "POST",
       body: JSON.stringify({ password }),
     }),
+
+  deleteAccount: () =>
+    apiFetch<{ ok: true }>("/me", { method: "DELETE" }),
 };

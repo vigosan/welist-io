@@ -200,6 +200,11 @@ export const en = {
     saving: "Saving…",
     show: "Show password",
     hide: "Hide password",
+    deleteAccount: "Delete my account",
+    deleteAccountConfirmTitle: "Delete your account?",
+    deleteAccountConfirmBody:
+      "Your account, your lists and all your data will be removed. This cannot be undone.",
+    deleteAccountFailed: "Could not delete account.",
   },
   u: {
     follow: "Follow",

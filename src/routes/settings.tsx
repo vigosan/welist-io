@@ -1,4 +1,4 @@
-import { useSession } from "@hono/auth-js/react";
+import { signOut, useSession } from "@hono/auth-js/react";
 import { useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link, useSearch } from "@tanstack/react-router";
 import { Eye, EyeOff } from "lucide-react";
@@ -8,6 +8,7 @@ import { useTranslation } from "react-i18next";
 import { z } from "zod";
 import { AppNav } from "@/components/AppNav";
 import {
+  useDeleteAccount,
   useSetPassword,
   useUpdateProfile,
   useUserMe,
@@ -45,6 +46,7 @@ function SettingsPage() {
   const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const setPasswordMutation = useSetPassword();
+  const deleteAccount = useDeleteAccount();
   const hasPassword = userMe?.hasPassword ?? false;
 
   async function handleSavePassword(e: React.FormEvent) {
@@ -379,6 +381,40 @@ function SettingsPage() {
                   ? "Continuar configuración"
                   : "Conectar Stripe"}
             </button>
+          )}
+        </section>
+
+        <section className="bg-white dark:bg-white/[0.02] border border-red-200 dark:border-red-900 rounded-2xl p-5 flex flex-col gap-4">
+          <div>
+            <p className="text-sm font-semibold text-red-700 dark:text-red-400">
+              {t("settings.dangerZone.title")}
+            </p>
+            <p className="text-xs text-gray-500 dark:text-[#a0a09c] mt-0.5 leading-relaxed">
+              {t("settings.dangerZone.deleteAccountDescription")}
+            </p>
+          </div>
+          <button
+            type="button"
+            data-testid="delete-account-button"
+            disabled={deleteAccount.isPending}
+            onClick={() => {
+              if (!window.confirm(t("settings.dangerZone.deleteAccountConfirm"))) {
+                return;
+              }
+              deleteAccount.mutate(undefined, {
+                onSuccess: () => signOut({ callbackUrl: "/" }),
+              });
+            }}
+            className="cursor-pointer self-start px-4 py-2 text-sm font-medium bg-red-600 text-white rounded-xl hover:bg-red-700 disabled:opacity-40 transition-[opacity,transform] duration-150 active:scale-[0.96]"
+          >
+            {deleteAccount.isPending
+              ? t("settings.dangerZone.deleting")
+              : t("settings.dangerZone.deleteAccount")}
+          </button>
+          {deleteAccount.isError && (
+            <p className="text-xs text-red-600 dark:text-red-400">
+              {t("settings.dangerZone.failed")}
+            </p>
           )}
         </section>
       </main>
