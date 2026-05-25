@@ -1,10 +1,11 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { MoreVertical } from "lucide-react-native";
+import { ListFilter, MoreVertical } from "lucide-react-native";
 import * as Clipboard from "expo-clipboard";
 import * as Haptics from "expo-haptics";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
+  ActionSheetIOS,
   ActivityIndicator,
   Alert,
   Image,
@@ -58,6 +59,7 @@ export default function ListDetailScreen() {
   const router = useRouter();
   const [newText, setNewText] = useState("");
   const [filter, setFilter] = useState<FilterMode>("all");
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const [editing, setEditing] = useState<Item | null>(null);
   const [editingText, setEditingText] = useState("");
   const [locating, setLocating] = useState<Item | null>(null);
@@ -283,24 +285,51 @@ export default function ListDetailScreen() {
   };
 
   const openActions = () => {
+    const goSettings = () =>
+      router.push({
+        pathname: "/lists/[listId]/settings",
+        params: { listId },
+      });
+    const actions = [
+      { label: t("list.randomItem"), run: handleRandom },
+      { label: t("list.shareLink"), run: handleShare },
+      { label: t("list.copyPlain"), run: handleCopyPlain },
+      { label: t("list.settings"), run: goSettings },
+      {
+        label: t("list.deleteList"),
+        run: handleDelete,
+        destructive: true,
+      },
+    ];
+    if (Platform.OS === "ios") {
+      const options = [
+        ...actions.map((a) => a.label),
+        t("common.cancel"),
+      ];
+      const destructiveIdx = actions.findIndex((a) => a.destructive);
+      ActionSheetIOS.showActionSheetWithOptions(
+        {
+          title: list.data?.name ?? "",
+          options,
+          cancelButtonIndex: options.length - 1,
+          destructiveButtonIndex: destructiveIdx,
+        },
+        (idx) => {
+          if (idx === undefined || idx === options.length - 1) return;
+          actions[idx]?.run();
+        }
+      );
+      return;
+    }
     Alert.alert(list.data?.name ?? "", undefined, [
-      { text: t("list.randomItem"), onPress: handleRandom },
-      { text: t("list.shareLink"), onPress: handleShare },
-      { text: t("list.copyPlain"), onPress: handleCopyPlain },
-      {
-        text: t("list.settings"),
-        onPress: () =>
-          router.push({
-            pathname: "/lists/[listId]/settings",
-            params: { listId },
-          }),
-      },
-      {
-        text: t("list.deleteList"),
-        style: "destructive",
-        onPress: handleDelete,
-      },
-      { text: t("common.cancel"), style: "cancel" },
+      ...actions.map((a) => ({
+        text: a.label,
+        onPress: a.run,
+        style: a.destructive
+          ? ("destructive" as const)
+          : ("default" as const),
+      })),
+      { text: t("common.cancel"), style: "cancel" as const },
     ]);
   };
 
@@ -310,14 +339,33 @@ export default function ListDetailScreen() {
         title={list.data?.name ?? ""}
         back
         right={
-          <Pressable
-            onPress={openActions}
-            accessibilityLabel={t("list.actions")}
-            hitSlop={8}
-            className="h-9 w-9 items-center justify-center rounded-full active:bg-black/[0.05] dark:active:bg-white/[0.06]"
-          >
-            <MoreVertical color="#0c0c0b" size={22} />
-          </Pressable>
+          <View className="flex-row items-center gap-1">
+            <Pressable
+              onPress={() => setFiltersOpen((v) => !v)}
+              accessibilityLabel={t("list.filterAll")}
+              hitSlop={8}
+              className={`h-9 w-9 items-center justify-center rounded-full active:bg-black/[0.05] dark:active:bg-white/[0.06] ${
+                filtersOpen || filter !== "all"
+                  ? "bg-gray-900 dark:bg-gray-100"
+                  : ""
+              }`}
+            >
+              <ListFilter
+                color={
+                  filtersOpen || filter !== "all" ? "#ffffff" : "#0c0c0b"
+                }
+                size={18}
+              />
+            </Pressable>
+            <Pressable
+              onPress={openActions}
+              accessibilityLabel={t("list.actions")}
+              hitSlop={8}
+              className="h-9 w-9 items-center justify-center rounded-full active:bg-black/[0.05] dark:active:bg-white/[0.06]"
+            >
+              <MoreVertical color="#0c0c0b" size={22} />
+            </Pressable>
+          </View>
         }
       />
 
@@ -359,6 +407,7 @@ export default function ListDetailScreen() {
         </View>
       )}
 
+      {filtersOpen && (
       <View className="mx-6 mb-3 flex-row gap-2">
         {FILTERS.map((f) => {
           const active = filter === f;
@@ -391,6 +440,7 @@ export default function ListDetailScreen() {
           );
         })}
       </View>
+      )}
 
       <DraggableFlatList
         data={visible}
