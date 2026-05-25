@@ -59,6 +59,42 @@ export function useUpdateItem(listId: string) {
   });
 }
 
+export function useSetItemLocation(listId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      itemId,
+      coords,
+    }: {
+      itemId: string;
+      coords:
+        | { latitude: string; longitude: string; placeName: string }
+        | null;
+    }) => itemsService.setLocation(listId, itemId, coords),
+    onMutate: async ({ itemId, coords }) => {
+      await qc.cancelQueries({ queryKey: ["items", listId] });
+      const previous = qc.getQueryData<Item[]>(["items", listId]);
+      qc.setQueryData<Item[]>(["items", listId], (old) =>
+        old?.map((it) =>
+          it.id === itemId
+            ? {
+                ...it,
+                latitude: coords?.latitude ?? null,
+                longitude: coords?.longitude ?? null,
+                placeName: coords?.placeName ?? null,
+              }
+            : it
+        )
+      );
+      return { previous };
+    },
+    onError: (_err, _vars, ctx) => {
+      if (ctx?.previous) qc.setQueryData(["items", listId], ctx.previous);
+    },
+    onSettled: () => qc.invalidateQueries({ queryKey: ["items", listId] }),
+  });
+}
+
 export function useBulkAddItems(listId: string) {
   const qc = useQueryClient();
   return useMutation({

@@ -3,7 +3,9 @@ import { useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  Linking,
   Modal,
+  Platform,
   Pressable,
   Text,
   TextInput,
@@ -14,11 +16,13 @@ import DraggableFlatList, {
   ScaleDecorator,
 } from "react-native-draggable-flatlist";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { LocationPickerModal } from "@/components/LocationPickerModal";
 import {
   useAddItem,
   useDeleteItem,
   useItems,
   useReorderItems,
+  useSetItemLocation,
   useToggleItem,
   useUpdateItem,
 } from "@/hooks/items";
@@ -26,6 +30,7 @@ import { useActiveParticipants, useList } from "@/hooks/lists";
 import { useRateList } from "@/hooks/rating";
 import { useSession } from "@/lib/auth";
 import { type FilterMode, filterItems } from "@/lib/items-filter";
+import { mapsUrl } from "@/lib/maps";
 import type { Item } from "@/types";
 import { StarRating } from "@/components/StarRating";
 
@@ -38,6 +43,7 @@ export default function ListDetailScreen() {
   const [filter, setFilter] = useState<FilterMode>("all");
   const [editing, setEditing] = useState<Item | null>(null);
   const [editingText, setEditingText] = useState("");
+  const [locating, setLocating] = useState<Item | null>(null);
 
   const { session } = useSession();
   const list = useList(listId);
@@ -47,6 +53,7 @@ export default function ListDetailScreen() {
   const update = useUpdateItem(listId);
   const remove = useDeleteItem(listId);
   const reorder = useReorderItems(listId);
+  const setLocation = useSetItemLocation(listId);
   const rate = useRateList(listId);
   const participants = useActiveParticipants(listId);
 
@@ -70,8 +77,9 @@ export default function ListDetailScreen() {
     });
   };
 
-  const openItemMenu = (item: Item) =>
-    Alert.alert(item.text, undefined, [
+  const openItemMenu = (item: Item) => {
+    const hasCoords = !!(item.latitude && item.longitude && item.placeName);
+    const buttons: Parameters<typeof Alert.alert>[2] = [
       {
         text: "Edit",
         onPress: () => {
@@ -80,12 +88,39 @@ export default function ListDetailScreen() {
         },
       },
       {
-        text: "Delete",
-        style: "destructive",
-        onPress: () => remove.mutate(item.id),
+        text: hasCoords ? "Change location" : "Set location",
+        onPress: () => setLocating(item),
       },
-      { text: "Cancel", style: "cancel" },
-    ]);
+    ];
+    if (hasCoords) {
+      buttons.push({
+        text: "Open in Maps",
+        onPress: () => {
+          const platform = Platform.OS === "android" ? "android" : "ios";
+          Linking.openURL(
+            mapsUrl(
+              {
+                // biome-ignore lint/style/noNonNullAssertion: gated by hasCoords
+                latitude: item.latitude!,
+                // biome-ignore lint/style/noNonNullAssertion: gated by hasCoords
+                longitude: item.longitude!,
+                // biome-ignore lint/style/noNonNullAssertion: gated by hasCoords
+                placeName: item.placeName!,
+              },
+              platform
+            )
+          );
+        },
+      });
+    }
+    buttons.push({
+      text: "Delete",
+      style: "destructive",
+      onPress: () => remove.mutate(item.id),
+    });
+    buttons.push({ text: "Cancel", style: "cancel" });
+    Alert.alert(item.text, undefined, buttons);
+  };
 
   const saveEdit = () => {
     if (!editing) return;
@@ -132,15 +167,25 @@ export default function ListDetailScreen() {
                 </Text>
               )}
             </View>
-            <Text
-              className={`flex-1 text-base ${
-                item.done
-                  ? "text-gray-400 line-through dark:text-gray-600"
-                  : "text-gray-900 dark:text-gray-100"
-              }`}
-            >
-              {item.text}
-            </Text>
+            <View className="flex-1">
+              <Text
+                className={`text-base ${
+                  item.done
+                    ? "text-gray-400 line-through dark:text-gray-600"
+                    : "text-gray-900 dark:text-gray-100"
+                }`}
+              >
+                {item.text}
+              </Text>
+              {item.placeName && (
+                <Text
+                  numberOfLines={1}
+                  className="mt-0.5 text-xs text-gray-500 dark:text-gray-400"
+                >
+                  📍 {item.placeName}
+                </Text>
+              )}
+            </View>
           </Pressable>
 
           {dragEnabled && (
@@ -318,6 +363,31 @@ export default function ListDetailScreen() {
           </View>
         </View>
       </Modal>
+
+      <LocationPickerModal
+        visible={locating !== null}
+        currentPlaceName={locating?.placeName ?? null}
+        onClose={() => setLocating(null)}
+        onSelect={(place) => {
+          if (!locating) return;
+          setLocation.mutate({
+            itemId: locating.id,
+            coords: {
+              latitude: place.latitude,
+              longitude: place.longitude,
+              placeName: place.name,
+            },
+          });
+        }}
+        onRemove={
+          locating?.placeName
+            ? () => {
+                if (!locating) return;
+                setLocation.mutate({ itemId: locating.id, coords: null });
+              }
+            : undefined
+        }
+      />
     </SafeAreaView>
   );
 }

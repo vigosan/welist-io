@@ -21,6 +21,20 @@ export const itemsService = {
       body: JSON.stringify({ text }),
     }),
 
+  setLocation: (
+    listId: string,
+    itemId: string,
+    coords:
+      | { latitude: string; longitude: string; placeName: string }
+      | null
+  ) =>
+    apiFetch<Item>(`/lists/${listId}/items/${itemId}`, {
+      method: "PATCH",
+      body: JSON.stringify(
+        coords ?? { latitude: null, longitude: null, placeName: null }
+      ),
+    }),
+
   delete: (listId: string, itemId: string) =>
     apiFetch<void>(`/lists/${listId}/items/${itemId}`, { method: "DELETE" }),
 
