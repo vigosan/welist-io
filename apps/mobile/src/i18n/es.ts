@@ -13,6 +13,7 @@ export const es = {
     error: "Algo ha ido mal",
     retry: "Reintentar",
     back: "Atrás",
+    search: "Buscar",
   },
   auth: {
     continueGoogle: "Continuar con Google",

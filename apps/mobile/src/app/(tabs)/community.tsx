@@ -1,4 +1,5 @@
 import { useRouter } from "expo-router";
+import { Search } from "lucide-react-native";
 import { useMemo, useState } from "react";
 import {
   ActivityIndicator,
@@ -20,8 +21,10 @@ export default function UsersScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const [q, setQ] = useState("");
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const debouncedQ = useDebouncedValue(q, 300);
   const query = useUserDirectory(debouncedQ || undefined);
+  const isFiltered = q.length > 0;
 
   const users = useMemo(() => {
     const list = query.data?.pages.flatMap((p) => p.users) ?? [];
@@ -36,18 +39,38 @@ export default function UsersScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-canvas dark:bg-canvas-dark" edges={["top"]}>
-      <ScreenHeader title={t("nav.community")} />
+      <ScreenHeader
+        title={t("nav.community")}
+        right={
+          <Pressable
+            onPress={() => setFiltersOpen((v) => !v)}
+            accessibilityLabel={t("common.search")}
+            hitSlop={8}
+            className={`h-9 w-9 items-center justify-center rounded-full active:bg-black/[0.05] dark:active:bg-white/[0.06] ${
+              filtersOpen || isFiltered ? "bg-gray-900 dark:bg-gray-100" : ""
+            }`}
+          >
+            <Search
+              color={filtersOpen || isFiltered ? "#ffffff" : "#0c0c0b"}
+              size={18}
+            />
+          </Pressable>
+        }
+      />
 
-      <View className="mx-6 mb-3 flex-row items-center gap-2 rounded-2xl border border-gray-200 bg-white p-1.5 dark:border-gray-700 dark:bg-gray-900">
-        <TextInput
-          value={q}
-          onChangeText={setQ}
-          placeholder={t("users.search")}
-          placeholderTextColor="#a0a09c"
-          autoCapitalize="none"
-          className="flex-1 px-3 py-2 text-sm text-gray-900 dark:text-gray-100"
-        />
-      </View>
+      {filtersOpen && (
+        <View className="mx-6 mb-3 flex-row items-center gap-2 rounded-2xl border border-gray-200 bg-white p-1.5 dark:border-gray-700 dark:bg-gray-900">
+          <TextInput
+            value={q}
+            onChangeText={setQ}
+            placeholder={t("users.search")}
+            placeholderTextColor="#a0a09c"
+            autoCapitalize="none"
+            autoFocus
+            className="flex-1 px-3 py-2 text-sm text-gray-900 dark:text-gray-100"
+          />
+        </View>
+      )}
 
       <FlatList
         data={users}

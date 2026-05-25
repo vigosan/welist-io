@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import { HelpCircle } from "lucide-react-native";
+import { HelpCircle, Search } from "lucide-react-native";
 import { useMemo, useState } from "react";
 import {
   ActivityIndicator,
@@ -31,6 +31,9 @@ export default function MyListsScreen() {
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<MyListsSort>("recent");
   const [visibility, setVisibility] = useState<MyListsVisibility>("all");
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const isFiltered =
+    search.length > 0 || sort !== "recent" || visibility !== "all";
   const debouncedSearch = useDebouncedValue(search, 300);
   const query = useMyLists(debouncedSearch || undefined, sort, visibility);
   const create = useCreateList();
@@ -73,14 +76,33 @@ export default function MyListsScreen() {
       <ScreenHeader
         title={t("lists.title")}
         right={
-          <Pressable
-            onPress={() => router.push("/help")}
-            accessibilityLabel={t("nav.help")}
-            hitSlop={8}
-            className="h-9 w-9 items-center justify-center rounded-full active:bg-black/[0.05] dark:active:bg-white/[0.06]"
-          >
-            <HelpCircle color="#0c0c0b" size={20} />
-          </Pressable>
+          <View className="flex-row items-center gap-1">
+            <Pressable
+              onPress={() => setFiltersOpen((v) => !v)}
+              accessibilityLabel={t("common.search")}
+              hitSlop={8}
+              className={`h-9 w-9 items-center justify-center rounded-full active:bg-black/[0.05] dark:active:bg-white/[0.06] ${
+                filtersOpen || isFiltered
+                  ? "bg-gray-900 dark:bg-gray-100"
+                  : ""
+              }`}
+            >
+              <Search
+                color={
+                  filtersOpen || isFiltered ? "#ffffff" : "#0c0c0b"
+                }
+                size={18}
+              />
+            </Pressable>
+            <Pressable
+              onPress={() => router.push("/help")}
+              accessibilityLabel={t("nav.help")}
+              hitSlop={8}
+              className="h-9 w-9 items-center justify-center rounded-full active:bg-black/[0.05] dark:active:bg-white/[0.06]"
+            >
+              <HelpCircle color="#0c0c0b" size={20} />
+            </Pressable>
+          </View>
         }
       />
 
@@ -105,18 +127,21 @@ export default function MyListsScreen() {
         </Pressable>
       </View>
 
-      <View className="mx-6 mb-3 flex-row items-center gap-2 rounded-2xl border border-gray-200 bg-white p-1.5 dark:border-gray-700 dark:bg-gray-900">
-        <TextInput
-          value={search}
-          onChangeText={setSearch}
-          placeholder={t("lists.searchPlaceholder")}
-          placeholderTextColor="#a0a09c"
-          autoCapitalize="none"
-          className="flex-1 px-3 py-2 text-sm text-gray-900 dark:text-gray-100"
-        />
-      </View>
+      {filtersOpen && (
+        <>
+          <View className="mx-6 mb-3 flex-row items-center gap-2 rounded-2xl border border-gray-200 bg-white p-1.5 dark:border-gray-700 dark:bg-gray-900">
+            <TextInput
+              value={search}
+              onChangeText={setSearch}
+              placeholder={t("lists.searchPlaceholder")}
+              placeholderTextColor="#a0a09c"
+              autoCapitalize="none"
+              autoFocus
+              className="flex-1 px-3 py-2 text-sm text-gray-900 dark:text-gray-100"
+            />
+          </View>
 
-      <View className="mx-6 mb-3 flex-row gap-1 rounded-xl bg-gray-100 p-1 dark:bg-gray-800">
+          <View className="mx-6 mb-3 flex-row gap-1 rounded-xl bg-gray-100 p-1 dark:bg-gray-800">
         {VISIBILITIES.map((v) => {
           const active = visibility === v;
           return (
@@ -183,6 +208,8 @@ export default function MyListsScreen() {
           );
         })}
       </ScrollView>
+        </>
+      )}
 
       <FlatList
         data={lists}
