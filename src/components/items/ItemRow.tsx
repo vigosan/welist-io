@@ -268,7 +268,7 @@ export const ItemRow = memo(
               </form>
             </div>
           ) : (
-            <div className="flex items-center gap-1.5 min-w-0">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-y-0.5 sm:gap-x-1.5 min-w-0">
               {/* biome-ignore lint/a11y/noStaticElementInteractions: link click passthrough */}
               {/* biome-ignore lint/a11y/useKeyWithClickEvents: link click passthrough */}
               <span
@@ -280,7 +280,7 @@ export const ItemRow = memo(
                   if ((e.target as HTMLElement).tagName === "A")
                     e.stopPropagation();
                 }}
-                className={`text-sm font-medium cursor-default select-none leading-snug truncate ${
+                className={`text-sm font-medium cursor-default select-none leading-snug sm:truncate ${
                   item.done
                     ? "line-through text-gray-400 dark:text-gray-600"
                     : "text-gray-800 dark:text-gray-200"
@@ -288,50 +288,52 @@ export const ItemRow = memo(
               >
                 {renderInlineMarkdown(display || item.text)}
               </span>
-              {tags.length > 0 &&
-                tags.map((tag) => (
-                  <button
-                    type="button"
-                    key={tag}
-                    data-testid={`item-tag-${item.id}-${tag}`}
-                    onClick={() => onTagClick?.(tag)}
-                    className={`cursor-pointer inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium transition-colors active:scale-[0.96] ${
-                      activeTag === tag
-                        ? "bg-gray-900 text-white dark:bg-white dark:text-gray-900"
-                        : "bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-gray-600 hover:text-gray-700 dark:hover:text-gray-200"
-                    }`}
-                  >
-                    #{tag}
-                  </button>
-                ))}
-              {places.length > 0 &&
-                places.map((place) => (
-                  <button
-                    type="button"
-                    key={place}
-                    data-testid={`item-place-${item.id}-${place}`}
-                    onClick={() => onPlaceClick?.(place)}
-                    className={`cursor-pointer inline-flex items-center gap-0.5 rounded-full px-2 py-0.5 text-xs font-medium transition-colors active:scale-[0.96] ${
-                      activePlace === place
-                        ? "bg-gray-900 text-white dark:bg-white dark:text-gray-900"
-                        : "bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-gray-600 hover:text-gray-700 dark:hover:text-gray-200"
-                    }`}
-                  >
-                    <svg
-                      aria-hidden="true"
-                      className="w-2.5 h-2.5 shrink-0"
-                      fill="currentColor"
-                      viewBox="0 0 24 24"
+              {(tags.length > 0 || places.length > 0) && (
+                <div className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5">
+                  {tags.map((tag) => (
+                    <button
+                      type="button"
+                      key={tag}
+                      data-testid={`item-tag-${item.id}-${tag}`}
+                      onClick={() => onTagClick?.(tag)}
+                      className={`cursor-pointer inline-flex items-center rounded-full sm:px-2 sm:py-0.5 text-[11px] sm:text-xs font-medium transition-colors active:scale-[0.96] ${
+                        activeTag === tag
+                          ? "sm:bg-gray-900 sm:text-white sm:dark:bg-white sm:dark:text-gray-900 text-gray-900 dark:text-gray-100"
+                          : "text-gray-500 dark:text-gray-400 sm:bg-gray-200 sm:dark:bg-gray-700 hover:text-gray-700 dark:hover:text-gray-200 sm:hover:bg-gray-300 sm:dark:hover:bg-gray-600"
+                      }`}
                     >
-                      <path
-                        fillRule="evenodd"
-                        d="M11.54 22.351l.07.04.028.016a.76.76 0 00.723 0l.028-.015.07-.041a16.975 16.975 0 001.144-.742 19.58 19.58 0 002.683-2.282c1.944-2.007 3.864-5.175 3.864-9.15C20.15 5.413 16.415 2 12 2 7.585 2 3.85 5.413 3.85 10.174c0 3.975 1.92 7.143 3.864 9.15a19.58 19.58 0 002.683 2.282 16.975 16.975 0 001.144.742zM12 13.5a3.5 3.5 0 100-7 3.5 3.5 0 000 7z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                    {place}
-                  </button>
-                ))}
+                      #{tag}
+                    </button>
+                  ))}
+                  {places.map((place) => (
+                    <button
+                      type="button"
+                      key={place}
+                      data-testid={`item-place-${item.id}-${place}`}
+                      onClick={() => onPlaceClick?.(place)}
+                      className={`cursor-pointer inline-flex items-center gap-0.5 rounded-full sm:px-2 sm:py-0.5 text-[11px] sm:text-xs font-medium transition-colors active:scale-[0.96] ${
+                        activePlace === place
+                          ? "sm:bg-gray-900 sm:text-white sm:dark:bg-white sm:dark:text-gray-900 text-gray-900 dark:text-gray-100"
+                          : "text-gray-500 dark:text-gray-400 sm:bg-gray-200 sm:dark:bg-gray-700 hover:text-gray-700 dark:hover:text-gray-200 sm:hover:bg-gray-300 sm:dark:hover:bg-gray-600"
+                      }`}
+                    >
+                      <svg
+                        aria-hidden="true"
+                        className="w-2.5 h-2.5 shrink-0"
+                        fill="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M11.54 22.351l.07.04.028.016a.76.76 0 00.723 0l.028-.015.07-.041a16.975 16.975 0 001.144-.742 19.58 19.58 0 002.683-2.282c1.944-2.007 3.864-5.175 3.864-9.15C20.15 5.413 16.415 2 12 2 7.585 2 3.85 5.413 3.85 10.174c0 3.975 1.92 7.143 3.864 9.15a19.58 19.58 0 002.683 2.282 16.975 16.975 0 001.144.742zM12 13.5a3.5 3.5 0 100-7 3.5 3.5 0 000 7z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      {place}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </div>
