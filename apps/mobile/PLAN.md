@@ -305,11 +305,6 @@ Cada fase termina con un build instalable en simulador. **No avanzamos a la sigu
 - [ ] Configurar handler en `app/_layout.tsx` para procesar deep links pendientes al arrancar.
 - [ ] Crear página fallback web que muestre "Abrir en la app" si la app está instalada (smart banner).
 
-#### Búsqueda global
-- [ ] Command palette nativo (modal full-screen accesible desde nav bar o gesture):
-  - Buscador unificado: listas mías, usuarios, listas públicas.
-  - Atajos: "Crear lista", "Ir a settings", "Logout".
-
 #### Criterios de éxito
 - Compra completa de una lista de prueba ($1) en Stripe test mode.
 - Mapa renderiza con > 5 markers sin lag.
