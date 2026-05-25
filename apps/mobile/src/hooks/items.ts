@@ -39,6 +39,34 @@ export function useToggleItem(listId: string) {
   });
 }
 
+export function useUpdateItem(listId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ itemId, text }: { itemId: string; text: string }) =>
+      itemsService.update(listId, itemId, text),
+    onMutate: async ({ itemId, text }) => {
+      await qc.cancelQueries({ queryKey: ["items", listId] });
+      const previous = qc.getQueryData<Item[]>(["items", listId]);
+      qc.setQueryData<Item[]>(["items", listId], (old) =>
+        old?.map((it) => (it.id === itemId ? { ...it, text } : it))
+      );
+      return { previous };
+    },
+    onError: (_err, _vars, ctx) => {
+      if (ctx?.previous) qc.setQueryData(["items", listId], ctx.previous);
+    },
+    onSettled: () => qc.invalidateQueries({ queryKey: ["items", listId] }),
+  });
+}
+
+export function useBulkAddItems(listId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (texts: string[]) => itemsService.bulkAdd(listId, texts),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["items", listId] }),
+  });
+}
+
 export function useDeleteItem(listId: string) {
   const qc = useQueryClient();
   return useMutation({

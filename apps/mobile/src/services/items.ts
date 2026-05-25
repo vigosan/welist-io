@@ -15,6 +15,18 @@ export const itemsService = {
       method: "PATCH",
     }),
 
+  update: (listId: string, itemId: string, text: string) =>
+    apiFetch<Item>(`/lists/${listId}/items/${itemId}`, {
+      method: "PATCH",
+      body: JSON.stringify({ text }),
+    }),
+
   delete: (listId: string, itemId: string) =>
     apiFetch<void>(`/lists/${listId}/items/${itemId}`, { method: "DELETE" }),
+
+  bulkAdd: (listId: string, texts: string[]) =>
+    apiFetch<Item[]>(`/lists/${listId}/items/bulk`, {
+      method: "POST",
+      body: JSON.stringify({ texts }),
+    }),
 };
