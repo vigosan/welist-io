@@ -12,7 +12,7 @@ export default function HelpScreen() {
       className="flex-1 bg-canvas dark:bg-canvas-dark"
       edges={["top"]}
     >
-      <ScreenHeader title={t("help.title")} />
+      <ScreenHeader title={t("help.title")} back />
       <ScrollView contentContainerClassName="px-5 pb-12">
         <Text className="mb-6 text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
           {t("help.subtitle")}

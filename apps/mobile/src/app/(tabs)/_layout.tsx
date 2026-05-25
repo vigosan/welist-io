@@ -1,10 +1,5 @@
 import { Tabs } from "expo-router";
-import {
-  Compass,
-  HelpCircle,
-  List as ListIcon,
-  Users,
-} from "lucide-react-native";
+import { Compass, List as ListIcon, Users } from "lucide-react-native";
 import type { ComponentType } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -60,19 +55,6 @@ export default function TabsLayout() {
           tabBarIcon: ({ color, size }) => (
             <TabIcon
               Icon={Users as unknown as ComponentType<IconProps>}
-              color={color}
-              size={size}
-            />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="help"
-        options={{
-          title: t("nav.help"),
-          tabBarIcon: ({ color, size }) => (
-            <TabIcon
-              Icon={HelpCircle as unknown as ComponentType<IconProps>}
               color={color}
               size={size}
             />
