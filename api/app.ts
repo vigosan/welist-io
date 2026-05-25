@@ -277,6 +277,44 @@ app.post(
   }
 );
 
+const mobileEmailSignupSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(8).max(200),
+  name: z.string().min(1).max(100).optional(),
+});
+
+app.post(
+  "/auth-mobile/email-signup",
+  zValidator("json", mobileEmailSignupSchema),
+  async (c) => {
+    const { email, password, name } = c.req.valid("json");
+    const secret = process.env.AUTH_SECRET ?? "";
+    if (!secret) return c.json({ error: "Server misconfigured" }, 500);
+    const existing = await db.query.users.findFirst({
+      where: eq(users.email, email),
+      columns: { id: true },
+    });
+    if (existing) return c.json({ error: "Email already in use" }, 409);
+    const passwordHash = await hashPassword(password);
+    const [created] = await db
+      .insert(users)
+      .values({
+        id: crypto.randomUUID(),
+        email,
+        name: name ?? null,
+        passwordHash,
+      })
+      .returning({
+        id: users.id,
+        name: users.name,
+        email: users.email,
+        image: users.image,
+      });
+    const token = await issueMobileToken(created, secret);
+    return c.json({ token, user: created });
+  }
+);
+
 function isUniqueViolation(e: unknown): boolean {
   if (typeof e !== "object" || e === null || !("code" in e)) return false;
   const { code } = e as { code: unknown };

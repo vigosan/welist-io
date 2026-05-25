@@ -31,6 +31,11 @@ type SessionContextValue = {
   signInWithGoogle: () => Promise<void>;
   signInWithApple: () => Promise<void>;
   signInWithPassword: (email: string, password: string) => Promise<void>;
+  signUpWithPassword: (
+    email: string,
+    password: string,
+    name?: string
+  ) => Promise<void>;
   signOut: () => Promise<void>;
 };
 
@@ -159,6 +164,25 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     setSession({ status: "signed-in", user: data.user });
   };
 
+  const signUpWithPassword = async (
+    email: string,
+    password: string,
+    name?: string
+  ) => {
+    const res = await fetch(`${API_BASE}/api/auth-mobile/email-signup`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password, name }),
+    });
+    if (!res.ok) {
+      if (res.status === 409) throw new Error("EMAIL_IN_USE");
+      throw new Error(`Sign-up failed (${res.status})`);
+    }
+    const data = (await res.json()) as { token: string; user: User };
+    await setToken(data.token);
+    setSession({ status: "signed-in", user: data.user });
+  };
+
   const signOut = async () => {
     await setToken(null);
     setSession({ status: "signed-out" });
@@ -171,6 +195,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
         signInWithGoogle,
         signInWithApple,
         signInWithPassword,
+        signUpWithPassword,
         signOut,
       }}
     >
