@@ -55,12 +55,12 @@ function AuthGate({ children }: { children: React.ReactNode }) {
     const onSignIn = segments[0] === "sign-in";
     if (session.status === "signed-out" && !onSignIn) {
       const path = segments.filter((s) => !s.startsWith("(")).join("/");
-      pendingPath.current = path ? `/${path}` : null;
+      pendingPath.current = path && path !== "" ? `/${path}` : null;
       router.replace("/sign-in");
     } else if (session.status === "signed-in" && onSignIn) {
       const target = pendingPath.current;
       pendingPath.current = null;
-      router.replace((target ?? "/") as Href);
+      router.replace((target ?? "/lists") as Href);
     }
   }, [session, segments, router]);
 
