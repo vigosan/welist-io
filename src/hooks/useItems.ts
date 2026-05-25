@@ -3,12 +3,16 @@ import { toast } from "sonner";
 import type { Item } from "@/db/schema";
 import { t } from "@/i18n/service";
 import { queryKeys } from "@/lib/query-keys";
-import { type Coords, itemsService } from "@/services/items.service";
+import {
+  type Coords,
+  type ItemWithLikes,
+  itemsService,
+} from "@/services/items.service";
 
-export type { Item };
+export type { Item, ItemWithLikes };
 
 interface MutationContext {
-  previous: Item[] | undefined;
+  previous: ItemWithLikes[] | undefined;
 }
 
 export function useItems(listId: string) {
@@ -31,6 +35,42 @@ export function useAddItem(listId: string) {
   });
 }
 
+export function useToggleItemLike(listId: string) {
+  const qc = useQueryClient();
+  return useMutation<
+    { liked: boolean; likeCount: number },
+    Error,
+    string,
+    MutationContext
+  >({
+    mutationFn: (itemId: string) => itemsService.toggleLike(listId, itemId),
+    onMutate: async (itemId) => {
+      await qc.cancelQueries({ queryKey: queryKeys.items(listId) });
+      const previous = qc.getQueryData<ItemWithLikes[]>(
+        queryKeys.items(listId)
+      );
+      qc.setQueryData<ItemWithLikes[]>(queryKeys.items(listId), (old) =>
+        old?.map((i) =>
+          i.id === itemId
+            ? {
+                ...i,
+                likedByMe: !i.likedByMe,
+                likeCount: i.likeCount + (i.likedByMe ? -1 : 1),
+              }
+            : i
+        )
+      );
+      return { previous };
+    },
+    onError: (_err, _id, ctx) => {
+      qc.setQueryData(queryKeys.items(listId), ctx?.previous);
+      toast.error(t("items.errorLike"));
+    },
+    onSettled: () =>
+      qc.invalidateQueries({ queryKey: queryKeys.items(listId) }),
+  });
+}
+
 export function useToggleItem(listId: string) {
   const qc = useQueryClient();
   return useMutation<Item, Error, string, MutationContext>({
@@ -39,8 +79,10 @@ export function useToggleItem(listId: string) {
       await qc.cancelQueries({
         queryKey: queryKeys.items(listId),
       });
-      const previous = qc.getQueryData<Item[]>(queryKeys.items(listId));
-      qc.setQueryData<Item[]>(queryKeys.items(listId), (old) =>
+      const previous = qc.getQueryData<ItemWithLikes[]>(
+        queryKeys.items(listId)
+      );
+      qc.setQueryData<ItemWithLikes[]>(queryKeys.items(listId), (old) =>
         old?.map((i) => (i.id === itemId ? { ...i, done: !i.done } : i))
       );
       return { previous };
@@ -77,8 +119,10 @@ export function useUpdateItem(listId: string) {
       await qc.cancelQueries({
         queryKey: queryKeys.items(listId),
       });
-      const previous = qc.getQueryData<Item[]>(queryKeys.items(listId));
-      qc.setQueryData<Item[]>(queryKeys.items(listId), (old) =>
+      const previous = qc.getQueryData<ItemWithLikes[]>(
+        queryKeys.items(listId)
+      );
+      qc.setQueryData<ItemWithLikes[]>(queryKeys.items(listId), (old) =>
         old?.map((i) => (i.id === id ? { ...i, text } : i))
       );
       return { previous };
@@ -113,8 +157,10 @@ export function useBulkDeleteItems(listId: string) {
       await qc.cancelQueries({
         queryKey: queryKeys.items(listId),
       });
-      const previous = qc.getQueryData<Item[]>(queryKeys.items(listId));
-      qc.setQueryData<Item[]>(queryKeys.items(listId), (old) =>
+      const previous = qc.getQueryData<ItemWithLikes[]>(
+        queryKeys.items(listId)
+      );
+      qc.setQueryData<ItemWithLikes[]>(queryKeys.items(listId), (old) =>
         old?.filter((i) => !ids.includes(i.id))
       );
       return { previous };
@@ -127,14 +173,21 @@ export function useBulkDeleteItems(listId: string) {
 
 export function useReorderItems(listId: string) {
   const qc = useQueryClient();
-  return useMutation<void, Error, string[], { previous: Item[] | undefined }>({
+  return useMutation<
+    void,
+    Error,
+    string[],
+    { previous: ItemWithLikes[] | undefined }
+  >({
     mutationFn: (ids) => itemsService.reorder(listId, ids),
     onMutate: async (ids) => {
       await qc.cancelQueries({
         queryKey: queryKeys.items(listId),
       });
-      const previous = qc.getQueryData<Item[]>(queryKeys.items(listId));
-      qc.setQueryData<Item[]>(queryKeys.items(listId), (old) => {
+      const previous = qc.getQueryData<ItemWithLikes[]>(
+        queryKeys.items(listId)
+      );
+      qc.setQueryData<ItemWithLikes[]>(queryKeys.items(listId), (old) => {
         if (!old) return old;
         const map = new Map(old.map((i) => [i.id, i]));
         return ids.map((id, pos) => ({
@@ -163,8 +216,10 @@ export function useDeleteItem(listId: string) {
       await qc.cancelQueries({
         queryKey: queryKeys.items(listId),
       });
-      const previous = qc.getQueryData<Item[]>(queryKeys.items(listId));
-      qc.setQueryData<Item[]>(queryKeys.items(listId), (old) =>
+      const previous = qc.getQueryData<ItemWithLikes[]>(
+        queryKeys.items(listId)
+      );
+      qc.setQueryData<ItemWithLikes[]>(queryKeys.items(listId), (old) =>
         old?.filter((i) => i.id !== itemId)
       );
       return { previous };

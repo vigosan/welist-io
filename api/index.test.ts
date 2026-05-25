@@ -6,6 +6,7 @@ const mockDb = {
     items: { findMany: vi.fn(), findFirst: vi.fn() },
     participations: { findFirst: vi.fn() },
     itemProgress: { findFirst: vi.fn(), findMany: vi.fn() },
+    itemLikes: { findFirst: vi.fn(), findMany: vi.fn() },
     users: { findFirst: vi.fn() },
     stripeAccounts: { findFirst: vi.fn() },
     listPurchases: { findFirst: vi.fn() },
@@ -230,6 +231,7 @@ describe("GET /api/lists/:listId/items", () => {
       public: true,
     });
     mockDb.query.items.findMany.mockResolvedValue(rows);
+    mockDb.query.itemLikes.findMany.mockResolvedValue([]);
 
     const res = await app.request("/api/lists/abc/items");
     expect(res.status).toBe(200);
@@ -510,6 +512,130 @@ describe("PATCH /api/lists/:listId/items/:itemId/toggle", () => {
       method: "PATCH",
     });
     expect(res.status).toBe(404);
+  });
+});
+
+describe("POST /api/lists/:listId/items/:itemId/like", () => {
+  const headers = { "x-forwarded-for": "10.0.0.99" };
+  beforeEach(() => vi.clearAllMocks());
+
+  it("returns 401 when unauthenticated", async () => {
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "abc",
+      ownerId: null,
+      collaborative: false,
+      public: true,
+    });
+    const res = await app.request("/api/lists/abc/items/i1/like", {
+      method: "POST",
+      headers,
+    });
+    expect(res.status).toBe(401);
+  });
+
+  it("creates a like when none exists and returns liked=true with count", async () => {
+    mockGetAuthUser.mockResolvedValueOnce({
+      session: { user: { id: "u1" } },
+    });
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "abc",
+      ownerId: null,
+      collaborative: false,
+      public: true,
+    });
+    mockDb.query.items.findFirst.mockResolvedValue({ id: "i1" });
+    mockDb.query.itemLikes.findFirst.mockResolvedValue(null);
+    mockDb.insert.mockReturnValue(chainableInsert());
+    mockDb.$count.mockResolvedValue(1);
+
+    const res = await app.request("/api/lists/abc/items/i1/like", {
+      method: "POST",
+      headers,
+    });
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as Record<string, unknown>;
+    expect(body.liked).toBe(true);
+    expect(body.likeCount).toBe(1);
+    expect(mockDb.insert).toHaveBeenCalled();
+  });
+
+  it("removes the like when it exists and returns liked=false", async () => {
+    mockGetAuthUser.mockResolvedValueOnce({
+      session: { user: { id: "u1" } },
+    });
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "abc",
+      ownerId: null,
+      collaborative: false,
+      public: true,
+    });
+    mockDb.query.items.findFirst.mockResolvedValue({ id: "i1" });
+    mockDb.query.itemLikes.findFirst.mockResolvedValue({ id: "like-1" });
+    mockDb.delete.mockReturnValue({
+      where: vi.fn().mockResolvedValue(undefined),
+    });
+    mockDb.$count.mockResolvedValue(0);
+
+    const res = await app.request("/api/lists/abc/items/i1/like", {
+      method: "POST",
+      headers,
+    });
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as Record<string, unknown>;
+    expect(body.liked).toBe(false);
+    expect(body.likeCount).toBe(0);
+    expect(mockDb.delete).toHaveBeenCalled();
+  });
+
+  it("returns 404 when the item does not exist", async () => {
+    mockGetAuthUser.mockResolvedValueOnce({
+      session: { user: { id: "u1" } },
+    });
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "abc",
+      ownerId: null,
+      collaborative: false,
+      public: true,
+    });
+    mockDb.query.items.findFirst.mockResolvedValue(null);
+
+    const res = await app.request("/api/lists/abc/items/missing/like", {
+      method: "POST",
+      headers,
+    });
+    expect(res.status).toBe(404);
+  });
+});
+
+describe("GET /api/lists/:listId/items (likes overlay)", () => {
+  const headers = { "x-forwarded-for": "10.0.0.100" };
+  beforeEach(() => vi.clearAllMocks());
+
+  it("aggregates likeCount and flags likedByMe for the current user", async () => {
+    mockGetAuthUser.mockResolvedValueOnce({
+      session: { user: { id: "u1" } },
+    });
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "abc",
+      ownerId: "owner",
+      collaborative: false,
+      public: true,
+    });
+    mockDb.query.items.findMany.mockResolvedValue([
+      { id: "i1", listId: "abc", text: "A", done: false, position: 0 },
+      { id: "i2", listId: "abc", text: "B", done: false, position: 1 },
+    ]);
+    mockDb.query.itemLikes.findMany.mockResolvedValue([
+      { itemId: "i1", userId: "u1" },
+      { itemId: "i1", userId: "u2" },
+      { itemId: "i2", userId: "u2" },
+    ]);
+
+    const res = await app.request("/api/lists/abc/items", { headers });
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as Array<Record<string, unknown>>;
+    expect(body[0]).toMatchObject({ id: "i1", likeCount: 2, likedByMe: true });
+    expect(body[1]).toMatchObject({ id: "i2", likeCount: 1, likedByMe: false });
   });
 });
 
@@ -1543,6 +1669,7 @@ describe("GET /api/lists/:listId/items (participant item_progress)", () => {
       public: true,
     });
     mockDb.query.items.findMany.mockResolvedValue(rows);
+    mockDb.query.itemLikes.findMany.mockResolvedValue([]);
 
     const res = await app.request("/api/lists/abc/items");
     expect(res.status).toBe(200);

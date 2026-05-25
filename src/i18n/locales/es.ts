@@ -179,6 +179,7 @@ const es = {
     sortRecent: "Recientes",
     sortNewest: "Más nuevas",
     sortOldest: "Más antiguas",
+    sortLikes: "Más populares",
     noListsSearch: "No hay listas con ese nombre.",
     noLists: "Aún no tienes listas.",
     loading: "Cargando…",
@@ -272,6 +273,9 @@ const es = {
     errorUpdate: "No se pudieron guardar los cambios",
     errorDelete: "No se pudo eliminar el elemento",
     errorAdd: "No se pudo añadir el elemento",
+    errorLike: "No se pudo registrar tu like",
+    like: "Me gusta",
+    unlike: "Quitar me gusta",
   },
   bulk: {
     header_one: "{{count}} elemento para añadir",

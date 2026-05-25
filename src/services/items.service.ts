@@ -7,8 +7,20 @@ export interface Coords {
   placeName: string;
 }
 
+export type ItemWithLikes = Item & {
+  likeCount: number;
+  likedByMe: boolean;
+};
+
 export const itemsService = {
-  list: (listId: string) => apiClient<Item[]>(`/api/lists/${listId}/items`),
+  list: (listId: string) =>
+    apiClient<ItemWithLikes[]>(`/api/lists/${listId}/items`),
+
+  toggleLike: (listId: string, itemId: string) =>
+    apiClient<{ liked: boolean; likeCount: number }>(
+      `/api/lists/${listId}/items/${itemId}/like`,
+      { method: "POST" }
+    ),
 
   add: (listId: string, text: string, coords?: Coords) =>
     apiClient<Item>(`/api/lists/${listId}/items`, {

@@ -1,6 +1,6 @@
 import { memo, useRef, useState } from "react";
 import { useGeocodingSearch } from "@/hooks/useGeocodingSearch";
-import type { Item } from "@/hooks/useItems";
+import type { ItemWithLikes } from "@/hooks/useItems";
 import { useTranslation } from "@/i18n/service";
 import { renderInlineMarkdown } from "@/lib/inline-markdown";
 import { parseItemText } from "@/lib/item-text";
@@ -8,16 +8,18 @@ import { PARTIAL_PLACE_REGEX } from "@/lib/places";
 import type { Coords } from "@/services/items.service";
 
 interface Props {
-  item: Item;
+  item: ItemWithLikes;
   onToggle: () => void;
   onDelete: () => void;
   onEdit: (text: string, coords?: Coords | null) => void;
+  onLike?: () => void;
   onTagClick?: (tag: string) => void;
   activeTag?: string;
   onPlaceClick?: (place: string) => void;
   activePlace?: string;
   canWrite?: boolean;
   canToggle?: boolean;
+  canLike?: boolean;
   onDragStart?: (e: React.DragEvent) => void;
   onDragOver?: (e: React.DragEvent) => void;
   onDrop?: (e: React.DragEvent) => void;
@@ -32,12 +34,14 @@ export const ItemRow = memo(
     onToggle,
     onDelete,
     onEdit,
+    onLike,
     onTagClick,
     activeTag,
     onPlaceClick,
     activePlace,
     canWrite = true,
     canToggle,
+    canLike = true,
     onDragStart,
     onDragOver,
     onDrop,
@@ -113,7 +117,7 @@ export const ItemRow = memo(
         onDragOver={onDragOver}
         onDrop={onDrop}
         onDragEnd={onDragEnd}
-        className={`flex items-center gap-3 px-3 py-3.5 rounded-xl transition-colors ${
+        className={`flex items-center gap-2 px-2.5 py-2 rounded-xl transition-colors ${
           isDragOver
             ? "bg-gray-200 dark:bg-gray-700"
             : item.done
@@ -147,7 +151,7 @@ export const ItemRow = memo(
           onClick={effectiveCanToggle ? onToggle : undefined}
           data-testid={`item-checkbox-${item.id}`}
           aria-label={item.done ? t("items.markPending") : t("items.markDone")}
-          className={`shrink-0 w-11 h-11 rounded-full flex items-center justify-center ${effectiveCanToggle ? "cursor-pointer active:scale-[0.96]" : "cursor-default"}`}
+          className={`shrink-0 w-9 h-9 rounded-full flex items-center justify-center ${effectiveCanToggle ? "cursor-pointer active:scale-[0.96]" : "cursor-default"}`}
           style={{ transition: "transform 150ms cubic-bezier(0.2, 0, 0, 1)" }}
         >
           <div
@@ -264,7 +268,7 @@ export const ItemRow = memo(
               </form>
             </div>
           ) : (
-            <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+            <div className="flex items-center gap-1.5 min-w-0">
               {/* biome-ignore lint/a11y/noStaticElementInteractions: link click passthrough */}
               {/* biome-ignore lint/a11y/useKeyWithClickEvents: link click passthrough */}
               <span
@@ -276,7 +280,7 @@ export const ItemRow = memo(
                   if ((e.target as HTMLElement).tagName === "A")
                     e.stopPropagation();
                 }}
-                className={`text-sm font-medium cursor-default select-none leading-snug ${
+                className={`text-sm font-medium cursor-default select-none leading-snug truncate ${
                   item.done
                     ? "line-through text-gray-400 dark:text-gray-600"
                     : "text-gray-800 dark:text-gray-200"
@@ -332,44 +336,56 @@ export const ItemRow = memo(
           )}
         </div>
 
-        {canWrite && (
-          <div className="flex items-center gap-0.5 shrink-0">
-            {!item.done && !editing && (
-              <button
-                type="button"
-                onClick={() => setEditing(true)}
-                data-testid={`item-edit-${item.id}`}
-                aria-label={t("items.edit", { text: display || item.text })}
-                className="cursor-pointer min-w-[44px] min-h-[44px] flex items-center justify-center text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors active:scale-[0.96]"
-              >
-                <svg
-                  aria-hidden="true"
-                  className="w-3.5 h-3.5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={1.5}
-                    d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
-                  />
-                </svg>
-              </button>
-            )}
+        <div className="flex items-center shrink-0">
+          {onLike && (
             <button
               type="button"
-              onClick={onDelete}
-              data-testid={`item-delete-${item.id}`}
-              aria-label={t("items.delete", {
-                text: display || item.text,
-              })}
-              className="cursor-pointer min-w-[44px] min-h-[44px] flex items-center justify-center text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors active:scale-[0.96]"
+              onClick={canLike ? onLike : undefined}
+              disabled={!canLike}
+              data-testid={`item-like-${item.id}`}
+              aria-label={item.likedByMe ? t("items.unlike") : t("items.like")}
+              aria-pressed={item.likedByMe}
+              className={`cursor-pointer w-9 h-9 sm:w-8 sm:h-8 flex items-center justify-center gap-1 rounded-md transition-colors active:scale-[0.92] ${
+                item.likedByMe
+                  ? "text-gray-900 dark:text-gray-100"
+                  : "text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+              } ${canLike ? "" : "cursor-default"}`}
             >
               <svg
                 aria-hidden="true"
-                className="w-3.5 h-3.5"
+                className="w-4 h-4"
+                fill={item.likedByMe ? "currentColor" : "none"}
+                stroke="currentColor"
+                strokeWidth={1.75}
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6.633 10.5c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 012.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 00.322-1.672V3a.75.75 0 01.75-.75A2.25 2.25 0 0116.5 4.5c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 01-2.649 7.521c-.388.482-.987.729-1.605.729H13.48c-.483 0-.964-.078-1.423-.23l-3.114-1.04a4.501 4.501 0 00-1.423-.23H5.904M14.25 9h2.25M5.904 18.75c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 01-.521-3.507c0-1.553.295-3.036.831-4.398C3.387 10.203 4.167 9.75 5 9.75h1.053c.472 0 .745.556.5.96a8.958 8.958 0 00-1.302 4.665c0 1.194.232 2.333.654 3.375z"
+                />
+              </svg>
+              {item.likeCount > 0 && (
+                <span
+                  data-testid={`item-like-count-${item.id}`}
+                  className="text-[11px] font-mono tabular-nums leading-none"
+                >
+                  {item.likeCount}
+                </span>
+              )}
+            </button>
+          )}
+          {canWrite && !item.done && !editing && (
+            <button
+              type="button"
+              onClick={() => setEditing(true)}
+              data-testid={`item-edit-${item.id}`}
+              aria-label={t("items.edit", { text: display || item.text })}
+              className="cursor-pointer w-9 h-9 sm:w-8 sm:h-8 flex items-center justify-center text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors active:scale-[0.92] rounded-md"
+            >
+              <svg
+                aria-hidden="true"
+                className="w-4 h-4"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -377,13 +393,39 @@ export const ItemRow = memo(
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  strokeWidth={1.5}
+                  strokeWidth={1.75}
+                  d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
+                />
+              </svg>
+            </button>
+          )}
+          {canWrite && (
+            <button
+              type="button"
+              onClick={onDelete}
+              data-testid={`item-delete-${item.id}`}
+              aria-label={t("items.delete", {
+                text: display || item.text,
+              })}
+              className="cursor-pointer w-9 h-9 sm:w-8 sm:h-8 flex items-center justify-center text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors active:scale-[0.92] rounded-md"
+            >
+              <svg
+                aria-hidden="true"
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.75}
                   d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
                 />
               </svg>
             </button>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     );
   },
@@ -391,11 +433,15 @@ export const ItemRow = memo(
     prev.item.id === next.item.id &&
     prev.item.done === next.item.done &&
     prev.item.text === next.item.text &&
+    prev.item.likeCount === next.item.likeCount &&
+    prev.item.likedByMe === next.item.likedByMe &&
     prev.highlighted === next.highlighted &&
     prev.activeTag === next.activeTag &&
     prev.activePlace === next.activePlace &&
     prev.canWrite === next.canWrite &&
     prev.canToggle === next.canToggle &&
+    prev.canLike === next.canLike &&
     prev.isDragOver === next.isDragOver &&
-    !!prev.onDragStart === !!next.onDragStart
+    !!prev.onDragStart === !!next.onDragStart &&
+    !!prev.onLike === !!next.onLike
 );

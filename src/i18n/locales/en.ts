@@ -180,6 +180,7 @@ const en: Translations = {
     sortRecent: "Recent",
     sortNewest: "Newest",
     sortOldest: "Oldest",
+    sortLikes: "Most liked",
     noListsSearch: "No lists found with that name.",
     noLists: "You don't have any lists yet.",
     loading: "Loading…",
@@ -273,6 +274,9 @@ const en: Translations = {
     errorUpdate: "Failed to save changes",
     errorDelete: "Failed to delete item",
     errorAdd: "Failed to add item",
+    errorLike: "Could not register your like",
+    like: "Like",
+    unlike: "Remove like",
   },
   bulk: {
     header_one: "{{count}} item to add",

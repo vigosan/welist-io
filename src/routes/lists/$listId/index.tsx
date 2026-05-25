@@ -42,6 +42,7 @@ import {
   useItems,
   useReorderItems,
   useToggleItem,
+  useToggleItemLike,
   useUpdateItem,
 } from "@/hooks/useItems";
 import { useItemsFilter } from "@/hooks/useItemsFilter";
@@ -290,6 +291,7 @@ function ListDetailPage() {
   const addItem = useAddItem(listId);
   const bulkAddItems = useBulkAddItems(listId);
   const toggleItem = useToggleItem(listId);
+  const toggleItemLike = useToggleItemLike(listId);
   const deleteItem = useDeleteItem(listId);
   const updateItem = useUpdateItem(listId);
   const reorderItems = useReorderItems(listId);
@@ -1015,6 +1017,12 @@ function ListDetailPage() {
                         activePlace={activePlace}
                         canWrite={canWrite}
                         canToggle={canToggle}
+                        canLike={!!session?.user?.id}
+                        onLike={
+                          session?.user?.id
+                            ? () => toggleItemLike.mutate(item.id)
+                            : undefined
+                        }
                         highlighted={item.id === highlightedItemId}
                         onDragStart={
                           isOwner && !item.done

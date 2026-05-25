@@ -2,7 +2,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act, renderHook, waitFor } from "@testing-library/react";
 import type React from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { Item } from "./useItems";
+import type { ItemWithLikes } from "./useItems";
 import {
   useAddItem,
   useBulkAddItems,
@@ -17,6 +17,7 @@ vi.mock("@/services/items.service", () => ({
     list: vi.fn(),
     add: vi.fn(),
     toggle: vi.fn(),
+    toggleLike: vi.fn(),
     update: vi.fn(),
     delete: vi.fn(),
     bulkAdd: vi.fn(),
@@ -27,7 +28,7 @@ import { itemsService } from "@/services/items.service";
 
 const LIST_ID = "list-1";
 
-const ITEM_A: Item = {
+const ITEM_A: ItemWithLikes = {
   id: "i1",
   listId: LIST_ID,
   text: "Tarea A",
@@ -38,8 +39,10 @@ const ITEM_A: Item = {
   placeName: null,
   createdAt: new Date(),
   updatedAt: new Date(),
+  likeCount: 0,
+  likedByMe: false,
 };
-const ITEM_B: Item = {
+const ITEM_B: ItemWithLikes = {
   id: "i2",
   listId: LIST_ID,
   text: "Tarea B",
@@ -50,6 +53,8 @@ const ITEM_B: Item = {
   placeName: null,
   createdAt: new Date(),
   updatedAt: new Date(),
+  likeCount: 0,
+  likedByMe: false,
 };
 
 function makeWrapper() {
@@ -98,7 +103,7 @@ describe("useToggleItem", () => {
       result.current.mutate(ITEM_A.id);
     });
 
-    const cached = qc.getQueryData<Item[]>(["items", LIST_ID]);
+    const cached = qc.getQueryData<ItemWithLikes[]>(["items", LIST_ID]);
     expect(cached?.find((i) => i.id === ITEM_A.id)?.done).toBe(true);
   });
 
@@ -117,7 +122,7 @@ describe("useToggleItem", () => {
     });
 
     await waitFor(() => expect(result.current.isError).toBe(true));
-    const cached = qc.getQueryData<Item[]>(["items", LIST_ID]);
+    const cached = qc.getQueryData<ItemWithLikes[]>(["items", LIST_ID]);
     expect(cached?.find((i) => i.id === ITEM_A.id)?.done).toBe(false);
   });
 });
@@ -135,7 +140,7 @@ describe("useDeleteItem", () => {
       result.current.mutate(ITEM_A.id);
     });
 
-    const cached = qc.getQueryData<Item[]>(["items", LIST_ID]);
+    const cached = qc.getQueryData<ItemWithLikes[]>(["items", LIST_ID]);
     expect(cached?.map((i) => i.id)).not.toContain(ITEM_A.id);
   });
 
@@ -152,7 +157,7 @@ describe("useDeleteItem", () => {
     });
 
     await waitFor(() => expect(result.current.isError).toBe(true));
-    const cached = qc.getQueryData<Item[]>(["items", LIST_ID]);
+    const cached = qc.getQueryData<ItemWithLikes[]>(["items", LIST_ID]);
     expect(cached?.map((i) => i.id)).toContain(ITEM_A.id);
   });
 });
@@ -176,7 +181,7 @@ describe("useUpdateItem", () => {
       });
     });
 
-    const cached = qc.getQueryData<Item[]>(["items", LIST_ID]);
+    const cached = qc.getQueryData<ItemWithLikes[]>(["items", LIST_ID]);
     expect(cached?.find((i) => i.id === ITEM_A.id)?.text).toBe("Nuevo texto");
   });
 
@@ -196,7 +201,7 @@ describe("useUpdateItem", () => {
     });
 
     await waitFor(() => expect(result.current.isError).toBe(true));
-    const cached = qc.getQueryData<Item[]>(["items", LIST_ID]);
+    const cached = qc.getQueryData<ItemWithLikes[]>(["items", LIST_ID]);
     expect(cached?.find((i) => i.id === ITEM_A.id)?.text).toBe("Tarea A");
   });
 });

@@ -253,7 +253,7 @@ function CreateListInline({ onClose }: { onClose: () => void }) {
   );
 }
 
-type SortOption = "recent" | "created_desc" | "created_asc";
+type SortOption = "recent" | "created_desc" | "created_asc" | "likes";
 type VisibilityFilter = "all" | "public" | "private";
 
 function FilterChip({
@@ -302,6 +302,7 @@ function MyListsPage() {
     { value: "recent", label: t("myLists.sortRecent") },
     { value: "created_desc", label: t("myLists.sortNewest") },
     { value: "created_asc", label: t("myLists.sortOldest") },
+    { value: "likes", label: t("myLists.sortLikes") },
   ];
 
   const VISIBILITY_OPTIONS: { value: VisibilityFilter; label: string }[] = [

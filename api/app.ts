@@ -27,6 +27,7 @@ import {
   achievements,
   events,
   follows,
+  itemLikes,
   itemProgress,
   items,
   listActivity,
@@ -444,6 +445,30 @@ app.get("/my-lists", async (c) => {
   const itemCountExpr = sql<number>`cast((select count(*) from ${items} where ${items.listId} = ${lists.id}) as int)`;
   const doneCountExpr = sql<number>`cast((select count(*) from ${items} where ${items.listId} = ${lists.id} and ${items.done} = true) as int)`;
   const participantCountExpr = sql<number>`cast((select count(*) from ${participations} where ${participations.sourceListId} = ${lists.id}) as int)`;
+  const likeCountExpr = sql<number>`cast((select count(*) from ${itemLikes} il join ${items} i on i.id = il.item_id where i.list_id = ${lists.id}) as int)`;
+
+  if (sort === "likes") {
+    const rows = await db
+      .select({
+        id: lists.id,
+        name: lists.name,
+        slug: lists.slug,
+        description: lists.description,
+        public: lists.public,
+        collaborative: lists.collaborative,
+        ownerId: lists.ownerId,
+        createdAt: lists.createdAt,
+        itemCount: itemCountExpr,
+        doneCount: doneCountExpr,
+        participantCount: participantCountExpr,
+        likeCount: likeCountExpr,
+      })
+      .from(lists)
+      .where(baseWhere)
+      .orderBy(desc(likeCountExpr), desc(lists.createdAt))
+      .limit(MY_LISTS_PAGE_SIZE);
+    return c.json({ items: rows, nextCursor: null });
+  }
 
   if (sort === "recent") {
     const activityExpr = sql<Date>`coalesce(max(${items.updatedAt}), ${lists.createdAt})`;
@@ -615,10 +640,29 @@ app.get("/lists/:listId/items", async (c) => {
     orderBy: (t, { asc }) => [asc(t.position), asc(t.createdAt)],
   });
 
-  if (!participation || participation.role !== "challenger")
-    return c.json(rows);
-
   const itemIds = rows.map((r) => r.id);
+  const likeRows =
+    itemIds.length === 0
+      ? []
+      : await db.query.itemLikes.findMany({
+          where: inUuids(itemLikes.itemId, itemIds),
+          columns: { itemId: true, userId: true },
+        });
+  const likeCountByItem = new Map<string, number>();
+  const likedByMeSet = new Set<string>();
+  for (const row of likeRows) {
+    likeCountByItem.set(row.itemId, (likeCountByItem.get(row.itemId) ?? 0) + 1);
+    if (userId && row.userId === userId) likedByMeSet.add(row.itemId);
+  }
+  const withLikes = rows.map((item) => ({
+    ...item,
+    likeCount: likeCountByItem.get(item.id) ?? 0,
+    likedByMe: likedByMeSet.has(item.id),
+  }));
+
+  if (!participation || participation.role !== "challenger")
+    return c.json(withLikes);
+
   const progressRows =
     itemIds.length === 0
       ? []
@@ -632,7 +676,7 @@ app.get("/lists/:listId/items", async (c) => {
         });
   const progressMap = new Map(progressRows.map((p) => [p.itemId, p.done]));
   return c.json(
-    rows.map((item) => ({
+    withLikes.map((item) => ({
       ...item,
       done: progressMap.get(item.id) ?? false,
     }))
@@ -867,6 +911,34 @@ app.patch("/lists/:listId/items/:itemId/toggle", async (c) => {
   if (!updated) return c.json({ error: "Not found" }, 404);
 
   return c.json(updated);
+});
+
+app.post("/lists/:listId/items/:itemId/like", async (c) => {
+  const list = await resolveList(c.req.param("listId"));
+  if (!list) return c.json({ error: "Not found" }, 404);
+  const authUser = getOptionalUser(c);
+  const userId = authUser?.session?.user?.id ?? null;
+  if (!userId) return c.json({ error: "Unauthorized" }, 401);
+  if (!(await canViewList(list, userId)))
+    return c.json({ error: "Not found" }, 404);
+  const itemId = c.req.param("itemId");
+  const item = await db.query.items.findFirst({
+    where: and(eq(items.id, itemId), eq(items.listId, list.id)),
+    columns: { id: true },
+  });
+  if (!item) return c.json({ error: "Not found" }, 404);
+
+  const existing = await db.query.itemLikes.findFirst({
+    where: and(eq(itemLikes.userId, userId), eq(itemLikes.itemId, itemId)),
+    columns: { id: true },
+  });
+  if (existing) {
+    await db.delete(itemLikes).where(eq(itemLikes.id, existing.id));
+  } else {
+    await db.insert(itemLikes).values({ userId, itemId });
+  }
+  const likeCount = await db.$count(itemLikes, eq(itemLikes.itemId, itemId));
+  return c.json({ liked: !existing, likeCount });
 });
 
 app.delete("/lists/:listId/items/:itemId", async (c) => {
