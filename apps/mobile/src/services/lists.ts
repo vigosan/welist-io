@@ -39,4 +39,29 @@ export const listsService = {
 
   delete: (listId: string) =>
     apiFetch<void>(`/lists/${listId}`, { method: "DELETE" }),
+
+  activeParticipants: (listId: string) =>
+    apiFetch<{
+      participants: { id: string; name: string | null; image: string | null }[];
+      total: number;
+    }>(`/lists/${listId}/active-participants`),
+
+  activity: (listId: string) =>
+    apiFetch<
+      {
+        id: string;
+        action:
+          | "item_added"
+          | "item_edited"
+          | "item_deleted"
+          | "challenge_accepted"
+          | "challenge_completed";
+        itemId: string | null;
+        previousValue: unknown;
+        newValue: unknown;
+        createdAt: string;
+        userName: string | null;
+        userImage: string | null;
+      }[]
+    >(`/lists/${listId}/activity`),
 };

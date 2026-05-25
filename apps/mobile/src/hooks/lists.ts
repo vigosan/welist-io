@@ -53,6 +53,22 @@ export function useCloneList() {
   });
 }
 
+export function useActiveParticipants(listId: string) {
+  return useQuery({
+    queryKey: ["active-participants", listId],
+    queryFn: () => listsService.activeParticipants(listId),
+    enabled: !!listId,
+  });
+}
+
+export function useListActivity(listId: string, enabled: boolean) {
+  return useQuery({
+    queryKey: ["list-activity", listId],
+    queryFn: () => listsService.activity(listId),
+    enabled: enabled && !!listId,
+  });
+}
+
 export function useDeleteList() {
   const qc = useQueryClient();
   return useMutation({

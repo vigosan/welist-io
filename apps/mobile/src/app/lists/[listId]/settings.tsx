@@ -20,6 +20,7 @@ import {
   useCloneList,
   useDeleteList,
   useList,
+  useListActivity,
   useUpdateList,
 } from "@/hooks/lists";
 import { useUserSearch } from "@/hooks/users";
@@ -205,6 +206,8 @@ export default function ListSettingsScreen() {
 
         {showCollabs && <CollaboratorsSection listId={listId} />}
 
+        {isOwner && <ActivitySection listId={listId} />}
+
         <View className="mt-10 gap-3">
           <Pressable
             onPress={doClone}
@@ -269,6 +272,59 @@ function Toggle({
         </Text>
       </View>
       <Switch value={value} onValueChange={onChange} />
+    </View>
+  );
+}
+
+const ACTIVITY_LABEL: Record<string, string> = {
+  item_added: "added an item",
+  item_edited: "edited an item",
+  item_deleted: "deleted an item",
+  challenge_accepted: "accepted the challenge",
+  challenge_completed: "completed the challenge",
+};
+
+function ActivitySection({ listId }: { listId: string }) {
+  const activity = useListActivity(listId, true);
+
+  if (activity.isLoading) {
+    return (
+      <View className="mt-10">
+        <Text className="mb-3 text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
+          Activity
+        </Text>
+        <ActivityIndicator />
+      </View>
+    );
+  }
+
+  const rows = activity.data ?? [];
+
+  return (
+    <View className="mt-10">
+      <Text className="mb-3 text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
+        Activity
+      </Text>
+      {rows.length === 0 ? (
+        <Text className="text-sm text-gray-500 dark:text-gray-400">
+          No activity yet.
+        </Text>
+      ) : (
+        rows.slice(0, 30).map((a) => (
+          <View
+            key={a.id}
+            className="mb-2 rounded-2xl border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-900"
+          >
+            <Text className="text-sm text-gray-900 dark:text-gray-100">
+              <Text className="font-medium">{a.userName ?? "Someone"}</Text>{" "}
+              {ACTIVITY_LABEL[a.action] ?? a.action}
+            </Text>
+            <Text className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
+              {new Date(a.createdAt).toLocaleString()}
+            </Text>
+          </View>
+        ))
+      )}
     </View>
   );
 }

@@ -22,7 +22,7 @@ import {
   useToggleItem,
   useUpdateItem,
 } from "@/hooks/items";
-import { useList } from "@/hooks/lists";
+import { useActiveParticipants, useList } from "@/hooks/lists";
 import { useRateList } from "@/hooks/rating";
 import { useSession } from "@/lib/auth";
 import { type FilterMode, filterItems } from "@/lib/items-filter";
@@ -48,6 +48,7 @@ export default function ListDetailScreen() {
   const remove = useDeleteItem(listId);
   const reorder = useReorderItems(listId);
   const rate = useRateList(listId);
+  const participants = useActiveParticipants(listId);
 
   const isOwner =
     session.status === "signed-in" &&
@@ -217,13 +218,18 @@ export default function ListDetailScreen() {
       </View>
 
       {list.data && (list.data.rating.count > 0 || !isOwner) && (
-        <View className="mx-6 mb-3">
+        <View className="mx-6 mb-3 flex-row items-center justify-between">
           <StarRating
             value={list.data.rating.mine}
             avg={list.data.rating.avg}
             count={list.data.rating.count}
             onChange={isOwner ? undefined : (v) => rate.mutate(v)}
           />
+          {participants.data && participants.data.total > 0 && (
+            <Text className="text-xs text-gray-500 dark:text-gray-400">
+              {participants.data.total} active
+            </Text>
+          )}
         </View>
       )}
 
