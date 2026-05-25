@@ -20,6 +20,12 @@ import {
 type DirectoryPage = { users: DirectoryUser[]; nextCursor: string | null };
 type DirectoryInfiniteData = { pages: DirectoryPage[]; pageParams: unknown[] };
 
+type MyListsPage = {
+  items: { id: string }[];
+  nextCursor: string | null;
+};
+type MyListsInfiniteData = { pages: MyListsPage[]; pageParams: unknown[] };
+
 export function useCollaborators(listId: string, enabled: boolean) {
   return useQuery({
     queryKey: queryKeys.listCollaborators(listId),
@@ -275,7 +281,32 @@ export function useDeleteList() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (listId: string) => listsService.remove(listId),
-    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.myListsAll() }),
+    onMutate: async (listId) => {
+      await qc.cancelQueries({ queryKey: queryKeys.myListsAll() });
+      const previous = qc.getQueriesData<MyListsInfiniteData>({
+        queryKey: queryKeys.myListsAll(),
+      });
+      qc.setQueriesData<MyListsInfiniteData>(
+        { queryKey: queryKeys.myListsAll() },
+        (old) =>
+          old
+            ? {
+                ...old,
+                pages: old.pages.map((p) => ({
+                  ...p,
+                  items: p.items.filter((i) => i.id !== listId),
+                })),
+              }
+            : old
+      );
+      return { previous };
+    },
+    onError: (_err, _listId, ctx) => {
+      ctx?.previous?.forEach(([key, data]) => {
+        qc.setQueryData(key, data);
+      });
+    },
+    onSettled: () => qc.invalidateQueries({ queryKey: queryKeys.myListsAll() }),
   });
 }
 
