@@ -169,6 +169,27 @@ export const en = {
     themeSystem: "System",
     themeLight: "Light",
     themeDark: "Dark",
+    account: "Account",
+    publicProfile: "Show in directory",
+    publicProfileHint: "Control if you appear in the public users directory.",
+    notifications: "Email notifications",
+    notificationsHint:
+      "Get a bi-weekly reminder with a random pending item from your lists.",
+    password: "Password",
+    passwordSet: "Change password",
+    passwordHintNew:
+      "Set a password to also sign in with email and password.",
+    passwordHintSet:
+      "You already have a password set. You can change it here.",
+    newPassword: "New password",
+    confirmPassword: "Repeat password",
+    minLength: "Minimum 8 characters.",
+    notMatch: "Passwords don't match.",
+    saved: "Password saved.",
+    savePassword: "Save password",
+    saving: "Saving…",
+    show: "Show password",
+    hide: "Hide password",
   },
   u: {
     follow: "Follow",

@@ -77,7 +77,45 @@ export function useToggleFollow(userId: string) {
     },
     onSettled: () => {
       qc.invalidateQueries({ queryKey: ["follow-status", userId] });
-      qc.invalidateQueries({ queryKey: ["feed"] });
+    },
+  });
+}
+
+type UserMe = {
+  publicProfile: boolean;
+  emailOptIn: boolean;
+  hasPassword: boolean;
+};
+
+export function useUserMe(enabled = true) {
+  return useQuery({
+    queryKey: ["user-me"],
+    queryFn: () => usersService.getMe(),
+    enabled,
+  });
+}
+
+export function useUpdateProfile() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data: { publicProfile?: boolean; emailOptIn?: boolean }) =>
+      usersService.updateProfile(data),
+    onSuccess: (updated) => {
+      qc.setQueryData<UserMe>(["user-me"], (old) =>
+        old ? { ...old, ...updated } : { ...updated, hasPassword: false }
+      );
+    },
+  });
+}
+
+export function useSetPassword() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (password: string) => usersService.setPassword(password),
+    onSuccess: () => {
+      qc.setQueryData<UserMe>(["user-me"], (old) =>
+        old ? { ...old, hasPassword: true } : old
+      );
     },
   });
 }

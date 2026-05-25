@@ -169,6 +169,28 @@ export const es = {
     themeSystem: "Sistema",
     themeLight: "Claro",
     themeDark: "Oscuro",
+    account: "Cuenta",
+    publicProfile: "Aparecer en el directorio",
+    publicProfileHint:
+      "Controla si apareces en el directorio público de usuarios.",
+    notifications: "Notificaciones por email",
+    notificationsHint:
+      "Recibe un recordatorio quincenal con un ítem aleatorio pendiente.",
+    password: "Contraseña",
+    passwordSet: "Cambiar contraseña",
+    passwordHintNew:
+      "Define una contraseña para entrar también con email y contraseña.",
+    passwordHintSet:
+      "Ya tienes una contraseña configurada. Puedes cambiarla aquí.",
+    newPassword: "Nueva contraseña",
+    confirmPassword: "Repetir contraseña",
+    minLength: "Mínimo 8 caracteres.",
+    notMatch: "Las contraseñas no coinciden.",
+    saved: "Contraseña guardada.",
+    savePassword: "Guardar contraseña",
+    saving: "Guardando…",
+    show: "Mostrar contraseña",
+    hide: "Ocultar contraseña",
   },
   u: {
     follow: "Seguir",

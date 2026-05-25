@@ -39,4 +39,23 @@ export const usersService = {
 
   unfollow: (userId: string) =>
     apiFetch<void>(`/users/${userId}/follow`, { method: "DELETE" }),
+
+  getMe: () =>
+    apiFetch<{
+      publicProfile: boolean;
+      emailOptIn: boolean;
+      hasPassword: boolean;
+    }>("/users/me"),
+
+  updateProfile: (data: { publicProfile?: boolean; emailOptIn?: boolean }) =>
+    apiFetch<{ publicProfile: boolean; emailOptIn: boolean }>("/users/me", {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    }),
+
+  setPassword: (password: string) =>
+    apiFetch<{ ok: true }>("/me/password", {
+      method: "POST",
+      body: JSON.stringify({ password }),
+    }),
 };
