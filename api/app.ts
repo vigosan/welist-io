@@ -2,7 +2,6 @@ import Google from "@auth/core/providers/google";
 import type { AuthUser } from "@hono/auth-js";
 import { authHandler, getAuthUser, initAuthConfig } from "@hono/auth-js";
 import { zValidator } from "@hono/zod-validator";
-import bcrypt from "bcryptjs";
 import type { AnyColumn } from "drizzle-orm";
 import {
   and,
@@ -52,6 +51,7 @@ import {
   verifyGoogleIdToken,
   verifyMobileToken,
 } from "./auth-mobile.js";
+import { hashPassword, verifyPassword } from "./password.js";
 import { sendEmail } from "./email.js";
 import { signUnsubscribeToken, verifyUnsubscribeToken } from "./email-token.js";
 import { rateLimit } from "./rate-limit.js";
@@ -234,7 +234,7 @@ app.post(
     const userId = authUser?.session?.user?.id;
     if (!userId) return c.json({ error: "Unauthorized" }, 401);
     const { password } = c.req.valid("json");
-    const passwordHash = await bcrypt.hash(password, 10);
+    const passwordHash = await hashPassword(password);
     await db.update(users).set({ passwordHash }).where(eq(users.id, userId));
     return c.json({ ok: true });
   }
@@ -264,7 +264,7 @@ app.post(
     });
     if (!existing?.passwordHash)
       return c.json({ error: "Invalid email or password" }, 401);
-    const ok = await bcrypt.compare(password, existing.passwordHash);
+    const ok = await verifyPassword(password, existing.passwordHash);
     if (!ok) return c.json({ error: "Invalid email or password" }, 401);
     const user = {
       id: existing.id,
