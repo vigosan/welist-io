@@ -7,6 +7,7 @@ export const queryKeys = {
   exploreDetail: (id: string) => ["explore-detail", id] as const,
   myLists: (q?: string, sort?: string, visibility?: string) =>
     ["my-lists", q ?? "", sort ?? "recent", visibility ?? "all"] as const,
+  myListsAll: () => ["my-lists"] as const,
   listPrice: (listId: string) => ["list-price", listId] as const,
   listCollaborators: (listId: string) =>
     ["list-collaborators", listId] as const,
@@ -16,6 +17,7 @@ export const queryKeys = {
   userProfile: (userId: string) => ["user-profile", userId] as const,
   userAchievements: (userId: string) => ["user-achievements", userId] as const,
   userDirectory: (q?: string) => ["user-directory", q ?? ""] as const,
+  userDirectoryAll: () => ["user-directory"] as const,
   userSearch: (q: string) => ["user-search", q] as const,
   userMe: () => ["user-me"] as const,
   followStatus: (userId: string) => ["follow-status", userId] as const,

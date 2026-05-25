@@ -85,7 +85,7 @@ export function useCreateList() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (name: string) => listsService.create(name),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["my-lists"] }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.myListsAll() }),
   });
 }
 
@@ -275,7 +275,7 @@ export function useDeleteList() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (listId: string) => listsService.remove(listId),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["my-lists"] }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.myListsAll() }),
   });
 }
 
@@ -402,7 +402,7 @@ export function useToggleFollow(userId: string) {
           : old
       );
       qc.setQueriesData<DirectoryInfiniteData>(
-        { queryKey: ["user-directory"] },
+        { queryKey: queryKeys.userDirectoryAll() },
         (old) =>
           old
             ? {
