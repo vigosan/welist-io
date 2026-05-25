@@ -265,7 +265,7 @@ export default function ListDetailScreen() {
         </Pressable>
       </View>
 
-      {list.data && (list.data.rating.count > 0 || !isOwner) && (
+      {list.data?.rating && (list.data.rating.count > 0 || !isOwner) && (
         <View className="mx-6 mb-3 flex-row items-center justify-between">
           <StarRating
             value={list.data.rating.mine}
