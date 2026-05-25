@@ -2,6 +2,7 @@ import Google from "@auth/core/providers/google";
 import type { AuthUser } from "@hono/auth-js";
 import { authHandler, getAuthUser, initAuthConfig } from "@hono/auth-js";
 import { zValidator } from "@hono/zod-validator";
+import bcrypt from "bcryptjs";
 import type { AnyColumn } from "drizzle-orm";
 import {
   and,
@@ -216,6 +217,61 @@ app.post(
       user = created;
     }
 
+    const token = await issueMobileToken(user, secret);
+    return c.json({ token, user });
+  }
+);
+
+const setPasswordSchema = z.object({
+  password: z.string().min(8).max(200),
+});
+
+app.post(
+  "/auth/set-password",
+  zValidator("json", setPasswordSchema),
+  async (c) => {
+    const authUser = getOptionalUser(c);
+    const userId = authUser?.session?.user?.id;
+    if (!userId) return c.json({ error: "Unauthorized" }, 401);
+    const { password } = c.req.valid("json");
+    const passwordHash = await bcrypt.hash(password, 10);
+    await db.update(users).set({ passwordHash }).where(eq(users.id, userId));
+    return c.json({ ok: true });
+  }
+);
+
+const mobileEmailLoginSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(1),
+});
+
+app.post(
+  "/auth-mobile/email-login",
+  zValidator("json", mobileEmailLoginSchema),
+  async (c) => {
+    const { email, password } = c.req.valid("json");
+    const secret = process.env.AUTH_SECRET ?? "";
+    if (!secret) return c.json({ error: "Server misconfigured" }, 500);
+    const existing = await db.query.users.findFirst({
+      where: eq(users.email, email),
+      columns: {
+        id: true,
+        name: true,
+        email: true,
+        image: true,
+        passwordHash: true,
+      },
+    });
+    if (!existing?.passwordHash)
+      return c.json({ error: "Invalid email or password" }, 401);
+    const ok = await bcrypt.compare(password, existing.passwordHash);
+    if (!ok) return c.json({ error: "Invalid email or password" }, 401);
+    const user = {
+      id: existing.id,
+      name: existing.name,
+      email: existing.email,
+      image: existing.image,
+    };
     const token = await issueMobileToken(user, secret);
     return c.json({ token, user });
   }
