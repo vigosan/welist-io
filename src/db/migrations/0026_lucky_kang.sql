@@ -1,0 +1,1 @@
+ALTER TYPE "public"."notification_type" ADD VALUE 'added_as_collaborator';

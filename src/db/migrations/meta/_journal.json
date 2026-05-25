@@ -183,6 +183,13 @@
       "when": 1779439570243,
       "tag": "0025_nappy_korath",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1779687934901,
+      "tag": "0026_lucky_kang",
+      "breakpoints": true
     }
   ]
 }

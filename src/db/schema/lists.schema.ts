@@ -225,6 +225,7 @@ export const notificationTypeEnum = pgEnum("notification_type", [
   "challenge_completed",
   "new_follower",
   "list_purchased",
+  "added_as_collaborator",
 ]);
 
 export const notifications = pgTable(
