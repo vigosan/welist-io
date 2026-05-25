@@ -26,8 +26,50 @@ export const es = {
     home: "Inicio",
     explore: "Explorar",
     feed: "Feed",
-    lists: "Listas",
+    lists: "Mis listas",
+    community: "Comunidad",
+    help: "Ayuda",
     profile: "Perfil",
+  },
+  help: {
+    title: "Cómo funciona Wilist",
+    subtitle: "Todo lo que puedes hacer con Wilist, explicado.",
+    sections: {
+      lists: {
+        title: "Listas",
+        items: {
+          create: "Crea una lista y dale un nombre",
+          addItems: "Añade ítems uno a uno",
+          reorder: "Reordénalos arrastrándolos",
+          markDone: "Marca ítems como hechos o pendientes",
+          tag: "Etiqueta con #hashtag para filtrar después",
+        },
+      },
+      challenges: {
+        title: "Retos",
+        items: {
+          makePublic: "Haz pública tu lista y comparte el enlace",
+          track: "Otros pueden aceptar el reto y tener su propia copia",
+          complete: "El progreso se trackea por persona",
+        },
+      },
+      collaboration: {
+        title: "Colaboración",
+        items: {
+          enable: "Marca la lista como colaborativa para editar entre todos",
+          edit: "Cualquier colaborador puede añadir o editar ítems",
+          leave: "Sal de la lista cuando quieras",
+        },
+      },
+      social: {
+        title: "Social",
+        items: {
+          follow: "Sigue a otros usuarios",
+          feed: "Mira la actividad de a quienes sigues",
+          directory: "Descubre gente en la comunidad",
+        },
+      },
+    },
   },
   home: {
     hi: "Hola {{name}}",
