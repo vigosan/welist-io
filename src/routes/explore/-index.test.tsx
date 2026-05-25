@@ -140,15 +140,12 @@ describe("ExplorePage", () => {
     expect(screen.getByText("Lista Explorar B")).toBeInTheDocument();
   });
 
-  it("shows the average progress bar and completion count, only when there are participants", async () => {
+  it("shows the average progress bar only when there are participants", async () => {
     setupMocks();
     renderPage();
     await waitFor(() =>
       expect(screen.getByTestId("explore-card-progress-e1")).toBeInTheDocument()
     );
-    const prog = screen.getByTestId("explore-card-progress-e1");
-    expect(prog).toHaveTextContent("40%");
-    expect(prog).toHaveTextContent("1 completado");
     expect(
       screen.queryByTestId("explore-card-progress-e2")
     ).not.toBeInTheDocument();
@@ -226,11 +223,13 @@ describe("ExplorePage", () => {
     expect(a).toHaveTextContent("5 elementos");
     expect(a).toHaveTextContent("3 participantes");
     expect(a).toHaveTextContent("1 completado");
+    expect(a).toHaveTextContent("40% medio");
 
     const b = screen.getByTestId("explore-card-meta-e2");
     expect(b).toHaveTextContent("2 elementos");
     expect(b).not.toHaveTextContent("participante");
     expect(b).not.toHaveTextContent("completado");
+    expect(b).not.toHaveTextContent("% medio");
   });
 
   it("shows empty state when there are no lists", async () => {

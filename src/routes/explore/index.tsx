@@ -10,6 +10,7 @@ import { useTranslation } from "@/i18n/service";
 import { LIST_CATEGORIES, type ListCategory } from "@/lib/categories";
 import { CategoryIcon } from "@/lib/categoryIcons";
 import { plainItemText } from "@/lib/item-text";
+import { privateName } from "@/lib/private-name";
 import type { ExploreItem } from "@/services/lists.service";
 
 export const Route = createFileRoute("/explore/")({
@@ -54,14 +55,30 @@ function ExploreListCard({
     }
   }
 
+  const owner =
+    list.owner?.id && list.owner?.name
+      ? { id: list.owner.id, name: list.owner.name, image: list.owner.image }
+      : null;
+  const pct =
+    list.participantCount > 0 && list.itemCount > 0
+      ? Math.min(
+          100,
+          Math.round(
+            (list.progressDoneTotal /
+              (list.participantCount * list.itemCount)) *
+              100
+          )
+        )
+      : null;
+
   return (
     <div className="rounded-2xl border border-black/[0.08] dark:border-white/[0.08] bg-white dark:bg-white/[0.02] p-5 transition-colors duration-150 hover:border-black/[0.18] dark:hover:border-white/[0.18]">
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex-1 min-w-0">
+      {(list.category || owner) && (
+        <div className="mb-2 flex items-center gap-3">
           {list.category && (
             <span
               data-testid={`explore-card-category-${list.id}`}
-              className="mb-2 inline-flex items-center gap-1.5 rounded-full border border-black/[0.10] dark:border-white/[0.10] bg-black/[0.03] dark:bg-white/[0.04] px-2 py-0.5 text-[11px] font-medium text-gray-600 dark:text-gray-400"
+              className="inline-flex items-center gap-1.5 rounded-full border border-black/[0.10] dark:border-white/[0.10] bg-black/[0.03] dark:bg-white/[0.04] px-2 py-0.5 text-[11px] font-medium text-gray-600 dark:text-gray-400"
             >
               <CategoryIcon
                 category={list.category as ListCategory}
@@ -71,152 +88,127 @@ function ExploreListCard({
               {t(`categories.${list.category}`)}
             </span>
           )}
-          <Link
-            to="/explore/$listId"
-            params={{ listId: list.slug ?? list.id }}
-            className="block text-[14px] font-semibold text-[#0c0c0b] dark:text-[#f0ede8] mb-1.5 leading-snug tracking-[-0.01em] hover:opacity-70 transition-opacity duration-150 no-underline"
-          >
-            {list.name}
-          </Link>
-          {list.description && (
-            <p className="text-[12px] leading-[1.6] mb-2.5 text-gray-500 dark:text-[#6b6b67]">
-              {list.description}
-            </p>
-          )}
-          {list.previewItems.length > 0 && (
-            <p
-              data-testid={`explore-card-preview-${list.id}`}
-              className="mb-2.5 truncate text-[12px] text-gray-400 dark:text-gray-500"
+          {owner && (
+            <Link
+              to="/u/$userId"
+              params={{ userId: owner.id }}
+              data-testid={`explore-card-author-${list.id}`}
+              className="ml-auto flex items-center gap-1.5 text-[11px] text-gray-500 hover:text-[#0c0c0b] dark:text-[#6b6b67] dark:hover:text-[#f0ede8] no-underline transition-colors"
             >
-              <span className="text-gray-500 dark:text-[#6b6b67]">
-                {t("explore.previewLabel")}:
-              </span>{" "}
-              {list.previewItems.map(plainItemText).join(" · ")}
-            </p>
-          )}
-          <div
-            data-testid={`explore-card-meta-${list.id}`}
-            className="flex items-center gap-2 text-[11px] tabular-nums text-gray-500 dark:text-[#6b6b67]"
-          >
-            <span>
-              {[
-                t("explore.metaItems", { count: list.itemCount }),
-                list.participantCount > 0
-                  ? t("explore.metaParticipants", {
-                      count: list.participantCount,
-                    })
-                  : null,
-                list.completedCount > 0
-                  ? t("explore.metaCompleted", { count: list.completedCount })
-                  : null,
-              ]
-                .filter(Boolean)
-                .join(" · ")}
-            </span>
-            {list.rating.count > 0 && (
-              <>
-                <span className="text-gray-300 dark:text-gray-600">·</span>
-                <StarRatingDisplay
-                  avg={list.rating.avg}
-                  count={list.rating.count}
+              {owner.image ? (
+                <img
+                  src={owner.image}
+                  alt=""
+                  className="h-5 w-5 rounded-full object-cover outline outline-1 outline-black/10 dark:outline-white/10"
                 />
-              </>
-            )}
-          </div>
-          {list.participantCount > 0 && list.itemCount > 0 && (
-            <div
-              data-testid={`explore-card-progress-${list.id}`}
-              className="mt-2"
-            >
-              {(() => {
-                const pct = Math.min(
-                  100,
-                  Math.round(
-                    (list.progressDoneTotal /
-                      (list.participantCount * list.itemCount)) *
-                      100
-                  )
-                );
-                return (
-                  <>
-                    <div className="h-0.5 w-full overflow-hidden rounded-full bg-black/[0.06] dark:bg-white/[0.06]">
-                      <div
-                        className="h-full rounded-full bg-[#0c0c0b] dark:bg-[#f0ede8]"
-                        style={{
-                          width: `${pct}%`,
-                          transition: "width 600ms cubic-bezier(0.2, 0, 0, 1)",
-                        }}
-                      />
-                    </div>
-                    <p className="mt-1 text-[11px] tabular-nums text-gray-400 dark:text-gray-500">
-                      {t("explore.avgProgress", { pct })}
-                      {list.completedCount > 0 &&
-                        ` · ${t("explore.metaCompleted", {
-                          count: list.completedCount,
-                        })}`}
-                    </p>
-                  </>
-                );
-              })()}
-            </div>
-          )}
-          {list.owner?.id && list.owner?.name && (
-            <div className="mt-1 text-[11px] text-gray-400 dark:text-gray-500">
-              {t("explore.by")}{" "}
-              <Link
-                to="/u/$userId"
-                params={{ userId: list.owner.id }}
-                data-testid={`explore-card-author-${list.id}`}
-                className="font-medium text-gray-500 no-underline hover:text-[#0c0c0b] dark:text-[#6b6b67] dark:hover:text-[#f0ede8]"
-              >
-                {list.owner.name}
-              </Link>
-            </div>
-          )}
-          {list.participants.length > 0 && (
-            <div
-              data-testid={`explore-card-participants-${list.id}`}
-              className="mt-2.5 flex items-center gap-2"
-            >
-              <div className="flex -space-x-2">
-                {list.participants.map((p) =>
-                  p.image ? (
-                    <img
-                      key={p.id}
-                      src={p.image}
-                      alt={p.name ?? ""}
-                      title={p.name ?? ""}
-                      className="h-6 w-6 rounded-full object-cover outline outline-2 outline-[#f8f7f5] dark:outline-[#0d0d0d]"
-                    />
-                  ) : (
-                    <div
-                      key={p.id}
-                      title={p.name ?? ""}
-                      className="flex h-6 w-6 items-center justify-center rounded-full bg-black/[0.06] text-[9px] font-semibold text-gray-500 outline outline-2 outline-[#f8f7f5] dark:bg-white/[0.08] dark:text-[#6b6b67] dark:outline-[#0d0d0d]"
-                    >
-                      {(p.name ?? "?")[0]?.toUpperCase()}
-                    </div>
-                  )
-                )}
-              </div>
-              {list.participantCount > list.participants.length && (
-                <span className="text-[11px] tabular-nums text-gray-400 dark:text-gray-500">
-                  +{list.participantCount - list.participants.length}
-                </span>
+              ) : (
+                <div className="h-5 w-5 rounded-full bg-black/[0.06] dark:bg-white/[0.06] outline outline-1 outline-black/10 dark:outline-white/10" />
               )}
-            </div>
+              <span className="font-medium">{privateName(owner.name)}</span>
+            </Link>
           )}
         </div>
-        {list.owner?.image ? (
-          <img
-            src={list.owner.image}
-            alt=""
-            className="w-9 h-9 rounded-full shrink-0 outline outline-1 outline-black/10 dark:outline-white/10"
-          />
-        ) : (
-          <div className="w-9 h-9 rounded-full shrink-0 bg-black/[0.06] dark:bg-white/[0.06] border border-black/[0.08] dark:border-white/[0.08]" />
+      )}
+      <Link
+        to="/explore/$listId"
+        params={{ listId: list.slug ?? list.id }}
+        className="block text-[14px] font-semibold text-[#0c0c0b] dark:text-[#f0ede8] mb-1.5 leading-snug tracking-[-0.01em] hover:opacity-70 transition-opacity duration-150 no-underline"
+      >
+        {list.name}
+      </Link>
+      {list.description && (
+        <p className="text-[12px] leading-[1.6] mb-2.5 text-gray-500 dark:text-[#6b6b67]">
+          {list.description}
+        </p>
+      )}
+      {list.previewItems.length > 0 && (
+        <p
+          data-testid={`explore-card-preview-${list.id}`}
+          className="mb-2.5 truncate text-[12px] text-gray-400 dark:text-gray-500"
+        >
+          <span className="text-gray-500 dark:text-[#6b6b67]">
+            {t("explore.previewLabel")}:
+          </span>{" "}
+          {list.previewItems.map(plainItemText).join(" · ")}
+        </p>
+      )}
+      <div
+        data-testid={`explore-card-meta-${list.id}`}
+        className="flex items-center gap-2 text-[11px] tabular-nums text-gray-500 dark:text-[#6b6b67]"
+      >
+        <span>
+          {[
+            t("explore.metaItems", { count: list.itemCount }),
+            list.participantCount > 0
+              ? t("explore.metaParticipants", {
+                  count: list.participantCount,
+                })
+              : null,
+            list.completedCount > 0
+              ? t("explore.metaCompleted", { count: list.completedCount })
+              : null,
+            pct !== null ? t("explore.avgProgressShort", { pct }) : null,
+          ]
+            .filter(Boolean)
+            .join(" · ")}
+        </span>
+        {list.rating.count > 0 && (
+          <>
+            <span className="text-gray-300 dark:text-gray-600">·</span>
+            <StarRatingDisplay
+              avg={list.rating.avg}
+              count={list.rating.count}
+            />
+          </>
         )}
       </div>
+      {pct !== null && (
+        <div
+          data-testid={`explore-card-progress-${list.id}`}
+          className="mt-2 h-0.5 w-full overflow-hidden rounded-full bg-black/[0.06] dark:bg-white/[0.06]"
+        >
+          <div
+            className="h-full rounded-full bg-[#0c0c0b] dark:bg-[#f0ede8]"
+            style={{
+              width: `${pct}%`,
+              transition: "width 600ms cubic-bezier(0.2, 0, 0, 1)",
+            }}
+          />
+        </div>
+      )}
+      {list.participants.length > 0 && (
+        <div
+          data-testid={`explore-card-participants-${list.id}`}
+          className="mt-2.5 flex items-center gap-2"
+        >
+          <div className="flex -space-x-2">
+            {list.participants.map((p) =>
+              p.image ? (
+                <img
+                  key={p.id}
+                  src={p.image}
+                  alt={p.name ?? ""}
+                  title={p.name ?? ""}
+                  className="h-6 w-6 rounded-full object-cover outline outline-2 outline-[#f8f7f5] dark:outline-[#0d0d0d]"
+                />
+              ) : (
+                <div
+                  key={p.id}
+                  title={p.name ?? ""}
+                  className="flex h-6 w-6 items-center justify-center rounded-full bg-black/[0.06] text-[9px] font-semibold text-gray-500 outline outline-2 outline-[#f8f7f5] dark:bg-white/[0.08] dark:text-[#6b6b67] dark:outline-[#0d0d0d]"
+                >
+                  {(p.name ?? "?")[0]?.toUpperCase()}
+                </div>
+              )
+            )}
+          </div>
+          {list.participantCount > list.participants.length && (
+            <span className="text-[11px] tabular-nums text-gray-400 dark:text-gray-500">
+              +{list.participantCount - list.participants.length}
+            </span>
+          )}
+        </div>
+      )}
       <button
         type="button"
         onClick={handleAccept}
