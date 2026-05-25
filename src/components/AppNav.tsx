@@ -65,6 +65,7 @@ function NavLink({
     <Link
       to={to}
       data-testid={testId}
+      aria-current={isActive ? "page" : undefined}
       className={[
         "cursor-pointer text-[13px] transition-colors duration-150",
         "no-underline tracking-[0.01em] pb-[2px] border-b",
@@ -161,6 +162,11 @@ export function AppNav() {
               type="button"
               onClick={() => setLanguage(language === "es" ? "en" : "es")}
               data-testid="lang-switcher"
+              aria-label={
+                language === "es"
+                  ? "Switch language to English"
+                  : "Cambiar idioma a español"
+              }
               className="cursor-pointer text-[11px] font-medium font-mono text-gray-500 dark:text-muted hover:text-ink dark:hover:text-paper transition-colors duration-150 tabular-nums"
             >
               {language === "es" ? "EN" : "ES"}
@@ -356,6 +362,11 @@ export function AppNav() {
                   closeMobile();
                 }}
                 data-testid="lang-switcher-mobile"
+                aria-label={
+                  language === "es"
+                    ? "Switch language to English"
+                    : "Cambiar idioma a español"
+                }
                 className="cursor-pointer text-[11px] font-medium font-mono text-gray-500 dark:text-muted hover:text-ink dark:hover:text-paper transition-colors duration-150 tabular-nums"
               >
                 {language === "es" ? "EN" : "ES"}
