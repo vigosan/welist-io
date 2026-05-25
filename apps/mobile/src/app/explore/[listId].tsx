@@ -1,4 +1,4 @@
-import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import {
   ActivityIndicator,
   Alert,
@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { ScreenHeader } from "@/components/ScreenHeader";
 import {
   useAcceptChallenge,
   useExploreDetail,
@@ -46,14 +47,11 @@ export default function ExploreDetailScreen() {
   if (!d) return null;
 
   return (
-    <SafeAreaView className="flex-1 bg-canvas dark:bg-canvas-dark">
-      <Stack.Screen options={{ title: d.name, headerShown: true }} />
+    <SafeAreaView className="flex-1 bg-canvas dark:bg-canvas-dark" edges={["top"]}>
+      <ScreenHeader title={d.name} back />
 
-      <ScrollView contentContainerClassName="px-6 pb-10 pt-4">
-        <Text className="text-2xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
-          {d.name}
-        </Text>
-        <Text className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+      <ScrollView contentContainerClassName="px-5 pb-10">
+        <Text className="text-sm text-gray-500 dark:text-gray-400">
           {t("common.by")} {d.owner?.name ?? t("common.anonymous")}
         </Text>
 

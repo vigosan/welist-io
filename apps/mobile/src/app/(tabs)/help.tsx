@@ -1,6 +1,7 @@
 import { ScrollView, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { ScreenHeader } from "@/components/ScreenHeader";
 
 export default function HelpScreen() {
   const { t } = useTranslation();
@@ -11,10 +12,8 @@ export default function HelpScreen() {
       className="flex-1 bg-canvas dark:bg-canvas-dark"
       edges={["top"]}
     >
-      <ScrollView contentContainerClassName="px-4 pb-12">
-        <Text className="mt-2 mb-3 text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
-          {t("help.title")}
-        </Text>
+      <ScreenHeader title={t("help.title")} />
+      <ScrollView contentContainerClassName="px-5 pb-12">
         <Text className="mb-6 text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
           {t("help.subtitle")}
         </Text>

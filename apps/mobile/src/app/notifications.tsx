@@ -1,4 +1,4 @@
-import { Stack, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import {
   ActivityIndicator,
   FlatList,
@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { ScreenHeader } from "@/components/ScreenHeader";
 import {
   useMarkAllNotificationsRead,
   useMarkNotificationRead,
@@ -34,26 +35,25 @@ export default function NotificationsScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-canvas dark:bg-canvas-dark">
-      <Stack.Screen
-        options={{
-          title: t("notifications.title"),
-          headerShown: true,
-          headerRight: () =>
-            (query.data?.length ?? 0) > 0 ? (
-              <Pressable onPress={() => markAllRead.mutate()} className="pr-3">
-                <Text className="text-sm text-gray-900 dark:text-gray-100">
-                  {t("notifications.markAllRead")}
-                </Text>
-              </Pressable>
-            ) : null,
-        }}
+    <SafeAreaView className="flex-1 bg-canvas dark:bg-canvas-dark" edges={["top"]}>
+      <ScreenHeader
+        title={t("notifications.title")}
+        back
+        right={
+          (query.data?.length ?? 0) > 0 ? (
+            <Pressable onPress={() => markAllRead.mutate()} hitSlop={8}>
+              <Text className="text-sm text-gray-900 dark:text-gray-100">
+                {t("notifications.markAllRead")}
+              </Text>
+            </Pressable>
+          ) : null
+        }
       />
 
       <FlatList
         data={query.data ?? []}
         keyExtractor={(n) => n.id}
-        contentContainerClassName="px-6 pb-10 pt-3"
+        contentContainerClassName="px-5 pb-10"
         refreshControl={
           <RefreshControl
             refreshing={query.isRefetching}

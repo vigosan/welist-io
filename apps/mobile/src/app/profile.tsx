@@ -2,6 +2,7 @@ import { useColorScheme } from "nativewind";
 import { Pressable, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { ScreenHeader } from "@/components/ScreenHeader";
 import {
   currentLanguage,
   setLanguage,
@@ -34,12 +35,10 @@ export default function ProfileScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-canvas dark:bg-canvas-dark">
-      <View className="flex-1 px-6 pt-16">
-        <Text className="text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
-          {t("profile.title")}
-        </Text>
-        <Text className="mt-4 text-base text-gray-900 dark:text-gray-100">
+    <SafeAreaView className="flex-1 bg-canvas dark:bg-canvas-dark" edges={["top"]}>
+      <ScreenHeader title={t("profile.title")} back />
+      <View className="flex-1 px-5">
+        <Text className="text-base text-gray-900 dark:text-gray-100">
           {session.user.name ?? "—"}
         </Text>
         <Text className="text-sm text-gray-500 dark:text-gray-400">

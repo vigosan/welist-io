@@ -1,4 +1,4 @@
-import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { ScreenHeader } from "@/components/ScreenHeader";
 import {
   useAddCollaborator,
   useCollaborators,
@@ -118,10 +119,10 @@ export default function ListSettingsScreen() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-canvas dark:bg-canvas-dark">
-      <Stack.Screen options={{ title: t("settings.title"), headerShown: true }} />
+    <SafeAreaView className="flex-1 bg-canvas dark:bg-canvas-dark" edges={["top"]}>
+      <ScreenHeader title={t("settings.title")} back />
 
-      <ScrollView contentContainerClassName="px-6 pb-10 pt-4">
+      <ScrollView contentContainerClassName="px-5 pb-10">
         <Field label={t("settings.name")}>
           <TextInput
             value={name}

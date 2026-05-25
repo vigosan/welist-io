@@ -1,5 +1,5 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { ChevronLeft, Settings } from "lucide-react-native";
+import { Settings } from "lucide-react-native";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
@@ -20,6 +20,7 @@ import DraggableFlatList, {
 } from "react-native-draggable-flatlist";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LocationPickerModal } from "@/components/LocationPickerModal";
+import { ScreenHeader } from "@/components/ScreenHeader";
 import {
   useAddItem,
   useBulkAddItems,
@@ -222,36 +223,26 @@ export default function ListDetailScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-canvas dark:bg-canvas-dark">
-      <View className="flex-row items-center justify-between px-2 py-1">
-        <Pressable
-          onPress={() => router.back()}
-          accessibilityLabel={t("common.back")}
-          hitSlop={8}
-          className="h-9 w-9 items-center justify-center rounded-full active:bg-black/[0.05] dark:active:bg-white/[0.06]"
-        >
-          <ChevronLeft color="#0c0c0b" size={24} />
-        </Pressable>
-        <Text
-          numberOfLines={1}
-          className="mx-2 flex-1 text-center text-base font-semibold text-gray-900 dark:text-gray-100"
-        >
-          {list.data?.name ?? ""}
-        </Text>
-        <Pressable
-          onPress={() =>
-            router.push({
-              pathname: "/lists/[listId]/settings",
-              params: { listId },
-            })
-          }
-          accessibilityLabel={t("list.settings")}
-          hitSlop={8}
-          className="h-9 w-9 items-center justify-center rounded-full active:bg-black/[0.05] dark:active:bg-white/[0.06]"
-        >
-          <Settings color="#0c0c0b" size={20} />
-        </Pressable>
-      </View>
+    <SafeAreaView className="flex-1 bg-canvas dark:bg-canvas-dark" edges={["top"]}>
+      <ScreenHeader
+        title={list.data?.name ?? ""}
+        back
+        right={
+          <Pressable
+            onPress={() =>
+              router.push({
+                pathname: "/lists/[listId]/settings",
+                params: { listId },
+              })
+            }
+            accessibilityLabel={t("list.settings")}
+            hitSlop={8}
+            className="h-9 w-9 items-center justify-center rounded-full active:bg-black/[0.05] dark:active:bg-white/[0.06]"
+          >
+            <Settings color="#0c0c0b" size={20} />
+          </Pressable>
+        }
+      />
 
       <View className="mx-6 mt-3 mb-3 flex-row items-center gap-2 rounded-2xl border border-gray-200 bg-white p-1.5 dark:border-gray-700 dark:bg-gray-900">
         <TextInput

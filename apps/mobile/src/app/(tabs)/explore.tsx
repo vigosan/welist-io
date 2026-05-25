@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { ScreenHeader } from "@/components/ScreenHeader";
 import { useExplore } from "@/hooks/explore";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { LIST_CATEGORIES, type ListCategory } from "@/lib/categories";
@@ -35,12 +36,8 @@ export default function ExploreScreen() {
   );
 
   return (
-    <SafeAreaView className="flex-1 bg-canvas dark:bg-canvas-dark">
-      <View className="px-6 pt-6 pb-3">
-        <Text className="text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
-          {t("explore.title")}
-        </Text>
-      </View>
+    <SafeAreaView className="flex-1 bg-canvas dark:bg-canvas-dark" edges={["top"]}>
+      <ScreenHeader title={t("explore.title")} />
 
       <View className="mx-6 mb-3 flex-row items-center gap-2 rounded-2xl border border-gray-200 bg-white p-1.5 dark:border-gray-700 dark:bg-gray-900">
         <TextInput

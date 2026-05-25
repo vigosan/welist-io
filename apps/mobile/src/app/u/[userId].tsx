@@ -1,4 +1,4 @@
-import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import {
   ActivityIndicator,
   Alert,
@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { ScreenHeader } from "@/components/ScreenHeader";
 import {
   useFollowStatus,
   useToggleFollow,
@@ -49,15 +50,10 @@ export default function UserProfileScreen() {
   if (!p) return null;
 
   return (
-    <SafeAreaView className="flex-1 bg-canvas dark:bg-canvas-dark">
-      <Stack.Screen
-        options={{ title: p.name ?? t("profile.title"), headerShown: true }}
-      />
+    <SafeAreaView className="flex-1 bg-canvas dark:bg-canvas-dark" edges={["top"]}>
+      <ScreenHeader title={p.name ?? t("common.anonymous")} back />
 
-      <ScrollView contentContainerClassName="px-6 pb-10 pt-4">
-        <Text className="text-2xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
-          {p.name ?? t("common.anonymous")}
-        </Text>
+      <ScrollView contentContainerClassName="px-5 pb-10">
 
         {status.data && (
           <Text className="mt-1 text-xs text-gray-500 dark:text-gray-400">
