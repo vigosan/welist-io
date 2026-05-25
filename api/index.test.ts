@@ -1853,6 +1853,8 @@ describe("GET /api/users", () => {
 });
 
 describe("GET /api/users/search", () => {
+  const headers = { "x-forwarded-for": "10.0.0.42" };
+
   beforeEach(() => {
     vi.clearAllMocks();
     mockGetAuthUser.mockResolvedValue({ session: { user: { id: "me" } } });
@@ -1860,17 +1862,17 @@ describe("GET /api/users/search", () => {
 
   it("returns 401 when unauthenticated", async () => {
     mockGetAuthUser.mockRejectedValue(new Error("no session"));
-    const res = await app.request("/api/users/search?q=ali");
+    const res = await app.request("/api/users/search?q=ali", { headers });
     expect(res.status).toBe(401);
   });
 
   it("returns 400 when q is missing", async () => {
-    const res = await app.request("/api/users/search");
+    const res = await app.request("/api/users/search", { headers });
     expect(res.status).toBe(400);
   });
 
   it("returns 400 when q is shorter than 2 characters", async () => {
-    const res = await app.request("/api/users/search?q=a");
+    const res = await app.request("/api/users/search?q=a", { headers });
     expect(res.status).toBe(400);
   });
 
@@ -1885,7 +1887,7 @@ describe("GET /api/users/search", () => {
     };
     mockDb.select.mockReturnValue(chain);
 
-    const res = await app.request("/api/users/search?q=ali");
+    const res = await app.request("/api/users/search?q=ali", { headers });
     expect(res.status).toBe(200);
     const body = (await res.json()) as {
       users: { id: string; name: string; email: string; image: string | null }[];
@@ -1902,7 +1904,7 @@ describe("GET /api/users/search", () => {
     };
     mockDb.select.mockReturnValue(chain);
 
-    await app.request("/api/users/search?q=al");
+    await app.request("/api/users/search?q=al", { headers });
     expect(chain.limit).toHaveBeenCalledWith(8);
   });
 });
