@@ -187,8 +187,10 @@ export function AppNav() {
             ) : (
               <button
                 type="button"
+                onClick={() => signIn("google")}
                 onMouseEnter={() => setLoginHov(true)}
                 onMouseLeave={() => setLoginHov(false)}
+                data-testid="sign-in-btn"
                 className="cursor-pointer text-[12px] font-medium transition-all duration-150"
                 style={{
                   padding: "5px 14px",
