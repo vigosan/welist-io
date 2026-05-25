@@ -253,7 +253,8 @@ type NotificationType =
   | "challenge_accepted"
   | "challenge_completed"
   | "new_follower"
-  | "list_purchased";
+  | "list_purchased"
+  | "added_as_collaborator";
 
 type CreateNotificationInput = {
   recipientId: string;
@@ -1915,6 +1916,67 @@ app.get("/lists/:listId/collaborators", async (c) => {
     }));
   return c.json({ collaborators, challengers });
 });
+
+app.post(
+  "/lists/:listId/collaborators",
+  zValidator("json", z.object({ userId: z.string().min(1) })),
+  async (c) => {
+    const authUser = getOptionalUser(c);
+    const viewerId = authUser?.session?.user?.id;
+    if (!viewerId) return c.json({ error: "Unauthorized" }, 401);
+
+    const list = await db.query.lists.findFirst({
+      where: listWhere(c.req.param("listId")),
+      columns: { id: true, name: true, ownerId: true, collaborative: true },
+    });
+    if (!list) return c.json({ error: "Not found" }, 404);
+    if (list.ownerId !== viewerId) return c.json({ error: "Forbidden" }, 403);
+    if (!list.collaborative)
+      return c.json({ error: "list_not_collaborative" }, 400);
+
+    const { userId } = c.req.valid("json");
+    if (userId === list.ownerId)
+      return c.json({ error: "owner_cannot_be_collaborator" }, 400);
+
+    const target = await db.query.users.findFirst({
+      where: eq(users.id, userId),
+      columns: { id: true },
+    });
+    if (!target) return c.json({ error: "user_not_found" }, 404);
+
+    const existing = await getParticipation(list.id, userId);
+    if (existing?.role === "collaborator") return c.body(null, 204);
+
+    if (existing) {
+      await db
+        .update(participations)
+        .set({ role: "collaborator" })
+        .where(eq(participations.id, existing.id));
+    } else {
+      await db.insert(participations).values({
+        sourceListId: list.id,
+        userId,
+        role: "collaborator",
+      });
+    }
+
+    const actor = await db.query.users.findFirst({
+      where: eq(users.id, viewerId),
+      columns: { name: true, image: true },
+    });
+    await createNotification({
+      recipientId: userId,
+      type: "added_as_collaborator",
+      listId: list.id,
+      listName: list.name,
+      actorId: viewerId,
+      actorName: actor?.name,
+      actorImage: actor?.image,
+    });
+
+    return c.body(null, 204);
+  }
+);
 
 app.get("/lists/:listId/activity", async (c) => {
   const authUser = getOptionalUser(c);

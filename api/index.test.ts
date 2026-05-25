@@ -47,7 +47,9 @@ vi.mock("stripe", () => {
 
 const { app } = await import("./app");
 const { sendEmail: mockSendEmail } = await import("./email");
-const { achievements } = await import("../src/db/schema/index");
+const { achievements, notifications, participations } = await import(
+  "../src/db/schema/index"
+);
 
 function chainableInsert() {
   const valuesMock = vi.fn().mockImplementation(() => {
@@ -1906,6 +1908,148 @@ describe("GET /api/users/search", () => {
 
     await app.request("/api/users/search?q=al", { headers });
     expect(chain.limit).toHaveBeenCalledWith(8);
+  });
+});
+
+describe("POST /api/lists/:listId/collaborators", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockGetAuthUser.mockResolvedValue({ session: { user: { id: "owner" } } });
+  });
+
+  const url = "/api/lists/abc/collaborators";
+  const body = (userId: string) => ({
+    method: "POST",
+    body: JSON.stringify({ userId }),
+    headers: {
+      "Content-Type": "application/json",
+      "x-forwarded-for": "10.0.7.1",
+    },
+  });
+
+  it("returns 401 when unauthenticated", async () => {
+    mockGetAuthUser.mockRejectedValue(new Error("no session"));
+    const res = await app.request(url, body("u2"));
+    expect(res.status).toBe(401);
+  });
+
+  it("returns 404 when list does not exist", async () => {
+    mockDb.query.lists.findFirst.mockResolvedValue(null);
+    const res = await app.request(url, body("u2"));
+    expect(res.status).toBe(404);
+  });
+
+  it("returns 403 when caller is not the owner", async () => {
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "abc",
+      name: "Lista",
+      ownerId: "someone-else",
+      collaborative: true,
+    });
+    const res = await app.request(url, body("u2"));
+    expect(res.status).toBe(403);
+  });
+
+  it("returns 400 when list is not collaborative", async () => {
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "abc",
+      name: "Lista",
+      ownerId: "owner",
+      collaborative: false,
+    });
+    const res = await app.request(url, body("u2"));
+    expect(res.status).toBe(400);
+    const json = (await res.json()) as { error: string };
+    expect(json.error).toBe("list_not_collaborative");
+  });
+
+  it("returns 400 when adding the owner as collaborator", async () => {
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "abc",
+      name: "Lista",
+      ownerId: "owner",
+      collaborative: true,
+    });
+    const res = await app.request(url, body("owner"));
+    expect(res.status).toBe(400);
+    const json = (await res.json()) as { error: string };
+    expect(json.error).toBe("owner_cannot_be_collaborator");
+  });
+
+  it("returns 404 when target user does not exist", async () => {
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "abc",
+      name: "Lista",
+      ownerId: "owner",
+      collaborative: true,
+    });
+    mockDb.query.users.findFirst.mockResolvedValue(null);
+    const res = await app.request(url, body("ghost"));
+    expect(res.status).toBe(404);
+  });
+
+  it("inserts participation and creates notification when new", async () => {
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "abc",
+      name: "Lista",
+      ownerId: "owner",
+      collaborative: true,
+    });
+    mockDb.query.users.findFirst
+      .mockResolvedValueOnce({ id: "u2" })
+      .mockResolvedValueOnce({ name: "Owner", image: null });
+    mockDb.query.participations.findFirst.mockResolvedValue(null);
+    mockDb.insert.mockReturnValue(chainableInsert());
+
+    const res = await app.request(url, body("u2"));
+    expect(res.status).toBe(204);
+    expect(mockDb.insert).toHaveBeenCalledWith(participations);
+    expect(mockDb.insert).toHaveBeenCalledWith(notifications);
+  });
+
+  it("upgrades existing challenger participation to collaborator", async () => {
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "abc",
+      name: "Lista",
+      ownerId: "owner",
+      collaborative: true,
+    });
+    mockDb.query.users.findFirst
+      .mockResolvedValueOnce({ id: "u2" })
+      .mockResolvedValueOnce({ name: "Owner", image: null });
+    mockDb.query.participations.findFirst.mockResolvedValue({
+      id: "p1",
+      role: "challenger",
+    });
+    const setMock = vi.fn().mockReturnValue({
+      where: vi.fn().mockResolvedValue(undefined),
+    });
+    mockDb.update.mockReturnValue({ set: setMock });
+    mockDb.insert.mockReturnValue(chainableInsert());
+
+    const res = await app.request(url, body("u2"));
+    expect(res.status).toBe(204);
+    expect(mockDb.update).toHaveBeenCalledWith(participations);
+    expect(setMock).toHaveBeenCalledWith({ role: "collaborator" });
+  });
+
+  it("is idempotent when user is already a collaborator", async () => {
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "abc",
+      name: "Lista",
+      ownerId: "owner",
+      collaborative: true,
+    });
+    mockDb.query.users.findFirst.mockResolvedValueOnce({ id: "u2" });
+    mockDb.query.participations.findFirst.mockResolvedValue({
+      id: "p1",
+      role: "collaborator",
+    });
+
+    const res = await app.request(url, body("u2"));
+    expect(res.status).toBe(204);
+    expect(mockDb.insert).not.toHaveBeenCalled();
+    expect(mockDb.update).not.toHaveBeenCalled();
   });
 });
 
