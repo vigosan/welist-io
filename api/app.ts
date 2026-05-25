@@ -14,7 +14,6 @@ import {
   isNotNull,
   lt,
   max,
-  min,
   or,
   sql,
 } from "drizzle-orm";
@@ -727,11 +726,11 @@ app.post(
     if (!canModifyList(list, userId))
       return c.json({ error: "Forbidden" }, 403);
     const { text, latitude, longitude, placeName } = c.req.valid("json");
-    const [minRow] = await db
-      .select({ pos: min(items.position) })
+    const [maxRow] = await db
+      .select({ pos: max(items.position) })
       .from(items)
       .where(eq(items.listId, list.id));
-    const position = (minRow?.pos ?? 0) - 1;
+    const position = (maxRow?.pos ?? -1) + 1;
     const [item] = await db
       .insert(items)
       .values({

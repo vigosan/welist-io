@@ -381,13 +381,13 @@ describe("POST /api/lists/:listId/items", () => {
     expect(body.text).toBe("Nueva tarea");
   });
 
-  it("assigns position -1 when list has no items", async () => {
+  it("assigns position 0 when list has no items", async () => {
     const item = {
       id: "i1",
       listId: "abc",
       text: "Primero",
       done: false,
-      position: -1,
+      position: 0,
     };
     mockDb.query.lists.findFirst.mockResolvedValue({
       id: "abc",
@@ -411,7 +411,41 @@ describe("POST /api/lists/:listId/items", () => {
     });
 
     expect(valuesMock).toHaveBeenCalledWith(
-      expect.objectContaining({ position: -1 })
+      expect.objectContaining({ position: 0 })
+    );
+  });
+
+  it("assigns position after the last item", async () => {
+    const item = {
+      id: "i1",
+      listId: "abc",
+      text: "Siguiente",
+      done: false,
+      position: 5,
+    };
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "abc",
+      ownerId: null,
+      collaborative: false,
+    });
+    mockDb.select.mockReturnValue({
+      from: vi.fn().mockReturnValue({
+        where: vi.fn().mockResolvedValue([{ pos: 4 }]),
+      }),
+    });
+    const valuesMock = vi.fn().mockReturnValue({
+      returning: vi.fn().mockResolvedValue([item]),
+    });
+    mockDb.insert.mockReturnValue({ values: valuesMock });
+
+    await app.request("/api/lists/abc/items", {
+      method: "POST",
+      body: JSON.stringify({ text: "Siguiente" }),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    expect(valuesMock).toHaveBeenCalledWith(
+      expect.objectContaining({ position: 5 })
     );
   });
 
