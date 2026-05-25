@@ -105,22 +105,58 @@ export default function MyListsScreen() {
         </Pressable>
       </View>
 
-      <View className="mx-6 mb-2 rounded-2xl border border-gray-200 bg-white p-1.5 dark:border-gray-700 dark:bg-gray-900">
+      <View className="mx-6 mb-3 flex-row items-center gap-2 rounded-2xl border border-gray-200 bg-white p-1.5 dark:border-gray-700 dark:bg-gray-900">
         <TextInput
           value={search}
           onChangeText={setSearch}
           placeholder={t("lists.searchPlaceholder")}
           placeholderTextColor="#a0a09c"
           autoCapitalize="none"
-          className="px-3 py-2 text-sm text-gray-900 dark:text-gray-100"
+          className="flex-1 px-3 py-2 text-sm text-gray-900 dark:text-gray-100"
         />
+      </View>
+
+      <View className="mx-6 mb-3 flex-row gap-1 rounded-xl bg-gray-100 p-1 dark:bg-gray-800">
+        {VISIBILITIES.map((v) => {
+          const active = visibility === v;
+          return (
+            <Pressable
+              key={v}
+              onPress={() => setVisibility(v)}
+              className={`flex-1 items-center rounded-lg py-1.5 ${
+                active ? "bg-white dark:bg-gray-900" : ""
+              }`}
+              style={
+                active
+                  ? {
+                      shadowColor: "#000",
+                      shadowOpacity: 0.06,
+                      shadowRadius: 2,
+                      shadowOffset: { width: 0, height: 1 },
+                      elevation: 1,
+                    }
+                  : undefined
+              }
+            >
+              <Text
+                className={`text-xs font-medium ${
+                  active
+                    ? "text-gray-900 dark:text-gray-100"
+                    : "text-gray-500 dark:text-gray-400"
+                }`}
+              >
+                {t(`lists.visibility${v[0].toUpperCase()}${v.slice(1)}` as never)}
+              </Text>
+            </Pressable>
+          );
+        })}
       </View>
 
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerClassName="px-6 gap-1.5"
-        style={{ flexGrow: 0, flexShrink: 0, marginBottom: 8 }}
+        style={{ flexGrow: 0, flexShrink: 0, marginBottom: 12 }}
       >
         {SORTS.map((s) => {
           const active = sort === s;
@@ -142,38 +178,6 @@ export default function MyListsScreen() {
                 }`}
               >
                 {t(`lists.sort${s[0].toUpperCase()}${s.slice(1)}` as never)}
-              </Text>
-            </Pressable>
-          );
-        })}
-      </ScrollView>
-
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerClassName="px-6 gap-1.5"
-        style={{ flexGrow: 0, flexShrink: 0, marginBottom: 12 }}
-      >
-        {VISIBILITIES.map((v) => {
-          const active = visibility === v;
-          return (
-            <Pressable
-              key={v}
-              onPress={() => setVisibility(v)}
-              className={`rounded-full px-3 py-1 ${
-                active
-                  ? "bg-gray-900 dark:bg-gray-100"
-                  : "bg-gray-100 dark:bg-gray-800"
-              }`}
-            >
-              <Text
-                className={`text-xs font-medium ${
-                  active
-                    ? "text-white dark:text-gray-900"
-                    : "text-gray-700 dark:text-gray-300"
-                }`}
-              >
-                {t(`lists.visibility${v[0].toUpperCase()}${v.slice(1)}` as never)}
               </Text>
             </Pressable>
           );
