@@ -1,5 +1,6 @@
 import { signIn, useSession } from "@hono/auth-js/react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useState } from "react";
 import { AppNav } from "@/components/AppNav";
 import { ParticipantsPanel } from "@/components/lists/ParticipantsPanel";
 import {
@@ -29,6 +30,7 @@ function ExploreDetailPage() {
   const { data: session } = useSession();
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const [showChallengers, setShowChallengers] = useState(false);
 
   function handleAccept() {
     const id = detail?.id;
@@ -159,30 +161,34 @@ function ExploreDetailPage() {
             </span>
           </div>
           {shownParticipants.length > 0 && (
-            <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={() => setShowChallengers((v) => !v)}
+              aria-expanded={showChallengers}
+              aria-label={`${challengers.length} challengers`}
+              data-testid="challengers-toggle"
+              className="cursor-pointer flex items-center gap-1.5 hover:opacity-70 transition-opacity"
+            >
               <div className="flex -space-x-1.5">
-                {shownParticipants.map((p) => (
-                  <Link
-                    key={p.id}
-                    to="/u/$userId"
-                    params={{ userId: p.id }}
-                    className="hover:opacity-80 transition-opacity"
-                  >
-                    {p.image ? (
-                      <img
-                        src={p.image}
-                        alt={p.name ?? ""}
-                        className="w-6 h-6 rounded-full outline outline-2 outline-canvas dark:outline-canvas-dark"
-                      />
-                    ) : (
-                      <div className="w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-700 outline outline-2 outline-canvas dark:outline-canvas-dark flex items-center justify-center">
-                        <span className="text-[8px] text-gray-500 dark:text-gray-400 font-medium">
-                          {(p.name ?? "?")[0]?.toUpperCase()}
-                        </span>
-                      </div>
-                    )}
-                  </Link>
-                ))}
+                {shownParticipants.map((p) =>
+                  p.image ? (
+                    <img
+                      key={p.id}
+                      src={p.image}
+                      alt={p.name ?? ""}
+                      className="w-6 h-6 rounded-full outline outline-2 outline-canvas dark:outline-canvas-dark"
+                    />
+                  ) : (
+                    <div
+                      key={p.id}
+                      className="w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-700 outline outline-2 outline-canvas dark:outline-canvas-dark flex items-center justify-center"
+                    >
+                      <span className="text-[8px] text-gray-500 dark:text-gray-400 font-medium">
+                        {(p.name ?? "?")[0]?.toUpperCase()}
+                      </span>
+                    </div>
+                  )
+                )}
               </div>
               {extraParticipants > 0 && (
                 <span className="text-xs text-gray-400 dark:text-gray-500 tabular-nums">
@@ -191,11 +197,11 @@ function ExploreDetailPage() {
                   })}
                 </span>
               )}
-            </div>
+            </button>
           )}
         </div>
 
-        {challengers.length > 0 && (
+        {showChallengers && challengers.length > 0 && (
           <ParticipantsPanel
             panel="challengers"
             challengers={challengers}

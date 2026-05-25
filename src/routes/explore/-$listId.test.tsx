@@ -4,7 +4,7 @@ import {
   createRouter,
   RouterProvider,
 } from "@tanstack/react-router";
-import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { routeTree } from "@/routeTree.gen";
 
@@ -88,7 +88,7 @@ describe("ExploreDetailPage", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("renders detail page with challengers panel", async () => {
+  it("hides the challengers panel by default and toggles it via the avatar stack", async () => {
     setupBaseMocks();
     vi.mocked(useExploreDetail).mockReturnValue({
       data: {
@@ -128,10 +128,14 @@ describe("ExploreDetailPage", () => {
     await waitFor(() =>
       expect(screen.getByText("Lista Detalle")).toBeInTheDocument()
     );
-    expect(screen.getByText("Una descripción")).toBeInTheDocument();
-    expect(screen.getByTestId("accept-challenge-btn")).toBeInTheDocument();
+    expect(screen.queryByText("2 challengers")).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByTestId("challengers-toggle"));
     expect(screen.getByText("2 challengers")).toBeInTheDocument();
     expect(screen.getByText("1/3")).toBeInTheDocument();
     expect(screen.getByText("0/3")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByTestId("challengers-toggle"));
+    expect(screen.queryByText("2 challengers")).not.toBeInTheDocument();
   });
 });
