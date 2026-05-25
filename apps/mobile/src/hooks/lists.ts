@@ -17,10 +17,24 @@ export function useMyLists(q?: string) {
 }
 
 export function useList(listId: string) {
+  const qc = useQueryClient();
   return useQuery({
     queryKey: ["list", listId],
     queryFn: () => listsService.get(listId),
     enabled: !!listId,
+    placeholderData: () => {
+      const queries = qc.getQueriesData<{
+        pages: { items: { id: string; name: string }[] }[];
+      }>({ queryKey: ["my-lists"] });
+      for (const [, data] of queries) {
+        if (!data) continue;
+        for (const page of data.pages) {
+          const found = page.items?.find((x) => x.id === listId);
+          if (found) return found as unknown as ReturnType<typeof listsService.get> extends Promise<infer T> ? T : never;
+        }
+      }
+      return undefined;
+    },
   });
 }
 

@@ -80,7 +80,14 @@ export default function RootLayout() {
       <QueryClientProvider client={queryClient}>
         <SessionProvider>
           <AuthGate>
-            <Stack screenOptions={{ headerShown: false }} />
+            <Stack
+              screenOptions={{
+                headerShown: false,
+                animation: "slide_from_right",
+                animationDuration: 250,
+                gestureEnabled: true,
+              }}
+            />
           </AuthGate>
         </SessionProvider>
       </QueryClientProvider>
