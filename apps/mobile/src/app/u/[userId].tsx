@@ -15,6 +15,7 @@ import {
   useUserProfile,
 } from "@/hooks/users";
 import { useSession } from "@/lib/auth";
+import { ACHIEVEMENT_LABELS } from "@/lib/achievement-labels";
 
 export default function UserProfileScreen() {
   const { userId } = useLocalSearchParams<{ userId: string }>();
@@ -141,7 +142,7 @@ export default function UserProfileScreen() {
                       : "text-gray-500 dark:text-gray-400"
                   }`}
                 >
-                  {a.type.replace(/_/g, " ")}
+                  {ACHIEVEMENT_LABELS[a.type] ?? a.type}
                 </Text>
                 <Text className="ml-3 text-xs text-gray-500 dark:text-gray-400">
                   {a.progress}/{a.target}

@@ -3,17 +3,20 @@ import { useMemo } from "react";
 import { Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNotifications } from "@/hooks/notifications";
+import { useStreak } from "@/hooks/streak";
 import { useSession } from "@/lib/auth";
 
 export default function HomeScreen() {
   const { session } = useSession();
   const router = useRouter();
   const notifs = useNotifications(session.status === "signed-in");
+  const streak = useStreak(session.status === "signed-in");
 
   const unread = useMemo(
     () => (notifs.data ?? []).filter((n) => !n.readAt).length,
     [notifs.data]
   );
+  const streakDays = streak.data?.current ?? 0;
 
   if (session.status !== "signed-in") return null;
 
@@ -46,6 +49,14 @@ export default function HomeScreen() {
             )}
           </Pressable>
         </View>
+
+        {streakDays > 0 && (
+          <View className="mt-6 self-start rounded-full border border-gray-200 px-3 py-1.5 dark:border-gray-700">
+            <Text className="text-xs font-medium text-gray-900 dark:text-gray-100">
+              🔥 {streakDays}-day streak
+            </Text>
+          </View>
+        )}
 
         <Pressable
           onPress={() => router.push("/lists")}
