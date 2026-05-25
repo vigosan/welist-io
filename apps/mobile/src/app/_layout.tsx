@@ -1,11 +1,13 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { type Href, Stack, useRouter, useSegments } from "expo-router";
+import { useColorScheme } from "nativewind";
 import { useEffect, useRef } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "../global.css";
 import "@/i18n";
 import { loadStoredLanguage } from "@/i18n";
 import { SessionProvider, useSession } from "@/lib/auth";
+import { loadStoredTheme } from "@/lib/theme";
 
 const queryClient = new QueryClient();
 
@@ -33,9 +35,12 @@ function AuthGate({ children }: { children: React.ReactNode }) {
 }
 
 export default function RootLayout() {
+  const { setColorScheme } = useColorScheme();
+
   useEffect(() => {
     loadStoredLanguage();
-  }, []);
+    loadStoredTheme().then((theme) => setColorScheme(theme));
+  }, [setColorScheme]);
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
