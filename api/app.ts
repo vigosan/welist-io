@@ -41,6 +41,15 @@ import {
 } from "../src/db/schema/index.js";
 import { LIST_CATEGORIES } from "../src/lib/categories.js";
 import { plainItemText } from "../src/lib/item-text.js";
+import {
+  getAppleAudiences,
+  getGoogleMobileAudiences,
+  issueMobileToken,
+  MOBILE_TOKEN_MAX_AGE,
+  verifyAppleIdToken,
+  verifyGoogleIdToken,
+  verifyMobileToken,
+} from "./auth-mobile.js";
 import { sendEmail } from "./email.js";
 import { signUnsubscribeToken, verifyUnsubscribeToken } from "./email-token.js";
 import { rateLimit } from "./rate-limit.js";
@@ -106,6 +115,29 @@ app.use(
 app.use("/auth/*", authHandler());
 
 app.use("*", async (c, next) => {
+  const authHeader = c.req.header("Authorization") ?? "";
+  if (authHeader.startsWith("Bearer ")) {
+    const token = authHeader.slice("Bearer ".length).trim();
+    const secret = process.env.AUTH_SECRET ?? "";
+    const session = await verifyMobileToken(token, secret);
+    if (session) {
+      c.set("authUser", {
+        session: {
+          user: {
+            id: session.id,
+            name: session.name,
+            email: session.email,
+            image: session.image,
+          },
+          expires: new Date(
+            Date.now() + MOBILE_TOKEN_MAX_AGE * 1000
+          ).toISOString(),
+        },
+      } as AuthUser);
+      await next();
+      return;
+    }
+  }
   try {
     const authUser = await getAuthUser(c);
     c.set("authUser", authUser);
@@ -125,6 +157,68 @@ app.get("/me", (c) => {
   const authUser = getOptionalUser(c);
   return c.json(authUser?.session?.user ?? null);
 });
+
+const mobileExchangeSchema = z.object({
+  provider: z.enum(["google", "apple"]),
+  idToken: z.string().min(1),
+});
+
+app.post(
+  "/auth-mobile/exchange",
+  zValidator("json", mobileExchangeSchema),
+  async (c) => {
+    const { provider, idToken } = c.req.valid("json");
+    const secret = process.env.AUTH_SECRET ?? "";
+    if (!secret) return c.json({ error: "Server misconfigured" }, 500);
+
+    let profile: Awaited<ReturnType<typeof verifyGoogleIdToken>>;
+    try {
+      profile =
+        provider === "google"
+          ? await verifyGoogleIdToken(idToken, getGoogleMobileAudiences())
+          : await verifyAppleIdToken(idToken, getAppleAudiences());
+    } catch {
+      return c.json({ error: "Invalid id token" }, 401);
+    }
+
+    if (!profile.email)
+      return c.json({ error: "Email not provided by identity provider" }, 401);
+
+    const existing = await db.query.users.findFirst({
+      where: eq(users.email, profile.email),
+      columns: { id: true, name: true, email: true, image: true },
+    });
+
+    let user: {
+      id: string;
+      name: string | null;
+      email: string | null;
+      image: string | null;
+    };
+    if (existing) {
+      user = existing;
+    } else {
+      const [created] = await db
+        .insert(users)
+        .values({
+          id: profile.sub,
+          name: profile.name,
+          email: profile.email,
+          image: profile.image,
+        })
+        .returning({
+          id: users.id,
+          name: users.name,
+          email: users.email,
+          image: users.image,
+        });
+      user = created;
+    }
+
+    const token = await issueMobileToken(user, secret);
+    return c.json({ token, user });
+  }
+);
 
 function isUniqueViolation(e: unknown): boolean {
   if (typeof e !== "object" || e === null || !("code" in e)) return false;
