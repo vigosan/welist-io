@@ -16,6 +16,14 @@ export function useUserDirectory(q?: string) {
   });
 }
 
+export function useUserSearch(q: string) {
+  return useQuery({
+    queryKey: ["user-search", q],
+    queryFn: () => usersService.search(q),
+    enabled: q.trim().length >= 2,
+  });
+}
+
 export function useUserProfile(userId: string) {
   return useQuery({
     queryKey: ["user-profile", userId],

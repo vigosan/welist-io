@@ -12,20 +12,35 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
+  useAddCollaborator,
+  useCollaborators,
+  useRemoveCollaborator,
+} from "@/hooks/collaborators";
+import {
   useCloneList,
   useDeleteList,
   useList,
   useUpdateList,
 } from "@/hooks/lists";
+import { useUserSearch } from "@/hooks/users";
+import { useDebouncedValue } from "@/hooks/useDebouncedValue";
+import { useSession } from "@/lib/auth";
 import { LIST_CATEGORIES, type ListCategory } from "@/lib/categories";
 
 export default function ListSettingsScreen() {
   const { listId } = useLocalSearchParams<{ listId: string }>();
   const router = useRouter();
+  const { session } = useSession();
   const list = useList(listId);
   const update = useUpdateList(listId);
   const clone = useCloneList();
   const remove = useDeleteList();
+
+  const isOwner =
+    session.status === "signed-in" &&
+    !!list.data?.ownerId &&
+    session.user.id === list.data.ownerId;
+  const showCollabs = isOwner && list.data?.collaborative === true;
 
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
@@ -188,6 +203,8 @@ export default function ListSettingsScreen() {
           </Text>
         </Pressable>
 
+        {showCollabs && <CollaboratorsSection listId={listId} />}
+
         <View className="mt-10 gap-3">
           <Pressable
             onPress={doClone}
@@ -252,6 +269,105 @@ function Toggle({
         </Text>
       </View>
       <Switch value={value} onValueChange={onChange} />
+    </View>
+  );
+}
+
+function CollaboratorsSection({ listId }: { listId: string }) {
+  const [q, setQ] = useState("");
+  const debouncedQ = useDebouncedValue(q, 300);
+  const collaborators = useCollaborators(listId, true);
+  const search = useUserSearch(debouncedQ);
+  const add = useAddCollaborator(listId);
+  const remove = useRemoveCollaborator(listId);
+
+  const existingIds = new Set(
+    (collaborators.data?.collaborators ?? []).map((c) => c.id)
+  );
+  const results = (search.data ?? []).filter((u) => !existingIds.has(u.id));
+
+  return (
+    <View className="mt-10">
+      <Text className="mb-3 text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
+        Collaborators
+      </Text>
+
+      {(collaborators.data?.collaborators ?? []).map((c) => (
+        <View
+          key={c.id}
+          className="mb-2 flex-row items-center justify-between rounded-2xl border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-900"
+        >
+          <Text
+            numberOfLines={1}
+            className="flex-1 text-sm text-gray-900 dark:text-gray-100"
+          >
+            {c.name ?? "Anonymous"}
+          </Text>
+          <Pressable
+            onPress={() =>
+              Alert.alert("Remove collaborator", `Remove ${c.name ?? "user"}?`, [
+                { text: "Cancel", style: "cancel" },
+                {
+                  text: "Remove",
+                  style: "destructive",
+                  onPress: () => remove.mutate(c.id),
+                },
+              ])
+            }
+            className="px-2"
+          >
+            <Text className="text-xs text-red-600">Remove</Text>
+          </Pressable>
+        </View>
+      ))}
+
+      <TextInput
+        value={q}
+        onChangeText={setQ}
+        placeholder="Search users to invite"
+        placeholderTextColor="#a0a09c"
+        autoCapitalize="none"
+        className="mt-3 rounded-2xl border border-gray-200 bg-white px-3 py-3 text-base text-gray-900 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100"
+      />
+
+      {results.map((u) => (
+        <View
+          key={u.id}
+          className="mt-2 flex-row items-center justify-between rounded-2xl border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-900"
+        >
+          <View className="flex-1 pr-3">
+            <Text
+              numberOfLines={1}
+              className="text-sm text-gray-900 dark:text-gray-100"
+            >
+              {u.name ?? "Anonymous"}
+            </Text>
+            {u.email && (
+              <Text
+                numberOfLines={1}
+                className="text-xs text-gray-500 dark:text-gray-400"
+              >
+                {u.email}
+              </Text>
+            )}
+          </View>
+          <Pressable
+            onPress={() =>
+              add.mutate(u.id, {
+                onSuccess: () => setQ(""),
+                onError: (e) =>
+                  Alert.alert("Could not add", String((e as Error).message)),
+              })
+            }
+            disabled={add.isPending}
+            className="rounded-xl bg-gray-900 px-3 py-1.5 active:opacity-80 disabled:opacity-40 dark:bg-gray-100"
+          >
+            <Text className="text-xs font-medium text-white dark:text-gray-900">
+              Add
+            </Text>
+          </Pressable>
+        </View>
+      ))}
     </View>
   );
 }

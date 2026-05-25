@@ -12,6 +12,13 @@ export const usersService = {
     );
   },
 
+  search: (q: string) => {
+    const qs = new URLSearchParams({ q }).toString();
+    return apiFetch<
+      { id: string; name: string | null; email: string | null; image: string | null }[]
+    >(`/users/search?${qs}`);
+  },
+
   getProfile: (userId: string) =>
     apiFetch<UserProfile>(`/users/${userId}/profile`),
 
