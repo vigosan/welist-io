@@ -1,10 +1,11 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { ChevronLeft, MoreVertical } from "lucide-react-native";
+import { ChevronLeft, Settings } from "lucide-react-native";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
   Alert,
+  Image,
   Linking,
   Modal,
   Platform,
@@ -21,6 +22,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { LocationPickerModal } from "@/components/LocationPickerModal";
 import {
   useAddItem,
+  useBulkAddItems,
   useDeleteItem,
   useItems,
   useReorderItems,
@@ -52,6 +54,7 @@ export default function ListDetailScreen() {
   const list = useList(listId);
   const items = useItems(listId);
   const add = useAddItem(listId);
+  const bulkAdd = useBulkAddItems(listId);
   const toggle = useToggleItem(listId);
   const update = useUpdateItem(listId);
   const remove = useDeleteItem(listId);
@@ -71,9 +74,20 @@ export default function ListDetailScreen() {
   );
 
   const submitAdd = () => {
-    const text = newText.trim();
-    if (!text) return;
-    add.mutate(text, {
+    const lines = newText
+      .split("\n")
+      .map((l) => l.trim())
+      .filter(Boolean);
+    if (lines.length === 0) return;
+    if (lines.length === 1) {
+      add.mutate(lines[0], {
+        onSuccess: () => setNewText(""),
+        onError: (e) =>
+          Alert.alert(t("list.couldNotAdd"), String((e as Error).message)),
+      });
+      return;
+    }
+    bulkAdd.mutate(lines, {
       onSuccess: () => setNewText(""),
       onError: (e) =>
         Alert.alert(t("list.couldNotAdd"), String((e as Error).message)),
@@ -207,28 +221,6 @@ export default function ListDetailScreen() {
     );
   };
 
-  const openActions = () => {
-    Alert.alert(list.data?.name ?? "", undefined, [
-      {
-        text: t("list.bulk"),
-        onPress: () =>
-          router.push({
-            pathname: "/lists/[listId]/bulk-add",
-            params: { listId },
-          }),
-      },
-      {
-        text: t("list.settings"),
-        onPress: () =>
-          router.push({
-            pathname: "/lists/[listId]/settings",
-            params: { listId },
-          }),
-      },
-      { text: t("common.cancel"), style: "cancel" },
-    ]);
-  };
-
   return (
     <SafeAreaView className="flex-1 bg-canvas dark:bg-canvas-dark">
       <View className="flex-row items-center justify-between px-2 py-1">
@@ -247,12 +239,17 @@ export default function ListDetailScreen() {
           {list.data?.name ?? ""}
         </Text>
         <Pressable
-          onPress={openActions}
-          accessibilityLabel={t("list.actions")}
+          onPress={() =>
+            router.push({
+              pathname: "/lists/[listId]/settings",
+              params: { listId },
+            })
+          }
+          accessibilityLabel={t("list.settings")}
           hitSlop={8}
           className="h-9 w-9 items-center justify-center rounded-full active:bg-black/[0.05] dark:active:bg-white/[0.06]"
         >
-          <MoreVertical color="#0c0c0b" size={22} />
+          <Settings color="#0c0c0b" size={20} />
         </Pressable>
       </View>
 
@@ -286,9 +283,10 @@ export default function ListDetailScreen() {
             onChange={isOwner ? undefined : (v) => rate.mutate(v)}
           />
           {participants.data && participants.data.total > 0 && (
-            <Text className="text-xs text-gray-500 dark:text-gray-400">
-              {t("list.activeCount", { count: participants.data.total })}
-            </Text>
+            <ParticipantAvatars
+              participants={participants.data.participants}
+              total={participants.data.total}
+            />
           )}
         </View>
       )}
@@ -410,5 +408,54 @@ export default function ListDetailScreen() {
         }
       />
     </SafeAreaView>
+  );
+}
+
+type Participant = { id: string; name: string | null; image: string | null };
+
+function initials(name: string | null): string {
+  if (!name) return "?";
+  const parts = name.trim().split(/\s+/).slice(0, 2);
+  return parts.map((p) => p[0]?.toUpperCase() ?? "").join("") || "?";
+}
+
+function ParticipantAvatars({
+  participants,
+  total,
+}: {
+  participants: Participant[];
+  total: number;
+}) {
+  const max = 5;
+  const shown = participants.slice(0, max);
+  const extra = total - shown.length;
+  return (
+    <View className="flex-row items-center">
+      {shown.map((p, i) => (
+        <View
+          key={p.id}
+          style={{ marginLeft: i === 0 ? 0 : -8 }}
+          className="h-7 w-7 items-center justify-center overflow-hidden rounded-full border-2 border-canvas bg-gray-200 dark:border-canvas-dark dark:bg-gray-800"
+        >
+          {p.image ? (
+            <Image source={{ uri: p.image }} className="h-full w-full" />
+          ) : (
+            <Text className="text-[10px] font-semibold text-gray-700 dark:text-gray-200">
+              {initials(p.name)}
+            </Text>
+          )}
+        </View>
+      ))}
+      {extra > 0 && (
+        <View
+          style={{ marginLeft: -8 }}
+          className="h-7 items-center justify-center rounded-full border-2 border-canvas bg-gray-200 px-1.5 dark:border-canvas-dark dark:bg-gray-800"
+        >
+          <Text className="text-[10px] font-semibold text-gray-700 dark:text-gray-200">
+            +{extra}
+          </Text>
+        </View>
+      )}
+    </View>
   );
 }
