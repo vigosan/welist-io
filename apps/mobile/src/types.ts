@@ -38,3 +38,46 @@ export type Item = {
 };
 
 export type Page<T> = { items: T[]; nextCursor: string | null };
+
+export type ExploreItem = {
+  id: string;
+  name: string;
+  slug: string | null;
+  description: string | null;
+  category: string | null;
+  createdAt: string;
+  itemCount: number;
+  participantCount: number;
+  completedCount: number;
+  progressDoneTotal: number;
+  previewItems: string[];
+  participants: { id: string; name: string | null; image: string | null }[];
+  isParticipating: boolean;
+  rating: { avg: number | null; count: number };
+  owner: { id: string | null; name: string | null; image: string | null } | null;
+};
+
+export type ExploreDetail = {
+  id: string;
+  name: string;
+  slug: string | null;
+  description: string | null;
+  createdAt: string;
+  ownerId: string | null;
+  owner: { name: string | null; image: string | null } | null;
+  itemCount: number;
+  participantCount: number;
+  challengers: {
+    id: string;
+    name: string | null;
+    image: string | null;
+    completedAt: string | null;
+    doneCount: number;
+    totalItems: number;
+  }[];
+  completedParticipants: {
+    name: string | null;
+    image: string | null;
+    completedAt: string | null;
+  }[];
+};
