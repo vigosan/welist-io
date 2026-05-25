@@ -10,11 +10,13 @@ import {
   TextInput,
   View,
 } from "react-native";
+import { useTranslation } from "react-i18next";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useCreateList, useDeleteList, useMyLists } from "@/hooks/lists";
 import type { MyListItem } from "@/types";
 
 export default function MyListsScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   const [newName, setNewName] = useState("");
   const query = useMyLists();
@@ -32,25 +34,29 @@ export default function MyListsScreen() {
     create.mutate(name, {
       onSuccess: () => setNewName(""),
       onError: (e) =>
-        Alert.alert("Could not create list", String((e as Error).message)),
+        Alert.alert(t("lists.couldNotCreate"), String((e as Error).message)),
     });
   };
 
   const confirmDelete = (item: MyListItem) =>
-    Alert.alert("Delete list", `Delete "${item.name}"? This cannot be undone.`, [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Delete",
-        style: "destructive",
-        onPress: () => remove.mutate(item.id),
-      },
-    ]);
+    Alert.alert(
+      t("lists.deleteTitle"),
+      t("lists.deleteBody", { name: item.name }),
+      [
+        { text: t("common.cancel"), style: "cancel" },
+        {
+          text: t("common.delete"),
+          style: "destructive",
+          onPress: () => remove.mutate(item.id),
+        },
+      ]
+    );
 
   return (
     <SafeAreaView className="flex-1 bg-canvas dark:bg-canvas-dark">
       <View className="px-6 pt-6 pb-3">
         <Text className="text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
-          My lists
+          {t("lists.title")}
         </Text>
       </View>
 
@@ -59,7 +65,7 @@ export default function MyListsScreen() {
           value={newName}
           onChangeText={setNewName}
           onSubmitEditing={submitCreate}
-          placeholder="New list name"
+          placeholder={t("lists.newPlaceholder")}
           placeholderTextColor="#a0a09c"
           returnKeyType="done"
           className="flex-1 px-3 text-sm text-gray-900 dark:text-gray-100"
@@ -70,7 +76,7 @@ export default function MyListsScreen() {
           className="rounded-xl bg-gray-900 px-4 py-2 active:opacity-80 disabled:opacity-40 dark:bg-gray-100"
         >
           <Text className="text-sm font-medium text-white dark:text-gray-900">
-            Add
+            {t("common.add")}
           </Text>
         </Pressable>
       </View>
@@ -94,7 +100,7 @@ export default function MyListsScreen() {
             <ActivityIndicator className="mt-10" />
           ) : (
             <Text className="mt-10 text-center text-sm text-gray-500 dark:text-gray-400">
-              No lists yet. Create your first one above.
+              {t("lists.empty")}
             </Text>
           )
         }
@@ -119,9 +125,12 @@ export default function MyListsScreen() {
               {item.name}
             </Text>
             <Text className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-              {item.doneCount}/{item.itemCount} done
+              {t("lists.progress", {
+                done: item.doneCount,
+                total: item.itemCount,
+              })}
               {item.participantCount > 0
-                ? ` · ${item.participantCount} participants`
+                ? ` · ${t("lists.participants", { count: item.participantCount })}`
                 : ""}
             </Text>
           </Pressable>

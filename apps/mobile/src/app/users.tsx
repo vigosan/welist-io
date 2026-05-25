@@ -9,11 +9,13 @@ import {
   TextInput,
   View,
 } from "react-native";
+import { useTranslation } from "react-i18next";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useUserDirectory } from "@/hooks/users";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 
 export default function UsersScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   const [q, setQ] = useState("");
   const debouncedQ = useDebouncedValue(q, 300);
@@ -26,13 +28,13 @@ export default function UsersScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-canvas dark:bg-canvas-dark">
-      <Stack.Screen options={{ title: "Users", headerShown: true }} />
+      <Stack.Screen options={{ title: t("users.title"), headerShown: true }} />
 
       <View className="mx-6 mt-3 mb-3 flex-row items-center gap-2 rounded-2xl border border-gray-200 bg-white p-1.5 dark:border-gray-700 dark:bg-gray-900">
         <TextInput
           value={q}
           onChangeText={setQ}
-          placeholder="Search users"
+          placeholder={t("users.search")}
           placeholderTextColor="#a0a09c"
           autoCapitalize="none"
           className="flex-1 px-3 text-sm text-gray-900 dark:text-gray-100"
@@ -58,7 +60,7 @@ export default function UsersScreen() {
             <ActivityIndicator className="mt-10" />
           ) : (
             <Text className="mt-10 text-center text-sm text-gray-500 dark:text-gray-400">
-              No users found.
+              {t("users.empty")}
             </Text>
           )
         }
@@ -79,7 +81,7 @@ export default function UsersScreen() {
               numberOfLines={1}
               className="text-base font-medium text-gray-900 dark:text-gray-100"
             >
-              {item.name ?? "Anonymous"}
+              {item.name ?? t("common.anonymous")}
             </Text>
             <Text className="mt-1 text-xs text-gray-500 dark:text-gray-400">
               {item.ownedListsCount} lists · {item.completedChallengesCount}{" "}

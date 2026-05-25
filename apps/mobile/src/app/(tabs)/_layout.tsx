@@ -1,6 +1,8 @@
 import { Tabs } from "expo-router";
+import { useTranslation } from "react-i18next";
 
 export default function TabsLayout() {
+  const { t } = useTranslation();
   return (
     <Tabs
       screenOptions={{
@@ -9,11 +11,11 @@ export default function TabsLayout() {
         tabBarInactiveTintColor: "#a0a09c",
       }}
     >
-      <Tabs.Screen name="index" options={{ title: "Home" }} />
-      <Tabs.Screen name="explore" options={{ title: "Explore" }} />
-      <Tabs.Screen name="feed" options={{ title: "Feed" }} />
-      <Tabs.Screen name="lists" options={{ title: "Lists" }} />
-      <Tabs.Screen name="profile" options={{ title: "Profile" }} />
+      <Tabs.Screen name="index" options={{ title: t("nav.home") }} />
+      <Tabs.Screen name="explore" options={{ title: t("nav.explore") }} />
+      <Tabs.Screen name="feed" options={{ title: t("nav.feed") }} />
+      <Tabs.Screen name="lists" options={{ title: t("nav.lists") }} />
+      <Tabs.Screen name="profile" options={{ title: t("nav.profile") }} />
     </Tabs>
   );
 }

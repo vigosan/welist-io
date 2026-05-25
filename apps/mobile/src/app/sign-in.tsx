@@ -1,16 +1,21 @@
 import * as AppleAuthentication from "expo-apple-authentication";
 import { Alert, Platform, Pressable, Text, View } from "react-native";
+import { useTranslation } from "react-i18next";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useSession } from "@/lib/auth";
 
 export default function SignInScreen() {
+  const { t } = useTranslation();
   const { signInWithGoogle, signInWithApple } = useSession();
 
   const handle = async (fn: () => Promise<void>) => {
     try {
       await fn();
     } catch (e) {
-      Alert.alert("Sign-in failed", e instanceof Error ? e.message : String(e));
+      Alert.alert(
+        t("auth.signInFailed"),
+        e instanceof Error ? e.message : String(e)
+      );
     }
   };
 
@@ -26,7 +31,7 @@ export default function SignInScreen() {
           className="mb-3 w-full items-center rounded-xl bg-gray-900 px-6 py-4 active:opacity-80 dark:bg-gray-100"
         >
           <Text className="font-medium text-white dark:text-gray-900">
-            Continue with Google
+            {t("auth.continueGoogle")}
           </Text>
         </Pressable>
 

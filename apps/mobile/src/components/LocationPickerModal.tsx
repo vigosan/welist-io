@@ -8,6 +8,7 @@ import {
   TextInput,
   View,
 } from "react-native";
+import { useTranslation } from "react-i18next";
 import { useGeocodingSearch } from "@/hooks/geocoding";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import type { Place } from "@/services/geocoding";
@@ -27,6 +28,7 @@ export function LocationPickerModal({
   onSelect,
   onRemove,
 }: Props) {
+  const { t } = useTranslation();
   const [q, setQ] = useState("");
   const debounced = useDebouncedValue(q, 300);
   const search = useGeocodingSearch(debounced);
@@ -46,10 +48,12 @@ export function LocationPickerModal({
       <View className="flex-1 bg-canvas dark:bg-canvas-dark">
         <View className="flex-row items-center justify-between border-b border-gray-200 px-6 pt-16 pb-3 dark:border-gray-700">
           <Text className="text-lg font-bold text-gray-900 dark:text-gray-100">
-            {currentPlaceName ? "Change location" : "Set location"}
+            {currentPlaceName ? t("list.changeLocation") : t("list.setLocation")}
           </Text>
           <Pressable onPress={close}>
-            <Text className="text-sm text-gray-500 dark:text-gray-400">Cancel</Text>
+            <Text className="text-sm text-gray-500 dark:text-gray-400">
+              {t("common.cancel")}
+            </Text>
           </Pressable>
         </View>
 
@@ -57,7 +61,7 @@ export function LocationPickerModal({
           value={q}
           onChangeText={setQ}
           autoFocus
-          placeholder="Search a place"
+          placeholder={t("list.searchPlace")}
           placeholderTextColor="#a0a09c"
           className="mx-6 mt-3 rounded-2xl border border-gray-200 bg-white px-3 py-3 text-base text-gray-900 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100"
         />
@@ -71,7 +75,7 @@ export function LocationPickerModal({
               <ActivityIndicator className="mt-10" />
             ) : q.trim().length < 2 ? null : (
               <Text className="mt-10 text-center text-sm text-gray-500 dark:text-gray-400">
-                No places found.
+                {t("list.noPlacesFound")}
               </Text>
             )
           }
@@ -108,7 +112,7 @@ export function LocationPickerModal({
             className="mx-6 mb-10 rounded-xl border border-red-200 px-6 py-3 active:opacity-80"
           >
             <Text className="text-center text-sm font-medium text-red-600">
-              Remove location
+              {t("list.removeLocation")}
             </Text>
           </Pressable>
         )}

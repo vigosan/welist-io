@@ -1,5 +1,6 @@
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
   Alert,
@@ -37,6 +38,7 @@ import { StarRating } from "@/components/StarRating";
 const FILTERS: FilterMode[] = ["all", "pending", "done"];
 
 export default function ListDetailScreen() {
+  const { t } = useTranslation();
   const { listId } = useLocalSearchParams<{ listId: string }>();
   const router = useRouter();
   const [newText, setNewText] = useState("");
@@ -73,7 +75,7 @@ export default function ListDetailScreen() {
     add.mutate(text, {
       onSuccess: () => setNewText(""),
       onError: (e) =>
-        Alert.alert("Could not add item", String((e as Error).message)),
+        Alert.alert(t("list.couldNotAdd"), String((e as Error).message)),
     });
   };
 
@@ -81,20 +83,20 @@ export default function ListDetailScreen() {
     const hasCoords = !!(item.latitude && item.longitude && item.placeName);
     const buttons: Parameters<typeof Alert.alert>[2] = [
       {
-        text: "Edit",
+        text: t("common.edit"),
         onPress: () => {
           setEditingText(item.text);
           setEditing(item);
         },
       },
       {
-        text: hasCoords ? "Change location" : "Set location",
+        text: hasCoords ? t("list.changeLocation") : t("list.setLocation"),
         onPress: () => setLocating(item),
       },
     ];
     if (hasCoords) {
       buttons.push({
-        text: "Open in Maps",
+        text: t("list.openInMaps"),
         onPress: () => {
           const platform = Platform.OS === "android" ? "android" : "ios";
           Linking.openURL(
@@ -114,11 +116,11 @@ export default function ListDetailScreen() {
       });
     }
     buttons.push({
-      text: "Delete",
+      text: t("common.delete"),
       style: "destructive",
       onPress: () => remove.mutate(item.id),
     });
-    buttons.push({ text: "Cancel", style: "cancel" });
+    buttons.push({ text: t("common.cancel"), style: "cancel" });
     Alert.alert(item.text, undefined, buttons);
   };
 
@@ -134,7 +136,7 @@ export default function ListDetailScreen() {
       {
         onSettled: () => setEditing(null),
         onError: (e) =>
-          Alert.alert("Could not save", String((e as Error).message)),
+          Alert.alert(t("list.couldNotSave"), String((e as Error).message)),
       }
     );
   };
@@ -221,7 +223,7 @@ export default function ListDetailScreen() {
                 }
               >
                 <Text className="text-sm text-gray-900 dark:text-gray-100">
-                  Bulk
+                  {t("list.bulk")}
                 </Text>
               </Pressable>
               <Pressable
@@ -233,7 +235,7 @@ export default function ListDetailScreen() {
                 }
               >
                 <Text className="text-sm text-gray-900 dark:text-gray-100">
-                  Settings
+                  {t("list.settings")}
                 </Text>
               </Pressable>
             </View>
@@ -246,7 +248,7 @@ export default function ListDetailScreen() {
           value={newText}
           onChangeText={setNewText}
           onSubmitEditing={submitAdd}
-          placeholder="Add an item"
+          placeholder={t("list.addPlaceholder")}
           placeholderTextColor="#a0a09c"
           returnKeyType="done"
           className="flex-1 px-3 text-sm text-gray-900 dark:text-gray-100"
@@ -257,7 +259,7 @@ export default function ListDetailScreen() {
           className="rounded-xl bg-gray-900 px-4 py-2 active:opacity-80 disabled:opacity-40 dark:bg-gray-100"
         >
           <Text className="text-sm font-medium text-white dark:text-gray-900">
-            Add
+            {t("common.add")}
           </Text>
         </Pressable>
       </View>
@@ -272,7 +274,7 @@ export default function ListDetailScreen() {
           />
           {participants.data && participants.data.total > 0 && (
             <Text className="text-xs text-gray-500 dark:text-gray-400">
-              {participants.data.total} active
+              {t("list.activeCount", { count: participants.data.total })}
             </Text>
           )}
         </View>
@@ -281,6 +283,12 @@ export default function ListDetailScreen() {
       <View className="mx-6 mb-3 flex-row gap-2">
         {FILTERS.map((f) => {
           const active = filter === f;
+          const label =
+            f === "all"
+              ? t("list.filterAll")
+              : f === "pending"
+                ? t("list.filterPending")
+                : t("list.filterDone");
           return (
             <Pressable
               key={f}
@@ -292,13 +300,13 @@ export default function ListDetailScreen() {
               }`}
             >
               <Text
-                className={`text-xs font-medium capitalize ${
+                className={`text-xs font-medium ${
                   active
                     ? "text-white dark:text-gray-900"
                     : "text-gray-500 dark:text-gray-400"
                 }`}
               >
-                {f}
+                {label}
               </Text>
             </Pressable>
           );
@@ -318,7 +326,7 @@ export default function ListDetailScreen() {
             <ActivityIndicator className="mt-10" />
           ) : (
             <Text className="mt-10 text-center text-sm text-gray-500 dark:text-gray-400">
-              No items.
+              {t("common.noItems")}
             </Text>
           )
         }
@@ -334,7 +342,7 @@ export default function ListDetailScreen() {
         <View className="flex-1 items-center justify-center bg-black/40 px-8">
           <View className="w-full rounded-2xl bg-white p-5 dark:bg-gray-900">
             <Text className="mb-3 text-base font-medium text-gray-900 dark:text-gray-100">
-              Edit item
+              {t("list.editItem")}
             </Text>
             <TextInput
               value={editingText}
@@ -348,7 +356,7 @@ export default function ListDetailScreen() {
                 className="px-4 py-2"
               >
                 <Text className="text-sm text-gray-500 dark:text-gray-400">
-                  Cancel
+                  {t("common.cancel")}
                 </Text>
               </Pressable>
               <Pressable
@@ -356,7 +364,7 @@ export default function ListDetailScreen() {
                 className="rounded-xl bg-gray-900 px-4 py-2 active:opacity-80 dark:bg-gray-100"
               >
                 <Text className="text-sm font-medium text-white dark:text-gray-900">
-                  Save
+                  {t("common.save")}
                 </Text>
               </Pressable>
             </View>

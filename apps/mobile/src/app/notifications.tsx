@@ -7,6 +7,7 @@ import {
   Text,
   View,
 } from "react-native";
+import { useTranslation } from "react-i18next";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
   useMarkAllNotificationsRead,
@@ -17,15 +18,8 @@ import { useSession } from "@/lib/auth";
 import { notificationHref } from "@/lib/notification-route";
 import type { AppNotification } from "@/types";
 
-const TYPE_LABEL: Record<AppNotification["type"], string> = {
-  challenge_accepted: "accepted your list",
-  challenge_completed: "completed your list",
-  new_follower: "followed you",
-  list_purchased: "bought your list",
-  added_as_collaborator: "added you as a collaborator",
-};
-
 export default function NotificationsScreen() {
+  const { t } = useTranslation();
   const { session } = useSession();
   const router = useRouter();
   const enabled = session.status === "signed-in";
@@ -43,13 +37,13 @@ export default function NotificationsScreen() {
     <SafeAreaView className="flex-1 bg-canvas dark:bg-canvas-dark">
       <Stack.Screen
         options={{
-          title: "Notifications",
+          title: t("notifications.title"),
           headerShown: true,
           headerRight: () =>
             (query.data?.length ?? 0) > 0 ? (
               <Pressable onPress={() => markAllRead.mutate()} className="pr-3">
                 <Text className="text-sm text-gray-900 dark:text-gray-100">
-                  Mark all read
+                  {t("notifications.markAllRead")}
                 </Text>
               </Pressable>
             ) : null,
@@ -71,7 +65,7 @@ export default function NotificationsScreen() {
             <ActivityIndicator className="mt-10" />
           ) : (
             <Text className="mt-10 text-center text-sm text-gray-500 dark:text-gray-400">
-              You're all caught up.
+              {t("notifications.empty")}
             </Text>
           )
         }
@@ -89,9 +83,9 @@ export default function NotificationsScreen() {
               <View className="flex-1">
                 <Text className="text-sm text-gray-900 dark:text-gray-100">
                   <Text className="font-medium">
-                    {item.actorName ?? "Someone"}
+                    {item.actorName ?? t("common.anonymous")}
                   </Text>{" "}
-                  {TYPE_LABEL[item.type]}
+                  {t(`notifications.${item.type}` as const)}
                   {item.listName ? ` "${item.listName}"` : ""}
                 </Text>
               </View>

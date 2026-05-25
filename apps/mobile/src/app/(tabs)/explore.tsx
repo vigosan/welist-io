@@ -10,18 +10,17 @@ import {
   TextInput,
   View,
 } from "react-native";
+import { useTranslation } from "react-i18next";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useExplore } from "@/hooks/explore";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { LIST_CATEGORIES, type ListCategory } from "@/lib/categories";
 import type { ExploreSort } from "@/services/explore";
 
-const SORTS: { value: ExploreSort; label: string }[] = [
-  { value: "trending", label: "Trending" },
-  { value: "created_desc", label: "Recent" },
-];
+const SORTS: ExploreSort[] = ["trending", "created_desc"];
 
 export default function ExploreScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   const [q, setQ] = useState("");
   const [sort, setSort] = useState<ExploreSort>("trending");
@@ -39,7 +38,7 @@ export default function ExploreScreen() {
     <SafeAreaView className="flex-1 bg-canvas dark:bg-canvas-dark">
       <View className="px-6 pt-6 pb-3">
         <Text className="text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
-          Explore
+          {t("explore.title")}
         </Text>
       </View>
 
@@ -47,7 +46,7 @@ export default function ExploreScreen() {
         <TextInput
           value={q}
           onChangeText={setQ}
-          placeholder="Search public lists"
+          placeholder={t("explore.search")}
           placeholderTextColor="#a0a09c"
           autoCapitalize="none"
           className="flex-1 px-3 text-sm text-gray-900 dark:text-gray-100"
@@ -56,11 +55,12 @@ export default function ExploreScreen() {
 
       <View className="mx-6 mb-3 flex-row gap-2">
         {SORTS.map((s) => {
-          const active = sort === s.value;
+          const active = sort === s;
+          const label = s === "trending" ? t("explore.trending") : t("explore.recent");
           return (
             <Pressable
-              key={s.value}
-              onPress={() => setSort(s.value)}
+              key={s}
+              onPress={() => setSort(s)}
               className={`rounded-full border px-3 py-1.5 ${
                 active
                   ? "border-gray-900 bg-gray-900 dark:border-gray-100 dark:bg-gray-100"
@@ -74,7 +74,7 @@ export default function ExploreScreen() {
                     : "text-gray-500 dark:text-gray-400"
                 }`}
               >
-                {s.label}
+                {label}
               </Text>
             </Pressable>
           );
@@ -101,7 +101,7 @@ export default function ExploreScreen() {
                 : "text-gray-500 dark:text-gray-400"
             }`}
           >
-            All
+            {t("explore.all")}
           </Text>
         </Pressable>
         {LIST_CATEGORIES.map((c) => {
@@ -117,13 +117,13 @@ export default function ExploreScreen() {
               }`}
             >
               <Text
-                className={`text-xs font-medium capitalize ${
+                className={`text-xs font-medium ${
                   active
                     ? "text-white dark:text-gray-900"
                     : "text-gray-500 dark:text-gray-400"
                 }`}
               >
-                {c}
+                {t(`categories.${c}`)}
               </Text>
             </Pressable>
           );
@@ -149,7 +149,7 @@ export default function ExploreScreen() {
             <ActivityIndicator className="mt-10" />
           ) : (
             <Text className="mt-10 text-center text-sm text-gray-500 dark:text-gray-400">
-              No public lists match.
+              {t("explore.empty")}
             </Text>
           )
         }
@@ -173,11 +173,16 @@ export default function ExploreScreen() {
               {item.name}
             </Text>
             <Text className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
-              {item.owner?.name ?? "anonymous"}
-              {item.category ? ` · ${item.category}` : ""}
+              {item.owner?.name ?? t("common.anonymous")}
+              {item.category
+                ? ` · ${t(`categories.${item.category}` as never)}`
+                : ""}
             </Text>
             <Text className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-              {item.itemCount} items · {item.participantCount} participants
+              {t("explore.itemsAndParticipants", {
+                items: item.itemCount,
+                participants: item.participantCount,
+              })}
               {item.rating.count > 0
                 ? ` · ★ ${item.rating.avg?.toFixed(1)} (${item.rating.count})`
                 : ""}

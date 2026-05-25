@@ -7,6 +7,7 @@ import {
   Text,
   View,
 } from "react-native";
+import { useTranslation } from "react-i18next";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
   useAcceptChallenge,
@@ -15,6 +16,7 @@ import {
 } from "@/hooks/explore";
 
 export default function ExploreDetailScreen() {
+  const { t } = useTranslation();
   const { listId } = useLocalSearchParams<{ listId: string }>();
   const router = useRouter();
   const detail = useExploreDetail(listId);
@@ -29,7 +31,7 @@ export default function ExploreDetailScreen() {
           params: { listId },
         }),
       onError: (e) =>
-        Alert.alert("Could not accept", String((e as Error).message)),
+        Alert.alert(t("common.error"), String((e as Error).message)),
     });
 
   if (detail.isLoading) {
@@ -52,7 +54,7 @@ export default function ExploreDetailScreen() {
           {d.name}
         </Text>
         <Text className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-          by {d.owner?.name ?? "anonymous"}
+          {t("common.by")} {d.owner?.name ?? t("common.anonymous")}
         </Text>
 
         {d.description && (
@@ -62,7 +64,10 @@ export default function ExploreDetailScreen() {
         )}
 
         <Text className="mt-4 text-xs text-gray-500 dark:text-gray-400">
-          {d.itemCount} items · {d.participantCount} participants
+          {t("explore.itemsAndParticipants", {
+            items: d.itemCount,
+            participants: d.participantCount,
+          })}
         </Text>
 
         <Pressable
@@ -71,12 +76,12 @@ export default function ExploreDetailScreen() {
           className="mt-6 rounded-xl bg-gray-900 px-6 py-4 active:opacity-80 disabled:opacity-40 dark:bg-gray-100"
         >
           <Text className="text-center font-medium text-white dark:text-gray-900">
-            Accept challenge
+            {t("explore.accept")}
           </Text>
         </Pressable>
 
         <Text className="mt-8 mb-2 text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
-          Preview
+          {t("explore.preview")}
         </Text>
         {items.isLoading ? (
           <ActivityIndicator />
@@ -96,7 +101,7 @@ export default function ExploreDetailScreen() {
           ))
         ) : (
           <Text className="text-sm text-gray-500 dark:text-gray-400">
-            No items yet.
+            {t("common.noItems")}
           </Text>
         )}
       </ScrollView>

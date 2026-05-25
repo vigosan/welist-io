@@ -7,11 +7,13 @@ import {
   Text,
   View,
 } from "react-native";
+import { useTranslation } from "react-i18next";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useFeed } from "@/hooks/feed";
 import { useSession } from "@/lib/auth";
 
 export default function FeedScreen() {
+  const { t } = useTranslation();
   const { session } = useSession();
   const router = useRouter();
   const enabled = session.status === "signed-in";
@@ -21,10 +23,10 @@ export default function FeedScreen() {
     <SafeAreaView className="flex-1 bg-canvas dark:bg-canvas-dark">
       <View className="px-6 pt-6 pb-3">
         <Text className="text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
-          Feed
+          {t("feed.title")}
         </Text>
         <Text className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-          Public lists from people you follow.
+          {t("feed.subtitle")}
         </Text>
       </View>
 
@@ -44,14 +46,14 @@ export default function FeedScreen() {
           ) : (
             <View className="mt-10 items-center">
               <Text className="text-sm text-gray-500 dark:text-gray-400">
-                Nothing in your feed yet.
+                {t("feed.empty")}
               </Text>
               <Pressable
                 onPress={() => router.push("/users")}
                 className="mt-4 rounded-xl border border-gray-200 px-4 py-2 active:opacity-80 dark:border-gray-700"
               >
                 <Text className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                  Browse users
+                  {t("feed.browseUsers")}
                 </Text>
               </Pressable>
             </View>
@@ -74,7 +76,8 @@ export default function FeedScreen() {
               {item.name}
             </Text>
             <Text className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
-              by {item.owner.name ?? "anonymous"} · {item.itemCount} items
+              {t("common.by")} {item.owner.name ?? t("common.anonymous")} ·{" "}
+              {t("feed.itemsCount", { count: item.itemCount })}
             </Text>
           </Pressable>
         )}

@@ -3,6 +3,8 @@ import { type Href, Stack, useRouter, useSegments } from "expo-router";
 import { useEffect, useRef } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "../global.css";
+import "@/i18n";
+import { loadStoredLanguage } from "@/i18n";
 import { SessionProvider, useSession } from "@/lib/auth";
 
 const queryClient = new QueryClient();
@@ -31,6 +33,10 @@ function AuthGate({ children }: { children: React.ReactNode }) {
 }
 
 export default function RootLayout() {
+  useEffect(() => {
+    loadStoredLanguage();
+  }, []);
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <QueryClientProvider client={queryClient}>

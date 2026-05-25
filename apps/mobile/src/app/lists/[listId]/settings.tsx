@@ -10,6 +10,7 @@ import {
   TextInput,
   View,
 } from "react-native";
+import { useTranslation } from "react-i18next";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
   useAddCollaborator,
@@ -29,6 +30,7 @@ import { useSession } from "@/lib/auth";
 import { LIST_CATEGORIES, type ListCategory } from "@/lib/categories";
 
 export default function ListSettingsScreen() {
+  const { t } = useTranslation();
   const { listId } = useLocalSearchParams<{ listId: string }>();
   const router = useRouter();
   const { session } = useSession();
@@ -73,7 +75,7 @@ export default function ListSettingsScreen() {
       {
         onSuccess: () => router.back(),
         onError: (e) =>
-          Alert.alert("Could not save", String((e as Error).message)),
+          Alert.alert(t("settings.couldNotSave"), String((e as Error).message)),
       }
     );
   };
@@ -87,21 +89,25 @@ export default function ListSettingsScreen() {
         });
       },
       onError: (e) =>
-        Alert.alert("Could not clone", String((e as Error).message)),
+        Alert.alert(t("settings.couldNotClone"), String((e as Error).message)),
     });
 
   const confirmDelete = () =>
-    Alert.alert("Delete list", `Delete "${list.data?.name}"? This cannot be undone.`, [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Delete",
-        style: "destructive",
-        onPress: () =>
-          remove.mutate(listId, {
-            onSuccess: () => router.dismissAll(),
-          }),
-      },
-    ]);
+    Alert.alert(
+      t("lists.deleteTitle"),
+      t("lists.deleteBody", { name: list.data?.name ?? "" }),
+      [
+        { text: t("common.cancel"), style: "cancel" },
+        {
+          text: t("common.delete"),
+          style: "destructive",
+          onPress: () =>
+            remove.mutate(listId, {
+              onSuccess: () => router.dismissAll(),
+            }),
+        },
+      ]
+    );
 
   if (list.isLoading) {
     return (
@@ -113,10 +119,10 @@ export default function ListSettingsScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-canvas dark:bg-canvas-dark">
-      <Stack.Screen options={{ title: "List settings", headerShown: true }} />
+      <Stack.Screen options={{ title: t("settings.title"), headerShown: true }} />
 
       <ScrollView contentContainerClassName="px-6 pb-10 pt-4">
-        <Field label="Name">
+        <Field label={t("settings.name")}>
           <TextInput
             value={name}
             onChangeText={setName}
@@ -124,30 +130,30 @@ export default function ListSettingsScreen() {
           />
         </Field>
 
-        <Field label="Slug">
+        <Field label={t("settings.slug")}>
           <TextInput
             value={slug}
             onChangeText={setSlug}
             autoCapitalize="none"
-            placeholder="optional, e.g. my-best-movies"
+            placeholder={t("settings.slugPlaceholder")}
             placeholderTextColor="#a0a09c"
             className="rounded-2xl border border-gray-200 bg-white px-3 py-3 text-base text-gray-900 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100"
           />
         </Field>
 
-        <Field label="Description">
+        <Field label={t("settings.description")}>
           <TextInput
             value={description}
             onChangeText={setDescription}
             multiline
             textAlignVertical="top"
-            placeholder="optional"
+            placeholder={t("settings.descPlaceholder")}
             placeholderTextColor="#a0a09c"
             className="h-24 rounded-2xl border border-gray-200 bg-white px-3 py-3 text-base text-gray-900 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100"
           />
         </Field>
 
-        <Field label="Category">
+        <Field label={t("settings.category")}>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -166,13 +172,13 @@ export default function ListSettingsScreen() {
                   }`}
                 >
                   <Text
-                    className={`text-xs font-medium capitalize ${
+                    className={`text-xs font-medium ${
                       active
                         ? "text-white dark:text-gray-900"
                         : "text-gray-500 dark:text-gray-400"
                     }`}
                   >
-                    {c}
+                    {t(`categories.${c}`)}
                   </Text>
                 </Pressable>
               );
@@ -181,15 +187,15 @@ export default function ListSettingsScreen() {
         </Field>
 
         <Toggle
-          label="Public"
-          hint="Visible in Explore. Others can take it as a challenge."
+          label={t("settings.public")}
+          hint={t("settings.publicHint")}
           value={isPublic}
           onChange={setIsPublic}
         />
 
         <Toggle
-          label="Collaborative"
-          hint="Signed-in viewers can edit items."
+          label={t("settings.collaborative")}
+          hint={t("settings.collabHint")}
           value={collaborative}
           onChange={setCollaborative}
         />
@@ -200,7 +206,7 @@ export default function ListSettingsScreen() {
           className="mt-6 rounded-xl bg-gray-900 px-6 py-4 active:opacity-80 disabled:opacity-40 dark:bg-gray-100"
         >
           <Text className="text-center font-medium text-white dark:text-gray-900">
-            Save
+            {t("common.save")}
           </Text>
         </Pressable>
 
@@ -215,7 +221,7 @@ export default function ListSettingsScreen() {
             className="rounded-xl border border-gray-200 px-6 py-3 active:opacity-80 dark:border-gray-700"
           >
             <Text className="text-center font-medium text-gray-900 dark:text-gray-100">
-              Clone list
+              {t("settings.cloneList")}
             </Text>
           </Pressable>
 
@@ -224,7 +230,7 @@ export default function ListSettingsScreen() {
             className="rounded-xl border border-red-200 px-6 py-3 active:opacity-80"
           >
             <Text className="text-center font-medium text-red-600">
-              Delete list
+              {t("settings.deleteList")}
             </Text>
           </Pressable>
         </View>
@@ -276,22 +282,15 @@ function Toggle({
   );
 }
 
-const ACTIVITY_LABEL: Record<string, string> = {
-  item_added: "added an item",
-  item_edited: "edited an item",
-  item_deleted: "deleted an item",
-  challenge_accepted: "accepted the challenge",
-  challenge_completed: "completed the challenge",
-};
-
 function ActivitySection({ listId }: { listId: string }) {
+  const { t } = useTranslation();
   const activity = useListActivity(listId, true);
 
   if (activity.isLoading) {
     return (
       <View className="mt-10">
         <Text className="mb-3 text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
-          Activity
+          {t("settings.activity")}
         </Text>
         <ActivityIndicator />
       </View>
@@ -303,11 +302,11 @@ function ActivitySection({ listId }: { listId: string }) {
   return (
     <View className="mt-10">
       <Text className="mb-3 text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
-        Activity
+        {t("settings.activity")}
       </Text>
       {rows.length === 0 ? (
         <Text className="text-sm text-gray-500 dark:text-gray-400">
-          No activity yet.
+          {t("settings.noActivity")}
         </Text>
       ) : (
         rows.slice(0, 30).map((a) => (
@@ -316,8 +315,10 @@ function ActivitySection({ listId }: { listId: string }) {
             className="mb-2 rounded-2xl border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-900"
           >
             <Text className="text-sm text-gray-900 dark:text-gray-100">
-              <Text className="font-medium">{a.userName ?? "Someone"}</Text>{" "}
-              {ACTIVITY_LABEL[a.action] ?? a.action}
+              <Text className="font-medium">
+                {a.userName ?? t("common.anonymous")}
+              </Text>{" "}
+              {t(`activity.${a.action}`)}
             </Text>
             <Text className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
               {new Date(a.createdAt).toLocaleString()}
@@ -330,6 +331,7 @@ function ActivitySection({ listId }: { listId: string }) {
 }
 
 function CollaboratorsSection({ listId }: { listId: string }) {
+  const { t } = useTranslation();
   const [q, setQ] = useState("");
   const debouncedQ = useDebouncedValue(q, 300);
   const collaborators = useCollaborators(listId, true);
@@ -345,7 +347,7 @@ function CollaboratorsSection({ listId }: { listId: string }) {
   return (
     <View className="mt-10">
       <Text className="mb-3 text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
-        Collaborators
+        {t("settings.collaborators")}
       </Text>
 
       {(collaborators.data?.collaborators ?? []).map((c) => (
@@ -357,22 +359,28 @@ function CollaboratorsSection({ listId }: { listId: string }) {
             numberOfLines={1}
             className="flex-1 text-sm text-gray-900 dark:text-gray-100"
           >
-            {c.name ?? "Anonymous"}
+            {c.name ?? t("common.anonymous")}
           </Text>
           <Pressable
             onPress={() =>
-              Alert.alert("Remove collaborator", `Remove ${c.name ?? "user"}?`, [
-                { text: "Cancel", style: "cancel" },
-                {
-                  text: "Remove",
-                  style: "destructive",
-                  onPress: () => remove.mutate(c.id),
-                },
-              ])
+              Alert.alert(
+                t("settings.removeCollabTitle"),
+                t("settings.removeCollabBody", {
+                  name: c.name ?? t("common.anonymous"),
+                }),
+                [
+                  { text: t("common.cancel"), style: "cancel" },
+                  {
+                    text: t("common.remove"),
+                    style: "destructive",
+                    onPress: () => remove.mutate(c.id),
+                  },
+                ]
+              )
             }
             className="px-2"
           >
-            <Text className="text-xs text-red-600">Remove</Text>
+            <Text className="text-xs text-red-600">{t("common.remove")}</Text>
           </Pressable>
         </View>
       ))}
@@ -380,7 +388,7 @@ function CollaboratorsSection({ listId }: { listId: string }) {
       <TextInput
         value={q}
         onChangeText={setQ}
-        placeholder="Search users to invite"
+        placeholder={t("settings.searchUsers")}
         placeholderTextColor="#a0a09c"
         autoCapitalize="none"
         className="mt-3 rounded-2xl border border-gray-200 bg-white px-3 py-3 text-base text-gray-900 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100"
@@ -396,7 +404,7 @@ function CollaboratorsSection({ listId }: { listId: string }) {
               numberOfLines={1}
               className="text-sm text-gray-900 dark:text-gray-100"
             >
-              {u.name ?? "Anonymous"}
+              {u.name ?? t("common.anonymous")}
             </Text>
             {u.email && (
               <Text
@@ -419,7 +427,7 @@ function CollaboratorsSection({ listId }: { listId: string }) {
             className="rounded-xl bg-gray-900 px-3 py-1.5 active:opacity-80 disabled:opacity-40 dark:bg-gray-100"
           >
             <Text className="text-xs font-medium text-white dark:text-gray-900">
-              Add
+              {t("common.add")}
             </Text>
           </Pressable>
         </View>

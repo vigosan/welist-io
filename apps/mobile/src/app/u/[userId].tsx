@@ -7,6 +7,7 @@ import {
   Text,
   View,
 } from "react-native";
+import { useTranslation } from "react-i18next";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
   useFollowStatus,
@@ -15,9 +16,9 @@ import {
   useUserProfile,
 } from "@/hooks/users";
 import { useSession } from "@/lib/auth";
-import { ACHIEVEMENT_LABELS } from "@/lib/achievement-labels";
 
 export default function UserProfileScreen() {
+  const { t } = useTranslation();
   const { userId } = useLocalSearchParams<{ userId: string }>();
   const { session } = useSession();
   const router = useRouter();
@@ -50,18 +51,20 @@ export default function UserProfileScreen() {
   return (
     <SafeAreaView className="flex-1 bg-canvas dark:bg-canvas-dark">
       <Stack.Screen
-        options={{ title: p.name ?? "Profile", headerShown: true }}
+        options={{ title: p.name ?? t("profile.title"), headerShown: true }}
       />
 
       <ScrollView contentContainerClassName="px-6 pb-10 pt-4">
         <Text className="text-2xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
-          {p.name ?? "Anonymous"}
+          {p.name ?? t("common.anonymous")}
         </Text>
 
         {status.data && (
           <Text className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-            {status.data.followerCount} followers · {status.data.followingCount}{" "}
-            following
+            {t("u.followers", {
+              followers: status.data.followerCount,
+              following: status.data.followingCount,
+            })}
           </Text>
         )}
 
@@ -82,17 +85,17 @@ export default function UserProfileScreen() {
                   : "text-white dark:text-gray-900"
               }`}
             >
-              {status.data.isFollowing ? "Following" : "Follow"}
+              {status.data.isFollowing ? t("u.following") : t("u.follow")}
             </Text>
           </Pressable>
         )}
 
         <Text className="mt-8 mb-2 text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
-          Public lists
+          {t("u.publicLists")}
         </Text>
         {p.publicLists.length === 0 && (
           <Text className="text-sm text-gray-500 dark:text-gray-400">
-            None yet.
+            {t("u.noneYet")}
           </Text>
         )}
         {p.publicLists.map((list) => (
@@ -119,7 +122,7 @@ export default function UserProfileScreen() {
         ))}
 
         <Text className="mt-8 mb-2 text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
-          Achievements
+          {t("u.achievements")}
         </Text>
         {achievements.isLoading ? (
           <ActivityIndicator />
@@ -142,7 +145,7 @@ export default function UserProfileScreen() {
                       : "text-gray-500 dark:text-gray-400"
                   }`}
                 >
-                  {ACHIEVEMENT_LABELS[a.type] ?? a.type}
+                  {t(`achievements.${a.type}`)}
                 </Text>
                 <Text className="ml-3 text-xs text-gray-500 dark:text-gray-400">
                   {a.progress}/{a.target}
@@ -155,7 +158,7 @@ export default function UserProfileScreen() {
         {p.completedChallenges.length > 0 && (
           <>
             <Text className="mt-8 mb-2 text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
-              Completed challenges
+              {t("u.completedChallenges")}
             </Text>
             {p.completedChallenges.map((c) => (
               <View
