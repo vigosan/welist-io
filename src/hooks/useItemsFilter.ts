@@ -37,7 +37,6 @@ export function useItemsFilter({
       setSortedIds(ids);
     }
     if (!ids) return items;
-    // Order by sortedIds but use live items for done state
     const liveById = new Map(items.map((i) => [i.id, i]));
     const sortedSet = new Set(ids);
     const inOrder = ids.flatMap((id) => {
