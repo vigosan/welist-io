@@ -57,6 +57,27 @@ export type ExploreItem = {
   owner: { id: string | null; name: string | null; image: string | null } | null;
 };
 
+export type NotificationType =
+  | "challenge_accepted"
+  | "challenge_completed"
+  | "new_follower"
+  | "list_purchased"
+  | "added_as_collaborator";
+
+export type AppNotification = {
+  id: string;
+  userId: string;
+  type: NotificationType;
+  listId: string | null;
+  listName: string | null;
+  actorId: string | null;
+  actorName: string | null;
+  actorImage: string | null;
+  actionUrl: string | null;
+  readAt: string | null;
+  createdAt: string;
+};
+
 export type FeedItem = {
   id: string;
   name: string;
