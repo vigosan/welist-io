@@ -106,7 +106,7 @@ export default function UsersScreen() {
                 params: { userId: item.id },
               })
             }
-            className="mb-2 flex-row items-center gap-3 rounded-2xl border border-gray-200 bg-white p-4 active:opacity-80 dark:border-gray-700 dark:bg-gray-900"
+            className="mb-2 flex-row items-center gap-3 rounded-2xl border border-black/[0.06] bg-white p-4 active:opacity-80 dark:border-white/[0.08] dark:bg-gray-900"
           >
             <Avatar name={item.name} image={item.image} />
             <View className="flex-1">
@@ -118,6 +118,7 @@ export default function UsersScreen() {
               </Text>
               <Text
                 numberOfLines={1}
+                style={{ fontVariant: ["tabular-nums"] }}
                 className="mt-0.5 text-xs text-gray-500 dark:text-gray-400"
               >
                 {item.ownedListsCount} lists · {item.completedChallengesCount}{" "}

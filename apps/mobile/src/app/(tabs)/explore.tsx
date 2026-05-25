@@ -199,7 +199,7 @@ export default function ExploreScreen() {
                 params: { listId: item.id },
               })
             }
-            className="mb-3 rounded-2xl border border-gray-200 bg-white p-4 active:opacity-80 dark:border-gray-700 dark:bg-gray-900"
+            className="mb-3 rounded-2xl border border-black/[0.06] bg-white p-4 active:opacity-80 dark:border-white/[0.08] dark:bg-gray-900"
           >
             <Text
               numberOfLines={1}

@@ -1,6 +1,7 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { MoreVertical } from "lucide-react-native";
 import * as Clipboard from "expo-clipboard";
+import * as Haptics from "expo-haptics";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
@@ -178,7 +179,10 @@ export default function ListDetailScreen() {
           }`}
         >
           <Pressable
-            onPress={() => toggle.mutate(item.id)}
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              toggle.mutate(item.id);
+            }}
             onLongPress={() => openItemMenu(item)}
             disabled={isActive}
             className="flex-1 flex-row items-center gap-3 active:opacity-80"

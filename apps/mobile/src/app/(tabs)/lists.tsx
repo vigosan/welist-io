@@ -246,7 +246,7 @@ export default function MyListsScreen() {
               })
             }
             onLongPress={() => confirmDelete(item)}
-            className="mb-2 flex-row items-center gap-3 rounded-2xl border border-gray-200 bg-white p-4 active:opacity-80 dark:border-gray-700 dark:bg-gray-900"
+            className="mb-2 flex-row items-center gap-3 rounded-2xl border border-black/[0.06] bg-white p-4 active:opacity-80 dark:border-white/[0.08] dark:bg-gray-900"
           >
             <ProgressDonut done={item.doneCount} total={item.itemCount} />
             <View className="flex-1">
@@ -256,7 +256,10 @@ export default function MyListsScreen() {
               >
                 {item.name}
               </Text>
-              <Text className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
+              <Text
+                style={{ fontVariant: ["tabular-nums"] }}
+                className="mt-0.5 text-xs text-gray-500 dark:text-gray-400"
+              >
                 {t("lists.progress", {
                   done: item.doneCount,
                   total: item.itemCount,
