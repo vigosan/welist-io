@@ -1451,12 +1451,18 @@ app.get("/users/me", async (c) => {
   if (!userId) return c.json({ error: "Unauthorized" }, 401);
   const user = await db.query.users.findFirst({
     where: eq(users.id, userId),
-    columns: { id: true, publicProfile: true, emailOptIn: true },
+    columns: {
+      id: true,
+      publicProfile: true,
+      emailOptIn: true,
+      passwordHash: true,
+    },
   });
   if (!user) return c.json({ error: "Not found" }, 404);
   return c.json({
     publicProfile: user.publicProfile,
     emailOptIn: user.emailOptIn,
+    hasPassword: user.passwordHash !== null,
   });
 });
 

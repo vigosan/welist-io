@@ -1,6 +1,7 @@
 import { useSession } from "@hono/auth-js/react";
 import { useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link, useSearch } from "@tanstack/react-router";
+import { Eye, EyeOff } from "lucide-react";
 import type React from "react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -40,8 +41,11 @@ function SettingsPage() {
   const [connecting, setConnecting] = useState(false);
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const setPasswordMutation = useSetPassword();
+  const hasPassword = userMe?.hasPassword ?? false;
 
   async function handleSavePassword(e: React.FormEvent) {
     e.preventDefault();
@@ -219,10 +223,14 @@ function SettingsPage() {
         <section className="bg-white dark:bg-white/[0.02] border border-black/[0.08] dark:border-white/[0.08] rounded-2xl p-5 flex flex-col gap-4">
           <div>
             <p className="text-sm font-semibold text-[#0c0c0b] dark:text-[#f0ede8]">
-              {t("settings.password.title")}
+              {hasPassword
+                ? t("settings.password.titleChange")
+                : t("settings.password.title")}
             </p>
             <p className="text-xs text-gray-500 dark:text-[#a0a09c] mt-0.5 leading-relaxed">
-              {t("settings.password.description")}
+              {hasPassword
+                ? t("settings.password.descriptionSet")
+                : t("settings.password.description")}
             </p>
           </div>
           <form
@@ -230,24 +238,62 @@ function SettingsPage() {
             className="flex flex-col gap-3"
             data-testid="set-password-form"
           >
-            <input
-              type="password"
-              autoComplete="new-password"
-              placeholder={t("settings.password.newPassword")}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              data-testid="password-input"
-              className="px-3 py-2 text-sm bg-black/[0.03] dark:bg-white/[0.04] border border-black/[0.08] dark:border-white/[0.08] rounded-xl text-[#0c0c0b] dark:text-[#f0ede8] outline-none focus:border-gray-400"
-            />
-            <input
-              type="password"
-              autoComplete="new-password"
-              placeholder={t("settings.password.confirmPassword")}
-              value={passwordConfirm}
-              onChange={(e) => setPasswordConfirm(e.target.value)}
-              data-testid="password-confirm-input"
-              className="px-3 py-2 text-sm bg-black/[0.03] dark:bg-white/[0.04] border border-black/[0.08] dark:border-white/[0.08] rounded-xl text-[#0c0c0b] dark:text-[#f0ede8] outline-none focus:border-gray-400"
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                autoComplete="new-password"
+                placeholder={t("settings.password.newPassword")}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                data-testid="password-input"
+                className="w-full px-3 py-2 pr-10 text-sm bg-black/[0.03] dark:bg-white/[0.04] border border-black/[0.08] dark:border-white/[0.08] rounded-xl text-[#0c0c0b] dark:text-[#f0ede8] outline-none focus:border-gray-400"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((v) => !v)}
+                aria-label={
+                  showPassword
+                    ? t("settings.password.hide")
+                    : t("settings.password.show")
+                }
+                data-testid="toggle-password-visibility"
+                className="cursor-pointer absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-gray-500 dark:text-[#a0a09c] hover:text-[#0c0c0b] dark:hover:text-[#f0ede8] transition-colors"
+              >
+                {showPassword ? (
+                  <EyeOff className="w-4 h-4" />
+                ) : (
+                  <Eye className="w-4 h-4" />
+                )}
+              </button>
+            </div>
+            <div className="relative">
+              <input
+                type={showPasswordConfirm ? "text" : "password"}
+                autoComplete="new-password"
+                placeholder={t("settings.password.confirmPassword")}
+                value={passwordConfirm}
+                onChange={(e) => setPasswordConfirm(e.target.value)}
+                data-testid="password-confirm-input"
+                className="w-full px-3 py-2 pr-10 text-sm bg-black/[0.03] dark:bg-white/[0.04] border border-black/[0.08] dark:border-white/[0.08] rounded-xl text-[#0c0c0b] dark:text-[#f0ede8] outline-none focus:border-gray-400"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPasswordConfirm((v) => !v)}
+                aria-label={
+                  showPasswordConfirm
+                    ? t("settings.password.hide")
+                    : t("settings.password.show")
+                }
+                data-testid="toggle-password-confirm-visibility"
+                className="cursor-pointer absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-gray-500 dark:text-[#a0a09c] hover:text-[#0c0c0b] dark:hover:text-[#f0ede8] transition-colors"
+              >
+                {showPasswordConfirm ? (
+                  <EyeOff className="w-4 h-4" />
+                ) : (
+                  <Eye className="w-4 h-4" />
+                )}
+              </button>
+            </div>
             {passwordError && (
               <p className="text-xs text-red-600 dark:text-red-400">
                 {passwordError}

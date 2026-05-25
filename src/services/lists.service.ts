@@ -195,7 +195,11 @@ export const usersService = {
   },
 
   getMe: () =>
-    apiClient<{ publicProfile: boolean; emailOptIn: boolean }>("/api/users/me"),
+    apiClient<{
+      publicProfile: boolean;
+      emailOptIn: boolean;
+      hasPassword: boolean;
+    }>("/api/users/me"),
 
   getStreak: () => apiClient<{ current: number }>("/api/me/streak"),
 

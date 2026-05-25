@@ -404,20 +404,34 @@ export function useUserMe() {
   });
 }
 
+type UserMe = {
+  publicProfile: boolean;
+  emailOptIn: boolean;
+  hasPassword: boolean;
+};
+
 export function useUpdateProfile() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (data: { publicProfile?: boolean; emailOptIn?: boolean }) =>
       usersService.updateProfile(data),
     onSuccess: (updated) => {
-      qc.setQueryData(queryKeys.userMe(), updated);
+      qc.setQueryData<UserMe>(queryKeys.userMe(), (old) =>
+        old ? { ...old, ...updated } : { ...updated, hasPassword: false }
+      );
     },
   });
 }
 
 export function useSetPassword() {
+  const qc = useQueryClient();
   return useMutation({
     mutationFn: (password: string) => usersService.setPassword(password),
+    onSuccess: () => {
+      qc.setQueryData<UserMe>(queryKeys.userMe(), (old) =>
+        old ? { ...old, hasPassword: true } : old
+      );
+    },
   });
 }
 

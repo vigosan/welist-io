@@ -411,8 +411,10 @@ const es = {
   settings: {
     password: {
       title: "Contraseña",
+      titleChange: "Cambiar contraseña",
       description:
         "Define una contraseña para poder entrar también con email y contraseña (útil para la app móvil).",
+      descriptionSet: "Ya tienes una contraseña configurada. Puedes cambiarla aquí.",
       newPassword: "Nueva contraseña",
       confirmPassword: "Repetir contraseña",
       minLength: "Mínimo 8 caracteres.",
@@ -421,6 +423,8 @@ const es = {
       genericError: "No se pudo guardar. Intenta de nuevo.",
       save: "Guardar contraseña",
       saving: "Guardando…",
+      show: "Mostrar contraseña",
+      hide: "Ocultar contraseña",
     },
   },
   directory: {
