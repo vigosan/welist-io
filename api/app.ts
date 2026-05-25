@@ -1978,6 +1978,35 @@ app.post(
   }
 );
 
+app.delete("/lists/:listId/collaborators/:userId", async (c) => {
+  const authUser = getOptionalUser(c);
+  const viewerId = authUser?.session?.user?.id;
+  if (!viewerId) return c.json({ error: "Unauthorized" }, 401);
+
+  const list = await db.query.lists.findFirst({
+    where: listWhere(c.req.param("listId")),
+    columns: { id: true, ownerId: true },
+  });
+  if (!list) return c.json({ error: "Not found" }, 404);
+  if (list.ownerId !== viewerId) return c.json({ error: "Forbidden" }, 403);
+
+  const targetId = c.req.param("userId");
+  if (targetId === list.ownerId)
+    return c.json({ error: "cannot_remove_owner" }, 400);
+
+  await db
+    .delete(participations)
+    .where(
+      and(
+        eq(participations.sourceListId, list.id),
+        eq(participations.userId, targetId),
+        eq(participations.role, "collaborator")
+      )
+    );
+
+  return c.body(null, 204);
+});
+
 app.get("/lists/:listId/activity", async (c) => {
   const authUser = getOptionalUser(c);
   const userId = authUser?.session?.user?.id;

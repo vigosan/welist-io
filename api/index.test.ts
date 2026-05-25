@@ -2053,6 +2053,62 @@ describe("POST /api/lists/:listId/collaborators", () => {
   });
 });
 
+describe("DELETE /api/lists/:listId/collaborators/:userId", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockGetAuthUser.mockResolvedValue({ session: { user: { id: "owner" } } });
+  });
+
+  const url = (userId: string) => `/api/lists/abc/collaborators/${userId}`;
+  const opts = { method: "DELETE" };
+
+  it("returns 401 when unauthenticated", async () => {
+    mockGetAuthUser.mockRejectedValue(new Error("no session"));
+    const res = await app.request(url("u2"), opts);
+    expect(res.status).toBe(401);
+  });
+
+  it("returns 404 when list does not exist", async () => {
+    mockDb.query.lists.findFirst.mockResolvedValue(null);
+    const res = await app.request(url("u2"), opts);
+    expect(res.status).toBe(404);
+  });
+
+  it("returns 403 when caller is not the owner", async () => {
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "abc",
+      ownerId: "someone-else",
+    });
+    const res = await app.request(url("u2"), opts);
+    expect(res.status).toBe(403);
+  });
+
+  it("returns 400 when trying to remove the owner", async () => {
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "abc",
+      ownerId: "owner",
+    });
+    const res = await app.request(url("owner"), opts);
+    expect(res.status).toBe(400);
+    const json = (await res.json()) as { error: string };
+    expect(json.error).toBe("cannot_remove_owner");
+  });
+
+  it("removes the collaborator participation", async () => {
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "abc",
+      ownerId: "owner",
+    });
+    const where = vi.fn().mockResolvedValue(undefined);
+    mockDb.delete.mockReturnValue({ where });
+
+    const res = await app.request(url("u2"), opts);
+    expect(res.status).toBe(204);
+    expect(mockDb.delete).toHaveBeenCalledWith(participations);
+    expect(where).toHaveBeenCalledTimes(1);
+  });
+});
+
 describe("PATCH /api/users/me", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -3198,6 +3254,76 @@ describe("GET /api/lists/:listId/active-participants", () => {
     };
     expect(body.total).toBe(0);
     expect(body.participants).toEqual([]);
+  });
+});
+
+describe("DELETE /api/lists/:listId/collaborators/:userId", () => {
+  const headers = { "x-forwarded-for": "10.0.7.2" };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockGetAuthUser.mockResolvedValue({
+      session: { user: { id: "owner" } },
+    });
+  });
+
+  it("returns 401 when unauthenticated", async () => {
+    mockGetAuthUser.mockRejectedValue(new Error("no session"));
+    const res = await app.request("/api/lists/abc/collaborators/u2", {
+      method: "DELETE",
+      headers,
+    });
+    expect(res.status).toBe(401);
+  });
+
+  it("returns 404 when list not found", async () => {
+    mockDb.query.lists.findFirst.mockResolvedValue(null);
+    const res = await app.request("/api/lists/abc/collaborators/u2", {
+      method: "DELETE",
+      headers,
+    });
+    expect(res.status).toBe(404);
+  });
+
+  it("returns 403 when caller is not the owner", async () => {
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "abc",
+      ownerId: "someone-else",
+    });
+    const res = await app.request("/api/lists/abc/collaborators/u2", {
+      method: "DELETE",
+      headers,
+    });
+    expect(res.status).toBe(403);
+  });
+
+  it("returns 400 when trying to remove the owner", async () => {
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "abc",
+      ownerId: "owner",
+    });
+    const res = await app.request("/api/lists/abc/collaborators/owner", {
+      method: "DELETE",
+      headers,
+    });
+    expect(res.status).toBe(400);
+  });
+
+  it("deletes the participation and returns 204", async () => {
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "abc",
+      ownerId: "owner",
+    });
+    const where = vi.fn().mockResolvedValue(undefined);
+    mockDb.delete.mockReturnValue({ where });
+
+    const res = await app.request("/api/lists/abc/collaborators/u2", {
+      method: "DELETE",
+      headers,
+    });
+    expect(res.status).toBe(204);
+    expect(mockDb.delete).toHaveBeenCalledWith(participations);
+    expect(where).toHaveBeenCalled();
   });
 });
 
