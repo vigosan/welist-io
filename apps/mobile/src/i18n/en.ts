@@ -16,6 +16,11 @@ export const en = {
   auth: {
     continueGoogle: "Continue with Google",
     signInFailed: "Sign-in failed",
+    emailPlaceholder: "Email",
+    passwordPlaceholder: "Password",
+    signInWithEmail: "Sign in with email",
+    signingIn: "Signing in…",
+    invalidCredentials: "Invalid email or password",
   },
   nav: {
     home: "Home",

@@ -1,7 +1,9 @@
 import * as SecureStore from "expo-secure-store";
 
 export const API_BASE =
-  process.env.EXPO_PUBLIC_API_BASE ?? "https://wilist.io";
+  process.env.EXPO_PUBLIC_API_URL ??
+  process.env.EXPO_PUBLIC_API_BASE ??
+  "https://wilist.io";
 
 const TOKEN_KEY = "wilist.session.token";
 

@@ -16,6 +16,11 @@ export const es = {
   auth: {
     continueGoogle: "Continuar con Google",
     signInFailed: "Fallo al iniciar sesión",
+    emailPlaceholder: "Email",
+    passwordPlaceholder: "Contraseña",
+    signInWithEmail: "Entrar con email",
+    signingIn: "Entrando…",
+    invalidCredentials: "Email o contraseña incorrectos",
   },
   nav: {
     home: "Inicio",
