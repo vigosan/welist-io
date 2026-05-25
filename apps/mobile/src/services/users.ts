@@ -61,4 +61,10 @@ export const usersService = {
 
   deleteAccount: () =>
     apiFetch<{ ok: true }>("/me", { method: "DELETE" }),
+
+  report: (targetType: "list" | "user", targetId: string, reason?: string) =>
+    apiFetch<{ ok: true }>("/reports", {
+      method: "POST",
+      body: JSON.stringify({ targetType, targetId, reason }),
+    }),
 };

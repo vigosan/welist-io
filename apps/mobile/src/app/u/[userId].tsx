@@ -1,7 +1,10 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { Flag } from "lucide-react-native";
 import {
+  ActionSheetIOS,
   ActivityIndicator,
   Alert,
+  Platform,
   Pressable,
   ScrollView,
   Text,
@@ -12,6 +15,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import {
   useFollowStatus,
+  useReport,
   useToggleFollow,
   useUserAchievements,
   useUserProfile,
@@ -29,6 +33,38 @@ export default function UserProfileScreen() {
   const isMe = signedIn && session.user.id === userId;
   const status = useFollowStatus(userId, signedIn && !isMe);
   const toggleFollow = useToggleFollow(userId);
+  const report = useReport();
+
+  const handleReport = () => {
+    report.mutate(
+      { targetType: "user", targetId: userId },
+      {
+        onSuccess: () => Alert.alert(t("u.reportSubmitted")),
+        onError: () => Alert.alert(t("u.reportFailed")),
+      }
+    );
+  };
+
+  const openActions = () => {
+    if (Platform.OS === "ios") {
+      ActionSheetIOS.showActionSheetWithOptions(
+        {
+          title: p?.name ?? "",
+          options: [t("u.report"), t("common.cancel")],
+          destructiveButtonIndex: 0,
+          cancelButtonIndex: 1,
+        },
+        (idx) => {
+          if (idx === 0) handleReport();
+        }
+      );
+      return;
+    }
+    Alert.alert(p?.name ?? "", undefined, [
+      { text: t("u.report"), style: "destructive", onPress: handleReport },
+      { text: t("common.cancel"), style: "cancel" },
+    ]);
+  };
 
   const onFollow = () => {
     if (!status.data) return;
@@ -51,7 +87,22 @@ export default function UserProfileScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-canvas dark:bg-canvas-dark" edges={["top"]}>
-      <ScreenHeader title={p.name ?? t("common.anonymous")} back />
+      <ScreenHeader
+        title={p.name ?? t("common.anonymous")}
+        back
+        right={
+          !isMe && signedIn ? (
+            <Pressable
+              onPress={openActions}
+              accessibilityLabel={t("u.report")}
+              hitSlop={8}
+              className="h-9 w-9 items-center justify-center rounded-full active:bg-black/[0.05] dark:active:bg-white/[0.06]"
+            >
+              <Flag color="#0c0c0b" size={18} />
+            </Pressable>
+          ) : null
+        }
+      />
 
       <ScrollView contentContainerClassName="px-5 pb-10">
 

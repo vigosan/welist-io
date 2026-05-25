@@ -37,6 +37,7 @@ import {
   lists,
   notifications,
   participations,
+  reports,
   stripeAccounts,
 } from "../src/db/schema/lists.schema.js";
 import { LIST_CATEGORIES } from "../src/lib/categories.js";
@@ -1503,6 +1504,30 @@ app.get("/users/me", async (c) => {
     hasPassword: user.passwordHash !== null,
   });
 });
+
+const reportSchema = z.object({
+  targetType: z.enum(["list", "user"]),
+  targetId: z.string().min(1).max(200),
+  reason: z.string().max(500).optional(),
+});
+
+app.post(
+  "/reports",
+  zValidator("json", reportSchema),
+  async (c) => {
+    const authUser = getOptionalUser(c);
+    const userId = authUser?.session?.user?.id;
+    if (!userId) return c.json({ error: "Unauthorized" }, 401);
+    const { targetType, targetId, reason } = c.req.valid("json");
+    await db.insert(reports).values({
+      reporterId: userId,
+      targetType,
+      targetId,
+      reason: reason ?? null,
+    });
+    return c.json({ ok: true });
+  }
+);
 
 app.delete("/me", async (c) => {
   const authUser = getOptionalUser(c);

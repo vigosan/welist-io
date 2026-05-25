@@ -357,6 +357,31 @@ export const follows = pgTable(
   ]
 );
 
+export const reportTargetEnum = pgEnum("report_target", ["list", "user"]);
+
+export const reports = pgTable(
+  "reports",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    reporterId: text("reporter_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    targetType: reportTargetEnum("target_type").notNull(),
+    targetId: text("target_id").notNull(),
+    reason: text("reason"),
+    createdAt: timestamp("created_at", { mode: "date" })
+      .defaultNow()
+      .notNull(),
+    resolvedAt: timestamp("resolved_at", { mode: "date" }),
+  },
+  (t) => [
+    index("reports_target_idx").on(t.targetType, t.targetId),
+    index("reports_reporter_idx").on(t.reporterId),
+  ]
+);
+
+export type Report = typeof reports.$inferSelect;
+
 export type List = typeof lists.$inferSelect;
 export type Follow = typeof follows.$inferSelect;
 export type Item = typeof items.$inferSelect;

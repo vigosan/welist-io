@@ -44,6 +44,7 @@ import {
   useDeleteList,
   useList,
 } from "@/hooks/lists";
+import { useReport } from "@/hooks/users";
 import { useRateList } from "@/hooks/rating";
 import { useSession } from "@/lib/auth";
 import { type FilterMode, filterItems } from "@/lib/items-filter";
@@ -77,6 +78,7 @@ export default function ListDetailScreen() {
   const rate = useRateList(listId);
   const participants = useActiveParticipants(listId);
   const deleteList = useDeleteList();
+  const report = useReport();
 
   const isOwner =
     session.status === "signed-in" &&
@@ -284,6 +286,16 @@ export default function ListDetailScreen() {
     ]);
   };
 
+  const handleReport = () => {
+    report.mutate(
+      { targetType: "list", targetId: listId },
+      {
+        onSuccess: () => Alert.alert(t("list.reportSubmitted")),
+        onError: () => Alert.alert(t("list.reportFailed")),
+      }
+    );
+  };
+
   const openActions = () => {
     const goSettings = () =>
       router.push({
@@ -294,12 +306,22 @@ export default function ListDetailScreen() {
       { label: t("list.randomItem"), run: handleRandom },
       { label: t("list.shareLink"), run: handleShare },
       { label: t("list.copyPlain"), run: handleCopyPlain },
-      { label: t("list.settings"), run: goSettings },
-      {
-        label: t("list.deleteList"),
-        run: handleDelete,
-        destructive: true,
-      },
+      ...(isOwner
+        ? [
+            { label: t("list.settings"), run: goSettings },
+            {
+              label: t("list.deleteList"),
+              run: handleDelete,
+              destructive: true as const,
+            },
+          ]
+        : [
+            {
+              label: t("list.report"),
+              run: handleReport,
+              destructive: true as const,
+            },
+          ]),
     ];
     if (Platform.OS === "ios") {
       const options = [

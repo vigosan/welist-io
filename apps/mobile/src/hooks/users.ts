@@ -125,3 +125,13 @@ export function useDeleteAccount() {
     mutationFn: () => usersService.deleteAccount(),
   });
 }
+
+export function useReport() {
+  return useMutation({
+    mutationFn: (args: {
+      targetType: "list" | "user";
+      targetId: string;
+      reason?: string;
+    }) => usersService.report(args.targetType, args.targetId, args.reason),
+  });
+}
