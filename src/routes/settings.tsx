@@ -1,7 +1,9 @@
 import { useSession } from "@hono/auth-js/react";
 import { useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link, useSearch } from "@tanstack/react-router";
+import type React from "react";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { z } from "zod";
 import { AppNav } from "@/components/AppNav";
 import { useUpdateProfile, useUserMe } from "@/hooks/useList";
@@ -18,6 +20,7 @@ export const Route = createFileRoute("/settings")({
 });
 
 function SettingsPage() {
+  const { t } = useTranslation();
   const { data: session } = useSession();
   const { stripe: stripeParam } = useSearch({
     from: "/settings",
@@ -31,6 +34,39 @@ function SettingsPage() {
   const { data: userMe } = useUserMe();
   const updateProfile = useUpdateProfile();
   const [connecting, setConnecting] = useState(false);
+  const [password, setPassword] = useState("");
+  const [passwordConfirm, setPasswordConfirm] = useState("");
+  const [passwordState, setPasswordState] = useState<
+    "idle" | "saving" | "saved" | "error"
+  >("idle");
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+
+  async function handleSavePassword(e: React.FormEvent) {
+    e.preventDefault();
+    setPasswordError(null);
+    if (password.length < 8) {
+      setPasswordError(t("settings.password.minLength"));
+      return;
+    }
+    if (password !== passwordConfirm) {
+      setPasswordError(t("settings.password.notMatch"));
+      return;
+    }
+    setPasswordState("saving");
+    try {
+      const res = await fetch("/api/auth/set-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password }),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      setPassword("");
+      setPasswordConfirm("");
+      setPasswordState("saved");
+    } catch {
+      setPasswordState("error");
+    }
+  }
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: intentional — qc and refetch are stable
   useEffect(() => {
@@ -185,6 +221,66 @@ function SettingsPage() {
               />
             </button>
           </label>
+        </section>
+
+        <section className="bg-white dark:bg-white/[0.02] border border-black/[0.08] dark:border-white/[0.08] rounded-2xl p-5 flex flex-col gap-4">
+          <div>
+            <p className="text-sm font-semibold text-[#0c0c0b] dark:text-[#f0ede8]">
+              {t("settings.password.title")}
+            </p>
+            <p className="text-xs text-gray-500 dark:text-[#a0a09c] mt-0.5 leading-relaxed">
+              {t("settings.password.description")}
+            </p>
+          </div>
+          <form
+            onSubmit={handleSavePassword}
+            className="flex flex-col gap-3"
+            data-testid="set-password-form"
+          >
+            <input
+              type="password"
+              autoComplete="new-password"
+              placeholder={t("settings.password.newPassword")}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              data-testid="password-input"
+              className="px-3 py-2 text-sm bg-black/[0.03] dark:bg-white/[0.04] border border-black/[0.08] dark:border-white/[0.08] rounded-xl text-[#0c0c0b] dark:text-[#f0ede8] outline-none focus:border-gray-400"
+            />
+            <input
+              type="password"
+              autoComplete="new-password"
+              placeholder={t("settings.password.confirmPassword")}
+              value={passwordConfirm}
+              onChange={(e) => setPasswordConfirm(e.target.value)}
+              data-testid="password-confirm-input"
+              className="px-3 py-2 text-sm bg-black/[0.03] dark:bg-white/[0.04] border border-black/[0.08] dark:border-white/[0.08] rounded-xl text-[#0c0c0b] dark:text-[#f0ede8] outline-none focus:border-gray-400"
+            />
+            {passwordError && (
+              <p className="text-xs text-red-600 dark:text-red-400">
+                {passwordError}
+              </p>
+            )}
+            {passwordState === "saved" && (
+              <p className="text-xs text-gray-500 dark:text-[#a0a09c]">
+                {t("settings.password.saved")}
+              </p>
+            )}
+            {passwordState === "error" && !passwordError && (
+              <p className="text-xs text-red-600 dark:text-red-400">
+                {t("settings.password.genericError")}
+              </p>
+            )}
+            <button
+              type="submit"
+              disabled={passwordState === "saving" || !password}
+              data-testid="save-password-button"
+              className="cursor-pointer self-start px-4 py-2 text-sm font-medium bg-[#0c0c0b] text-[#f8f7f5] dark:bg-[#f0ede8] dark:text-[#0c0c0b] rounded-xl hover:opacity-90 disabled:opacity-40 transition-[opacity,transform] duration-150 active:scale-[0.96]"
+            >
+              {passwordState === "saving"
+                ? t("settings.password.saving")
+                : t("settings.password.save")}
+            </button>
+          </form>
         </section>
 
         <section className="bg-white dark:bg-white/[0.02] border border-black/[0.08] dark:border-white/[0.08] rounded-2xl p-5 flex flex-col gap-4">

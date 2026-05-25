@@ -408,6 +408,21 @@ const es = {
     myLists: "Mis listas",
     settings: "Configuración",
   },
+  settings: {
+    password: {
+      title: "Contraseña",
+      description:
+        "Define una contraseña para poder entrar también con email y contraseña (útil para la app móvil).",
+      newPassword: "Nueva contraseña",
+      confirmPassword: "Repetir contraseña",
+      minLength: "Mínimo 8 caracteres.",
+      notMatch: "Las contraseñas no coinciden.",
+      saved: "Contraseña guardada.",
+      genericError: "No se pudo guardar. Intenta de nuevo.",
+      save: "Guardar contraseña",
+      saving: "Guardando…",
+    },
+  },
   directory: {
     searchPlaceholder: "Buscar personas…",
     searchAriaLabel: "Buscar usuarios",

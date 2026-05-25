@@ -409,6 +409,21 @@ const en: Translations = {
     myLists: "My lists",
     settings: "Settings",
   },
+  settings: {
+    password: {
+      title: "Password",
+      description:
+        "Set a password so you can also sign in with email and password (handy for the mobile app).",
+      newPassword: "New password",
+      confirmPassword: "Repeat password",
+      minLength: "Minimum 8 characters.",
+      notMatch: "Passwords don't match.",
+      saved: "Password saved.",
+      genericError: "Could not save. Try again.",
+      save: "Save password",
+      saving: "Saving…",
+    },
+  },
   directory: {
     searchPlaceholder: "Search people…",
     searchAriaLabel: "Search users",
