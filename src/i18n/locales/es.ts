@@ -139,6 +139,12 @@ const es = {
     commandPalette: "Paleta de comandos (⌘K)",
     exportText: "Copiar como texto plano",
     category: "Categoría",
+    collaborators: "Colaboradores",
+    collaboratorsSearchPlaceholder: "Buscar por nombre o correo…",
+    collaboratorsEmptySearch: "No se encontraron usuarios",
+    collaboratorsRequireCollaborative: "Activa Acceso = Colaborativa para invitar colaboradores",
+    collaboratorsOwnerBadge: "Propietario",
+    collaboratorsRemove: "Quitar colaborador",
   },
   categories: {
     none: "Sin categoría",

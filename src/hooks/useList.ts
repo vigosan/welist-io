@@ -29,6 +29,37 @@ export function useCollaborators(listId: string, enabled: boolean) {
   });
 }
 
+export function useUserSearch(q: string) {
+  return useQuery({
+    queryKey: queryKeys.userSearch(q),
+    queryFn: () => usersService.search(q),
+    enabled: q.length >= 2,
+    staleTime: 30_000,
+  });
+}
+
+export function useAddCollaborator(listId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (userId: string) =>
+      listsService.addCollaborator(listId, userId),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: queryKeys.listCollaborators(listId) });
+    },
+  });
+}
+
+export function useRemoveCollaborator(listId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (userId: string) =>
+      listsService.removeCollaborator(listId, userId),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: queryKeys.listCollaborators(listId) });
+    },
+  });
+}
+
 export function useActiveParticipants(listId: string) {
   return useQuery({
     queryKey: queryKeys.listActiveParticipants(listId),

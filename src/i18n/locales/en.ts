@@ -140,6 +140,12 @@ const en: Translations = {
     commandPalette: "Command palette (⌘K)",
     exportText: "Copy as plain text",
     category: "Category",
+    collaborators: "Collaborators",
+    collaboratorsSearchPlaceholder: "Search by name or email…",
+    collaboratorsEmptySearch: "No users found",
+    collaboratorsRequireCollaborative: "Set Access = Collaborative to invite collaborators",
+    collaboratorsOwnerBadge: "Owner",
+    collaboratorsRemove: "Remove collaborator",
   },
   categories: {
     none: "No category",

@@ -110,7 +110,8 @@ export type AppNotification = {
     | "challenge_accepted"
     | "challenge_completed"
     | "new_follower"
-    | "list_purchased";
+    | "list_purchased"
+    | "added_as_collaborator";
   listId: string | null;
   listName: string | null;
   actorId: string | null;
@@ -222,6 +223,16 @@ export const usersService = {
         body: JSON.stringify(data),
       }
     ),
+
+  search: (q: string) =>
+    apiClient<{
+      users: {
+        id: string;
+        name: string | null;
+        email: string | null;
+        image: string | null;
+      }[];
+    }>(`/api/users/search?q=${encodeURIComponent(q)}`),
 };
 
 export const stripeService = {
@@ -330,6 +341,17 @@ export const listsService = {
         totalItems: number;
       }[];
     }>(`/api/lists/${listId}/collaborators`),
+
+  addCollaborator: (listId: string, userId: string) =>
+    apiClient<void>(`/api/lists/${listId}/collaborators`, {
+      method: "POST",
+      body: JSON.stringify({ userId }),
+    }),
+
+  removeCollaborator: (listId: string, userId: string) =>
+    apiClient<void>(`/api/lists/${listId}/collaborators/${userId}`, {
+      method: "DELETE",
+    }),
 
   activeParticipants: (listId: string) =>
     apiClient<{

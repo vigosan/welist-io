@@ -41,11 +41,14 @@ import {
 import { useItemsFilter } from "@/hooks/useItemsFilter";
 import {
   useActiveParticipants,
+  useAddCollaborator,
   useCollaborators,
   useRateList,
+  useRemoveCollaborator,
   useToggleCollaborative,
   useUnrateList,
   useUpdateCategory,
+  useUserSearch,
 } from "@/hooks/useList";
 import { useListHeader } from "@/hooks/useListHeader";
 import {
@@ -264,6 +267,18 @@ function setupMocks({
   vi.mocked(useCollaborators).mockReturnValue({
     data: { collaborators: [], challengers: [] },
     isLoading: false,
+  } as never);
+  vi.mocked(useUserSearch).mockReturnValue({
+    data: { users: [] },
+    isFetching: false,
+  } as never);
+  vi.mocked(useAddCollaborator).mockReturnValue({
+    mutate: vi.fn(),
+    isPending: false,
+  } as never);
+  vi.mocked(useRemoveCollaborator).mockReturnValue({
+    mutate: vi.fn(),
+    isPending: false,
   } as never);
   vi.mocked(useActiveParticipants).mockReturnValue({
     data: { participants: [], total: 0 },

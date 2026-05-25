@@ -1,12 +1,28 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ListSettingsPanel } from "./ListSettingsPanel";
 
+vi.mock("@/hooks/useCachedSession", () => ({
+  useCachedSession: () => ({
+    data: { user: { id: "owner", name: "Owner", image: null } },
+    status: "authenticated",
+  }),
+}));
+
+vi.mock("@/hooks/useList", () => ({
+  useCollaborators: () => ({ data: { collaborators: [] } }),
+  useUserSearch: () => ({ data: { users: [] }, isFetching: false }),
+  useAddCollaborator: () => ({ mutate: vi.fn(), isPending: false }),
+  useRemoveCollaborator: () => ({ mutate: vi.fn(), isPending: false }),
+}));
+
 function renderPanel(
   overrides: Partial<Parameters<typeof ListSettingsPanel>[0]> = {}
 ) {
   const props = {
+    listId: "abc",
     isPublic: true,
     isCollaborative: false,
     category: null as string | null,
@@ -20,7 +36,12 @@ function renderPanel(
     onClose: vi.fn(),
     ...overrides,
   };
-  render(<ListSettingsPanel {...props} />);
+  const qc = new QueryClient();
+  render(
+    <QueryClientProvider client={qc}>
+      <ListSettingsPanel {...props} />
+    </QueryClientProvider>
+  );
   return props;
 }
 

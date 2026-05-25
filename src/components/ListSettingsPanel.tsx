@@ -1,10 +1,12 @@
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { CategoryCombobox } from "@/components/lists/CategoryCombobox";
+import { CollaboratorsManager } from "@/components/lists/CollaboratorsManager";
 import { useTranslation } from "@/i18n/service";
 import type { ListCategory } from "@/lib/categories";
 
 type Props = {
+  listId: string;
   isPublic: boolean;
   isCollaborative: boolean;
   category: string | null;
@@ -62,6 +64,7 @@ function SegmentedToggle({
 }
 
 export function ListSettingsPanel({
+  listId,
   isPublic,
   isCollaborative,
   category,
@@ -203,6 +206,11 @@ export function ListSettingsPanel({
           <span className="text-xs text-gray-400">USD</span>
         </div>
       )}
+
+      <CollaboratorsManager
+        listId={listId}
+        isCollaborative={isCollaborative}
+      />
     </div>
   );
 }

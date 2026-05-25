@@ -822,6 +822,7 @@ function ListDetailPage() {
               {!listLoading && isOwner && settingsOpen && (
                 <div className="mt-3 flex flex-col gap-2 order-7">
                   <ListSettingsPanel
+                    listId={list?.id ?? listId}
                     isPublic={!!list?.public}
                     isCollaborative={!!list?.collaborative}
                     category={list?.category ?? null}
