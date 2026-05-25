@@ -45,7 +45,7 @@ export default function UsersScreen() {
           placeholder={t("users.search")}
           placeholderTextColor="#a0a09c"
           autoCapitalize="none"
-          className="flex-1 px-3 text-sm text-gray-900 dark:text-gray-100"
+          className="flex-1 px-3 py-2 text-sm text-gray-900 dark:text-gray-100"
         />
       </View>
 

@@ -1,11 +1,21 @@
 import { apiFetch } from "@/lib/api";
 import type { List, ListWithParticipation, MyListItem, Page } from "@/types";
 
+export type MyListsSort = "recent" | "newest" | "oldest" | "likes";
+export type MyListsVisibility = "all" | "public" | "private";
+
 export const listsService = {
-  myLists: (cursor?: string, q?: string) => {
+  myLists: (
+    cursor?: string,
+    q?: string,
+    sort?: MyListsSort,
+    visibility?: MyListsVisibility
+  ) => {
     const params = new URLSearchParams();
     if (cursor) params.set("cursor", cursor);
     if (q) params.set("q", q);
+    if (sort && sort !== "recent") params.set("sort", sort);
+    if (visibility && visibility !== "all") params.set("visibility", visibility);
     const qs = params.toString();
     return apiFetch<Page<MyListItem>>(`/my-lists${qs ? `?${qs}` : ""}`);
   },

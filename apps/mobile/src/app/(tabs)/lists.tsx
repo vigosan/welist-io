@@ -7,6 +7,7 @@ import {
   FlatList,
   Pressable,
   RefreshControl,
+  ScrollView,
   Text,
   TextInput,
   View,
@@ -16,13 +17,22 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { ProgressDonut } from "@/components/ProgressDonut";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { useCreateList, useDeleteList, useMyLists } from "@/hooks/lists";
+import { useDebouncedValue } from "@/hooks/useDebouncedValue";
+import type { MyListsSort, MyListsVisibility } from "@/services/lists";
 import type { MyListItem } from "@/types";
+
+const SORTS: MyListsSort[] = ["recent", "newest", "oldest", "likes"];
+const VISIBILITIES: MyListsVisibility[] = ["all", "public", "private"];
 
 export default function MyListsScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const [newName, setNewName] = useState("");
-  const query = useMyLists();
+  const [search, setSearch] = useState("");
+  const [sort, setSort] = useState<MyListsSort>("recent");
+  const [visibility, setVisibility] = useState<MyListsVisibility>("all");
+  const debouncedSearch = useDebouncedValue(search, 300);
+  const query = useMyLists(debouncedSearch || undefined, sort, visibility);
   const create = useCreateList();
   const remove = useDeleteList();
 
@@ -56,7 +66,10 @@ export default function MyListsScreen() {
     );
 
   return (
-    <SafeAreaView className="flex-1 bg-canvas dark:bg-canvas-dark" edges={["top"]}>
+    <SafeAreaView
+      className="flex-1 bg-canvas dark:bg-canvas-dark"
+      edges={["top"]}
+    >
       <ScreenHeader
         title={t("lists.title")}
         right={
@@ -71,7 +84,7 @@ export default function MyListsScreen() {
         }
       />
 
-      <View className="mx-6 mb-3 flex-row items-center gap-2 rounded-2xl border border-gray-200 bg-white p-1.5 dark:border-gray-700 dark:bg-gray-900">
+      <View className="mx-6 mb-2 flex-row items-center gap-2 rounded-2xl border border-gray-200 bg-white p-1.5 dark:border-gray-700 dark:bg-gray-900">
         <TextInput
           value={newName}
           onChangeText={setNewName}
@@ -79,7 +92,7 @@ export default function MyListsScreen() {
           placeholder={t("lists.newPlaceholder")}
           placeholderTextColor="#a0a09c"
           returnKeyType="done"
-          className="flex-1 px-3 text-sm text-gray-900 dark:text-gray-100"
+          className="flex-1 px-3 py-2 text-sm text-gray-900 dark:text-gray-100"
         />
         <Pressable
           onPress={submitCreate}
@@ -91,6 +104,81 @@ export default function MyListsScreen() {
           </Text>
         </Pressable>
       </View>
+
+      <View className="mx-6 mb-2 rounded-2xl border border-gray-200 bg-white p-1.5 dark:border-gray-700 dark:bg-gray-900">
+        <TextInput
+          value={search}
+          onChangeText={setSearch}
+          placeholder={t("lists.searchPlaceholder")}
+          placeholderTextColor="#a0a09c"
+          autoCapitalize="none"
+          className="px-3 py-2 text-sm text-gray-900 dark:text-gray-100"
+        />
+      </View>
+
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerClassName="px-6 gap-1.5"
+        style={{ flexGrow: 0, flexShrink: 0, marginBottom: 8 }}
+      >
+        {SORTS.map((s) => {
+          const active = sort === s;
+          return (
+            <Pressable
+              key={s}
+              onPress={() => setSort(s)}
+              className={`rounded-full px-3 py-1 ${
+                active
+                  ? "bg-gray-900 dark:bg-gray-100"
+                  : "bg-gray-100 dark:bg-gray-800"
+              }`}
+            >
+              <Text
+                className={`text-xs font-medium ${
+                  active
+                    ? "text-white dark:text-gray-900"
+                    : "text-gray-700 dark:text-gray-300"
+                }`}
+              >
+                {t(`lists.sort${s[0].toUpperCase()}${s.slice(1)}` as never)}
+              </Text>
+            </Pressable>
+          );
+        })}
+      </ScrollView>
+
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerClassName="px-6 gap-1.5"
+        style={{ flexGrow: 0, flexShrink: 0, marginBottom: 12 }}
+      >
+        {VISIBILITIES.map((v) => {
+          const active = visibility === v;
+          return (
+            <Pressable
+              key={v}
+              onPress={() => setVisibility(v)}
+              className={`rounded-full px-3 py-1 ${
+                active
+                  ? "bg-gray-900 dark:bg-gray-100"
+                  : "bg-gray-100 dark:bg-gray-800"
+              }`}
+            >
+              <Text
+                className={`text-xs font-medium ${
+                  active
+                    ? "text-white dark:text-gray-900"
+                    : "text-gray-700 dark:text-gray-300"
+                }`}
+              >
+                {t(`lists.visibility${v[0].toUpperCase()}${v.slice(1)}` as never)}
+              </Text>
+            </Pressable>
+          );
+        })}
+      </ScrollView>
 
       <FlatList
         data={lists}

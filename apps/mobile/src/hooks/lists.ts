@@ -4,13 +4,26 @@ import {
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
-import { listsService } from "@/services/lists";
+import {
+  listsService,
+  type MyListsSort,
+  type MyListsVisibility,
+} from "@/services/lists";
 
-export function useMyLists(q?: string) {
+export function useMyLists(
+  q?: string,
+  sort: MyListsSort = "recent",
+  visibility: MyListsVisibility = "all"
+) {
   return useInfiniteQuery({
-    queryKey: ["my-lists", q ?? ""],
+    queryKey: ["my-lists", q ?? "", sort, visibility],
     queryFn: ({ pageParam }) =>
-      listsService.myLists(pageParam as string | undefined, q),
+      listsService.myLists(
+        pageParam as string | undefined,
+        q,
+        sort,
+        visibility
+      ),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (last) => last.nextCursor ?? undefined,
   });
