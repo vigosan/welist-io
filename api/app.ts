@@ -1110,7 +1110,7 @@ app.delete(
 );
 
 const EXPLORE_PAGE_SIZE = 6;
-const MY_LISTS_PAGE_SIZE = 6;
+const MY_LISTS_PAGE_SIZE = 30;
 
 const BULK_ITEM_LIMIT = 100;
 

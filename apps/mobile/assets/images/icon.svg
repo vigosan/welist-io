@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <rect width="1024" height="1024" rx="224" fill="#0c0c0b"/>
+  <g stroke="#f0ede8" stroke-width="56" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <!-- Row 1: checked -->
+    <path d="M256 340 l64 64 l128 -128"/>
+    <line x1="512" y1="360" x2="768" y2="360"/>
+    <!-- Row 2: checked -->
+    <path d="M256 540 l64 64 l128 -128"/>
+    <line x1="512" y1="560" x2="768" y2="560"/>
+    <!-- Row 3: unchecked -->
+    <rect x="256" y="700" width="160" height="160" rx="32"/>
+    <line x1="512" y1="780" x2="704" y2="780"/>
+  </g>
+</svg>
