@@ -94,6 +94,97 @@ describe("POST /api/lists", () => {
     expect(body.id).toBe("abc-123");
   });
 
+  it("collapses internal whitespace and trims the name", async () => {
+    const valuesMock = vi.fn().mockReturnValue({
+      returning: vi.fn().mockResolvedValue([{ id: "id1" }]),
+    });
+    mockDb.insert.mockReturnValue({ values: valuesMock });
+
+    await app.request("/api/lists", {
+      method: "POST",
+      body: JSON.stringify({ name: "  Mi    lista  " }),
+      headers: {
+        "Content-Type": "application/json",
+        "x-forwarded-for": "10.0.0.50",
+      },
+    });
+
+    expect(valuesMock).toHaveBeenCalledWith(
+      expect.objectContaining({ name: "Mi lista" })
+    );
+  });
+
+  it("generates a slug from the name on first create", async () => {
+    const valuesMock = vi.fn().mockReturnValue({
+      returning: vi.fn().mockResolvedValue([{ id: "id1" }]),
+    });
+    mockDb.insert.mockReturnValue({ values: valuesMock });
+
+    await app.request("/api/lists", {
+      method: "POST",
+      body: JSON.stringify({ name: "Pingüino Crónica" }),
+      headers: {
+        "Content-Type": "application/json",
+        "x-forwarded-for": "10.0.0.51",
+      },
+    });
+
+    expect(valuesMock).toHaveBeenCalledWith(
+      expect.objectContaining({ slug: "pinguino-cronica" })
+    );
+  });
+
+  it("retries with a numeric suffix when the slug is taken", async () => {
+    const valuesMock = vi
+      .fn()
+      .mockImplementationOnce(() => ({
+        returning: vi.fn().mockRejectedValue({ code: "23505" }),
+      }))
+      .mockImplementationOnce(() => ({
+        returning: vi.fn().mockResolvedValue([{ id: "id1", slug: "viajes-2" }]),
+      }));
+    mockDb.insert.mockReturnValue({ values: valuesMock });
+
+    const res = await app.request("/api/lists", {
+      method: "POST",
+      body: JSON.stringify({ name: "Viajes" }),
+      headers: {
+        "Content-Type": "application/json",
+        "x-forwarded-for": "10.0.0.52",
+      },
+    });
+
+    expect(res.status).toBe(201);
+    expect(valuesMock).toHaveBeenNthCalledWith(
+      1,
+      expect.objectContaining({ slug: "viajes" })
+    );
+    expect(valuesMock).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({ slug: "viajes-2" })
+    );
+  });
+
+  it("falls back to null slug when the name has no slug-safe characters", async () => {
+    const valuesMock = vi.fn().mockReturnValue({
+      returning: vi.fn().mockResolvedValue([{ id: "id1" }]),
+    });
+    mockDb.insert.mockReturnValue({ values: valuesMock });
+
+    await app.request("/api/lists", {
+      method: "POST",
+      body: JSON.stringify({ name: "🌍🌍🌍" }),
+      headers: {
+        "Content-Type": "application/json",
+        "x-forwarded-for": "10.0.0.53",
+      },
+    });
+
+    expect(valuesMock).toHaveBeenCalledWith(
+      expect.objectContaining({ slug: null })
+    );
+  });
+
   it("returns 400 when name is empty", async () => {
     const res = await app.request("/api/lists", {
       method: "POST",

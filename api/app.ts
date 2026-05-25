@@ -42,6 +42,7 @@ import {
 } from "../src/db/schema/index.js";
 import { LIST_CATEGORIES } from "../src/lib/categories.js";
 import { plainItemText } from "../src/lib/item-text.js";
+import { cleanName, slugify } from "../src/lib/slug.js";
 import {
   getAppleAudiences,
   getGoogleMobileAudiences,
@@ -402,10 +403,34 @@ app.post(
   "/lists",
   zValidator("json", z.object({ name: z.string().min(1).max(200) })),
   async (c) => {
-    const { name } = c.req.valid("json");
+    const name = cleanName(c.req.valid("json").name);
     const authUser = getOptionalUser(c);
     const ownerId = authUser?.session?.user?.id ?? null;
-    const [list] = await db.insert(lists).values({ name, ownerId }).returning();
+    const baseSlug = slugify(name);
+    let list: typeof lists.$inferSelect | undefined;
+    for (let attempt = 0; attempt < 6; attempt++) {
+      const slug =
+        baseSlug.length === 0
+          ? null
+          : attempt === 0
+            ? baseSlug
+            : `${baseSlug}-${attempt + 1}`;
+      try {
+        [list] = await db
+          .insert(lists)
+          .values({ name, slug, ownerId })
+          .returning();
+        break;
+      } catch (e: unknown) {
+        if (!isUniqueViolation(e) || slug === null) throw e;
+      }
+    }
+    if (!list) {
+      [list] = await db
+        .insert(lists)
+        .values({ name, slug: null, ownerId })
+        .returning();
+    }
     await checkAchievements(ownerId);
     return c.json(list, 201);
   }
@@ -599,7 +624,7 @@ app.patch(
     if (list.ownerId !== null && list.ownerId !== userId)
       return c.json({ error: "Forbidden" }, 403);
     const patch: Record<string, unknown> = {};
-    if (body.name !== undefined) patch.name = body.name;
+    if (body.name !== undefined) patch.name = cleanName(body.name);
     if ("slug" in body) patch.slug = body.slug ?? null;
     if ("description" in body) patch.description = body.description ?? null;
     if ("category" in body) patch.category = body.category ?? null;
