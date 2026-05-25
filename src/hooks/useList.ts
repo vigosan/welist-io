@@ -26,6 +26,10 @@ type MyListsPage = {
 };
 type MyListsInfiniteData = { pages: MyListsPage[]; pageParams: unknown[] };
 
+type CollaboratorsData = Awaited<
+  ReturnType<typeof listsService.collaborators>
+>;
+
 export function useCollaborators(listId: string, enabled: boolean) {
   return useQuery({
     queryKey: queryKeys.listCollaborators(listId),
@@ -60,7 +64,29 @@ export function useRemoveCollaborator(listId: string) {
   return useMutation({
     mutationFn: (userId: string) =>
       listsService.removeCollaborator(listId, userId),
-    onSuccess: () => {
+    onMutate: async (userId) => {
+      await qc.cancelQueries({
+        queryKey: queryKeys.listCollaborators(listId),
+      });
+      const previous = qc.getQueryData<CollaboratorsData>(
+        queryKeys.listCollaborators(listId)
+      );
+      qc.setQueryData<CollaboratorsData>(
+        queryKeys.listCollaborators(listId),
+        (old) =>
+          old
+            ? {
+                ...old,
+                collaborators: old.collaborators.filter((c) => c.id !== userId),
+              }
+            : old
+      );
+      return { previous };
+    },
+    onError: (_err, _userId, ctx) => {
+      qc.setQueryData(queryKeys.listCollaborators(listId), ctx?.previous);
+    },
+    onSettled: () => {
       qc.invalidateQueries({ queryKey: queryKeys.listCollaborators(listId) });
     },
   });
