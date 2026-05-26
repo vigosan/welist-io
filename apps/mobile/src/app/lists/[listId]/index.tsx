@@ -5,7 +5,6 @@ import * as Haptics from "expo-haptics";
 import { useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
-  ActionSheetIOS,
   ActivityIndicator,
   Alert,
   Image,
@@ -24,6 +23,7 @@ import DraggableFlatList, {
 } from "react-native-draggable-flatlist";
 import Swipeable from "react-native-gesture-handler/Swipeable";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { ActionDrawer, type DrawerAction } from "@/components/ActionDrawer";
 import { LocationPickerModal } from "@/components/LocationPickerModal";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import {
@@ -64,6 +64,7 @@ export default function ListDetailScreen() {
   const [editingText, setEditingText] = useState("");
   const [locating, setLocating] = useState<Item | null>(null);
   const [rateOpen, setRateOpen] = useState(false);
+  const [actionsOpen, setActionsOpen] = useState(false);
 
   const { session } = useSession();
   const list = useList(listId);
@@ -232,64 +233,34 @@ export default function ListDetailScreen() {
     );
   };
 
-  const openActions = () => {
-    const goSettings = () =>
-      router.push({
-        pathname: "/lists/[listId]/settings",
-        params: { listId },
-      });
-    const actions = [
-      { label: t("list.randomItem"), run: handleRandom },
-      { label: t("list.shareLink"), run: handleShare },
-      { label: t("list.copyPlain"), run: handleCopyPlain },
-      ...(isOwner
-        ? [
-            { label: t("list.settings"), run: goSettings },
-            {
-              label: t("list.deleteList"),
-              run: handleDelete,
-              destructive: true as const,
-            },
-          ]
-        : [
-            {
-              label: t("list.report"),
-              run: handleReport,
-              destructive: true as const,
-            },
-          ]),
-    ];
-    if (Platform.OS === "ios") {
-      const options = [
-        ...actions.map((a) => a.label),
-        t("common.cancel"),
-      ];
-      const destructiveIdx = actions.findIndex((a) => a.destructive);
-      ActionSheetIOS.showActionSheetWithOptions(
-        {
-          title: list.data?.name ?? "",
-          options,
-          cancelButtonIndex: options.length - 1,
-          destructiveButtonIndex: destructiveIdx,
-        },
-        (idx) => {
-          if (idx === undefined || idx === options.length - 1) return;
-          actions[idx]?.run();
-        }
-      );
-      return;
-    }
-    Alert.alert(list.data?.name ?? "", undefined, [
-      ...actions.map((a) => ({
-        text: a.label,
-        onPress: a.run,
-        style: a.destructive
-          ? ("destructive" as const)
-          : ("default" as const),
-      })),
-      { text: t("common.cancel"), style: "cancel" as const },
-    ]);
-  };
+  const actions: DrawerAction[] = [
+    { label: t("list.randomItem"), onPress: handleRandom },
+    { label: t("list.shareLink"), onPress: handleShare },
+    { label: t("list.copyPlain"), onPress: handleCopyPlain },
+    ...(isOwner
+      ? [
+          {
+            label: t("list.settings"),
+            onPress: () =>
+              router.push({
+                pathname: "/lists/[listId]/settings",
+                params: { listId },
+              }),
+          },
+          {
+            label: t("list.deleteList"),
+            onPress: handleDelete,
+            destructive: true,
+          },
+        ]
+      : [
+          {
+            label: t("list.report"),
+            onPress: handleReport,
+            destructive: true,
+          },
+        ]),
+  ];
 
   return (
     <SafeAreaView className="flex-1 bg-canvas dark:bg-canvas-dark" edges={["top"]}>
@@ -316,7 +287,7 @@ export default function ListDetailScreen() {
               />
             </Pressable>
             <Pressable
-              onPress={openActions}
+              onPress={() => setActionsOpen(true)}
               accessibilityLabel={t("list.actions")}
               hitSlop={8}
               className="h-9 w-9 items-center justify-center rounded-full active:bg-black/[0.05] dark:active:bg-white/[0.06]"
@@ -491,6 +462,13 @@ export default function ListDetailScreen() {
               }
             : undefined
         }
+      />
+
+      <ActionDrawer
+        visible={actionsOpen}
+        title={list.data?.name ?? undefined}
+        actions={actions}
+        onClose={() => setActionsOpen(false)}
       />
     </SafeAreaView>
   );
