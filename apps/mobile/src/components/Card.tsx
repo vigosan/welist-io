@@ -54,7 +54,9 @@ export function PressableCard({
     <Pressable
       style={(state) => [
         SHADOW,
-        state.pressed && Platform.OS === "ios" ? { opacity: 0.85 } : null,
+        state.pressed && Platform.OS === "ios"
+          ? { opacity: 0.94, transform: [{ scale: 0.985 }] }
+          : null,
         typeof style === "function" ? style(state) : style,
       ]}
       android_ripple={RIPPLE}

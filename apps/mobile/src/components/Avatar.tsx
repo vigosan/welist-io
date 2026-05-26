@@ -15,7 +15,13 @@ function initials(name: string | null): string {
 export function Avatar({ name, image, size = 40 }: Props) {
   return (
     <View
-      style={{ width: size, height: size, borderRadius: size / 2 }}
+      style={{
+        width: size,
+        height: size,
+        borderRadius: size / 2,
+        borderWidth: 0.5,
+        borderColor: "rgba(0,0,0,0.08)",
+      }}
       className="items-center justify-center overflow-hidden bg-gray-200 dark:bg-gray-800"
     >
       {image ? (

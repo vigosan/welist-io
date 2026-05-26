@@ -417,11 +417,12 @@ export function useUpdateProfile() {
 
 type UserSettings = { showAdult: boolean };
 
-export function useUserSettings() {
+export function useUserSettings(opts: { enabled?: boolean } = {}) {
   return useQuery({
     queryKey: queryKeys.userSettings(),
     queryFn: () => usersService.getSettings(),
     staleTime: 60_000,
+    enabled: opts.enabled ?? true,
   });
 }
 

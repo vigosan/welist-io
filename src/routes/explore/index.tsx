@@ -1,10 +1,14 @@
 import { signIn, useSession } from "@hono/auth-js/react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AppNav } from "@/components/AppNav";
 import { Skeleton } from "@/components/Skeleton";
 import { StarRatingDisplay } from "@/components/StarRating";
-import { useAcceptChallenge, useExplore } from "@/hooks/useList";
+import {
+  useAcceptChallenge,
+  useExplore,
+  useUserSettings,
+} from "@/hooks/useList";
 import { useTrackOnMount } from "@/hooks/useTrackOnMount";
 import { useTranslation } from "@/i18n/service";
 import {
@@ -13,9 +17,6 @@ import {
   type ListCategory,
 } from "@/lib/categories";
 
-const VISIBLE_CATEGORIES = LIST_CATEGORIES.filter(
-  (c) => !(ADULT_CATEGORIES as readonly string[]).includes(c)
-);
 import { CategoryIcon } from "@/lib/categoryIcons";
 import { plainItemText } from "@/lib/item-text";
 import { privateName } from "@/lib/private-name";
@@ -218,6 +219,18 @@ function chipClass(active: boolean): string {
 function ExplorePage() {
   useTrackOnMount({ type: "explore_view" });
   const navigate = useNavigate();
+  const { data: session } = useSession();
+  const isAuthed = !!session?.user;
+  const { data: userSettings } = useUserSettings({ enabled: isAuthed });
+  const showAdult = isAuthed && userSettings?.showAdult === true;
+  const visibleCategories = useMemo(
+    () =>
+      LIST_CATEGORIES.filter(
+        (c) =>
+          !(ADULT_CATEGORIES as readonly string[]).includes(c) || showAdult
+      ),
+    [showAdult]
+  );
   const [q, setQ] = useState("");
   const [search, setSearch] = useState("");
   const [focused, setFocused] = useState(false);
@@ -439,7 +452,7 @@ function ExplorePage() {
               >
                 {t("explore.allCategories")}
               </button>
-              {VISIBLE_CATEGORIES.map((cat) => {
+              {visibleCategories.map((cat) => {
                 const active = category === cat;
                 return (
                   <button
