@@ -24,6 +24,7 @@ import DraggableFlatList, {
 import Swipeable from "react-native-gesture-handler/Swipeable";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ActionDrawer, type DrawerAction } from "@/components/ActionDrawer";
+import { AnimatedCheckbox } from "@/components/AnimatedCheckbox";
 import { LocationPickerModal } from "@/components/LocationPickerModal";
 import { ItemRowSkeleton } from "@/components/Skeleton";
 import { ScreenHeader } from "@/components/ScreenHeader";
@@ -624,19 +625,7 @@ function SwipeableItemRow({
           disabled={isActive}
           className="flex-1 flex-row items-center gap-3 active:opacity-80"
         >
-          <View
-            className={`h-6 w-6 items-center justify-center rounded-full border-[1.5px] ${
-              item.done
-                ? "border-gray-900 bg-gray-900 dark:border-gray-100 dark:bg-gray-100"
-                : "border-gray-300 dark:border-gray-600"
-            }`}
-          >
-            {item.done && (
-              <Text className="text-sm font-bold text-white dark:text-gray-900">
-                ✓
-              </Text>
-            )}
-          </View>
+          <AnimatedCheckbox done={item.done} />
           <View className="flex-1">
             <Text
               className={`text-base ${
