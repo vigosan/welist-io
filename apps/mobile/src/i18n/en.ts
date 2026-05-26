@@ -128,6 +128,7 @@ export const en = {
     emptyAction: "Add item",
     newItemTitle: "New item",
     newItemHint: "Paste multiple lines to add several items at once.",
+    completed: "Completed",
     filterAll: "all",
     filterPending: "pending",
     filterDone: "done",

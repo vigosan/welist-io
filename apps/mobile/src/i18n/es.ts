@@ -131,6 +131,7 @@ export const es = {
     filterAll: "todos",
     filterPending: "pendientes",
     filterDone: "hechos",
+    completed: "Completados",
     settings: "Ajustes",
     actions: "Acciones",
     randomItem: "Elegir uno al azar",

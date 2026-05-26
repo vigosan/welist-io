@@ -52,6 +52,10 @@ import { useSession } from "@/lib/auth";
 import { type FilterMode, filterItems } from "@/lib/items-filter";
 import { mapsUrl } from "@/lib/maps";
 import type { Item } from "@/types";
+
+type Row =
+  | { kind: "item"; key: string; item: Item }
+  | { kind: "header"; key: string; label: string; count: number };
 import { RateSheet } from "@/components/RateSheet";
 import { RatingBadge } from "@/components/RatingBadge";
 
@@ -87,10 +91,33 @@ export default function ListDetailScreen() {
     !!list.data?.ownerId &&
     session.user.id === list.data.ownerId;
 
-  const visible = useMemo(
-    () => filterItems(items.data ?? [], filter),
-    [items.data, filter]
-  );
+  const rows = useMemo<Row[]>(() => {
+    const filtered = filterItems(items.data ?? [], filter);
+    if (filter !== "all")
+      return filtered.map((item) => ({ kind: "item", key: item.id, item }));
+    const pending = filtered.filter((it) => !it.done);
+    const done = filtered.filter((it) => it.done);
+    const result: Row[] = pending.map((item) => ({
+      kind: "item",
+      key: item.id,
+      item,
+    }));
+    if (done.length > 0) {
+      result.push({
+        kind: "header",
+        key: "done-header",
+        label: t("list.completed"),
+        count: done.length,
+      });
+      for (const item of done) {
+        result.push({ kind: "item", key: item.id, item });
+      }
+    }
+    return result;
+  }, [items.data, filter, t]);
+
+  const dragEnabled =
+    filter === "all" && !rows.some((r) => r.kind === "header");
 
   const openItemMenu = (item: Item) => {
     const hasCoords = !!(item.latitude && item.longitude && item.placeName);
@@ -154,26 +181,44 @@ export default function ListDetailScreen() {
     );
   };
 
-  const renderRow = ({ item, drag, isActive }: RenderItemParams<Item>) => {
-    const dragEnabled = filter === "all";
+  const renderRow = ({
+    item: row,
+    drag,
+    isActive,
+  }: RenderItemParams<Row>) => {
+    if (row.kind === "header") {
+      return (
+        <View className="mt-4 mb-2 flex-row items-center justify-between px-1">
+          <Text className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
+            {row.label}
+          </Text>
+          <Text
+            style={{ fontVariant: ["tabular-nums"] }}
+            className="text-xs text-gray-500 dark:text-gray-400"
+          >
+            {row.count}
+          </Text>
+        </View>
+      );
+    }
     return (
       <ScaleDecorator>
         <SwipeableItemRow
-          item={item}
+          item={row.item}
           isActive={isActive}
           dragEnabled={dragEnabled}
           drag={drag}
           onToggle={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            toggle.mutate(item.id);
+            toggle.mutate(row.item.id);
           }}
-          onOpenMenu={() => openItemMenu(item)}
+          onOpenMenu={() => openItemMenu(row.item)}
           onEdit={() => {
-            setEditingText(item.text);
-            setEditing(item);
+            setEditingText(row.item.text);
+            setEditing(row.item);
           }}
-          onDelete={() => remove.mutate(item.id)}
-          toggleLabel={item.done ? t("list.swipeUndo") : t("list.swipeDone")}
+          onDelete={() => remove.mutate(row.item.id)}
+          toggleLabel={row.item.done ? t("list.swipeUndo") : t("list.swipeDone")}
           editLabel={t("common.edit")}
           deleteLabel={t("common.delete")}
         />
@@ -376,13 +421,16 @@ export default function ListDetailScreen() {
       )}
 
       <DraggableFlatList
-        data={visible}
-        keyExtractor={(it) => it.id}
+        data={rows}
+        keyExtractor={(r) => r.key}
         containerStyle={{ flex: 1 }}
         contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 40 }}
         onDragEnd={({ data }) => {
-          if (filter !== "all") return;
-          reorder.mutate(data);
+          if (!dragEnabled) return;
+          const items = data.flatMap((r) =>
+            r.kind === "item" ? [r.item] : []
+          );
+          reorder.mutate(items);
         }}
         ListEmptyComponent={
           items.isLoading ? (
