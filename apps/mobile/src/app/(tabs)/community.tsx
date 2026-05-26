@@ -17,6 +17,7 @@ import { PressableCard } from "@/components/Card";
 import { EmptyState } from "@/components/EmptyState";
 import { Input } from "@/components/Input";
 import { ScreenHeader } from "@/components/ScreenHeader";
+import { UserCardSkeleton } from "@/components/Skeleton";
 import { useUserDirectory } from "@/hooks/users";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 
@@ -89,7 +90,12 @@ export default function UsersScreen() {
         onEndReachedThreshold={0.4}
         ListEmptyComponent={
           query.isLoading ? (
-            <ActivityIndicator className="mt-10" />
+            <View>
+              <UserCardSkeleton />
+              <UserCardSkeleton />
+              <UserCardSkeleton />
+              <UserCardSkeleton />
+            </View>
           ) : (
             <EmptyState icon="users" title={t("users.empty")} />
           )

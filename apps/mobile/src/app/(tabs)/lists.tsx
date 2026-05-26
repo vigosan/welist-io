@@ -18,6 +18,7 @@ import { EmptyState } from "@/components/EmptyState";
 import { Input } from "@/components/Input";
 import { ProgressDonut } from "@/components/ProgressDonut";
 import { ScreenHeader } from "@/components/ScreenHeader";
+import { MyListSkeleton } from "@/components/Skeleton";
 import { useDeleteList, useMyLists } from "@/hooks/lists";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import type { MyListsSort, MyListsVisibility } from "@/services/lists";
@@ -195,7 +196,12 @@ export default function MyListsScreen() {
         onEndReachedThreshold={0.4}
         ListEmptyComponent={
           query.isLoading ? (
-            <ActivityIndicator className="mt-10" />
+            <View>
+              <MyListSkeleton />
+              <MyListSkeleton />
+              <MyListSkeleton />
+              <MyListSkeleton />
+            </View>
           ) : (
             <EmptyState icon="list" title={t("lists.empty")} />
           )

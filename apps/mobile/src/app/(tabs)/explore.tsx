@@ -17,6 +17,7 @@ import { PressableCard } from "@/components/Card";
 import { EmptyState } from "@/components/EmptyState";
 import { Input } from "@/components/Input";
 import { ScreenHeader } from "@/components/ScreenHeader";
+import { ExploreCardSkeleton } from "@/components/Skeleton";
 import { useExplore } from "@/hooks/explore";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import {
@@ -190,7 +191,12 @@ export default function ExploreScreen() {
         onEndReachedThreshold={0.4}
         ListEmptyComponent={
           query.isLoading ? (
-            <ActivityIndicator className="mt-10" />
+            <View>
+              <ExploreCardSkeleton />
+              <ExploreCardSkeleton />
+              <ExploreCardSkeleton />
+              <ExploreCardSkeleton />
+            </View>
           ) : (
             <EmptyState icon="compass" title={t("explore.empty")} />
           )
