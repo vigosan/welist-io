@@ -69,7 +69,6 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       clientId: GOOGLE_WEB_CLIENT_ID,
       iosClientId: GOOGLE_IOS_CLIENT_ID || undefined,
       androidClientId: GOOGLE_ANDROID_CLIENT_ID || undefined,
-      redirectUri: "https://auth.expo.io/@vigosan/wilist",
     });
 
   const googlePending = useRef<{
