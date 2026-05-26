@@ -14,6 +14,7 @@ import { useTranslation } from "react-i18next";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Avatar } from "@/components/Avatar";
 import { PressableCard } from "@/components/Card";
+import { EmptyState } from "@/components/EmptyState";
 import { Input } from "@/components/Input";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { useUserDirectory } from "@/hooks/users";
@@ -90,9 +91,7 @@ export default function UsersScreen() {
           query.isLoading ? (
             <ActivityIndicator className="mt-10" />
           ) : (
-            <Text className="mt-10 text-center text-sm text-gray-500 dark:text-gray-400">
-              {t("users.empty")}
-            </Text>
+            <EmptyState icon="users" title={t("users.empty")} />
           )
         }
         ListFooterComponent={

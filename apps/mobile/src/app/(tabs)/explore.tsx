@@ -14,6 +14,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { PressableCard } from "@/components/Card";
+import { EmptyState } from "@/components/EmptyState";
 import { Input } from "@/components/Input";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { useExplore } from "@/hooks/explore";
@@ -191,9 +192,7 @@ export default function ExploreScreen() {
           query.isLoading ? (
             <ActivityIndicator className="mt-10" />
           ) : (
-            <Text className="mt-10 text-center text-sm text-gray-500 dark:text-gray-400">
-              {t("explore.empty")}
-            </Text>
+            <EmptyState icon="compass" title={t("explore.empty")} />
           )
         }
         ListFooterComponent={

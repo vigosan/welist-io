@@ -1,3 +1,5 @@
+import * as Haptics from "expo-haptics";
+import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Modal, Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -17,6 +19,9 @@ type Props = {
 
 export function ActionDrawer({ visible, title, actions, onClose }: Props) {
   const { t } = useTranslation();
+  useEffect(() => {
+    if (visible) Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  }, [visible]);
   return (
     <Modal
       visible={visible}
@@ -32,6 +37,9 @@ export function ActionDrawer({ visible, title, actions, onClose }: Props) {
           onPress={(e) => e.stopPropagation()}
           className="px-3 pb-2"
         >
+          <View className="mb-2 items-center">
+            <View className="h-1 w-10 rounded-full bg-white/60" />
+          </View>
           <SafeAreaView edges={["bottom"]} className="">
             <View className="overflow-hidden rounded-2xl bg-white dark:bg-gray-900">
               {title ? (

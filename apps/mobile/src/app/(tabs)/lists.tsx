@@ -14,6 +14,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { PressableCard } from "@/components/Card";
+import { EmptyState } from "@/components/EmptyState";
 import { Input } from "@/components/Input";
 import { ProgressDonut } from "@/components/ProgressDonut";
 import { ScreenHeader } from "@/components/ScreenHeader";
@@ -196,9 +197,7 @@ export default function MyListsScreen() {
           query.isLoading ? (
             <ActivityIndicator className="mt-10" />
           ) : (
-            <Text className="mt-10 text-center text-sm text-gray-500 dark:text-gray-400">
-              {t("lists.empty")}
-            </Text>
+            <EmptyState icon="list" title={t("lists.empty")} />
           )
         }
         ListFooterComponent={
