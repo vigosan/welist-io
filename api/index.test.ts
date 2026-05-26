@@ -11,6 +11,7 @@ const mockDb = {
     stripeAccounts: { findFirst: vi.fn() },
     listPurchases: { findFirst: vi.fn() },
     notifications: { findFirst: vi.fn(), findMany: vi.fn() },
+    userSettings: { findFirst: vi.fn() },
   },
   insert: vi.fn(),
   update: vi.fn(),
@@ -2487,6 +2488,92 @@ describe("GET /api/users/me", () => {
     expect(res.status).toBe(200);
     const body = (await res.json()) as Record<string, unknown>;
     expect(body.publicProfile).toBe(true);
+  });
+});
+
+describe("GET /api/users/me/settings", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockGetAuthUser.mockRejectedValue(new Error("no session"));
+  });
+
+  it("returns 401 when unauthenticated", async () => {
+    const res = await app.request("/api/users/me/settings");
+    expect(res.status).toBe(401);
+  });
+
+  it("returns showAdult=false by default when no row exists", async () => {
+    mockGetAuthUser.mockResolvedValue({ session: { user: { id: "u1" } } });
+    mockDb.query.userSettings.findFirst.mockResolvedValue(undefined);
+
+    const res = await app.request("/api/users/me/settings");
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as Record<string, unknown>;
+    expect(body.showAdult).toBe(false);
+  });
+
+  it("returns persisted showAdult value", async () => {
+    mockGetAuthUser.mockResolvedValue({ session: { user: { id: "u1" } } });
+    mockDb.query.userSettings.findFirst.mockResolvedValue({
+      userId: "u1",
+      showAdult: true,
+    });
+
+    const res = await app.request("/api/users/me/settings");
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as Record<string, unknown>;
+    expect(body.showAdult).toBe(true);
+  });
+});
+
+describe("PATCH /api/users/me/settings", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockGetAuthUser.mockRejectedValue(new Error("no session"));
+  });
+
+  it("returns 401 when unauthenticated", async () => {
+    const res = await app.request("/api/users/me/settings", {
+      method: "PATCH",
+      body: JSON.stringify({ showAdult: true }),
+      headers: { "Content-Type": "application/json" },
+    });
+    expect(res.status).toBe(401);
+  });
+
+  it("returns 400 when no fields are provided", async () => {
+    mockGetAuthUser.mockResolvedValue({ session: { user: { id: "u1" } } });
+    const res = await app.request("/api/users/me/settings", {
+      method: "PATCH",
+      body: JSON.stringify({}),
+      headers: { "Content-Type": "application/json" },
+    });
+    expect(res.status).toBe(400);
+  });
+
+  it("upserts showAdult and returns the new value", async () => {
+    mockGetAuthUser.mockResolvedValue({ session: { user: { id: "u1" } } });
+    const returningMock = vi.fn().mockResolvedValue([{ showAdult: true }]);
+    const onConflictMock = vi
+      .fn()
+      .mockReturnValue({ returning: returningMock });
+    const valuesMock = vi
+      .fn()
+      .mockReturnValue({ onConflictDoUpdate: onConflictMock });
+    mockDb.insert.mockReturnValue({ values: valuesMock });
+
+    const res = await app.request("/api/users/me/settings", {
+      method: "PATCH",
+      body: JSON.stringify({ showAdult: true }),
+      headers: { "Content-Type": "application/json" },
+    });
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as Record<string, unknown>;
+    expect(body.showAdult).toBe(true);
+    expect(valuesMock).toHaveBeenCalledWith({
+      userId: "u1",
+      showAdult: true,
+    });
   });
 });
 

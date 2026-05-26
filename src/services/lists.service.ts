@@ -219,6 +219,15 @@ export const usersService = {
       }
     ),
 
+  getSettings: () =>
+    apiClient<{ showAdult: boolean }>("/api/users/me/settings"),
+
+  updateSettings: (data: { showAdult: boolean }) =>
+    apiClient<{ showAdult: boolean }>("/api/users/me/settings", {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    }),
+
   setPassword: (password: string) =>
     apiClient<{ ok: true }>("/api/me/password", {
       method: "POST",

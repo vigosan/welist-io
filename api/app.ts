@@ -39,6 +39,7 @@ import {
   participations,
   reports,
   stripeAccounts,
+  userSettings,
 } from "../src/db/schema/lists.schema.js";
 import { ADULT_CATEGORIES, LIST_CATEGORIES } from "../src/lib/categories.js";
 import { plainItemText } from "../src/lib/item-text.js";
@@ -1514,6 +1515,43 @@ app.get("/users/me", async (c) => {
     hasPassword: user.passwordHash !== null,
   });
 });
+
+app.get("/users/me/settings", async (c) => {
+  const authUser = getOptionalUser(c);
+  const userId = authUser?.session?.user?.id;
+  if (!userId) return c.json({ error: "Unauthorized" }, 401);
+  const row = await db.query.userSettings.findFirst({
+    where: eq(userSettings.userId, userId),
+  });
+  return c.json({ showAdult: row?.showAdult ?? false });
+});
+
+app.patch(
+  "/users/me/settings",
+  zValidator(
+    "json",
+    z.object({
+      showAdult: z.boolean().optional(),
+    })
+  ),
+  async (c) => {
+    const authUser = getOptionalUser(c);
+    const userId = authUser?.session?.user?.id;
+    if (!userId) return c.json({ error: "Unauthorized" }, 401);
+    const body = c.req.valid("json");
+    if (body.showAdult === undefined)
+      return c.json({ error: "no_fields" }, 400);
+    const [row] = await db
+      .insert(userSettings)
+      .values({ userId, showAdult: body.showAdult })
+      .onConflictDoUpdate({
+        target: userSettings.userId,
+        set: { showAdult: body.showAdult, updatedAt: new Date() },
+      })
+      .returning({ showAdult: userSettings.showAdult });
+    return c.json({ showAdult: row.showAdult });
+  }
+);
 
 const reportSchema = z.object({
   targetType: z.enum(["list", "user"]),

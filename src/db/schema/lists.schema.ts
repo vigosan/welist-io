@@ -380,7 +380,21 @@ export const reports = pgTable(
   ]
 );
 
+export const userSettings = pgTable("user_settings", {
+  userId: text("user_id")
+    .primaryKey()
+    .references(() => users.id, { onDelete: "cascade" }),
+  showAdult: boolean("show_adult").notNull().default(false),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+});
+
 export type Report = typeof reports.$inferSelect;
+export type UserSettings = typeof userSettings.$inferSelect;
 
 export type List = typeof lists.$inferSelect;
 export type Follow = typeof follows.$inferSelect;

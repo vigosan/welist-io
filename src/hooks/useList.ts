@@ -415,6 +415,27 @@ export function useUpdateProfile() {
   });
 }
 
+type UserSettings = { showAdult: boolean };
+
+export function useUserSettings() {
+  return useQuery({
+    queryKey: queryKeys.userSettings(),
+    queryFn: () => usersService.getSettings(),
+    staleTime: 60_000,
+  });
+}
+
+export function useUpdateSettings() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data: { showAdult: boolean }) =>
+      usersService.updateSettings(data),
+    onSuccess: (updated) => {
+      qc.setQueryData<UserSettings>(queryKeys.userSettings(), updated);
+    },
+  });
+}
+
 export function useSetPassword() {
   const qc = useQueryClient();
   return useMutation({
