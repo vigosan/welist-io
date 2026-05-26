@@ -1,14 +1,6 @@
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import {
-  Alert,
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { Alert, Pressable, Text, TextInput, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useCreateList } from "@/hooks/lists";
@@ -43,46 +35,46 @@ export default function NewListScreen() {
       <View className="items-center pt-2 pb-1">
         <View className="h-1 w-10 rounded-full bg-gray-300 dark:bg-gray-700" />
       </View>
-      <View className="flex-row items-center justify-between px-7 pt-2 pb-6">
-        <Text className="text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
-          {t("lists.newTitle")}
-        </Text>
+      <View className="flex-row items-center justify-between px-5 pt-2 pb-4">
         <Pressable onPress={() => router.dismiss()} hitSlop={12}>
-          <Text className="text-sm text-gray-500 dark:text-gray-400">
+          <Text className="text-base text-gray-500 dark:text-gray-400">
             {t("common.cancel")}
           </Text>
         </Pressable>
-      </View>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        className="flex-1"
-      >
-        <View className="flex-1 px-7">
-          <TextInput
-            value={name}
-            onChangeText={setName}
-            onSubmitEditing={submit}
-            placeholder={t("lists.newPlaceholder")}
-            placeholderTextColor="#a8a39a"
-            autoFocus
-            returnKeyType="done"
-            underlineColorAndroid="transparent"
-            textAlignVertical="center"
-            style={{ fontSize: 16, lineHeight: 20 }}
-            className="rounded-2xl bg-gray-100 px-5 py-4 text-gray-900 dark:bg-gray-800 dark:text-gray-100"
-          />
-          <View className="flex-1" />
-          <Pressable
-            onPress={submit}
-            disabled={!name.trim() || create.isPending}
-            className="mb-4 items-center rounded-2xl bg-gray-900 px-6 py-4 active:opacity-80 disabled:opacity-40 dark:bg-gray-100"
+        <Text className="text-base font-semibold text-gray-900 dark:text-gray-100">
+          {t("lists.newTitle")}
+        </Text>
+        <Pressable
+          onPress={submit}
+          disabled={!name.trim() || create.isPending}
+          hitSlop={12}
+        >
+          <Text
+            className={`text-base font-semibold ${
+              !name.trim() || create.isPending
+                ? "text-gray-400 dark:text-gray-600"
+                : "text-gray-900 dark:text-gray-100"
+            }`}
           >
-            <Text className="font-medium text-white dark:text-gray-900">
-              {create.isPending ? t("common.saving") : t("common.add")}
-            </Text>
-          </Pressable>
-        </View>
-      </KeyboardAvoidingView>
+            {create.isPending ? t("common.saving") : t("common.add")}
+          </Text>
+        </Pressable>
+      </View>
+      <View className="flex-1 px-5">
+        <TextInput
+          value={name}
+          onChangeText={setName}
+          onSubmitEditing={submit}
+          placeholder={t("lists.newPlaceholder")}
+          placeholderTextColor="#a8a39a"
+          autoFocus
+          returnKeyType="done"
+          underlineColorAndroid="transparent"
+          textAlignVertical="center"
+          style={{ fontSize: 16, lineHeight: 20 }}
+          className="rounded-2xl bg-gray-100 px-5 py-4 text-gray-900 dark:bg-gray-800 dark:text-gray-100"
+        />
+      </View>
     </SafeAreaView>
   );
 }

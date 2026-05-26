@@ -1,14 +1,6 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
-import {
-  Alert,
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { Alert, Pressable, Text, TextInput, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useAddItem, useBulkAddItems } from "@/hooks/items";
@@ -48,51 +40,51 @@ export default function NewItemScreen() {
       <View className="items-center pt-2 pb-1">
         <View className="h-1 w-10 rounded-full bg-gray-300 dark:bg-gray-700" />
       </View>
-      <View className="flex-row items-center justify-between px-7 pt-2 pb-6">
-        <Text className="text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
-          {t("list.newItemTitle")}
-        </Text>
+      <View className="flex-row items-center justify-between px-5 pt-2 pb-4">
         <Pressable onPress={() => router.dismiss()} hitSlop={12}>
-          <Text className="text-sm text-gray-500 dark:text-gray-400">
+          <Text className="text-base text-gray-500 dark:text-gray-400">
             {t("common.cancel")}
           </Text>
         </Pressable>
-      </View>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        className="flex-1"
-      >
-        <View className="flex-1 px-7">
-          <TextInput
-            value={text}
-            onChangeText={setText}
-            placeholder={t("list.addPlaceholder")}
-            placeholderTextColor="#a8a39a"
-            autoFocus
-            multiline
-            underlineColorAndroid="transparent"
-            className="min-h-[160px] rounded-2xl bg-gray-100 px-5 py-4 text-base text-gray-900 dark:bg-gray-800 dark:text-gray-100"
-            textAlignVertical="top"
-          />
-          <Text className="mt-3 text-xs text-gray-500 dark:text-gray-400">
-            {t("list.newItemHint")}
-          </Text>
-          <View className="flex-1" />
-          <Pressable
-            onPress={submit}
-            disabled={!text.trim() || pending}
-            className="mb-4 items-center rounded-2xl bg-gray-900 px-6 py-4 active:opacity-80 disabled:opacity-40 dark:bg-gray-100"
+        <Text className="text-base font-semibold text-gray-900 dark:text-gray-100">
+          {t("list.newItemTitle")}
+        </Text>
+        <Pressable
+          onPress={submit}
+          disabled={!text.trim() || pending}
+          hitSlop={12}
+        >
+          <Text
+            className={`text-base font-semibold ${
+              !text.trim() || pending
+                ? "text-gray-400 dark:text-gray-600"
+                : "text-gray-900 dark:text-gray-100"
+            }`}
           >
-            <Text className="font-medium text-white dark:text-gray-900">
-              {pending
-                ? t("common.saving")
-                : lineCount > 1
-                  ? t("bulk.addCount", { count: lineCount })
-                  : t("common.add")}
-            </Text>
-          </Pressable>
-        </View>
-      </KeyboardAvoidingView>
+            {pending
+              ? t("common.saving")
+              : lineCount > 1
+                ? t("bulk.addCount", { count: lineCount })
+                : t("common.add")}
+          </Text>
+        </Pressable>
+      </View>
+      <View className="flex-1 px-5">
+        <TextInput
+          value={text}
+          onChangeText={setText}
+          placeholder={t("list.addPlaceholder")}
+          placeholderTextColor="#a8a39a"
+          autoFocus
+          multiline
+          underlineColorAndroid="transparent"
+          className="min-h-[160px] rounded-2xl bg-gray-100 px-5 py-4 text-base text-gray-900 dark:bg-gray-800 dark:text-gray-100"
+          textAlignVertical="top"
+        />
+        <Text className="mt-3 text-xs text-gray-500 dark:text-gray-400">
+          {t("list.newItemHint")}
+        </Text>
+      </View>
     </SafeAreaView>
   );
 }
