@@ -19,10 +19,9 @@
     "android": {
       "package": "io.wilist.app",
       "adaptiveIcon": {
-        "backgroundColor": "#ffffff",
+        "backgroundColor": "#0c0c0b",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+        "monochromeImage": "./assets/images/android-icon-foreground.png"
       },
       "predictiveBackGestureEnabled": false,
       "intentFilters": [
@@ -65,11 +64,9 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#ffffff",
-          "android": {
-            "image": "./assets/images/splash-icon.png",
-            "imageWidth": 76
-          }
+          "backgroundColor": "#0c0c0b",
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 160
         }
       ]
     ],
