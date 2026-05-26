@@ -241,6 +241,10 @@ export const es = {
     completedChallenges: "Retos completados",
     noneYet: "Todavía no hay.",
     followers: "{{followers}} seguidores · {{following}} siguiendo",
+    statsLists: "Listas",
+    statsChallenges: "Retos",
+    statsFollowers: "Seguidores",
+    statsFollowing: "Siguiendo",
   },
   notifications: {
     title: "Notificaciones",

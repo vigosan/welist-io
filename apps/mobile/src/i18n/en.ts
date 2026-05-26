@@ -240,6 +240,10 @@ export const en = {
     completedChallenges: "Completed challenges",
     noneYet: "None yet.",
     followers: "{{followers}} followers · {{following}} following",
+    statsLists: "Lists",
+    statsChallenges: "Challenges",
+    statsFollowers: "Followers",
+    statsFollowing: "Following",
   },
   notifications: {
     title: "Notifications",
