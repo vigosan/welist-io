@@ -12,7 +12,6 @@ import {
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { ScreenHeader } from "@/components/ScreenHeader";
 import {
   useAddCollaborator,
   useCollaborators,
@@ -121,7 +120,19 @@ export default function ListSettingsScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-canvas dark:bg-canvas-dark" edges={["top"]}>
-      <ScreenHeader title={t("settings.title")} back />
+      <View className="items-center pt-2 pb-1">
+        <View className="h-1 w-10 rounded-full bg-gray-300 dark:bg-gray-700" />
+      </View>
+      <View className="flex-row items-center justify-between px-5 pt-2 pb-4">
+        <Text className="text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
+          {t("settings.title")}
+        </Text>
+        <Pressable onPress={() => router.dismiss()} hitSlop={12}>
+          <Text className="text-sm text-gray-500 dark:text-gray-400">
+            {t("common.cancel")}
+          </Text>
+        </Pressable>
+      </View>
 
       <ScrollView contentContainerClassName="px-5 pb-10">
         <Field label={t("settings.name")}>
