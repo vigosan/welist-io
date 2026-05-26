@@ -65,7 +65,42 @@ export function useUpdateList(listId: string) {
     mutationFn: (
       patch: Parameters<typeof listsService.update>[1]
     ) => listsService.update(listId, patch),
-    onSuccess: () => {
+    onMutate: async (patch) => {
+      await qc.cancelQueries({ queryKey: ["list", listId] });
+      const previousList = qc.getQueryData<Record<string, unknown>>([
+        "list",
+        listId,
+      ]);
+      if (previousList) {
+        qc.setQueryData(["list", listId], { ...previousList, ...patch });
+      }
+      const previousMyLists = qc.getQueriesData<{
+        pages: { items: Record<string, unknown>[] }[];
+      }>({ queryKey: ["my-lists"] });
+      for (const [key, data] of previousMyLists) {
+        if (!data) continue;
+        qc.setQueryData(key, {
+          ...data,
+          pages: data.pages.map((page) => ({
+            ...page,
+            items: page.items.map((it) =>
+              it.id === listId ? { ...it, ...patch } : it
+            ),
+          })),
+        });
+      }
+      return { previousList, previousMyLists };
+    },
+    onError: (_err, _patch, ctx) => {
+      if (ctx?.previousList)
+        qc.setQueryData(["list", listId], ctx.previousList);
+      if (ctx?.previousMyLists) {
+        for (const [key, data] of ctx.previousMyLists) {
+          qc.setQueryData(key, data);
+        }
+      }
+    },
+    onSettled: () => {
       qc.invalidateQueries({ queryKey: ["list", listId] });
       qc.invalidateQueries({ queryKey: ["my-lists"] });
     },
@@ -100,6 +135,30 @@ export function useDeleteList() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (listId: string) => listsService.delete(listId),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["my-lists"] }),
+    onMutate: async (listId) => {
+      await qc.cancelQueries({ queryKey: ["my-lists"] });
+      const previousMyLists = qc.getQueriesData<{
+        pages: { items: { id: string }[] }[];
+      }>({ queryKey: ["my-lists"] });
+      for (const [key, data] of previousMyLists) {
+        if (!data) continue;
+        qc.setQueryData(key, {
+          ...data,
+          pages: data.pages.map((page) => ({
+            ...page,
+            items: page.items.filter((it) => it.id !== listId),
+          })),
+        });
+      }
+      return { previousMyLists };
+    },
+    onError: (_err, _listId, ctx) => {
+      if (ctx?.previousMyLists) {
+        for (const [key, data] of ctx.previousMyLists) {
+          qc.setQueryData(key, data);
+        }
+      }
+    },
+    onSettled: () => qc.invalidateQueries({ queryKey: ["my-lists"] }),
   });
 }

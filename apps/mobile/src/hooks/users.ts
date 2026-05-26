@@ -100,11 +100,23 @@ export function useUpdateProfile() {
   return useMutation({
     mutationFn: (data: { publicProfile?: boolean; emailOptIn?: boolean }) =>
       usersService.updateProfile(data),
+    onMutate: async (data) => {
+      await qc.cancelQueries({ queryKey: ["user-me"] });
+      const previous = qc.getQueryData<UserMe>(["user-me"]);
+      if (previous) {
+        qc.setQueryData<UserMe>(["user-me"], { ...previous, ...data });
+      }
+      return { previous };
+    },
+    onError: (_err, _data, ctx) => {
+      if (ctx?.previous) qc.setQueryData(["user-me"], ctx.previous);
+    },
     onSuccess: (updated) => {
       qc.setQueryData<UserMe>(["user-me"], (old) =>
         old ? { ...old, ...updated } : { ...updated, hasPassword: false }
       );
     },
+    onSettled: () => qc.invalidateQueries({ queryKey: ["user-me"] }),
   });
 }
 
