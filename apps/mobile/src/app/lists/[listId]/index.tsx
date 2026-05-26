@@ -25,6 +25,7 @@ import Swipeable from "react-native-gesture-handler/Swipeable";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ActionDrawer, type DrawerAction } from "@/components/ActionDrawer";
 import { LocationPickerModal } from "@/components/LocationPickerModal";
+import { ItemRowSkeleton } from "@/components/Skeleton";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import {
   renderInlineMarkdown,
@@ -383,7 +384,14 @@ export default function ListDetailScreen() {
         }}
         ListEmptyComponent={
           items.isLoading ? (
-            <ActivityIndicator className="mt-10" />
+            <View>
+              <ItemRowSkeleton />
+              <ItemRowSkeleton />
+              <ItemRowSkeleton />
+              <ItemRowSkeleton />
+              <ItemRowSkeleton />
+              <ItemRowSkeleton />
+            </View>
           ) : (
             <Text className="mt-10 text-center text-sm text-gray-500 dark:text-gray-400">
               {t("common.noItems")}

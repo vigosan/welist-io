@@ -74,6 +74,24 @@ export function ExploreCardSkeleton() {
   );
 }
 
+export function ItemRowSkeleton() {
+  return (
+    <View
+      style={{
+        shadowColor: "#000",
+        shadowOpacity: 0.04,
+        shadowRadius: 8,
+        shadowOffset: { width: 0, height: 1 },
+        elevation: 1,
+      }}
+      className="mb-2 flex-row items-center gap-3 rounded-2xl bg-white p-4 dark:bg-gray-900"
+    >
+      <Skeleton className="h-6 w-6 rounded-full" />
+      <Skeleton className="h-4 flex-1" />
+    </View>
+  );
+}
+
 export function UserCardSkeleton() {
   return (
     <View

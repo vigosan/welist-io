@@ -1,6 +1,5 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
-  ActivityIndicator,
   Alert,
   Pressable,
   ScrollView,
@@ -10,6 +9,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ScreenHeader } from "@/components/ScreenHeader";
+import { ItemRowSkeleton, Skeleton } from "@/components/Skeleton";
 import {
   useAcceptChallenge,
   useExploreDetail,
@@ -37,8 +37,26 @@ export default function ExploreDetailScreen() {
 
   if (detail.isLoading) {
     return (
-      <SafeAreaView className="flex-1 bg-canvas dark:bg-canvas-dark">
-        <ActivityIndicator className="mt-10" />
+      <SafeAreaView
+        className="flex-1 bg-canvas dark:bg-canvas-dark"
+        edges={["top"]}
+      >
+        <ScreenHeader title="" back />
+        <View className="px-5">
+          <Skeleton className="h-7 w-3/4" />
+          <Skeleton className="mt-3 h-3 w-1/3" />
+          <Skeleton className="mt-5 h-3 w-full" />
+          <Skeleton className="mt-2 h-3 w-5/6" />
+          <Skeleton className="mt-2 h-3 w-2/3" />
+          <Skeleton className="mt-6 h-12 w-full rounded-xl" />
+          <Skeleton className="mt-8 h-3 w-1/4" />
+          <View className="mt-3">
+            <ItemRowSkeleton />
+            <ItemRowSkeleton />
+            <ItemRowSkeleton />
+            <ItemRowSkeleton />
+          </View>
+        </View>
       </SafeAreaView>
     );
   }
@@ -82,7 +100,12 @@ export default function ExploreDetailScreen() {
           {t("explore.preview")}
         </Text>
         {items.isLoading ? (
-          <ActivityIndicator />
+          <View>
+            <ItemRowSkeleton />
+            <ItemRowSkeleton />
+            <ItemRowSkeleton />
+            <ItemRowSkeleton />
+          </View>
         ) : items.data?.length ? (
           items.data.map((it) => (
             <View
