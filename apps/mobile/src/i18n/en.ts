@@ -146,6 +146,8 @@ export const en = {
     activeCount: "{{count}} active",
     rateList: "Rate",
     yourRating: "Your rating",
+    swipeDone: "Done",
+    swipeUndo: "Undo",
   },
   bulk: {
     title: "Bulk add",

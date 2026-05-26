@@ -146,6 +146,8 @@ export const es = {
     activeCount: "{{count}} activos",
     rateList: "Valorar",
     yourRating: "Tu valoración",
+    swipeDone: "Hecho",
+    swipeUndo: "Deshacer",
   },
   bulk: {
     title: "Añadir en lote",

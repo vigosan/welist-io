@@ -2,7 +2,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { ListFilter, MoreVertical } from "lucide-react-native";
 import * as Clipboard from "expo-clipboard";
 import * as Haptics from "expo-haptics";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   ActionSheetIOS,
@@ -22,6 +22,7 @@ import DraggableFlatList, {
   type RenderItemParams,
   ScaleDecorator,
 } from "react-native-draggable-flatlist";
+import Swipeable from "react-native-gesture-handler/Swipeable";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LocationPickerModal } from "@/components/LocationPickerModal";
 import { InputRow } from "@/components/Input";
@@ -180,66 +181,25 @@ export default function ListDetailScreen() {
     const dragEnabled = filter === "all";
     return (
       <ScaleDecorator>
-        <View
-          className={`mb-2 flex-row items-center gap-3 rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-900 ${
-            isActive ? "opacity-80" : ""
-          }`}
-        >
-          <Pressable
-            onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              toggle.mutate(item.id);
-            }}
-            onLongPress={() => openItemMenu(item)}
-            disabled={isActive}
-            className="flex-1 flex-row items-center gap-3 active:opacity-80"
-          >
-            <View
-              className={`h-5 w-5 items-center justify-center rounded-md border ${
-                item.done
-                  ? "border-gray-900 bg-gray-900 dark:border-gray-100 dark:bg-gray-100"
-                  : "border-gray-300 dark:border-gray-600"
-              }`}
-            >
-              {item.done && (
-                <Text className="text-xs font-bold text-white dark:text-gray-900">
-                  ✓
-                </Text>
-              )}
-            </View>
-            <View className="flex-1">
-              <Text
-                className={`text-base ${
-                  item.done
-                    ? "text-gray-400 line-through dark:text-gray-600"
-                    : "text-gray-900 dark:text-gray-100"
-                }`}
-              >
-                {renderInlineMarkdown(item.text)}
-              </Text>
-              {item.placeName && (
-                <Text
-                  numberOfLines={1}
-                  className="mt-0.5 text-xs text-gray-500 dark:text-gray-400"
-                >
-                  📍 {item.placeName}
-                </Text>
-              )}
-            </View>
-          </Pressable>
-
-          {dragEnabled && (
-            <Pressable
-              onLongPress={drag}
-              delayLongPress={150}
-              disabled={isActive}
-              hitSlop={8}
-              className="px-1"
-            >
-              <Text className="text-base text-gray-400">≡</Text>
-            </Pressable>
-          )}
-        </View>
+        <SwipeableItemRow
+          item={item}
+          isActive={isActive}
+          dragEnabled={dragEnabled}
+          drag={drag}
+          onToggle={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            toggle.mutate(item.id);
+          }}
+          onOpenMenu={() => openItemMenu(item)}
+          onEdit={() => {
+            setEditingText(item.text);
+            setEditing(item);
+          }}
+          onDelete={() => remove.mutate(item.id)}
+          toggleLabel={item.done ? t("list.swipeUndo") : t("list.swipeDone")}
+          editLabel={t("common.edit")}
+          deleteLabel={t("common.delete")}
+        />
       </ScaleDecorator>
     );
   };
@@ -619,5 +579,139 @@ function ParticipantAvatars({
         </View>
       )}
     </View>
+  );
+}
+
+function SwipeableItemRow({
+  item,
+  isActive,
+  dragEnabled,
+  drag,
+  onToggle,
+  onOpenMenu,
+  onEdit,
+  onDelete,
+  toggleLabel,
+  editLabel,
+  deleteLabel,
+}: {
+  item: Item;
+  isActive: boolean;
+  dragEnabled: boolean;
+  drag: () => void;
+  onToggle: () => void;
+  onOpenMenu: () => void;
+  onEdit: () => void;
+  onDelete: () => void;
+  toggleLabel: string;
+  editLabel: string;
+  deleteLabel: string;
+}) {
+  const swipeRef = useRef<Swipeable>(null);
+  const close = () => swipeRef.current?.close();
+  return (
+    <Swipeable
+      ref={swipeRef}
+      friction={2}
+      overshootLeft={false}
+      overshootRight={false}
+      renderLeftActions={() => (
+        <Pressable
+          onPress={() => {
+            onToggle();
+            close();
+          }}
+          className="mb-2 mr-2 flex-1 items-end justify-center rounded-2xl bg-gray-900 pr-6 dark:bg-gray-100"
+        >
+          <Text className="text-sm font-semibold text-white dark:text-gray-900">
+            {toggleLabel}
+          </Text>
+        </Pressable>
+      )}
+      renderRightActions={() => (
+        <View className="mb-2 ml-2 flex-row gap-2">
+          <Pressable
+            onPress={() => {
+              onEdit();
+              close();
+            }}
+            className="items-center justify-center rounded-2xl bg-gray-200 px-5 dark:bg-gray-800"
+          >
+            <Text className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+              {editLabel}
+            </Text>
+          </Pressable>
+          <Pressable
+            onPress={() => {
+              onDelete();
+              close();
+            }}
+            className="items-center justify-center rounded-2xl bg-red-600 px-5"
+          >
+            <Text className="text-sm font-semibold text-white">
+              {deleteLabel}
+            </Text>
+          </Pressable>
+        </View>
+      )}
+    >
+      <View
+        className={`mb-2 flex-row items-center gap-3 rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-900 ${
+          isActive ? "opacity-80" : ""
+        }`}
+      >
+        <Pressable
+          onPress={onToggle}
+          onLongPress={onOpenMenu}
+          disabled={isActive}
+          className="flex-1 flex-row items-center gap-3 active:opacity-80"
+        >
+          <View
+            className={`h-5 w-5 items-center justify-center rounded-md border ${
+              item.done
+                ? "border-gray-900 bg-gray-900 dark:border-gray-100 dark:bg-gray-100"
+                : "border-gray-300 dark:border-gray-600"
+            }`}
+          >
+            {item.done && (
+              <Text className="text-xs font-bold text-white dark:text-gray-900">
+                ✓
+              </Text>
+            )}
+          </View>
+          <View className="flex-1">
+            <Text
+              className={`text-base ${
+                item.done
+                  ? "text-gray-400 line-through dark:text-gray-600"
+                  : "text-gray-900 dark:text-gray-100"
+              }`}
+            >
+              {renderInlineMarkdown(item.text)}
+            </Text>
+            {item.placeName && (
+              <Text
+                numberOfLines={1}
+                className="mt-0.5 text-xs text-gray-500 dark:text-gray-400"
+              >
+                📍 {item.placeName}
+              </Text>
+            )}
+          </View>
+        </Pressable>
+
+        {dragEnabled && (
+          <Pressable
+            onLongPress={drag}
+            delayLongPress={150}
+            disabled={isActive}
+            hitSlop={8}
+            className="px-1"
+          >
+            <Text className="text-base text-gray-400">≡</Text>
+          </Pressable>
+        )}
+      </View>
+    </Swipeable>
   );
 }
