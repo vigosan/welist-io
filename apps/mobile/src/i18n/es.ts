@@ -187,6 +187,7 @@ export const es = {
     title: "Perfil",
     language: "Idioma",
     appearance: "Apariencia",
+    preferences: "Preferencias",
     themeSystem: "Sistema",
     themeLight: "Claro",
     themeDark: "Oscuro",

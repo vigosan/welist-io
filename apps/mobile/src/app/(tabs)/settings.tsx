@@ -108,7 +108,7 @@ export default function SettingsScreen() {
           </View>
         </Card>
 
-        <SectionLabel>{t("profile.publicProfile")}</SectionLabel>
+        <SectionLabel>{t("profile.account")}</SectionLabel>
         <Card>
           <Row>
             <View className="flex-1 pr-3">
@@ -197,8 +197,13 @@ export default function SettingsScreen() {
           </Pressable>
         </Card>
 
-        <SectionLabel>{t("profile.language")}</SectionLabel>
+        <SectionLabel>{t("profile.preferences")}</SectionLabel>
         <Card>
+          <View className="mb-2">
+            <Text className="text-xs text-gray-500 dark:text-gray-400">
+              {t("profile.language")}
+            </Text>
+          </View>
           <View className="flex-row gap-2">
             {LANGS.map((lng) => (
               <Pressable
@@ -222,10 +227,12 @@ export default function SettingsScreen() {
               </Pressable>
             ))}
           </View>
-        </Card>
-
-        <SectionLabel>{t("profile.appearance")}</SectionLabel>
-        <Card>
+          <Divider />
+          <View className="mb-2">
+            <Text className="text-xs text-gray-500 dark:text-gray-400">
+              {t("profile.appearance")}
+            </Text>
+          </View>
           <View className="flex-row gap-2">
             {THEMES.map((theme) => (
               <Pressable
