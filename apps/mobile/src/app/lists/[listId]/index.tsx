@@ -481,6 +481,7 @@ export default function ListDetailScreen() {
       <DraggableFlatList
         data={visible}
         keyExtractor={(it) => it.id}
+        containerStyle={{ flex: 1 }}
         contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 40 }}
         onDragEnd={({ data }) => {
           if (filter !== "all") return;
