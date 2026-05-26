@@ -21,7 +21,7 @@ import { type Context, Hono } from "hono";
 import Stripe from "stripe";
 import { z } from "zod";
 import { db } from "../src/db/client.js";
-import { users } from "../src/db/schema/auth.schema.js";
+import { accounts, sessions, users } from "../src/db/schema/auth.schema.js";
 import {
   type AchievementType,
   achievements,
@@ -53,9 +53,9 @@ import {
   verifyGoogleIdToken,
   verifyMobileToken,
 } from "./auth-mobile.js";
-import { hashPassword, verifyPassword } from "./password.js";
 import { sendEmail } from "./email.js";
 import { signUnsubscribeToken, verifyUnsubscribeToken } from "./email-token.js";
+import { hashPassword, verifyPassword } from "./password.js";
 import { rateLimit } from "./rate-limit.js";
 
 type Variables = { authUser: AuthUser | null };
@@ -228,19 +228,15 @@ const setPasswordSchema = z.object({
   password: z.string().min(8).max(200),
 });
 
-app.post(
-  "/me/password",
-  zValidator("json", setPasswordSchema),
-  async (c) => {
-    const authUser = getOptionalUser(c);
-    const userId = authUser?.session?.user?.id;
-    if (!userId) return c.json({ error: "Unauthorized" }, 401);
-    const { password } = c.req.valid("json");
-    const passwordHash = await hashPassword(password);
-    await db.update(users).set({ passwordHash }).where(eq(users.id, userId));
-    return c.json({ ok: true });
-  }
-);
+app.post("/me/password", zValidator("json", setPasswordSchema), async (c) => {
+  const authUser = getOptionalUser(c);
+  const userId = authUser?.session?.user?.id;
+  if (!userId) return c.json({ error: "Unauthorized" }, 401);
+  const { password } = c.req.valid("json");
+  const passwordHash = await hashPassword(password);
+  await db.update(users).set({ passwordHash }).where(eq(users.id, userId));
+  return c.json({ ok: true });
+});
 
 const mobileEmailLoginSchema = z.object({
   email: z.string().email(),
@@ -338,7 +334,11 @@ async function canViewList(
     (userId !== null && list.ownerId === userId)
   )
     return true;
-  if (userId && list.id) return hasPurchased(userId, list.id);
+  if (userId && list.id) {
+    const participation = await getParticipation(list.id, userId);
+    if (participation) return true;
+    return hasPurchased(userId, list.id);
+  }
   return false;
 }
 
@@ -1164,8 +1164,7 @@ app.get("/explore", async (c) => {
       ? eq(lists.category, category)
       : undefined;
   const adultRequested =
-    !!category &&
-    (ADULT_CATEGORIES as readonly string[]).includes(category);
+    !!category && (ADULT_CATEGORIES as readonly string[]).includes(category);
   let viewerAllowsAdult = false;
   if (viewerId) {
     const settings = await db.query.userSettings.findFirst({
@@ -1567,29 +1566,53 @@ const reportSchema = z.object({
   reason: z.string().max(500).optional(),
 });
 
-app.post(
-  "/reports",
-  zValidator("json", reportSchema),
-  async (c) => {
-    const authUser = getOptionalUser(c);
-    const userId = authUser?.session?.user?.id;
-    if (!userId) return c.json({ error: "Unauthorized" }, 401);
-    const { targetType, targetId, reason } = c.req.valid("json");
-    await db.insert(reports).values({
-      reporterId: userId,
-      targetType,
-      targetId,
-      reason: reason ?? null,
-    });
-    return c.json({ ok: true });
-  }
-);
+app.post("/reports", zValidator("json", reportSchema), async (c) => {
+  const authUser = getOptionalUser(c);
+  const userId = authUser?.session?.user?.id;
+  if (!userId) return c.json({ error: "Unauthorized" }, 401);
+  const { targetType, targetId, reason } = c.req.valid("json");
+  await db.insert(reports).values({
+    reporterId: userId,
+    targetType,
+    targetId,
+    reason: reason ?? null,
+  });
+  return c.json({ ok: true });
+});
 
 app.delete("/me", async (c) => {
   const authUser = getOptionalUser(c);
   const userId = authUser?.session?.user?.id;
   if (!userId) return c.json({ error: "Unauthorized" }, 401);
-  await db.delete(users).where(eq(users.id, userId));
+
+  await db
+    .update(users)
+    .set({
+      name: null,
+      email: `deleted-${userId}@deleted.wilist.invalid`,
+      image: null,
+      emailVerified: null,
+      passwordHash: null,
+      publicProfile: false,
+      emailOptIn: false,
+      deletedAt: new Date(),
+    })
+    .where(eq(users.id, userId));
+
+  await db
+    .update(lists)
+    .set({ public: false, collaborative: false })
+    .where(eq(lists.ownerId, userId));
+
+  await db.delete(sessions).where(eq(sessions.userId, userId));
+  await db.delete(accounts).where(eq(accounts.userId, userId));
+  await db.delete(notifications).where(eq(notifications.userId, userId));
+  await db
+    .delete(follows)
+    .where(or(eq(follows.followerId, userId), eq(follows.followingId, userId)));
+  await db.delete(stripeAccounts).where(eq(stripeAccounts.userId, userId));
+  await db.delete(userSettings).where(eq(userSettings.userId, userId));
+
   return c.json({ ok: true });
 });
 
@@ -2693,6 +2716,7 @@ app.post("/lists/:listId/checkout", async (c) => {
     },
   });
   if (!list) return c.json({ error: "Not found" }, 404);
+  if (!list.public) return c.json({ error: "Not available" }, 410);
   if (list.ownerId === userId)
     return c.json({ error: "Cannot buy your own list" }, 409);
 

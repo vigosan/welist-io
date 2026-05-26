@@ -18,6 +18,7 @@ export const users = pgTable("users", {
   passwordHash: text("password_hash"),
   publicProfile: boolean("public_profile").default(true).notNull(),
   emailOptIn: boolean("email_opt_in").default(true).notNull(),
+  deletedAt: timestamp("deleted_at", { withTimezone: true }),
 });
 
 export const accounts = pgTable(

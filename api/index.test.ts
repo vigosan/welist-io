@@ -3509,6 +3509,7 @@ describe("POST /api/lists/:listId/rating", () => {
       public: false,
       collaborative: false,
     });
+    mockDb.query.participations.findFirst.mockResolvedValue(null);
     mockDb.query.listPurchases.findFirst.mockResolvedValue(undefined);
     const res = await app.request("/api/lists/abc/rating", {
       method: "POST",
@@ -3812,6 +3813,153 @@ describe("DELETE /api/lists/:listId/collaborators/:userId", () => {
     expect(res.status).toBe(204);
     expect(mockDb.delete).toHaveBeenCalledWith(participations);
     expect(where).toHaveBeenCalled();
+  });
+});
+
+describe("DELETE /api/me", () => {
+  const headers = { "x-forwarded-for": "10.9.0.1" };
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockGetAuthUser.mockRejectedValue(new Error("no session"));
+  });
+
+  it("returns 401 when unauthenticated", async () => {
+    const res = await app.request("/api/me", { method: "DELETE", headers });
+    expect(res.status).toBe(401);
+  });
+
+  it("anonymizes PII, despublishes owned lists and revokes sessions", async () => {
+    mockGetAuthUser.mockResolvedValue({ session: { user: { id: "u1" } } });
+    const userSet = vi
+      .fn()
+      .mockReturnValue({ where: vi.fn().mockResolvedValue(undefined) });
+    const listsSet = vi
+      .fn()
+      .mockReturnValue({ where: vi.fn().mockResolvedValue(undefined) });
+    mockDb.update
+      .mockReturnValueOnce({ set: userSet })
+      .mockReturnValueOnce({ set: listsSet });
+    mockDb.delete.mockReturnValue({
+      where: vi.fn().mockResolvedValue(undefined),
+    });
+
+    const res = await app.request("/api/me", { method: "DELETE", headers });
+    expect(res.status).toBe(200);
+
+    expect(userSet).toHaveBeenCalledTimes(1);
+    const userPatch = userSet.mock.calls[0][0] as Record<string, unknown>;
+    expect(userPatch.name).toBeNull();
+    expect(userPatch.image).toBeNull();
+    expect(userPatch.passwordHash).toBeNull();
+    expect(userPatch.emailVerified).toBeNull();
+    expect(userPatch.publicProfile).toBe(false);
+    expect(userPatch.email).toBe("deleted-u1@deleted.wilist.invalid");
+    expect(userPatch.deletedAt).toBeInstanceOf(Date);
+
+    expect(listsSet).toHaveBeenCalledTimes(1);
+    expect(listsSet.mock.calls[0][0]).toEqual({
+      public: false,
+      collaborative: false,
+    });
+
+    expect(mockDb.delete.mock.calls.length).toBeGreaterThanOrEqual(6);
+  });
+});
+
+describe("GET /api/lists/:listId on anonymized owner's list", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockGetAuthUser.mockRejectedValue(new Error("no session"));
+    mockDb.select.mockReturnValue({
+      from: vi.fn().mockReturnValue({
+        where: vi.fn().mockReturnValue(
+          Object.assign(Promise.resolve([{ avg: null, count: 0 }]), {
+            limit: vi.fn().mockResolvedValue([]),
+          })
+        ),
+      }),
+    });
+  });
+
+  it("returns 404 to a stranger when the list is despublished", async () => {
+    mockGetAuthUser.mockResolvedValue({
+      session: { user: { id: "stranger" } },
+    });
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "abc",
+      ownerId: "anon-owner",
+      public: false,
+      collaborative: false,
+    });
+    mockDb.query.participations.findFirst.mockResolvedValue(null);
+    mockDb.query.listPurchases.findFirst.mockResolvedValue(null);
+
+    const res = await app.request("/api/lists/abc", {
+      headers: { "x-forwarded-for": "10.9.1.1" },
+    });
+    expect(res.status).toBe(404);
+  });
+
+  it("lets an existing challenger keep viewing the list", async () => {
+    mockGetAuthUser.mockResolvedValue({
+      session: { user: { id: "challenger" } },
+    });
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "abc",
+      ownerId: "anon-owner",
+      public: false,
+      collaborative: false,
+    });
+    mockDb.query.participations.findFirst.mockResolvedValue({
+      id: "p1",
+      role: "challenger",
+      completedAt: null,
+    });
+
+    const res = await app.request("/api/lists/abc", {
+      headers: { "x-forwarded-for": "10.9.1.2" },
+    });
+    expect(res.status).toBe(200);
+  });
+
+  it("lets a prior buyer keep viewing the list", async () => {
+    mockGetAuthUser.mockResolvedValue({ session: { user: { id: "buyer" } } });
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "abc",
+      ownerId: "anon-owner",
+      public: false,
+      collaborative: false,
+    });
+    mockDb.query.participations.findFirst.mockResolvedValue(null);
+    mockDb.query.listPurchases.findFirst.mockResolvedValue({ id: "lp1" });
+
+    const res = await app.request("/api/lists/abc", {
+      headers: { "x-forwarded-for": "10.9.1.3" },
+    });
+    expect(res.status).toBe(200);
+  });
+});
+
+describe("POST /api/lists/:listId/checkout on anonymized owner's list", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockGetAuthUser.mockRejectedValue(new Error("no session"));
+  });
+
+  it("returns 410 when the list is no longer public", async () => {
+    mockGetAuthUser.mockResolvedValue({ session: { user: { id: "buyer" } } });
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "abc",
+      ownerId: "anon-owner",
+      name: "Old list",
+      public: false,
+    });
+
+    const res = await app.request("/api/lists/abc/checkout", {
+      method: "POST",
+      headers: { "x-forwarded-for": "10.9.2.1" },
+    });
+    expect(res.status).toBe(410);
   });
 });
 
