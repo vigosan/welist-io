@@ -14,6 +14,7 @@ export const en = {
     retry: "Try again",
     back: "Back",
     search: "Search",
+    saving: "Saving…",
   },
   auth: {
     continueGoogle: "Continue with Google",
@@ -99,6 +100,7 @@ export const en = {
   },
   lists: {
     title: "My lists",
+    newTitle: "New list",
     newPlaceholder: "New list name",
     searchPlaceholder: "Search my lists…",
     empty: "No lists yet. Create your first one above.",

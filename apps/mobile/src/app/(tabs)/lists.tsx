@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import { HelpCircle, ListFilter } from "lucide-react-native";
+import { HelpCircle, ListFilter, Plus } from "lucide-react-native";
 import { useMemo, useState } from "react";
 import {
   ActivityIndicator,
@@ -9,16 +9,15 @@ import {
   RefreshControl,
   ScrollView,
   Text,
-  TextInput,
   View,
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { PressableCard } from "@/components/Card";
-import { Input, InputRow } from "@/components/Input";
+import { Input } from "@/components/Input";
 import { ProgressDonut } from "@/components/ProgressDonut";
 import { ScreenHeader } from "@/components/ScreenHeader";
-import { useCreateList, useDeleteList, useMyLists } from "@/hooks/lists";
+import { useDeleteList, useMyLists } from "@/hooks/lists";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import type { MyListsSort, MyListsVisibility } from "@/services/lists";
 import type { MyListItem } from "@/types";
@@ -29,7 +28,6 @@ const VISIBILITIES: MyListsVisibility[] = ["all", "public", "private"];
 export default function MyListsScreen() {
   const { t } = useTranslation();
   const router = useRouter();
-  const [newName, setNewName] = useState("");
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<MyListsSort>("recent");
   const [visibility, setVisibility] = useState<MyListsVisibility>("all");
@@ -38,23 +36,12 @@ export default function MyListsScreen() {
     search.length > 0 || sort !== "recent" || visibility !== "all";
   const debouncedSearch = useDebouncedValue(search, 300);
   const query = useMyLists(debouncedSearch || undefined, sort, visibility);
-  const create = useCreateList();
   const remove = useDeleteList();
 
   const lists = useMemo(
     () => query.data?.pages.flatMap((p) => p.items) ?? [],
     [query.data]
   );
-
-  const submitCreate = () => {
-    const name = newName.trim();
-    if (!name) return;
-    create.mutate(name, {
-      onSuccess: () => setNewName(""),
-      onError: (e) =>
-        Alert.alert(t("lists.couldNotCreate"), String((e as Error).message)),
-    });
-  };
 
   const confirmDelete = (item: MyListItem) =>
     Alert.alert(
@@ -97,6 +84,14 @@ export default function MyListsScreen() {
               />
             </Pressable>
             <Pressable
+              onPress={() => router.push("/new-list")}
+              accessibilityLabel={t("lists.newTitle")}
+              hitSlop={8}
+              className="h-9 w-9 items-center justify-center rounded-full active:bg-black/[0.05] dark:active:bg-white/[0.06]"
+            >
+              <Plus color="#0c0c0b" size={22} strokeWidth={2.4} />
+            </Pressable>
+            <Pressable
               onPress={() => router.push("/help")}
               accessibilityLabel={t("nav.help")}
               hitSlop={8}
@@ -108,29 +103,6 @@ export default function MyListsScreen() {
         }
       />
 
-      <View className="mx-5 mb-2">
-        <InputRow>
-          <TextInput
-            value={newName}
-            onChangeText={setNewName}
-            onSubmitEditing={submitCreate}
-            placeholder={t("lists.newPlaceholder")}
-            placeholderTextColor="#a8a39a"
-            returnKeyType="done"
-            underlineColorAndroid="transparent"
-            className="flex-1 px-3 py-3 text-base text-gray-900 dark:text-gray-100"
-          />
-          <Pressable
-            onPress={submitCreate}
-            disabled={!newName.trim() || create.isPending}
-            className="mr-1 rounded-xl bg-gray-900 px-4 py-2 active:opacity-80 disabled:opacity-40 dark:bg-gray-100"
-          >
-            <Text className="text-sm font-medium text-white dark:text-gray-900">
-              {t("common.add")}
-            </Text>
-          </Pressable>
-        </InputRow>
-      </View>
 
       {filtersOpen && (
         <>

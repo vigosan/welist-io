@@ -14,6 +14,7 @@ export const es = {
     retry: "Reintentar",
     back: "Atrás",
     search: "Buscar",
+    saving: "Guardando…",
   },
   auth: {
     continueGoogle: "Continuar con Google",
@@ -99,6 +100,7 @@ export const es = {
   },
   lists: {
     title: "Mis listas",
+    newTitle: "Nueva lista",
     newPlaceholder: "Nombre de la nueva lista",
     searchPlaceholder: "Buscar mis listas…",
     empty: "No tienes listas. Crea la primera arriba.",

@@ -91,7 +91,16 @@ export default function RootLayout() {
                 gestureDirection: "horizontal",
                 fullScreenGestureEnabled: true,
               }}
-            />
+            >
+              <Stack.Screen
+                name="new-list"
+                options={{
+                  presentation: "modal",
+                  animation: "slide_from_bottom",
+                  gestureDirection: "vertical",
+                }}
+              />
+            </Stack>
           </AuthGate>
         </SessionProvider>
       </QueryClientProvider>
