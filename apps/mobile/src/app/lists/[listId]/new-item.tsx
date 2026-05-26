@@ -11,7 +11,6 @@ import {
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { ScreenHeader } from "@/components/ScreenHeader";
 import { useAddItem, useBulkAddItems } from "@/hooks/items";
 
 export default function NewItemScreen() {
@@ -46,22 +45,22 @@ export default function NewItemScreen() {
       className="flex-1 bg-canvas dark:bg-canvas-dark"
       edges={["top", "bottom"]}
     >
-      <ScreenHeader
-        title={t("list.newItemTitle")}
-        right={
-          <Pressable onPress={() => router.dismiss()} hitSlop={8}>
-            <Text className="text-sm text-gray-500 dark:text-gray-400">
-              {t("common.cancel")}
-            </Text>
-          </Pressable>
-        }
-      />
+      <View className="flex-row items-center justify-between px-7 pt-4 pb-6">
+        <Text className="text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
+          {t("list.newItemTitle")}
+        </Text>
+        <Pressable onPress={() => router.dismiss()} hitSlop={12}>
+          <Text className="text-sm text-gray-500 dark:text-gray-400">
+            {t("common.cancel")}
+          </Text>
+        </Pressable>
+      </View>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         className="flex-1"
         keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 24}
       >
-        <View className="flex-1 px-6 pt-4">
+        <View className="flex-1 px-7">
           <TextInput
             value={text}
             onChangeText={setText}
@@ -70,14 +69,14 @@ export default function NewItemScreen() {
             autoFocus
             multiline
             underlineColorAndroid="transparent"
-            className="min-h-[160px] rounded-2xl bg-gray-100 px-4 py-4 text-base text-gray-900 dark:bg-gray-800 dark:text-gray-100"
+            className="min-h-[160px] rounded-2xl bg-gray-100 px-5 py-4 text-base text-gray-900 dark:bg-gray-800 dark:text-gray-100"
             textAlignVertical="top"
           />
           <Text className="mt-3 text-xs text-gray-500 dark:text-gray-400">
             {t("list.newItemHint")}
           </Text>
         </View>
-        <View className="px-6 pb-4">
+        <View className="px-7 pb-6 pt-4">
           <Pressable
             onPress={submit}
             disabled={!text.trim() || pending}

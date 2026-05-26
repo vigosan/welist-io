@@ -11,7 +11,6 @@ import {
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { ScreenHeader } from "@/components/ScreenHeader";
 import { useCreateList } from "@/hooks/lists";
 
 export default function NewListScreen() {
@@ -41,22 +40,22 @@ export default function NewListScreen() {
       className="flex-1 bg-canvas dark:bg-canvas-dark"
       edges={["top", "bottom"]}
     >
-      <ScreenHeader
-        title={t("lists.newTitle")}
-        right={
-          <Pressable onPress={() => router.dismiss()} hitSlop={8}>
-            <Text className="text-sm text-gray-500 dark:text-gray-400">
-              {t("common.cancel")}
-            </Text>
-          </Pressable>
-        }
-      />
+      <View className="flex-row items-center justify-between px-7 pt-4 pb-6">
+        <Text className="text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
+          {t("lists.newTitle")}
+        </Text>
+        <Pressable onPress={() => router.dismiss()} hitSlop={12}>
+          <Text className="text-sm text-gray-500 dark:text-gray-400">
+            {t("common.cancel")}
+          </Text>
+        </Pressable>
+      </View>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         className="flex-1"
         keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 24}
       >
-        <View className="flex-1 px-6 pt-4">
+        <View className="flex-1 px-7">
           <TextInput
             value={name}
             onChangeText={setName}
@@ -66,10 +65,10 @@ export default function NewListScreen() {
             autoFocus
             returnKeyType="done"
             underlineColorAndroid="transparent"
-            className="rounded-2xl bg-gray-100 px-4 py-4 text-base text-gray-900 dark:bg-gray-800 dark:text-gray-100"
+            className="rounded-2xl bg-gray-100 px-5 py-4 text-base text-gray-900 dark:bg-gray-800 dark:text-gray-100"
           />
         </View>
-        <View className="px-6 pb-4">
+        <View className="px-7 pb-6 pt-4">
           <Pressable
             onPress={submit}
             disabled={!name.trim() || create.isPending}
