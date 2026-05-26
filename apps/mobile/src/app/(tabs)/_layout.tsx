@@ -1,3 +1,4 @@
+import * as Haptics from "expo-haptics";
 import { Tabs } from "expo-router";
 import {
   Compass,
@@ -8,7 +9,7 @@ import {
 import { useColorScheme } from "nativewind";
 import type { ComponentType } from "react";
 import { useTranslation } from "react-i18next";
-import { StyleSheet } from "react-native";
+import { Platform, StyleSheet } from "react-native";
 
 type IconProps = { color: string; size: number };
 const TabIcon = ({
@@ -25,8 +26,16 @@ export default function TabsLayout() {
   const dark = colorScheme === "dark";
   return (
     <Tabs
+      screenListeners={{
+        tabPress: () => {
+          if (Platform.OS !== "web") {
+            Haptics.selectionAsync();
+          }
+        },
+      }}
       screenOptions={{
         headerShown: false,
+        animation: "shift",
         tabBarActiveTintColor: dark ? "#f0ede8" : "#0c0c0b",
         tabBarInactiveTintColor: dark ? "#7a766c" : "#a8a39a",
         tabBarStyle: {
