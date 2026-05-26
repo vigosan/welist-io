@@ -14,6 +14,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { PressableCard } from "@/components/Card";
+import { Input } from "@/components/Input";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { useExplore } from "@/hooks/explore";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
@@ -71,17 +72,15 @@ export default function ExploreScreen() {
 
       {filtersOpen && (
         <>
-          <View className="mx-6 mb-3 flex-row items-center gap-2 rounded-2xl border border-gray-200 bg-white p-1.5 dark:border-gray-700 dark:bg-gray-900">
-        <TextInput
-          value={q}
-          onChangeText={setQ}
-          placeholder={t("explore.search")}
-          placeholderTextColor="#a0a09c"
-          autoCapitalize="none"
-          autoFocus
-          className="flex-1 px-3 py-2 text-sm text-gray-900 dark:text-gray-100"
-        />
-      </View>
+          <View className="mx-5 mb-3">
+            <Input
+              value={q}
+              onChangeText={setQ}
+              placeholder={t("explore.search")}
+              autoCapitalize="none"
+              autoFocus
+            />
+          </View>
 
       <View className="mx-6 mb-3 flex-row gap-1 rounded-xl bg-gray-100 p-1 dark:bg-gray-800">
         {SORTS.map((s) => {

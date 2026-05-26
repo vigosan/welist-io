@@ -144,6 +144,8 @@ export const es = {
     couldNotAdd: "No se pudo añadir el item",
     couldNotSave: "No se pudo guardar",
     activeCount: "{{count}} activos",
+    rateList: "Valorar",
+    yourRating: "Tu valoración",
   },
   bulk: {
     title: "Añadir en lote",

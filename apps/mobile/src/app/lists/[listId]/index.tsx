@@ -24,6 +24,7 @@ import DraggableFlatList, {
 } from "react-native-draggable-flatlist";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LocationPickerModal } from "@/components/LocationPickerModal";
+import { InputRow } from "@/components/Input";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import {
   renderInlineMarkdown,
@@ -50,7 +51,8 @@ import { useSession } from "@/lib/auth";
 import { type FilterMode, filterItems } from "@/lib/items-filter";
 import { mapsUrl } from "@/lib/maps";
 import type { Item } from "@/types";
-import { StarRating } from "@/components/StarRating";
+import { RateSheet } from "@/components/RateSheet";
+import { RatingBadge } from "@/components/RatingBadge";
 
 const FILTERS: FilterMode[] = ["all", "pending", "done"];
 
@@ -64,6 +66,7 @@ export default function ListDetailScreen() {
   const [editing, setEditing] = useState<Item | null>(null);
   const [editingText, setEditingText] = useState("");
   const [locating, setLocating] = useState<Item | null>(null);
+  const [rateOpen, setRateOpen] = useState(false);
 
   const { session } = useSession();
   const list = useList(listId);
@@ -391,35 +394,22 @@ export default function ListDetailScreen() {
         }
       />
 
-      <View className="mx-6 mt-3 mb-3 flex-row items-center gap-2 rounded-2xl border border-gray-200 bg-white p-1.5 dark:border-gray-700 dark:bg-gray-900">
-        <TextInput
-          value={newText}
-          onChangeText={setNewText}
-          onSubmitEditing={submitAdd}
-          placeholder={t("list.addPlaceholder")}
-          placeholderTextColor="#a0a09c"
-          returnKeyType="done"
-          className="flex-1 px-3 text-sm text-gray-900 dark:text-gray-100"
-        />
-        <Pressable
-          onPress={submitAdd}
-          disabled={!newText.trim() || add.isPending}
-          className="rounded-xl bg-gray-900 px-4 py-2 active:opacity-80 disabled:opacity-40 dark:bg-gray-100"
-        >
-          <Text className="text-sm font-medium text-white dark:text-gray-900">
-            {t("common.add")}
-          </Text>
-        </Pressable>
-      </View>
-
-      {list.data?.rating && (list.data.rating.count > 0 || !isOwner) && (
-        <View className="mx-6 mb-3 flex-row items-center justify-between">
-          <StarRating
-            value={list.data.rating.mine}
-            avg={list.data.rating.avg}
-            count={list.data.rating.count}
-            onChange={isOwner ? undefined : (v) => rate.mutate(v)}
-          />
+      {((list.data?.rating &&
+        (list.data.rating.count > 0 || !isOwner)) ||
+        (participants.data && participants.data.total > 0)) && (
+        <View className="mx-6 mb-2 flex-row items-center justify-between">
+          {list.data?.rating &&
+          (list.data.rating.count > 0 || !isOwner) ? (
+            <RatingBadge
+              avg={list.data.rating.avg ?? 0}
+              count={list.data.rating.count}
+              mine={list.data.rating.mine}
+              rateLabel={isOwner ? undefined : t("list.rateList")}
+              onPress={isOwner ? undefined : () => setRateOpen(true)}
+            />
+          ) : (
+            <View />
+          )}
           {participants.data && participants.data.total > 0 && (
             <ParticipantAvatars
               participants={participants.data.participants}
@@ -428,6 +418,30 @@ export default function ListDetailScreen() {
           )}
         </View>
       )}
+
+      <View className="mx-5 mt-1 mb-3">
+        <InputRow>
+          <TextInput
+            value={newText}
+            onChangeText={setNewText}
+            onSubmitEditing={submitAdd}
+            placeholder={t("list.addPlaceholder")}
+            placeholderTextColor="#a8a39a"
+            returnKeyType="done"
+            underlineColorAndroid="transparent"
+            className="flex-1 px-3 py-3 text-base text-gray-900 dark:text-gray-100"
+          />
+          <Pressable
+            onPress={submitAdd}
+            disabled={!newText.trim() || add.isPending}
+            className="mr-1 rounded-xl bg-gray-900 px-4 py-2 active:opacity-80 disabled:opacity-40 dark:bg-gray-100"
+          >
+            <Text className="text-sm font-medium text-white dark:text-gray-900">
+              {t("common.add")}
+            </Text>
+          </Pressable>
+        </InputRow>
+      </View>
 
       {filtersOpen && (
       <View className="mx-6 mb-3 flex-row gap-2">
@@ -522,6 +536,13 @@ export default function ListDetailScreen() {
           </View>
         </View>
       </Modal>
+
+      <RateSheet
+        visible={rateOpen}
+        value={list.data?.rating?.mine ?? null}
+        onChange={(v) => rate.mutate(v)}
+        onClose={() => setRateOpen(false)}
+      />
 
       <LocationPickerModal
         visible={locating !== null}

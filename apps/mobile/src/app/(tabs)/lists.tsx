@@ -15,6 +15,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { PressableCard } from "@/components/Card";
+import { Input, InputRow } from "@/components/Input";
 import { ProgressDonut } from "@/components/ProgressDonut";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { useCreateList, useDeleteList, useMyLists } from "@/hooks/lists";
@@ -107,38 +108,39 @@ export default function MyListsScreen() {
         }
       />
 
-      <View className="mx-6 mb-2 flex-row items-center gap-2 rounded-2xl border border-gray-200 bg-white p-1.5 dark:border-gray-700 dark:bg-gray-900">
-        <TextInput
-          value={newName}
-          onChangeText={setNewName}
-          onSubmitEditing={submitCreate}
-          placeholder={t("lists.newPlaceholder")}
-          placeholderTextColor="#a0a09c"
-          returnKeyType="done"
-          className="flex-1 px-3 py-2 text-sm text-gray-900 dark:text-gray-100"
-        />
-        <Pressable
-          onPress={submitCreate}
-          disabled={!newName.trim() || create.isPending}
-          className="rounded-xl bg-gray-900 px-4 py-2 active:opacity-80 disabled:opacity-40 dark:bg-gray-100"
-        >
-          <Text className="text-sm font-medium text-white dark:text-gray-900">
-            {t("common.add")}
-          </Text>
-        </Pressable>
+      <View className="mx-5 mb-2">
+        <InputRow>
+          <TextInput
+            value={newName}
+            onChangeText={setNewName}
+            onSubmitEditing={submitCreate}
+            placeholder={t("lists.newPlaceholder")}
+            placeholderTextColor="#a8a39a"
+            returnKeyType="done"
+            underlineColorAndroid="transparent"
+            className="flex-1 px-3 py-3 text-base text-gray-900 dark:text-gray-100"
+          />
+          <Pressable
+            onPress={submitCreate}
+            disabled={!newName.trim() || create.isPending}
+            className="mr-1 rounded-xl bg-gray-900 px-4 py-2 active:opacity-80 disabled:opacity-40 dark:bg-gray-100"
+          >
+            <Text className="text-sm font-medium text-white dark:text-gray-900">
+              {t("common.add")}
+            </Text>
+          </Pressable>
+        </InputRow>
       </View>
 
       {filtersOpen && (
         <>
-          <View className="mx-6 mb-3 flex-row items-center gap-2 rounded-2xl border border-gray-200 bg-white p-1.5 dark:border-gray-700 dark:bg-gray-900">
-            <TextInput
+          <View className="mx-5 mb-3">
+            <Input
               value={search}
               onChangeText={setSearch}
               placeholder={t("lists.searchPlaceholder")}
-              placeholderTextColor="#a0a09c"
               autoCapitalize="none"
               autoFocus
-              className="flex-1 px-3 py-2 text-sm text-gray-900 dark:text-gray-100"
             />
           </View>
 
