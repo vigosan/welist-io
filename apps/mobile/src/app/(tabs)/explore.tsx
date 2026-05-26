@@ -1,3 +1,4 @@
+import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import { ChevronRight, ListFilter } from "lucide-react-native";
 import { useMemo, useState } from "react";
@@ -182,7 +183,10 @@ export default function ExploreScreen() {
         refreshControl={
           <RefreshControl
             refreshing={query.isRefetching && !query.isFetchingNextPage}
-            onRefresh={() => query.refetch()}
+            onRefresh={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+              query.refetch();
+            }}
           />
         }
         onEndReached={() =>

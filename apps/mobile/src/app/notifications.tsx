@@ -1,3 +1,4 @@
+import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import {
   ActivityIndicator,
@@ -57,7 +58,10 @@ export default function NotificationsScreen() {
         refreshControl={
           <RefreshControl
             refreshing={query.isRefetching}
-            onRefresh={() => query.refetch()}
+            onRefresh={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+              query.refetch();
+            }}
           />
         }
         ListEmptyComponent={
