@@ -597,9 +597,16 @@ function SwipeableItemRow({
       )}
     >
       <View
-        className={`mb-2 flex-row items-center gap-3 rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-900 ${
+        className={`mb-2 flex-row items-center gap-3 rounded-2xl bg-white p-4 dark:bg-gray-900 ${
           isActive ? "opacity-80" : ""
-        }`}
+        } ${item.done ? "opacity-60" : ""}`}
+        style={{
+          shadowColor: "#000",
+          shadowOpacity: 0.04,
+          shadowRadius: 8,
+          shadowOffset: { width: 0, height: 1 },
+          elevation: 1,
+        }}
       >
         <Pressable
           onPress={onToggle}
@@ -608,14 +615,14 @@ function SwipeableItemRow({
           className="flex-1 flex-row items-center gap-3 active:opacity-80"
         >
           <View
-            className={`h-5 w-5 items-center justify-center rounded-md border ${
+            className={`h-6 w-6 items-center justify-center rounded-full border-[1.5px] ${
               item.done
                 ? "border-gray-900 bg-gray-900 dark:border-gray-100 dark:bg-gray-100"
                 : "border-gray-300 dark:border-gray-600"
             }`}
           >
             {item.done && (
-              <Text className="text-xs font-bold text-white dark:text-gray-900">
+              <Text className="text-sm font-bold text-white dark:text-gray-900">
                 ✓
               </Text>
             )}
@@ -624,7 +631,7 @@ function SwipeableItemRow({
             <Text
               className={`text-base ${
                 item.done
-                  ? "text-gray-400 line-through dark:text-gray-600"
+                  ? "line-through text-gray-600 dark:text-gray-400"
                   : "text-gray-900 dark:text-gray-100"
               }`}
             >

@@ -45,7 +45,10 @@ export default function NewItemScreen() {
       className="flex-1 bg-canvas dark:bg-canvas-dark"
       edges={["top"]}
     >
-      <View className="flex-row items-center justify-between px-7 pt-4 pb-6">
+      <View className="items-center pt-2 pb-1">
+        <View className="h-1 w-10 rounded-full bg-gray-300 dark:bg-gray-700" />
+      </View>
+      <View className="flex-row items-center justify-between px-7 pt-2 pb-6">
         <Text className="text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
           {t("list.newItemTitle")}
         </Text>

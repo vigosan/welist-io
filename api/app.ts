@@ -1166,12 +1166,20 @@ app.get("/explore", async (c) => {
   const adultRequested =
     !!category &&
     (ADULT_CATEGORIES as readonly string[]).includes(category);
-  const excludeAdult = !adultRequested
-    ? sql`(${lists.category} is null or ${lists.category} not in (${sql.join(
+  let viewerAllowsAdult = false;
+  if (viewerId) {
+    const settings = await db.query.userSettings.findFirst({
+      where: eq(userSettings.userId, viewerId),
+    });
+    viewerAllowsAdult = settings?.showAdult ?? false;
+  }
+  const allowAdultThrough = adultRequested && viewerAllowsAdult;
+  const excludeAdult = allowAdultThrough
+    ? undefined
+    : sql`(${lists.category} is null or ${lists.category} not in (${sql.join(
         ADULT_CATEGORIES.map((c) => sql`${c}`),
         sql`, `
-      )}))`
-    : undefined;
+      )}))`;
 
   const baseWhere = and(
     eq(lists.public, true),

@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import { ListFilter } from "lucide-react-native";
+import { ChevronRight, ListFilter } from "lucide-react-native";
 import { useMemo, useState } from "react";
 import {
   ActivityIndicator,
@@ -207,8 +207,9 @@ export default function ExploreScreen() {
                 params: { listId: item.id },
               })
             }
-            className="mb-3 p-4"
+            className="mb-3 flex-row items-center gap-3 p-4"
           >
+            <View className="flex-1">
             <Text
               numberOfLines={1}
               className="text-base font-medium text-gray-900 dark:text-gray-100"
@@ -233,6 +234,8 @@ export default function ExploreScreen() {
                 ? ` · ★ ${item.rating.avg?.toFixed(1)} (${item.rating.count})`
                 : ""}
             </Text>
+            </View>
+            <ChevronRight color="#c7c5be" size={18} />
           </PressableCard>
         )}
       />

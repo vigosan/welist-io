@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import { HelpCircle, ListFilter, Plus } from "lucide-react-native";
+import { ChevronRight, ListFilter, Plus } from "lucide-react-native";
 import { useMemo, useState } from "react";
 import {
   ActivityIndicator,
@@ -82,14 +82,6 @@ export default function MyListsScreen() {
                 }
                 size={18}
               />
-            </Pressable>
-            <Pressable
-              onPress={() => router.push("/help")}
-              accessibilityLabel={t("nav.help")}
-              hitSlop={8}
-              className="h-9 w-9 items-center justify-center rounded-full active:bg-black/[0.05] dark:active:bg-white/[0.06]"
-            >
-              <HelpCircle color="#0c0c0b" size={20} />
             </Pressable>
             <Pressable
               onPress={() => router.push("/new-list")}
@@ -244,6 +236,7 @@ export default function MyListsScreen() {
                   : ""}
               </Text>
             </View>
+            <ChevronRight color="#c7c5be" size={18} />
           </PressableCard>
         )}
       />

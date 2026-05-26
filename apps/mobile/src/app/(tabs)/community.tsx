@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import { ListFilter } from "lucide-react-native";
+import { ChevronRight, ListFilter } from "lucide-react-native";
 import { useMemo, useState } from "react";
 import {
   ActivityIndicator,
@@ -125,6 +125,7 @@ export default function UsersScreen() {
                 completed · {item.followerCount} followers
               </Text>
             </View>
+            <ChevronRight color="#c7c5be" size={18} />
           </PressableCard>
         )}
       />
