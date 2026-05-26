@@ -15,6 +15,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { PressableCard } from "@/components/Card";
+import { CategoryTag } from "@/components/CategoryTag";
 import { EmptyState } from "@/components/EmptyState";
 import { Input } from "@/components/Input";
 import { ScreenHeader } from "@/components/ScreenHeader";
@@ -238,19 +239,17 @@ export default function ExploreScreen() {
             }
             className="mb-3 flex-row items-center gap-3 p-4"
           >
-            <View className="flex-1">
-            <Text
-              numberOfLines={1}
-              className="text-base font-medium text-gray-900 dark:text-gray-100"
-            >
-              {item.name}
-            </Text>
-            <Text className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
-              {item.owner?.name ?? t("common.anonymous")}
-              {item.category
-                ? ` · ${t(`categories.${item.category}` as never)}`
-                : ""}
-            </Text>
+            <View className="flex-1 gap-1">
+              <Text
+                numberOfLines={1}
+                className="text-base font-medium text-gray-900 dark:text-gray-100"
+              >
+                {item.name}
+              </Text>
+              {item.category && <CategoryTag category={item.category} />}
+              <Text className="text-xs text-gray-500 dark:text-gray-400">
+                {item.owner?.name ?? t("common.anonymous")}
+              </Text>
             <Text
               style={{ fontVariant: ["tabular-nums"] }}
               className="mt-2 text-xs text-gray-500 dark:text-gray-400"

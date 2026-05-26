@@ -166,7 +166,13 @@ export default function ListDetailScreen() {
           dragEnabled={dragEnabled}
           drag={drag}
           onToggle={() => {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            if (item.done) {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            } else {
+              Haptics.notificationAsync(
+                Haptics.NotificationFeedbackType.Success
+              );
+            }
             toggle.mutate(item.id);
           }}
           onOpenMenu={() => openItemMenu(item)}
