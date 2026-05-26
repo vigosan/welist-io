@@ -21,6 +21,7 @@ import DraggableFlatList, {
   type RenderItemParams,
   ScaleDecorator,
 } from "react-native-draggable-flatlist";
+import { TouchableOpacity } from "react-native-gesture-handler";
 import Swipeable from "react-native-gesture-handler/Swipeable";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ActionDrawer, type DrawerAction } from "@/components/ActionDrawer";
@@ -638,42 +639,45 @@ function SwipeableItemRow({
       overshootLeft={false}
       overshootRight={false}
       renderLeftActions={() => (
-        <Pressable
+        <TouchableOpacity
+          activeOpacity={0.85}
           onPress={() => {
-            onToggle();
             close();
+            onToggle();
           }}
-          className="mb-2 mr-2 flex-1 items-end justify-center rounded-2xl bg-gray-900 pr-6 dark:bg-gray-100"
+          className="mb-2 mr-2 flex-1 items-start justify-center rounded-2xl bg-gray-900 pl-6 dark:bg-gray-100"
         >
           <Text className="text-sm font-semibold text-white dark:text-gray-900">
             {toggleLabel}
           </Text>
-        </Pressable>
+        </TouchableOpacity>
       )}
       renderRightActions={() => (
         <View className="mb-2 ml-2 flex-row gap-2">
-          <Pressable
+          <TouchableOpacity
+            activeOpacity={0.85}
             onPress={() => {
-              onEdit();
               close();
+              onEdit();
             }}
             className="items-center justify-center rounded-2xl bg-gray-200 px-5 dark:bg-gray-800"
           >
             <Text className="text-sm font-semibold text-gray-900 dark:text-gray-100">
               {editLabel}
             </Text>
-          </Pressable>
-          <Pressable
+          </TouchableOpacity>
+          <TouchableOpacity
+            activeOpacity={0.85}
             onPress={() => {
-              onDelete();
               close();
+              onDelete();
             }}
             className="items-center justify-center rounded-2xl bg-red-600 px-5"
           >
             <Text className="text-sm font-semibold text-white">
               {deleteLabel}
             </Text>
-          </Pressable>
+          </TouchableOpacity>
         </View>
       )}
     >

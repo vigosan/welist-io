@@ -1111,7 +1111,7 @@ app.delete(
   }
 );
 
-const EXPLORE_PAGE_SIZE = 6;
+const EXPLORE_PAGE_SIZE = 20;
 const MY_LISTS_PAGE_SIZE = 20;
 
 const BULK_ITEM_LIMIT = 100;
@@ -1288,7 +1288,7 @@ app.get("/stats", async (c) => {
   });
 });
 
-const USERS_PAGE_SIZE = 6;
+const USERS_PAGE_SIZE = 20;
 
 app.get("/users", async (c) => {
   const q = c.req.query("q")?.trim();
