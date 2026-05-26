@@ -1,5 +1,9 @@
 import { useColorScheme } from "nativewind";
+import { useEffect, useRef } from "react";
+import { Animated } from "react-native";
 import Svg, { Circle } from "react-native-svg";
+
+const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 type Props = {
   done: number;
@@ -20,9 +24,23 @@ export function ProgressDonut({
   const fill = dark ? "#f0ede8" : "#0c0c0b";
   const r = (size - strokeWidth) / 2;
   const c = 2 * Math.PI * r;
-  const progress = total > 0 ? Math.min(1, done / total) : 0;
-  const dash = c * progress;
-  const gap = c - dash;
+  const target = total > 0 ? Math.min(1, done / total) : 0;
+  const animated = useRef(new Animated.Value(target)).current;
+
+  useEffect(() => {
+    Animated.spring(animated, {
+      toValue: target,
+      useNativeDriver: false,
+      speed: 12,
+      bounciness: 6,
+    }).start();
+  }, [target, animated]);
+
+  const dashOffset = animated.interpolate({
+    inputRange: [0, 1],
+    outputRange: [c, 0],
+  });
+
   return (
     <Svg width={size} height={size}>
       <Circle
@@ -33,19 +51,18 @@ export function ProgressDonut({
         strokeWidth={strokeWidth}
         fill="none"
       />
-      {progress > 0 && (
-        <Circle
-          cx={size / 2}
-          cy={size / 2}
-          r={r}
-          stroke={fill}
-          strokeWidth={strokeWidth}
-          fill="none"
-          strokeDasharray={`${dash} ${gap}`}
-          strokeLinecap="round"
-          transform={`rotate(-90 ${size / 2} ${size / 2})`}
-        />
-      )}
+      <AnimatedCircle
+        cx={size / 2}
+        cy={size / 2}
+        r={r}
+        stroke={fill}
+        strokeWidth={strokeWidth}
+        fill="none"
+        strokeDasharray={c}
+        strokeDashoffset={dashOffset}
+        strokeLinecap="round"
+        transform={`rotate(-90 ${size / 2} ${size / 2})`}
+      />
     </Svg>
   );
 }
