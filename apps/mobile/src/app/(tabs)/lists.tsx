@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import { HelpCircle, Search } from "lucide-react-native";
+import { HelpCircle, ListFilter } from "lucide-react-native";
 import { useMemo, useState } from "react";
 import {
   ActivityIndicator,
@@ -87,7 +87,7 @@ export default function MyListsScreen() {
                   : ""
               }`}
             >
-              <Search
+              <ListFilter
                 color={
                   filtersOpen || isFiltered ? "#ffffff" : "#0c0c0b"
                 }
