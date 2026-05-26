@@ -53,10 +53,6 @@ import { useSession } from "@/lib/auth";
 import { type FilterMode, filterItems } from "@/lib/items-filter";
 import { mapsUrl } from "@/lib/maps";
 import type { Item } from "@/types";
-
-type Row =
-  | { kind: "item"; key: string; item: Item }
-  | { kind: "header"; key: string; label: string; count: number };
 import { RateSheet } from "@/components/RateSheet";
 import { RatingBadge } from "@/components/RatingBadge";
 
@@ -92,33 +88,12 @@ export default function ListDetailScreen() {
     !!list.data?.ownerId &&
     session.user.id === list.data.ownerId;
 
-  const rows = useMemo<Row[]>(() => {
-    const filtered = filterItems(items.data ?? [], filter);
-    if (filter !== "all")
-      return filtered.map((item) => ({ kind: "item", key: item.id, item }));
-    const pending = filtered.filter((it) => !it.done);
-    const done = filtered.filter((it) => it.done);
-    const result: Row[] = pending.map((item) => ({
-      kind: "item",
-      key: item.id,
-      item,
-    }));
-    if (done.length > 0) {
-      result.push({
-        kind: "header",
-        key: "done-header",
-        label: t("list.completed"),
-        count: done.length,
-      });
-      for (const item of done) {
-        result.push({ kind: "item", key: item.id, item });
-      }
-    }
-    return result;
-  }, [items.data, filter, t]);
+  const visible = useMemo(
+    () => filterItems(items.data ?? [], filter),
+    [items.data, filter]
+  );
 
-  const dragEnabled =
-    filter === "all" && !rows.some((r) => r.kind === "header");
+  const dragEnabled = filter === "all";
 
   const openItemMenu = (item: Item) => {
     const hasCoords = !!(item.latitude && item.longitude && item.placeName);
@@ -182,44 +157,25 @@ export default function ListDetailScreen() {
     );
   };
 
-  const renderRow = ({
-    item: row,
-    drag,
-    isActive,
-  }: RenderItemParams<Row>) => {
-    if (row.kind === "header") {
-      return (
-        <View className="mt-4 mb-2 flex-row items-center justify-between px-1">
-          <Text className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
-            {row.label}
-          </Text>
-          <Text
-            style={{ fontVariant: ["tabular-nums"] }}
-            className="text-xs text-gray-500 dark:text-gray-400"
-          >
-            {row.count}
-          </Text>
-        </View>
-      );
-    }
+  const renderRow = ({ item, drag, isActive }: RenderItemParams<Item>) => {
     return (
       <ScaleDecorator>
         <SwipeableItemRow
-          item={row.item}
+          item={item}
           isActive={isActive}
           dragEnabled={dragEnabled}
           drag={drag}
           onToggle={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            toggle.mutate(row.item.id);
+            toggle.mutate(item.id);
           }}
-          onOpenMenu={() => openItemMenu(row.item)}
+          onOpenMenu={() => openItemMenu(item)}
           onEdit={() => {
-            setEditingText(row.item.text);
-            setEditing(row.item);
+            setEditingText(item.text);
+            setEditing(item);
           }}
-          onDelete={() => remove.mutate(row.item.id)}
-          toggleLabel={row.item.done ? t("list.swipeUndo") : t("list.swipeDone")}
+          onDelete={() => remove.mutate(item.id)}
+          toggleLabel={item.done ? t("list.swipeUndo") : t("list.swipeDone")}
           editLabel={t("common.edit")}
           deleteLabel={t("common.delete")}
         />
@@ -422,16 +378,13 @@ export default function ListDetailScreen() {
       )}
 
       <DraggableFlatList
-        data={rows}
-        keyExtractor={(r) => r.key}
+        data={visible}
+        keyExtractor={(it) => it.id}
         containerStyle={{ flex: 1 }}
         contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 40 }}
         onDragEnd={({ data }) => {
           if (!dragEnabled) return;
-          const items = data.flatMap((r) =>
-            r.kind === "item" ? [r.item] : []
-          );
-          reorder.mutate(items);
+          reorder.mutate(data);
         }}
         ListEmptyComponent={
           items.isLoading ? (
@@ -638,21 +591,22 @@ function SwipeableItemRow({
       friction={2}
       overshootLeft={false}
       overshootRight={false}
+      leftThreshold={80}
+      onSwipeableOpen={(direction) => {
+        if (direction === "left") {
+          swipeRef.current?.close();
+          onToggle();
+        }
+      }}
       renderLeftActions={() => (
-        <TouchableOpacity
-          activeOpacity={0.85}
-          onPress={() => {
-            close();
-            onToggle();
-          }}
-          style={{ flex: 1, marginBottom: 8, marginRight: 8 }}
+        <View
+          style={{ width: 96, marginBottom: 8, marginRight: 8 }}
+          className="items-center justify-center rounded-2xl bg-gray-900 dark:bg-gray-100"
         >
-          <View className="h-full flex-1 items-start justify-center rounded-2xl bg-gray-900 pl-6 dark:bg-gray-100">
-            <Text className="text-sm font-semibold text-white dark:text-gray-900">
-              {toggleLabel}
-            </Text>
-          </View>
-        </TouchableOpacity>
+          <Text className="text-sm font-semibold text-white dark:text-gray-900">
+            {toggleLabel}
+          </Text>
+        </View>
       )}
       renderRightActions={() => (
         <View
