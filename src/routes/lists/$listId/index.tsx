@@ -798,14 +798,24 @@ function ListDetailPage() {
                                 />
                               </span>
                             )}
-                            {(list?.rating?.count ?? 0) > 0 && (
-                              <span className="shrink-0">
-                                <StarRatingDisplay
-                                  avg={list?.rating?.avg ?? null}
-                                  count={list?.rating?.count ?? 0}
-                                />
-                              </span>
-                            )}
+                            {(list?.rating?.count ?? 0) > 0 &&
+                              (session?.user ? (
+                                <span className="shrink-0 text-xs text-gray-500 dark:text-gray-400 tabular-nums">
+                                  <span data-testid="rating-avg">
+                                    {(list?.rating?.avg ?? 0).toFixed(1)}
+                                  </span>
+                                  <span className="ml-1 text-gray-400 dark:text-gray-500">
+                                    ({list?.rating?.count ?? 0})
+                                  </span>
+                                </span>
+                              ) : (
+                                <span className="shrink-0">
+                                  <StarRatingDisplay
+                                    avg={list?.rating?.avg ?? null}
+                                    count={list?.rating?.count ?? 0}
+                                  />
+                                </span>
+                              ))}
                           </>
                         )}
                     </div>
