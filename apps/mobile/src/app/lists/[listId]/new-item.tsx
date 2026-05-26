@@ -43,7 +43,7 @@ export default function NewItemScreen() {
   return (
     <SafeAreaView
       className="flex-1 bg-canvas dark:bg-canvas-dark"
-      edges={["top", "bottom"]}
+      edges={["top"]}
     >
       <View className="flex-row items-center justify-between px-7 pt-4 pb-6">
         <Text className="text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
@@ -56,9 +56,8 @@ export default function NewItemScreen() {
         </Pressable>
       </View>
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
         className="flex-1"
-        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 24}
       >
         <View className="flex-1 px-7">
           <TextInput
@@ -75,12 +74,11 @@ export default function NewItemScreen() {
           <Text className="mt-3 text-xs text-gray-500 dark:text-gray-400">
             {t("list.newItemHint")}
           </Text>
-        </View>
-        <View className="px-7 pb-6 pt-4">
+          <View className="flex-1" />
           <Pressable
             onPress={submit}
             disabled={!text.trim() || pending}
-            className="items-center rounded-2xl bg-gray-900 px-6 py-4 active:opacity-80 disabled:opacity-40 dark:bg-gray-100"
+            className="mb-4 items-center rounded-2xl bg-gray-900 px-6 py-4 active:opacity-80 disabled:opacity-40 dark:bg-gray-100"
           >
             <Text className="font-medium text-white dark:text-gray-900">
               {pending

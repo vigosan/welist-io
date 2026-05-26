@@ -38,7 +38,7 @@ export default function NewListScreen() {
   return (
     <SafeAreaView
       className="flex-1 bg-canvas dark:bg-canvas-dark"
-      edges={["top", "bottom"]}
+      edges={["top"]}
     >
       <View className="flex-row items-center justify-between px-7 pt-4 pb-6">
         <Text className="text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
@@ -51,9 +51,8 @@ export default function NewListScreen() {
         </Pressable>
       </View>
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
         className="flex-1"
-        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 24}
       >
         <View className="flex-1 px-7">
           <TextInput
@@ -67,12 +66,11 @@ export default function NewListScreen() {
             underlineColorAndroid="transparent"
             className="rounded-2xl bg-gray-100 px-5 py-4 text-base text-gray-900 dark:bg-gray-800 dark:text-gray-100"
           />
-        </View>
-        <View className="px-7 pb-6 pt-4">
+          <View className="flex-1" />
           <Pressable
             onPress={submit}
             disabled={!name.trim() || create.isPending}
-            className="items-center rounded-2xl bg-gray-900 px-6 py-4 active:opacity-80 disabled:opacity-40 dark:bg-gray-100"
+            className="mb-4 items-center rounded-2xl bg-gray-900 px-6 py-4 active:opacity-80 disabled:opacity-40 dark:bg-gray-100"
           >
             <Text className="font-medium text-white dark:text-gray-900">
               {create.isPending ? t("common.saving") : t("common.add")}
