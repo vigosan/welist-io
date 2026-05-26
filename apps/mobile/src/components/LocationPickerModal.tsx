@@ -63,7 +63,9 @@ export function LocationPickerModal({
           autoFocus
           placeholder={t("list.searchPlace")}
           placeholderTextColor="#a0a09c"
-          className="mx-6 mt-3 rounded-2xl border border-gray-200 bg-white px-3 py-3 text-base text-gray-900 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100"
+          textAlignVertical="center"
+          style={{ fontSize: 16, lineHeight: 20 }}
+          className="mx-6 mt-3 rounded-2xl border border-gray-200 bg-white px-3 py-3 text-gray-900 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100"
         />
 
         <FlatList

@@ -416,7 +416,9 @@ export default function ListDetailScreen() {
               value={editingText}
               onChangeText={setEditingText}
               autoFocus
-              className="rounded-xl border border-gray-200 px-3 py-2 text-base text-gray-900 dark:border-gray-700 dark:text-gray-100"
+              textAlignVertical="center"
+              style={{ fontSize: 16, lineHeight: 20 }}
+              className="rounded-xl border border-gray-200 px-3 py-2 text-gray-900 dark:border-gray-700 dark:text-gray-100"
             />
             <View className="mt-4 flex-row justify-end gap-3">
               <Pressable

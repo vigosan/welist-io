@@ -127,7 +127,9 @@ export default function ListSettingsScreen() {
           <TextInput
             value={name}
             onChangeText={setName}
-            className="rounded-2xl border border-gray-200 bg-white px-3 py-3 text-base text-gray-900 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100"
+            textAlignVertical="center"
+            style={{ fontSize: 16, lineHeight: 20 }}
+            className="rounded-2xl border border-gray-200 bg-white px-3 py-3 text-gray-900 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100"
           />
         </Field>
 
@@ -138,7 +140,9 @@ export default function ListSettingsScreen() {
             autoCapitalize="none"
             placeholder={t("settings.slugPlaceholder")}
             placeholderTextColor="#a0a09c"
-            className="rounded-2xl border border-gray-200 bg-white px-3 py-3 text-base text-gray-900 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100"
+            textAlignVertical="center"
+            style={{ fontSize: 16, lineHeight: 20 }}
+            className="rounded-2xl border border-gray-200 bg-white px-3 py-3 text-gray-900 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100"
           />
         </Field>
 
@@ -392,7 +396,9 @@ function CollaboratorsSection({ listId }: { listId: string }) {
         placeholder={t("settings.searchUsers")}
         placeholderTextColor="#a0a09c"
         autoCapitalize="none"
-        className="mt-3 rounded-2xl border border-gray-200 bg-white px-3 py-3 text-base text-gray-900 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100"
+        textAlignVertical="center"
+        style={{ fontSize: 16, lineHeight: 20 }}
+        className="mt-3 rounded-2xl border border-gray-200 bg-white px-3 py-3 text-gray-900 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100"
       />
 
       {results.map((u) => (

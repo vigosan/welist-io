@@ -10,13 +10,24 @@ type InputProps = TextInputProps & {
  * Works the same on iOS and Android (underline killed).
  */
 export const Input = forwardRef<TextInput, InputProps>(
-  ({ className = "", ...rest }, ref) => {
+  ({ className = "", style, ...rest }, ref) => {
     return (
       <TextInput
         ref={ref}
         underlineColorAndroid="transparent"
         placeholderTextColor="#a8a39a"
-        className={`rounded-2xl bg-gray-100 px-4 py-3 text-base text-gray-900 dark:bg-gray-800 dark:text-gray-100 ${className}`}
+        textAlignVertical="center"
+        style={[
+          {
+            height: 48,
+            paddingTop: 0,
+            paddingBottom: 0,
+            fontSize: 16,
+            lineHeight: 20,
+          },
+          style,
+        ]}
+        className={`rounded-2xl bg-gray-100 px-4 text-gray-900 dark:bg-gray-800 dark:text-gray-100 ${className}`}
         {...rest}
       />
     );

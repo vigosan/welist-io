@@ -1,15 +1,9 @@
 import * as AppleAuthentication from "expo-apple-authentication";
 import { useState } from "react";
-import {
-  Alert,
-  Platform,
-  Pressable,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { Alert, Platform, Pressable, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Input } from "@/components/Input";
 import { useSession } from "@/lib/auth";
 
 type Mode = "signIn" | "signUp";
@@ -113,7 +107,7 @@ export default function SignInScreen() {
         </View>
 
         {mode === "signUp" && (
-          <TextInput
+          <Input
             value={name}
             onChangeText={setName}
             placeholder={t("auth.namePlaceholder")}
@@ -121,10 +115,10 @@ export default function SignInScreen() {
             autoCorrect={false}
             autoComplete="name"
             textContentType="name"
-            className="mb-2 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-base text-gray-900 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100"
+            className="mb-2 w-full"
           />
         )}
-        <TextInput
+        <Input
           value={email}
           onChangeText={setEmail}
           placeholder={t("auth.emailPlaceholder")}
@@ -133,9 +127,9 @@ export default function SignInScreen() {
           autoComplete="email"
           keyboardType="email-address"
           textContentType="emailAddress"
-          className="mb-2 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-base text-gray-900 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100"
+          className="mb-2 w-full"
         />
-        <TextInput
+        <Input
           value={password}
           onChangeText={setPassword}
           placeholder={t("auth.passwordPlaceholder")}
@@ -144,7 +138,7 @@ export default function SignInScreen() {
           autoCorrect={false}
           autoComplete={mode === "signIn" ? "password" : "new-password"}
           textContentType={mode === "signIn" ? "password" : "newPassword"}
-          className="mb-3 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-base text-gray-900 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100"
+          className="mb-3 w-full"
         />
         <Pressable
           onPress={handleEmailSubmit}

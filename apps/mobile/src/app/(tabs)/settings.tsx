@@ -370,7 +370,9 @@ function PasswordField({
         autoCorrect={false}
         autoComplete="new-password"
         textContentType="newPassword"
-        className="rounded-xl border border-gray-200 bg-gray-50 px-3 py-3 pr-10 text-sm text-gray-900 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
+        textAlignVertical="center"
+        style={{ fontSize: 14, lineHeight: 18 }}
+        className="rounded-xl border border-gray-200 bg-gray-50 px-3 py-3 pr-10 text-gray-900 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
       />
       <Pressable
         onPress={onToggle}

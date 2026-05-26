@@ -67,7 +67,9 @@ export default function NewListScreen() {
             autoFocus
             returnKeyType="done"
             underlineColorAndroid="transparent"
-            className="rounded-2xl bg-gray-100 px-5 py-4 text-base text-gray-900 dark:bg-gray-800 dark:text-gray-100"
+            textAlignVertical="center"
+            style={{ fontSize: 16, lineHeight: 20 }}
+            className="rounded-2xl bg-gray-100 px-5 py-4 text-gray-900 dark:bg-gray-800 dark:text-gray-100"
           />
           <View className="flex-1" />
           <Pressable
