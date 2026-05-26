@@ -202,7 +202,27 @@ export default function ExploreScreen() {
               <ExploreCardSkeleton />
             </View>
           ) : (
-            <EmptyState icon="compass" title={t("explore.empty")} />
+            <EmptyState
+              icon="compass"
+              title={t("explore.empty")}
+              subtitle={isFiltered ? t("explore.emptySubtitle") : undefined}
+              action={
+                isFiltered ? (
+                  <Pressable
+                    onPress={() => {
+                      setQ("");
+                      setSort("trending");
+                      setCategory("");
+                    }}
+                    className="rounded-2xl border border-gray-200 px-5 py-3 active:bg-gray-50 dark:border-gray-700 dark:active:bg-gray-800"
+                  >
+                    <Text className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                      {t("explore.emptyAction")}
+                    </Text>
+                  </Pressable>
+                ) : undefined
+              }
+            />
           )
         }
         ListFooterComponent={

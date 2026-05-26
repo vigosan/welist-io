@@ -125,7 +125,71 @@ export default function SettingsScreen() {
               disabled={!me.data || updateProfile.isPending}
             />
           </Row>
+        </Card>
+
+        <SectionLabel>{t("profile.preferences")}</SectionLabel>
+        <Card>
+          <View className="mb-2">
+            <Text className="text-xs text-gray-500 dark:text-gray-400">
+              {t("profile.language")}
+            </Text>
+          </View>
+          <View className="flex-row gap-2">
+            {LANGS.map((lng) => (
+              <Pressable
+                key={lng}
+                onPress={() => setLanguage(lng)}
+                className={`rounded-full px-4 py-1.5 ${
+                  currentLang === lng
+                    ? "bg-gray-900 dark:bg-gray-100"
+                    : "bg-gray-100 dark:bg-gray-800"
+                }`}
+              >
+                <Text
+                  className={`text-xs font-medium ${
+                    currentLang === lng
+                      ? "text-white dark:text-gray-900"
+                      : "text-gray-700 dark:text-gray-300"
+                  }`}
+                >
+                  {lng.toUpperCase()}
+                </Text>
+              </Pressable>
+            ))}
+          </View>
           <Divider />
+          <View className="mb-2">
+            <Text className="text-xs text-gray-500 dark:text-gray-400">
+              {t("profile.appearance")}
+            </Text>
+          </View>
+          <View className="flex-row gap-2">
+            {THEMES.map((theme) => (
+              <Pressable
+                key={theme}
+                onPress={() => onTheme(theme)}
+                className={`rounded-full px-4 py-1.5 ${
+                  currentTheme === theme
+                    ? "bg-gray-900 dark:bg-gray-100"
+                    : "bg-gray-100 dark:bg-gray-800"
+                }`}
+              >
+                <Text
+                  className={`text-xs font-medium ${
+                    currentTheme === theme
+                      ? "text-white dark:text-gray-900"
+                      : "text-gray-700 dark:text-gray-300"
+                  }`}
+                >
+                  {t(`profile.theme${theme[0].toUpperCase()}${theme.slice(1)}` as never)}
+                </Text>
+              </Pressable>
+            ))}
+          </View>
+        </Card>
+
+        <SectionLabel>{t("profile.notifications")}</SectionLabel>
+        <Card>
           <Row>
             <View className="flex-1 pr-3">
               <Text className="text-sm text-gray-900 dark:text-gray-100">
@@ -195,67 +259,6 @@ export default function SettingsScreen() {
                 : t("profile.savePassword")}
             </Text>
           </Pressable>
-        </Card>
-
-        <SectionLabel>{t("profile.preferences")}</SectionLabel>
-        <Card>
-          <View className="mb-2">
-            <Text className="text-xs text-gray-500 dark:text-gray-400">
-              {t("profile.language")}
-            </Text>
-          </View>
-          <View className="flex-row gap-2">
-            {LANGS.map((lng) => (
-              <Pressable
-                key={lng}
-                onPress={() => setLanguage(lng)}
-                className={`rounded-full px-4 py-1.5 ${
-                  currentLang === lng
-                    ? "bg-gray-900 dark:bg-gray-100"
-                    : "bg-gray-100 dark:bg-gray-800"
-                }`}
-              >
-                <Text
-                  className={`text-xs font-medium ${
-                    currentLang === lng
-                      ? "text-white dark:text-gray-900"
-                      : "text-gray-700 dark:text-gray-300"
-                  }`}
-                >
-                  {lng.toUpperCase()}
-                </Text>
-              </Pressable>
-            ))}
-          </View>
-          <Divider />
-          <View className="mb-2">
-            <Text className="text-xs text-gray-500 dark:text-gray-400">
-              {t("profile.appearance")}
-            </Text>
-          </View>
-          <View className="flex-row gap-2">
-            {THEMES.map((theme) => (
-              <Pressable
-                key={theme}
-                onPress={() => onTheme(theme)}
-                className={`rounded-full px-4 py-1.5 ${
-                  currentTheme === theme
-                    ? "bg-gray-900 dark:bg-gray-100"
-                    : "bg-gray-100 dark:bg-gray-800"
-                }`}
-              >
-                <Text
-                  className={`text-xs font-medium ${
-                    currentTheme === theme
-                      ? "text-white dark:text-gray-900"
-                      : "text-gray-700 dark:text-gray-300"
-                  }`}
-                >
-                  {t(`profile.theme${theme[0].toUpperCase()}${theme.slice(1)}` as never)}
-                </Text>
-              </Pressable>
-            ))}
-          </View>
         </Card>
 
         <SectionLabel>{t("profile.about")}</SectionLabel>

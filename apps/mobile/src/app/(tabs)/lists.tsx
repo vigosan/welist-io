@@ -207,7 +207,21 @@ export default function MyListsScreen() {
               <MyListSkeleton />
             </View>
           ) : (
-            <EmptyState icon="list" title={t("lists.empty")} />
+            <EmptyState
+              icon="list"
+              title={t("lists.empty")}
+              subtitle={t("lists.emptySubtitle")}
+              action={
+                <Pressable
+                  onPress={() => router.push("/new-list")}
+                  className="rounded-2xl bg-gray-900 px-5 py-3 active:opacity-80 dark:bg-gray-100"
+                >
+                  <Text className="text-sm font-medium text-white dark:text-gray-900">
+                    {t("lists.emptyAction")}
+                  </Text>
+                </Pressable>
+              }
+            />
           )
         }
         ListFooterComponent={

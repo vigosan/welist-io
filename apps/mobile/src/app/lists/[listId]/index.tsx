@@ -25,6 +25,7 @@ import Swipeable from "react-native-gesture-handler/Swipeable";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ActionDrawer, type DrawerAction } from "@/components/ActionDrawer";
 import { AnimatedCheckbox } from "@/components/AnimatedCheckbox";
+import { EmptyState } from "@/components/EmptyState";
 import { LocationPickerModal } from "@/components/LocationPickerModal";
 import { ItemRowSkeleton } from "@/components/Skeleton";
 import { ScreenHeader } from "@/components/ScreenHeader";
@@ -393,6 +394,27 @@ export default function ListDetailScreen() {
               <ItemRowSkeleton />
               <ItemRowSkeleton />
             </View>
+          ) : filter === "all" ? (
+            <EmptyState
+              icon="list"
+              title={t("list.emptyTitle")}
+              subtitle={t("list.emptySubtitle")}
+              action={
+                <Pressable
+                  onPress={() =>
+                    router.push({
+                      pathname: "/lists/[listId]/new-item",
+                      params: { listId },
+                    })
+                  }
+                  className="rounded-2xl bg-gray-900 px-5 py-3 active:opacity-80 dark:bg-gray-100"
+                >
+                  <Text className="text-sm font-medium text-white dark:text-gray-900">
+                    {t("list.emptyAction")}
+                  </Text>
+                </Pressable>
+              }
+            />
           ) : (
             <Text className="mt-10 text-center text-sm text-gray-500 dark:text-gray-400">
               {t("common.noItems")}
