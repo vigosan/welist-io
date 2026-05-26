@@ -20,6 +20,11 @@ export const LIST_CATEGORIES = [
   "wishlist",
   "sports",
   "art",
+  "events",
+  "health",
+  "tech",
+  "nature",
+  "home",
   "adult",
   "other",
 ] as const;
