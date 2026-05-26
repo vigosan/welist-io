@@ -89,7 +89,7 @@ export default function SettingsScreen() {
       edges={["top"]}
     >
       <ScreenHeader title={t("nav.settings")} />
-      <ScrollView contentContainerClassName="px-5 pb-12">
+      <ScrollView contentContainerClassName="px-5 pb-28">
         <Card>
           <View className="flex-row items-center gap-3">
             <Avatar

@@ -76,7 +76,7 @@ export default function UsersScreen() {
       <FlatList
         data={users}
         keyExtractor={(u) => u.id}
-        contentContainerClassName="px-6 pb-10"
+        contentContainerClassName="px-6 pb-28"
         refreshControl={
           <RefreshControl
             refreshing={query.isRefetching && !query.isFetchingNextPage}

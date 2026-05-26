@@ -177,7 +177,7 @@ export default function ExploreScreen() {
       <FlatList
         data={lists}
         keyExtractor={(it) => it.id}
-        contentContainerClassName="px-6 pb-10 pt-3"
+        contentContainerClassName="px-6 pb-28 pt-3"
         refreshControl={
           <RefreshControl
             refreshing={query.isRefetching && !query.isFetchingNextPage}
