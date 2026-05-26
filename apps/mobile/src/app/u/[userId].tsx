@@ -1,5 +1,6 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Check, ChevronRight, Flag, Lock } from "lucide-react-native";
+import { useIsDark } from "@/hooks/useIsDark";
 import {
   ActionSheetIOS,
   Alert,
@@ -29,6 +30,7 @@ export default function UserProfileScreen() {
   const { userId } = useLocalSearchParams<{ userId: string }>();
   const { session } = useSession();
   const router = useRouter();
+  const isDark = useIsDark();
   const profile = useUserProfile(userId);
   const achievements = useUserAchievements(userId);
   const signedIn = session.status === "signed-in";
@@ -124,7 +126,7 @@ export default function UserProfileScreen() {
               hitSlop={8}
               className="h-9 w-9 items-center justify-center rounded-full active:bg-black/[0.05] dark:active:bg-white/[0.06]"
             >
-              <Flag color="#0c0c0b" size={18} />
+              <Flag color={isDark ? "#f0ede8" : "#0c0c0b"} size={18} />
             </Pressable>
           ) : null
         }
@@ -149,11 +151,7 @@ export default function UserProfileScreen() {
             >
               {status.data.isFollowing && (
                 <Check
-                  color={
-                    status.data.isFollowing
-                      ? "#0c0c0b"
-                      : "#ffffff"
-                  }
+                  color={isDark ? "#f0ede8" : "#0c0c0b"}
                   size={14}
                   strokeWidth={2.5}
                 />
@@ -273,7 +271,11 @@ export default function UserProfileScreen() {
                     }`}
                   >
                     {unlocked ? (
-                      <Check color="#ffffff" size={18} strokeWidth={2.5} />
+                      <Check
+                        color={isDark ? "#0c0c0b" : "#ffffff"}
+                        size={18}
+                        strokeWidth={2.5}
+                      />
                     ) : (
                       <Lock color="#a8a39a" size={16} />
                     )}

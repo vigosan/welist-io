@@ -23,6 +23,7 @@ import { ScreenHeader } from "@/components/ScreenHeader";
 import { MyListSkeleton } from "@/components/Skeleton";
 import { useDeleteList, useMyLists } from "@/hooks/lists";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
+import { useIsDark } from "@/hooks/useIsDark";
 import type { MyListsSort, MyListsVisibility } from "@/services/lists";
 import type { MyListItem } from "@/types";
 
@@ -32,6 +33,7 @@ const VISIBILITIES: MyListsVisibility[] = ["all", "public", "private"];
 export default function MyListsScreen() {
   const { t } = useTranslation();
   const router = useRouter();
+  const isDark = useIsDark();
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<MyListsSort>("recent");
   const [visibility, setVisibility] = useState<MyListsVisibility>("all");
@@ -82,7 +84,13 @@ export default function MyListsScreen() {
             >
               <ListFilter
                 color={
-                  filtersOpen || isFiltered ? "#ffffff" : "#0c0c0b"
+                  filtersOpen || isFiltered
+                    ? isDark
+                      ? "#0c0c0b"
+                      : "#ffffff"
+                    : isDark
+                      ? "#f0ede8"
+                      : "#0c0c0b"
                 }
                 size={18}
               />
@@ -93,7 +101,11 @@ export default function MyListsScreen() {
               hitSlop={8}
               className="ml-2 h-9 w-9 items-center justify-center rounded-full bg-gray-900 active:opacity-80 dark:bg-gray-100"
             >
-              <Plus color="#ffffff" size={20} strokeWidth={2.4} />
+              <Plus
+                color={isDark ? "#0c0c0b" : "#ffffff"}
+                size={20}
+                strokeWidth={2.4}
+              />
             </Pressable>
           </View>
         }

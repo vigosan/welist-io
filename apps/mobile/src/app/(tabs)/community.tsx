@@ -1,6 +1,7 @@
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import { ChevronRight, ListFilter } from "lucide-react-native";
+import { useIsDark } from "@/hooks/useIsDark";
 import { useMemo, useState } from "react";
 import {
   ActivityIndicator,
@@ -24,6 +25,7 @@ import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 
 export default function UsersScreen() {
   const { t } = useTranslation();
+  const isDark = useIsDark();
   const router = useRouter();
   const [q, setQ] = useState("");
   const [filtersOpen, setFiltersOpen] = useState(false);
@@ -56,7 +58,15 @@ export default function UsersScreen() {
             }`}
           >
             <ListFilter
-              color={filtersOpen || isFiltered ? "#ffffff" : "#0c0c0b"}
+              color={
+                filtersOpen || isFiltered
+                  ? isDark
+                    ? "#0c0c0b"
+                    : "#ffffff"
+                  : isDark
+                    ? "#f0ede8"
+                    : "#0c0c0b"
+              }
               size={18}
             />
           </Pressable>

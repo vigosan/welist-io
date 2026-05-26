@@ -51,18 +51,20 @@ export function ProgressDonut({
         strokeWidth={strokeWidth}
         fill="none"
       />
-      <AnimatedCircle
-        cx={size / 2}
-        cy={size / 2}
-        r={r}
-        stroke={fill}
-        strokeWidth={strokeWidth}
-        fill="none"
-        strokeDasharray={c}
-        strokeDashoffset={dashOffset}
-        strokeLinecap="round"
-        transform={`rotate(-90 ${size / 2} ${size / 2})`}
-      />
+      {target > 0 && (
+        <AnimatedCircle
+          cx={size / 2}
+          cy={size / 2}
+          r={r}
+          stroke={fill}
+          strokeWidth={strokeWidth}
+          fill="none"
+          strokeDasharray={c}
+          strokeDashoffset={dashOffset}
+          strokeLinecap="round"
+          transform={`rotate(-90 ${size / 2} ${size / 2})`}
+        />
+      )}
     </Svg>
   );
 }

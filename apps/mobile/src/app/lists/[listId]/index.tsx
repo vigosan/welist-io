@@ -49,6 +49,7 @@ import {
 } from "@/hooks/lists";
 import { useReport } from "@/hooks/users";
 import { useRateList } from "@/hooks/rating";
+import { useIsDark } from "@/hooks/useIsDark";
 import { useSession } from "@/lib/auth";
 import { type FilterMode, filterItems } from "@/lib/items-filter";
 import { mapsUrl } from "@/lib/maps";
@@ -62,6 +63,7 @@ export default function ListDetailScreen() {
   const { t } = useTranslation();
   const { listId } = useLocalSearchParams<{ listId: string }>();
   const router = useRouter();
+  const isDark = useIsDark();
   const [filter, setFilter] = useState<FilterMode>("all");
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [editing, setEditing] = useState<Item | null>(null);
@@ -292,7 +294,13 @@ export default function ListDetailScreen() {
             >
               <ListFilter
                 color={
-                  filtersOpen || filter !== "all" ? "#ffffff" : "#0c0c0b"
+                  filtersOpen || filter !== "all"
+                    ? isDark
+                      ? "#0c0c0b"
+                      : "#ffffff"
+                    : isDark
+                      ? "#f0ede8"
+                      : "#0c0c0b"
                 }
                 size={18}
               />
@@ -303,7 +311,7 @@ export default function ListDetailScreen() {
               hitSlop={8}
               className="h-9 w-9 items-center justify-center rounded-full active:bg-black/[0.05] dark:active:bg-white/[0.06]"
             >
-              <MoreVertical color="#0c0c0b" size={22} />
+              <MoreVertical color={isDark ? "#f0ede8" : "#0c0c0b"} size={22} />
             </Pressable>
             <Pressable
               onPress={() =>
@@ -316,7 +324,11 @@ export default function ListDetailScreen() {
               hitSlop={8}
               className="ml-2 h-9 w-9 items-center justify-center rounded-full bg-gray-900 active:opacity-80 dark:bg-gray-100"
             >
-              <Plus color="#ffffff" size={20} strokeWidth={2.4} />
+              <Plus
+                color={isDark ? "#0c0c0b" : "#ffffff"}
+                size={20}
+                strokeWidth={2.4}
+              />
             </Pressable>
           </View>
         }
