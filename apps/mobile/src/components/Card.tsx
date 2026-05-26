@@ -52,10 +52,10 @@ export function PressableCard({
 }: PressableCardProps) {
   return (
     <Pressable
-      style={({ pressed }) => [
+      style={(state) => [
         SHADOW,
-        pressed && Platform.OS === "ios" ? { opacity: 0.85 } : null,
-        typeof style === "function" ? style({ pressed }) : style,
+        state.pressed && Platform.OS === "ios" ? { opacity: 0.85 } : null,
+        typeof style === "function" ? style(state) : style,
       ]}
       android_ripple={RIPPLE}
       className={`overflow-hidden rounded-2xl bg-white dark:bg-gray-900 ${className}`}
