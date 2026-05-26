@@ -20,8 +20,7 @@
       "package": "io.wilist.app",
       "adaptiveIcon": {
         "backgroundColor": "#0c0c0b",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "monochromeImage": "./assets/images/android-icon-foreground.png"
+        "foregroundImage": "./assets/images/android-icon-foreground.png"
       },
       "predictiveBackGestureEnabled": false,
       "intentFilters": [
