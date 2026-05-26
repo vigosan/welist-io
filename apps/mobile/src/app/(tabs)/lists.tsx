@@ -215,7 +215,7 @@ export default function MyListsScreen() {
       <FlatList
         data={lists}
         keyExtractor={(it) => it.id}
-        contentContainerClassName="px-6 pb-28"
+        contentContainerClassName="px-6 pb-10"
         refreshControl={
           <RefreshControl
             refreshing={query.isRefetching && !query.isFetchingNextPage}

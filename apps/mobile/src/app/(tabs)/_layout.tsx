@@ -1,4 +1,3 @@
-import { BlurView } from "expo-blur";
 import { Tabs } from "expo-router";
 import {
   Compass,
@@ -9,7 +8,7 @@ import {
 import { useColorScheme } from "nativewind";
 import type { ComponentType } from "react";
 import { useTranslation } from "react-i18next";
-import { Platform, StyleSheet, View } from "react-native";
+import { StyleSheet } from "react-native";
 
 type IconProps = { color: string; size: number };
 const TabIcon = ({
@@ -31,33 +30,13 @@ export default function TabsLayout() {
         tabBarActiveTintColor: dark ? "#f0ede8" : "#0c0c0b",
         tabBarInactiveTintColor: dark ? "#7a766c" : "#a8a39a",
         tabBarStyle: {
-          position: "absolute",
-          borderTopWidth: 0,
-          backgroundColor: "transparent",
+          backgroundColor: dark ? "#0a0a0a" : "#fafaf8",
+          borderTopWidth: StyleSheet.hairlineWidth,
+          borderTopColor: dark
+            ? "rgba(255,255,255,0.08)"
+            : "rgba(0,0,0,0.08)",
           elevation: 0,
         },
-        tabBarBackground: () => (
-          <View style={StyleSheet.absoluteFill}>
-            <BlurView
-              intensity={Platform.OS === "ios" ? 80 : 100}
-              tint={dark ? "dark" : "light"}
-              experimentalBlurMethod="dimezisBlurView"
-              style={StyleSheet.absoluteFill}
-            />
-            <View
-              style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                right: 0,
-                height: StyleSheet.hairlineWidth,
-                backgroundColor: dark
-                  ? "rgba(255,255,255,0.08)"
-                  : "rgba(0,0,0,0.08)",
-              }}
-            />
-          </View>
-        ),
       }}
     >
       <Tabs.Screen
