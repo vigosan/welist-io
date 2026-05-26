@@ -1279,6 +1279,49 @@ describe("GET /api/explore", () => {
     };
     expect(body.items[0].isParticipating).toBe(false);
   });
+
+  it("does not consult user_settings for anonymous viewers requesting adult", async () => {
+    mockDb.select.mockReturnValue(chainMock([]));
+    const res = await app.request("/api/explore?category=adult");
+    expect(res.status).toBe(200);
+    expect(mockDb.query.userSettings.findFirst).not.toHaveBeenCalled();
+  });
+
+  it("consults user_settings when logged-in viewer requests adult category", async () => {
+    mockGetAuthUser.mockResolvedValueOnce({ session: { user: { id: "u1" } } });
+    mockDb.query.userSettings.findFirst.mockResolvedValue({
+      userId: "u1",
+      showAdult: false,
+    });
+    mockDb.select.mockReturnValue(chainMock([]));
+
+    const res = await app.request("/api/explore?category=adult");
+    expect(res.status).toBe(200);
+    expect(mockDb.query.userSettings.findFirst).toHaveBeenCalledTimes(1);
+  });
+
+  it("allows adult category to pass through when viewer has showAdult=true", async () => {
+    mockGetAuthUser.mockResolvedValueOnce({ session: { user: { id: "u1" } } });
+    mockDb.query.userSettings.findFirst.mockResolvedValue({
+      userId: "u1",
+      showAdult: true,
+    });
+    const rows = [
+      {
+        id: "l1",
+        name: "Adult List",
+        slug: null,
+        createdAt: new Date("2024-01-01"),
+        itemCount: 0,
+      },
+    ];
+    mockDb.select.mockReturnValue(chainMock(rows));
+
+    const res = await app.request("/api/explore?category=adult");
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as { items: unknown[] };
+    expect(body.items).toHaveLength(1);
+  });
 });
 
 describe("GET /api/explore/:listId", () => {

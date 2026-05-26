@@ -11,7 +11,9 @@ import {
   useDeleteAccount,
   useSetPassword,
   useUpdateProfile,
+  useUpdateSettings,
   useUserMe,
+  useUserSettings,
 } from "@/hooks/useList";
 import { useStripeAccountStatus } from "@/hooks/useStripeAccount";
 import { queryKeys } from "@/lib/query-keys";
@@ -39,6 +41,8 @@ function SettingsPage() {
   } = useStripeAccountStatus();
   const { data: userMe } = useUserMe();
   const updateProfile = useUpdateProfile();
+  const { data: userSettings } = useUserSettings();
+  const updateSettings = useUpdateSettings();
   const [connecting, setConnecting] = useState(false);
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
@@ -214,6 +218,48 @@ function SettingsPage() {
               <span
                 className={`inline-block h-3.5 w-3.5 rounded-full bg-white dark:bg-[#0c0c0b] shadow transition-transform duration-150 ${
                   (userMe?.emailOptIn ?? true)
+                    ? "translate-x-4.5"
+                    : "translate-x-0.5"
+                }`}
+              />
+            </button>
+          </label>
+        </section>
+
+        <section className="bg-white dark:bg-white/[0.02] border border-black/[0.08] dark:border-white/[0.08] rounded-2xl p-5 flex flex-col gap-4">
+          <div>
+            <p className="text-sm font-semibold text-[#0c0c0b] dark:text-[#f0ede8]">
+              Contenido para adultos
+            </p>
+            <p className="text-xs text-gray-500 dark:text-[#a0a09c] mt-0.5 leading-relaxed">
+              Si lo activas, las listas marcadas como +18 aparecerán en Explore.
+              Por defecto está desactivado.
+            </p>
+          </div>
+          <label className="flex items-center justify-between gap-3 cursor-pointer">
+            <span className="text-sm text-[#0c0c0b] dark:text-[#f0ede8]">
+              Mostrar contenido para adultos (+18)
+            </span>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={userSettings?.showAdult ?? false}
+              data-testid="show-adult-toggle"
+              onClick={() =>
+                updateSettings.mutate({
+                  showAdult: !(userSettings?.showAdult ?? false),
+                })
+              }
+              disabled={updateSettings.isPending || userSettings === undefined}
+              className={`cursor-pointer relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors duration-150 focus:outline-none disabled:opacity-40 ${
+                (userSettings?.showAdult ?? false)
+                  ? "bg-[#0c0c0b] dark:bg-[#f0ede8]"
+                  : "bg-black/[0.10] dark:bg-white/[0.10]"
+              }`}
+            >
+              <span
+                className={`inline-block h-3.5 w-3.5 rounded-full bg-white dark:bg-[#0c0c0b] shadow transition-transform duration-150 ${
+                  (userSettings?.showAdult ?? false)
                     ? "translate-x-4.5"
                     : "translate-x-0.5"
                 }`}

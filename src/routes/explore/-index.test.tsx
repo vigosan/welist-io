@@ -22,6 +22,7 @@ import {
   useExplore,
   useExploreDetail,
   useExploreItems,
+  useUserSettings,
 } from "@/hooks/useList";
 
 const EXPLORE_A: ExploreItem = {
@@ -125,6 +126,9 @@ function setupMocks({
   vi.mocked(useAcceptChallenge).mockReturnValue({
     mutate: acceptMutate,
     isPending: false,
+  } as never);
+  vi.mocked(useUserSettings).mockReturnValue({
+    data: { showAdult: false },
   } as never);
 }
 
