@@ -29,6 +29,7 @@ import { useUserSearch } from "@/hooks/users";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { useSession } from "@/lib/auth";
 import { LIST_CATEGORIES, type ListCategory } from "@/lib/categories";
+import { formatRelativeTime } from "@/lib/relative-time";
 
 export default function ListSettingsScreen() {
   const { t } = useTranslation();
@@ -288,7 +289,7 @@ function Toggle({
 }
 
 function ActivitySection({ listId }: { listId: string }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const activity = useListActivity(listId, true);
 
   if (activity.isLoading) {
@@ -326,7 +327,7 @@ function ActivitySection({ listId }: { listId: string }) {
               {t(`activity.${a.action}`)}
             </Text>
             <Text className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
-              {new Date(a.createdAt).toLocaleString()}
+              {formatRelativeTime(a.createdAt, i18n.language)}
             </Text>
           </View>
         ))
