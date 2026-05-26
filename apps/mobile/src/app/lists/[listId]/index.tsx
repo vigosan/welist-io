@@ -645,26 +645,32 @@ function SwipeableItemRow({
             close();
             onToggle();
           }}
-          className="mb-2 mr-2 flex-1 items-start justify-center rounded-2xl bg-gray-900 pl-6 dark:bg-gray-100"
+          style={{ flex: 1, marginBottom: 8, marginRight: 8 }}
         >
-          <Text className="text-sm font-semibold text-white dark:text-gray-900">
-            {toggleLabel}
-          </Text>
+          <View className="h-full flex-1 items-start justify-center rounded-2xl bg-gray-900 pl-6 dark:bg-gray-100">
+            <Text className="text-sm font-semibold text-white dark:text-gray-900">
+              {toggleLabel}
+            </Text>
+          </View>
         </TouchableOpacity>
       )}
       renderRightActions={() => (
-        <View className="mb-2 ml-2 flex-row gap-2">
+        <View
+          style={{ marginBottom: 8, marginLeft: 8 }}
+          className="flex-row gap-2"
+        >
           <TouchableOpacity
             activeOpacity={0.85}
             onPress={() => {
               close();
               onEdit();
             }}
-            className="items-center justify-center rounded-2xl bg-gray-200 px-5 dark:bg-gray-800"
           >
-            <Text className="text-sm font-semibold text-gray-900 dark:text-gray-100">
-              {editLabel}
-            </Text>
+            <View className="h-full items-center justify-center rounded-2xl bg-gray-200 px-5 dark:bg-gray-800">
+              <Text className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                {editLabel}
+              </Text>
+            </View>
           </TouchableOpacity>
           <TouchableOpacity
             activeOpacity={0.85}
@@ -672,11 +678,12 @@ function SwipeableItemRow({
               close();
               onDelete();
             }}
-            className="items-center justify-center rounded-2xl bg-red-600 px-5"
           >
-            <Text className="text-sm font-semibold text-white">
-              {deleteLabel}
-            </Text>
+            <View className="h-full items-center justify-center rounded-2xl bg-red-600 px-5">
+              <Text className="text-sm font-semibold text-white">
+                {deleteLabel}
+              </Text>
+            </View>
           </TouchableOpacity>
         </View>
       )}
