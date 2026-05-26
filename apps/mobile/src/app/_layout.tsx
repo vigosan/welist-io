@@ -100,6 +100,14 @@ export default function RootLayout() {
                   gestureDirection: "vertical",
                 }}
               />
+              <Stack.Screen
+                name="lists/[listId]/new-item"
+                options={{
+                  presentation: "modal",
+                  animation: "slide_from_bottom",
+                  gestureDirection: "vertical",
+                }}
+              />
             </Stack>
           </AuthGate>
         </SessionProvider>

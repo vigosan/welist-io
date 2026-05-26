@@ -119,6 +119,8 @@ export const es = {
   },
   list: {
     addPlaceholder: "Añadir un item",
+    newItemTitle: "Nuevo ítem",
+    newItemHint: "Pega varias líneas para añadir varios ítems a la vez.",
     filterAll: "todos",
     filterPending: "pendientes",
     filterDone: "hechos",

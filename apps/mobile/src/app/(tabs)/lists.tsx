@@ -84,20 +84,20 @@ export default function MyListsScreen() {
               />
             </Pressable>
             <Pressable
-              onPress={() => router.push("/new-list")}
-              accessibilityLabel={t("lists.newTitle")}
-              hitSlop={8}
-              className="h-9 w-9 items-center justify-center rounded-full active:bg-black/[0.05] dark:active:bg-white/[0.06]"
-            >
-              <Plus color="#0c0c0b" size={22} strokeWidth={2.4} />
-            </Pressable>
-            <Pressable
               onPress={() => router.push("/help")}
               accessibilityLabel={t("nav.help")}
               hitSlop={8}
               className="h-9 w-9 items-center justify-center rounded-full active:bg-black/[0.05] dark:active:bg-white/[0.06]"
             >
               <HelpCircle color="#0c0c0b" size={20} />
+            </Pressable>
+            <Pressable
+              onPress={() => router.push("/new-list")}
+              accessibilityLabel={t("lists.newTitle")}
+              hitSlop={8}
+              className="ml-2 h-9 w-9 items-center justify-center rounded-full bg-gray-900 active:opacity-80 dark:bg-gray-100"
+            >
+              <Plus color="#ffffff" size={20} strokeWidth={2.4} />
             </Pressable>
           </View>
         }

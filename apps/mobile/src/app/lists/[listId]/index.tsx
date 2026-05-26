@@ -1,5 +1,5 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { ListFilter, MoreVertical } from "lucide-react-native";
+import { ListFilter, MoreVertical, Plus } from "lucide-react-native";
 import * as Clipboard from "expo-clipboard";
 import * as Haptics from "expo-haptics";
 import { useMemo, useRef, useState } from "react";
@@ -25,15 +25,12 @@ import DraggableFlatList, {
 import Swipeable from "react-native-gesture-handler/Swipeable";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LocationPickerModal } from "@/components/LocationPickerModal";
-import { InputRow } from "@/components/Input";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import {
   renderInlineMarkdown,
   stripInlineMarkdown,
 } from "@/lib/inline-markdown";
 import {
-  useAddItem,
-  useBulkAddItems,
   useDeleteItem,
   useItems,
   useReorderItems,
@@ -61,7 +58,6 @@ export default function ListDetailScreen() {
   const { t } = useTranslation();
   const { listId } = useLocalSearchParams<{ listId: string }>();
   const router = useRouter();
-  const [newText, setNewText] = useState("");
   const [filter, setFilter] = useState<FilterMode>("all");
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [editing, setEditing] = useState<Item | null>(null);
@@ -72,8 +68,6 @@ export default function ListDetailScreen() {
   const { session } = useSession();
   const list = useList(listId);
   const items = useItems(listId);
-  const add = useAddItem(listId);
-  const bulkAdd = useBulkAddItems(listId);
   const toggle = useToggleItem(listId);
   const update = useUpdateItem(listId);
   const remove = useDeleteItem(listId);
@@ -93,27 +87,6 @@ export default function ListDetailScreen() {
     () => filterItems(items.data ?? [], filter),
     [items.data, filter]
   );
-
-  const submitAdd = () => {
-    const lines = newText
-      .split("\n")
-      .map((l) => l.trim())
-      .filter(Boolean);
-    if (lines.length === 0) return;
-    if (lines.length === 1) {
-      add.mutate(lines[0], {
-        onSuccess: () => setNewText(""),
-        onError: (e) =>
-          Alert.alert(t("list.couldNotAdd"), String((e as Error).message)),
-      });
-      return;
-    }
-    bulkAdd.mutate(lines, {
-      onSuccess: () => setNewText(""),
-      onError: (e) =>
-        Alert.alert(t("list.couldNotAdd"), String((e as Error).message)),
-    });
-  };
 
   const openItemMenu = (item: Item) => {
     const hasCoords = !!(item.latitude && item.longitude && item.placeName);
@@ -350,6 +323,19 @@ export default function ListDetailScreen() {
             >
               <MoreVertical color="#0c0c0b" size={22} />
             </Pressable>
+            <Pressable
+              onPress={() =>
+                router.push({
+                  pathname: "/lists/[listId]/new-item",
+                  params: { listId },
+                })
+              }
+              accessibilityLabel={t("list.newItemTitle")}
+              hitSlop={8}
+              className="ml-2 h-9 w-9 items-center justify-center rounded-full bg-gray-900 active:opacity-80 dark:bg-gray-100"
+            >
+              <Plus color="#ffffff" size={20} strokeWidth={2.4} />
+            </Pressable>
           </View>
         }
       />
@@ -379,29 +365,6 @@ export default function ListDetailScreen() {
         </View>
       )}
 
-      <View className="mx-5 mt-1 mb-3">
-        <InputRow>
-          <TextInput
-            value={newText}
-            onChangeText={setNewText}
-            onSubmitEditing={submitAdd}
-            placeholder={t("list.addPlaceholder")}
-            placeholderTextColor="#a8a39a"
-            returnKeyType="done"
-            underlineColorAndroid="transparent"
-            className="flex-1 px-3 py-3 text-base text-gray-900 dark:text-gray-100"
-          />
-          <Pressable
-            onPress={submitAdd}
-            disabled={!newText.trim() || add.isPending}
-            className="mr-1 rounded-xl bg-gray-900 px-4 py-2 active:opacity-80 disabled:opacity-40 dark:bg-gray-100"
-          >
-            <Text className="text-sm font-medium text-white dark:text-gray-900">
-              {t("common.add")}
-            </Text>
-          </Pressable>
-        </InputRow>
-      </View>
 
       {filtersOpen && (
       <View className="mx-6 mb-3 flex-row gap-2">
