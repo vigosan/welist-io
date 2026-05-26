@@ -8,7 +8,16 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "lint": "expo lint",
-    "check:types": "tsc --noEmit"
+    "check:types": "tsc --noEmit",
+    "build:dev:ios": "eas build --profile development --platform ios",
+    "build:dev:android": "eas build --profile development --platform android",
+    "build:preview:ios": "eas build --profile preview --platform ios",
+    "build:preview:android": "eas build --profile preview --platform android",
+    "build:prod:ios": "eas build --profile production --platform ios",
+    "build:prod:android": "eas build --profile production --platform android",
+    "build:prod": "eas build --profile production --platform all",
+    "submit:ios": "eas submit --profile production --platform ios",
+    "submit:android": "eas submit --profile production --platform android"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.74.4",

@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { type Href, Stack, useRouter, useSegments } from "expo-router";
+import { StatusBar } from "expo-status-bar";
 import { useColorScheme } from "nativewind";
 import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
@@ -77,6 +78,7 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
+      <StatusBar style="auto" />
       <QueryClientProvider client={queryClient}>
         <SessionProvider>
           <AuthGate>

@@ -4,17 +4,38 @@
     "appVersionSource": "remote"
   },
   "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID": "3382559471-sfjva42tqv0c3elsjf8spiuanh6fgik3.apps.googleusercontent.com",
+        "EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID": "3382559471-q1bdc5ov3ekjt3ungri7l7jaffi5f94p.apps.googleusercontent.com",
+        "EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID": "3382559471-4kfsn7shqod5ee9vaclktn5fsee7m1t9.apps.googleusercontent.com"
+      }
+    },
     "preview": {
       "distribution": "internal",
       "android": {
         "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://www.welist.io",
+        "EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID": "3382559471-sfjva42tqv0c3elsjf8spiuanh6fgik3.apps.googleusercontent.com",
+        "EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID": "3382559471-q1bdc5ov3ekjt3ungri7l7jaffi5f94p.apps.googleusercontent.com",
+        "EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID": "3382559471-4kfsn7shqod5ee9vaclktn5fsee7m1t9.apps.googleusercontent.com"
       }
     },
     "production": {
       "android": {
         "buildType": "app-bundle"
       },
-      "autoIncrement": true
+      "autoIncrement": true,
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://www.welist.io",
+        "EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID": "3382559471-sfjva42tqv0c3elsjf8spiuanh6fgik3.apps.googleusercontent.com",
+        "EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID": "3382559471-q1bdc5ov3ekjt3ungri7l7jaffi5f94p.apps.googleusercontent.com",
+        "EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID": "3382559471-4kfsn7shqod5ee9vaclktn5fsee7m1t9.apps.googleusercontent.com"
+      }
     }
   },
   "submit": {
