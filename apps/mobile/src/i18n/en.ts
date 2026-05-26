@@ -204,6 +204,9 @@ export const en = {
     show: "Show password",
     hide: "Hide password",
     deleteAccount: "Delete my account",
+    about: "About",
+    privacy: "Privacy policy",
+    terms: "Terms of service",
     deleteAccountConfirmTitle: "Delete your account?",
     deleteAccountConfirmBody:
       "Your account, your lists and all your data will be removed. This cannot be undone.",

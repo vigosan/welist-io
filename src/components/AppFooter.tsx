@@ -1,6 +1,5 @@
+import { Link } from "@tanstack/react-router";
 import { useTranslation } from "@/i18n/service";
-
-const footerLinks = ["Privacidad", "Términos", "Twitter"];
 
 export function AppFooter() {
   const { t } = useTranslation();
@@ -18,15 +17,20 @@ export function AppFooter() {
           {t("home.footer", { year: new Date().getFullYear() })}
         </span>
         <div className="flex gap-5">
-          {footerLinks.map((label) => (
-            <span
-              key={label}
-              className="text-[11px]"
-              style={{ color: "#a0a09c" }}
-            >
-              {label}
-            </span>
-          ))}
+          <Link
+            to="/privacy"
+            className="text-[11px] hover:text-[#0c0c0b] dark:hover:text-[#f0ede8] transition no-underline"
+            style={{ color: "#a0a09c" }}
+          >
+            Privacidad
+          </Link>
+          <Link
+            to="/terms"
+            className="text-[11px] hover:text-[#0c0c0b] dark:hover:text-[#f0ede8] transition no-underline"
+            style={{ color: "#a0a09c" }}
+          >
+            Términos
+          </Link>
         </div>
       </div>
     </footer>

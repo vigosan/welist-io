@@ -3,6 +3,7 @@ import { useColorScheme } from "nativewind";
 import { useState } from "react";
 import {
   Alert,
+  Linking,
   Pressable,
   ScrollView,
   Switch,
@@ -248,6 +249,27 @@ export default function SettingsScreen() {
               </Pressable>
             ))}
           </View>
+        </Card>
+
+        <SectionLabel>{t("profile.about")}</SectionLabel>
+        <Card>
+          <Pressable
+            onPress={() => Linking.openURL("https://welist.io/privacy")}
+            className="py-1"
+          >
+            <Text className="text-sm text-gray-900 dark:text-gray-100">
+              {t("profile.privacy")}
+            </Text>
+          </Pressable>
+          <Divider />
+          <Pressable
+            onPress={() => Linking.openURL("https://welist.io/terms")}
+            className="py-1"
+          >
+            <Text className="text-sm text-gray-900 dark:text-gray-100">
+              {t("profile.terms")}
+            </Text>
+          </Pressable>
         </Card>
 
         <View className="mt-6 gap-3">

@@ -205,6 +205,9 @@ export const es = {
     show: "Mostrar contraseña",
     hide: "Ocultar contraseña",
     deleteAccount: "Eliminar mi cuenta",
+    about: "Acerca de",
+    privacy: "Política de privacidad",
+    terms: "Términos del servicio",
     deleteAccountConfirmTitle: "¿Eliminar tu cuenta?",
     deleteAccountConfirmBody:
       "Se borrarán tu cuenta, tus listas y todos tus datos. Esta acción no se puede deshacer.",
