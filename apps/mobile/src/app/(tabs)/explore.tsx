@@ -13,6 +13,7 @@ import {
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { PressableCard } from "@/components/Card";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { useExplore } from "@/hooks/explore";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
@@ -200,14 +201,14 @@ export default function ExploreScreen() {
           query.isFetchingNextPage ? <ActivityIndicator className="my-4" /> : null
         }
         renderItem={({ item }) => (
-          <Pressable
+          <PressableCard
             onPress={() =>
               router.push({
                 pathname: "/explore/[listId]",
                 params: { listId: item.id },
               })
             }
-            className="mb-3 rounded-2xl border border-black/[0.06] bg-white p-4 active:opacity-80 dark:border-white/[0.08] dark:bg-gray-900"
+            className="mb-3 p-4"
           >
             <Text
               numberOfLines={1}
@@ -221,7 +222,10 @@ export default function ExploreScreen() {
                 ? ` · ${t(`categories.${item.category}` as never)}`
                 : ""}
             </Text>
-            <Text className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+            <Text
+              style={{ fontVariant: ["tabular-nums"] }}
+              className="mt-2 text-xs text-gray-500 dark:text-gray-400"
+            >
               {t("explore.itemsAndParticipants", {
                 items: item.itemCount,
                 participants: item.participantCount,
@@ -230,7 +234,7 @@ export default function ExploreScreen() {
                 ? ` · ★ ${item.rating.avg?.toFixed(1)} (${item.rating.count})`
                 : ""}
             </Text>
-          </Pressable>
+          </PressableCard>
         )}
       />
     </SafeAreaView>

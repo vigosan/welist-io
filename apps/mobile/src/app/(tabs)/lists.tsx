@@ -14,6 +14,7 @@ import {
 } from "react-native";
 import { useTranslation } from "react-i18next";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { PressableCard } from "@/components/Card";
 import { ProgressDonut } from "@/components/ProgressDonut";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { useCreateList, useDeleteList, useMyLists } from "@/hooks/lists";
@@ -238,7 +239,7 @@ export default function MyListsScreen() {
           query.isFetchingNextPage ? <ActivityIndicator className="my-4" /> : null
         }
         renderItem={({ item }) => (
-          <Pressable
+          <PressableCard
             onPress={() =>
               router.push({
                 pathname: "/lists/[listId]",
@@ -246,7 +247,7 @@ export default function MyListsScreen() {
               })
             }
             onLongPress={() => confirmDelete(item)}
-            className="mb-2 flex-row items-center gap-3 rounded-2xl border border-black/[0.06] bg-white p-4 active:opacity-80 dark:border-white/[0.08] dark:bg-gray-900"
+            className="mb-2 flex-row items-center gap-3 p-4"
           >
             <ProgressDonut done={item.doneCount} total={item.itemCount} />
             <View className="flex-1">
@@ -269,7 +270,7 @@ export default function MyListsScreen() {
                   : ""}
               </Text>
             </View>
-          </Pressable>
+          </PressableCard>
         )}
       />
     </SafeAreaView>

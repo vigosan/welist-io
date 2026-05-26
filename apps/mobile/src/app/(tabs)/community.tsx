@@ -13,6 +13,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Avatar } from "@/components/Avatar";
+import { PressableCard } from "@/components/Card";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { useUserDirectory } from "@/hooks/users";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
@@ -99,14 +100,14 @@ export default function UsersScreen() {
           query.isFetchingNextPage ? <ActivityIndicator className="my-4" /> : null
         }
         renderItem={({ item }) => (
-          <Pressable
+          <PressableCard
             onPress={() =>
               router.push({
                 pathname: "/u/[userId]",
                 params: { userId: item.id },
               })
             }
-            className="mb-2 flex-row items-center gap-3 rounded-2xl border border-black/[0.06] bg-white p-4 active:opacity-80 dark:border-white/[0.08] dark:bg-gray-900"
+            className="mb-2 flex-row items-center gap-3 p-4"
           >
             <Avatar name={item.name} image={item.image} />
             <View className="flex-1">
@@ -125,7 +126,7 @@ export default function UsersScreen() {
                 completed · {item.followerCount} followers
               </Text>
             </View>
-          </Pressable>
+          </PressableCard>
         )}
       />
     </SafeAreaView>
