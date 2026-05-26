@@ -40,7 +40,7 @@ import {
   reports,
   stripeAccounts,
 } from "../src/db/schema/lists.schema.js";
-import { LIST_CATEGORIES } from "../src/lib/categories.js";
+import { ADULT_CATEGORIES, LIST_CATEGORIES } from "../src/lib/categories.js";
 import { plainItemText } from "../src/lib/item-text.js";
 import { cleanName, slugify } from "../src/lib/slug.js";
 import {
@@ -1162,11 +1162,21 @@ app.get("/explore", async (c) => {
     category && (LIST_CATEGORIES as readonly string[]).includes(category)
       ? eq(lists.category, category)
       : undefined;
+  const adultRequested =
+    !!category &&
+    (ADULT_CATEGORIES as readonly string[]).includes(category);
+  const excludeAdult = !adultRequested
+    ? sql`(${lists.category} is null or ${lists.category} not in (${sql.join(
+        ADULT_CATEGORIES.map((c) => sql`${c}`),
+        sql`, `
+      )}))`
+    : undefined;
 
   const baseWhere = and(
     eq(lists.public, true),
     q ? ilike(lists.name, `%${q}%`) : undefined,
-    categoryFilter
+    categoryFilter,
+    excludeAdult
   );
   const where =
     cursor && !isTrending

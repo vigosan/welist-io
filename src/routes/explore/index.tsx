@@ -7,7 +7,15 @@ import { StarRatingDisplay } from "@/components/StarRating";
 import { useAcceptChallenge, useExplore } from "@/hooks/useList";
 import { useTrackOnMount } from "@/hooks/useTrackOnMount";
 import { useTranslation } from "@/i18n/service";
-import { LIST_CATEGORIES, type ListCategory } from "@/lib/categories";
+import {
+  ADULT_CATEGORIES,
+  LIST_CATEGORIES,
+  type ListCategory,
+} from "@/lib/categories";
+
+const VISIBLE_CATEGORIES = LIST_CATEGORIES.filter(
+  (c) => !(ADULT_CATEGORIES as readonly string[]).includes(c)
+);
 import { CategoryIcon } from "@/lib/categoryIcons";
 import { plainItemText } from "@/lib/item-text";
 import { privateName } from "@/lib/private-name";
@@ -431,7 +439,7 @@ function ExplorePage() {
               >
                 {t("explore.allCategories")}
               </button>
-              {LIST_CATEGORIES.map((cat) => {
+              {VISIBLE_CATEGORIES.map((cat) => {
                 const active = category === cat;
                 return (
                   <button

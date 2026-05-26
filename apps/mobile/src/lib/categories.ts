@@ -20,7 +20,10 @@ export const LIST_CATEGORIES = [
   "wishlist",
   "sports",
   "art",
+  "adult",
   "other",
 ] as const;
 
 export type ListCategory = (typeof LIST_CATEGORIES)[number];
+
+export const ADULT_CATEGORIES: readonly ListCategory[] = ["adult"];

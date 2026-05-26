@@ -9,6 +9,7 @@ import {
   GraduationCap,
   Heart,
   Hotel,
+  Lock,
   type LucideIcon,
   MapPin,
   Mic,
@@ -47,6 +48,7 @@ const CATEGORY_ICON: Record<ListCategory, LucideIcon> = {
   wishlist: Heart,
   sports: Dumbbell,
   art: Palette,
+  adult: Lock,
   other: Tag,
 };
 

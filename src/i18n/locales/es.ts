@@ -162,6 +162,7 @@ const es = {
     wishlist: "Deseos",
     sports: "Deportes",
     art: "Arte",
+    adult: "Adultos (+18)",
     other: "Otros",
   },
   myLists: {

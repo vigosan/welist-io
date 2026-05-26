@@ -284,6 +284,7 @@ export const es = {
     wishlist: "Wishlist",
     sports: "Deportes",
     art: "Arte",
+    adult: "Adultos (+18)",
     other: "Otros",
   },
 } as const;

@@ -163,6 +163,7 @@ const en: Translations = {
     wishlist: "Wishlist",
     sports: "Sports",
     art: "Art",
+    adult: "Adult (18+)",
     other: "Other",
   },
   myLists: {

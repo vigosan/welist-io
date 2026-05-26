@@ -16,7 +16,15 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { useExplore } from "@/hooks/explore";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
-import { LIST_CATEGORIES, type ListCategory } from "@/lib/categories";
+import {
+  ADULT_CATEGORIES,
+  LIST_CATEGORIES,
+  type ListCategory,
+} from "@/lib/categories";
+
+const VISIBLE_CATEGORIES = LIST_CATEGORIES.filter(
+  (c) => !(ADULT_CATEGORIES as readonly string[]).includes(c)
+);
 import type { ExploreSort } from "@/services/explore";
 
 const SORTS: ExploreSort[] = ["trending", "created_desc"];
@@ -137,7 +145,7 @@ export default function ExploreScreen() {
             {t("explore.all")}
           </Text>
         </Pressable>
-        {LIST_CATEGORIES.map((c) => {
+        {VISIBLE_CATEGORIES.map((c) => {
           const active = category === c;
           return (
             <Pressable
