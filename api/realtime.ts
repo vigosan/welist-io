@@ -20,11 +20,13 @@ let listenClient: pg.Client | null = null;
 let connecting: Promise<void> | null = null;
 
 function listenUrl() {
-  return (
+  const raw =
     process.env.DATABASE_URL_UNPOOLED ??
     process.env.POSTGRES_URL_NON_POOLING ??
     process.env.DATABASE_URL ??
-    ""
+    "";
+  return raw.replace(/([?&])sslmode=[^&]*(&|$)/, (_, prefix, suffix) =>
+    suffix === "&" ? prefix : ""
   );
 }
 
