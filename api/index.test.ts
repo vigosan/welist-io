@@ -11,6 +11,7 @@ const mockDb = {
     stripeAccounts: { findFirst: vi.fn() },
     listPurchases: { findFirst: vi.fn() },
     notifications: { findFirst: vi.fn(), findMany: vi.fn() },
+    deviceTokens: { findMany: vi.fn().mockResolvedValue([]) },
     userSettings: { findFirst: vi.fn() },
   },
   insert: vi.fn(),
@@ -41,6 +42,10 @@ vi.mock("./realtime", () => ({
   listChangesStream: vi.fn(),
 }));
 
+vi.mock("./push", () => ({
+  sendExpoPush: vi.fn().mockResolvedValue(undefined),
+}));
+
 const mockStripeConstructEvent = vi.fn();
 vi.mock("stripe", () => {
   const StripeMock = vi.fn().mockImplementation(() => ({
@@ -54,9 +59,9 @@ vi.mock("stripe", () => {
 
 const { app } = await import("./app");
 const { sendEmail: mockSendEmail } = await import("./email");
-const { achievements, lists, notifications, participations } = await import(
-  "../src/db/schema/index"
-);
+const { sendExpoPush: mockSendExpoPush } = await import("./push");
+const { achievements, deviceTokens, lists, notifications, participations } =
+  await import("../src/db/schema/index");
 
 function chainableInsert() {
   const valuesMock = vi.fn().mockImplementation(() => {
@@ -2832,6 +2837,152 @@ describe("PATCH /api/users/me", () => {
       headers: { "Content-Type": "application/json" },
     });
     expect(res.status).toBe(400);
+  });
+});
+
+describe("device-tokens endpoints", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockGetAuthUser.mockRejectedValue(new Error("no session"));
+  });
+
+  it("POST returns 401 when unauthenticated", async () => {
+    const res = await app.request("/api/me/device-tokens", {
+      method: "POST",
+      body: JSON.stringify({ token: "ExponentPushToken[x]", platform: "ios" }),
+      headers: { "Content-Type": "application/json" },
+    });
+    expect(res.status).toBe(401);
+  });
+
+  it("POST returns 400 on invalid platform", async () => {
+    mockGetAuthUser.mockResolvedValue({ session: { user: { id: "u1" } } });
+    const res = await app.request("/api/me/device-tokens", {
+      method: "POST",
+      body: JSON.stringify({ token: "ExponentPushToken[x]", platform: "web" }),
+      headers: { "Content-Type": "application/json" },
+    });
+    expect(res.status).toBe(400);
+  });
+
+  it("POST upserts the device token for the current user", async () => {
+    mockGetAuthUser.mockResolvedValue({ session: { user: { id: "u1" } } });
+    const insertChain = chainableInsert();
+    mockDb.insert.mockReturnValue(insertChain);
+
+    const res = await app.request("/api/me/device-tokens", {
+      method: "POST",
+      body: JSON.stringify({
+        token: "ExponentPushToken[abc]",
+        platform: "android",
+      }),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    expect(res.status).toBe(204);
+    expect(mockDb.insert).toHaveBeenCalledWith(deviceTokens);
+    expect(insertChain.values).toHaveBeenCalledWith({
+      userId: "u1",
+      token: "ExponentPushToken[abc]",
+      platform: "android",
+    });
+  });
+
+  it("DELETE returns 401 when unauthenticated", async () => {
+    const res = await app.request("/api/me/device-tokens/x", {
+      method: "DELETE",
+    });
+    expect(res.status).toBe(401);
+  });
+
+  it("DELETE removes only the caller's token", async () => {
+    mockGetAuthUser.mockResolvedValue({ session: { user: { id: "u1" } } });
+    const whereMock = vi.fn().mockResolvedValue(undefined);
+    mockDb.delete.mockReturnValue({ where: whereMock });
+
+    const res = await app.request("/api/me/device-tokens/abc", {
+      method: "DELETE",
+    });
+
+    expect(res.status).toBe(204);
+    expect(mockDb.delete).toHaveBeenCalledWith(deviceTokens);
+    expect(whereMock).toHaveBeenCalled();
+  });
+});
+
+describe("Expo push dispatch", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockGetAuthUser.mockResolvedValue({
+      session: { user: { id: "collab-1" } },
+    });
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "abc",
+      name: "Lista",
+      ownerId: "owner-1",
+      collaborative: true,
+      public: true,
+    });
+    mockDb.query.items.findFirst.mockResolvedValue({ id: "i1", done: false });
+    mockDb.query.participations.findFirst.mockResolvedValue({
+      role: "collaborator",
+    });
+    mockDb.query.participations.findMany.mockResolvedValue([
+      { userId: "collab-1" },
+    ]);
+    mockDb.query.users.findFirst.mockResolvedValue({
+      name: "Ana",
+      image: null,
+    });
+    mockDb.query.notifications.findFirst.mockResolvedValue(null);
+    mockDb.$count.mockResolvedValue(1);
+    mockDb.update.mockReturnValue({
+      set: vi.fn().mockReturnValue({
+        where: vi.fn().mockReturnValue({
+          returning: vi
+            .fn()
+            .mockResolvedValue([{ id: "i1", listId: "abc", done: true }]),
+        }),
+      }),
+    });
+    mockDb.insert.mockReturnValue(chainableInsert());
+  });
+  afterEach(() => {
+    mockGetAuthUser.mockRejectedValue(new Error("no session"));
+  });
+
+  it("sends a push to every device token of the recipient on item_done", async () => {
+    mockDb.query.deviceTokens.findMany.mockResolvedValue([
+      { token: "ExponentPushToken[A]" },
+      { token: "ExponentPushToken[B]" },
+    ]);
+
+    const res = await app.request("/api/lists/abc/items/i1/toggle", {
+      method: "PATCH",
+    });
+
+    expect(res.status).toBe(200);
+    expect(mockSendExpoPush).toHaveBeenCalledTimes(1);
+    const messages = (
+      mockSendExpoPush as unknown as { mock: { calls: unknown[][] } }
+    ).mock.calls[0]?.[0] as Array<{ to: string; body: string }>;
+    expect(messages.map((m) => m.to)).toEqual([
+      "ExponentPushToken[A]",
+      "ExponentPushToken[B]",
+    ]);
+    expect(messages[0]?.body).toContain("Ana");
+    expect(messages[0]?.body).toContain("«Lista»");
+  });
+
+  it("does not send a push when the recipient has no device tokens", async () => {
+    mockDb.query.deviceTokens.findMany.mockResolvedValue([]);
+
+    const res = await app.request("/api/lists/abc/items/i1/toggle", {
+      method: "PATCH",
+    });
+
+    expect(res.status).toBe(200);
+    expect(mockSendExpoPush).not.toHaveBeenCalled();
   });
 });
 

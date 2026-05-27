@@ -26,6 +26,7 @@ import { accounts, sessions, users } from "../src/db/schema/auth.schema.js";
 import {
   type AchievementType,
   achievements,
+  deviceTokens,
   events,
   follows,
   itemLikes,
@@ -56,6 +57,7 @@ import {
 import { sendEmail } from "./email.js";
 import { signUnsubscribeToken, verifyUnsubscribeToken } from "./email-token.js";
 import { hashPassword, verifyPassword } from "./password.js";
+import { sendExpoPush } from "./push.js";
 import { rateLimit } from "./rate-limit.js";
 import { listChangesStream, notifyListChange } from "./realtime.js";
 
@@ -446,6 +448,64 @@ async function createNotification(input: CreateNotificationInput) {
     actionUrl: input.actionUrl ?? null,
     metadata: input.metadata ?? null,
   });
+  await dispatchPushIfApplicable({
+    recipientId: input.recipientId,
+    type: input.type,
+    actorName: input.actorName,
+    listName: input.listName,
+    listId: input.listId,
+    count:
+      (input.metadata as { count?: number } | null | undefined)?.count ?? 1,
+  });
+}
+
+function renderPushBody(input: {
+  type: NotificationType;
+  actorName?: string | null;
+  listName?: string | null;
+  count: number;
+}): string | null {
+  const name = input.actorName ?? "Alguien";
+  const list = input.listName ?? "";
+  if (input.type === "item_added") {
+    return input.count === 1
+      ? `${name} ha añadido un ítem a «${list}»`
+      : `${name} ha añadido ${input.count} ítems a «${list}»`;
+  }
+  if (input.type === "item_done") {
+    return input.count === 1
+      ? `${name} ha completado un ítem en «${list}»`
+      : `${name} ha completado ${input.count} ítems en «${list}»`;
+  }
+  if (input.type === "list_completed") {
+    return `${name} ha completado «${list}»`;
+  }
+  return null;
+}
+
+async function dispatchPushIfApplicable(input: {
+  recipientId: string;
+  type: NotificationType;
+  actorName?: string | null;
+  listName?: string | null;
+  listId?: string | null;
+  count: number;
+}) {
+  const body = renderPushBody(input);
+  if (!body) return;
+  const tokens = await db.query.deviceTokens.findMany({
+    where: eq(deviceTokens.userId, input.recipientId),
+    columns: { token: true },
+  });
+  if (tokens.length === 0) return;
+  await sendExpoPush(
+    tokens.map((t) => ({
+      to: t.token,
+      title: input.listName ?? "Welist",
+      body,
+      data: { listId: input.listId ?? null, type: input.type },
+    }))
+  );
 }
 
 const COALESCE_WINDOW_MS = 15 * 60 * 1000;
@@ -489,16 +549,25 @@ async function insertOrCoalesceNotification(input: CoalesceNotificationInput) {
     const mergedItemIds = Array.from(
       new Set([...prev.itemIds, ...addedItemIds])
     ).slice(0, COALESCE_ITEM_IDS_CAP);
+    const newCount = prev.count + increment;
     await db
       .update(notifications)
       .set({
         metadata: {
-          count: prev.count + increment,
+          count: newCount,
           itemIds: mergedItemIds,
         },
         createdAt: new Date(),
       })
       .where(eq(notifications.id, existing.id));
+    await dispatchPushIfApplicable({
+      recipientId: input.recipientId,
+      type: input.type,
+      actorName: input.actorName,
+      listName: input.listName,
+      listId: input.listId,
+      count: newCount,
+    });
     return;
   }
   await createNotification({
@@ -1734,6 +1803,42 @@ app.get("/users/me", async (c) => {
     emailOptIn: user.emailOptIn,
     hasPassword: user.passwordHash !== null,
   });
+});
+
+app.post(
+  "/me/device-tokens",
+  zValidator(
+    "json",
+    z.object({
+      token: z.string().min(1).max(200),
+      platform: z.enum(["ios", "android"]),
+    })
+  ),
+  async (c) => {
+    const authUser = getOptionalUser(c);
+    const userId = authUser?.session?.user?.id;
+    if (!userId) return c.json({ error: "Unauthorized" }, 401);
+    const { token, platform } = c.req.valid("json");
+    await db
+      .insert(deviceTokens)
+      .values({ userId, token, platform })
+      .onConflictDoUpdate({
+        target: deviceTokens.token,
+        set: { userId, platform, updatedAt: new Date() },
+      });
+    return c.body(null, 204);
+  }
+);
+
+app.delete("/me/device-tokens/:token", async (c) => {
+  const authUser = getOptionalUser(c);
+  const userId = authUser?.session?.user?.id;
+  if (!userId) return c.json({ error: "Unauthorized" }, 401);
+  const token = c.req.param("token");
+  await db
+    .delete(deviceTokens)
+    .where(and(eq(deviceTokens.userId, userId), eq(deviceTokens.token, token)));
+  return c.body(null, 204);
 });
 
 app.get("/users/me/settings", async (c) => {
