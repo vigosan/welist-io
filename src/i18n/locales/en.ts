@@ -413,7 +413,8 @@ const en: Translations = {
       titleChange: "Change password",
       description:
         "Set a password so you can also sign in with email and password (handy for the mobile app).",
-      descriptionSet: "You already have a password set. You can change it here.",
+      descriptionSet:
+        "You already have a password set. You can change it here.",
       newPassword: "New password",
       confirmPassword: "Repeat password",
       minLength: "Minimum 8 characters.",

@@ -1,12 +1,6 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
-import {
-  Alert,
-  Pressable,
-  ScrollView,
-  Text,
-  View,
-} from "react-native";
 import { useTranslation } from "react-i18next";
+import { Alert, Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { ItemRowSkeleton, Skeleton } from "@/components/Skeleton";
@@ -65,7 +59,10 @@ export default function ExploreDetailScreen() {
   if (!d) return null;
 
   return (
-    <SafeAreaView className="flex-1 bg-canvas dark:bg-canvas-dark" edges={["top"]}>
+    <SafeAreaView
+      className="flex-1 bg-canvas dark:bg-canvas-dark"
+      edges={["top"]}
+    >
       <ScreenHeader title={d.name} back />
 
       <ScrollView contentContainerClassName="px-5 pb-10">

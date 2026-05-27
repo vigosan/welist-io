@@ -1,5 +1,5 @@
-import { ScrollView, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
+import { ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ScreenHeader } from "@/components/ScreenHeader";
 

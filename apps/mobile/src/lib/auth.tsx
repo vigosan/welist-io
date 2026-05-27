@@ -107,8 +107,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       try {
         if (googleResponse.type === "success") {
           const idToken = googleResponse.params.id_token;
-          if (!idToken)
-            throw new Error("Google did not return an id token");
+          if (!idToken) throw new Error("Google did not return an id token");
           const user = await exchange("google", idToken);
           setSession({ status: "signed-in", user });
           pending.resolve();

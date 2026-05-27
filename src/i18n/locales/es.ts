@@ -412,7 +412,8 @@ const es = {
       titleChange: "Cambiar contraseña",
       description:
         "Define una contraseña para poder entrar también con email y contraseña (útil para la app móvil).",
-      descriptionSet: "Ya tienes una contraseña configurada. Puedes cambiarla aquí.",
+      descriptionSet:
+        "Ya tienes una contraseña configurada. Puedes cambiarla aquí.",
       newPassword: "Nueva contraseña",
       confirmPassword: "Repetir contraseña",
       minLength: "Mínimo 8 caracteres.",

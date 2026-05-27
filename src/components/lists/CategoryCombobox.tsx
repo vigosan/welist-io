@@ -72,7 +72,11 @@ export function CategoryCombobox({ value, onChange }: Props) {
                 : "text-gray-500 dark:text-gray-400"
             }`}
           >
-            <X size={14} className="text-gray-400 shrink-0" aria-hidden="true" />
+            <X
+              size={14}
+              className="text-gray-400 shrink-0"
+              aria-hidden="true"
+            />
             {t("categories.none")}
           </button>
           <div className="border-t border-gray-100 dark:border-gray-800" />
@@ -97,7 +101,11 @@ export function CategoryCombobox({ value, onChange }: Props) {
                   <CategoryIcon
                     category={c}
                     size={14}
-                    className={active ? "text-gray-900 dark:text-gray-100" : "text-gray-500"}
+                    className={
+                      active
+                        ? "text-gray-900 dark:text-gray-100"
+                        : "text-gray-500"
+                    }
                   />
                   <span className="truncate">{t(`categories.${c}`)}</span>
                 </button>

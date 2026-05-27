@@ -15,7 +15,12 @@ export const usersService = {
   search: (q: string) => {
     const qs = new URLSearchParams({ q }).toString();
     return apiFetch<
-      { id: string; name: string | null; email: string | null; image: string | null }[]
+      {
+        id: string;
+        name: string | null;
+        email: string | null;
+        image: string | null;
+      }[]
     >(`/users/search?${qs}`);
   },
 
@@ -59,8 +64,7 @@ export const usersService = {
       body: JSON.stringify({ password }),
     }),
 
-  deleteAccount: () =>
-    apiFetch<{ ok: true }>("/me", { method: "DELETE" }),
+  deleteAccount: () => apiFetch<{ ok: true }>("/me", { method: "DELETE" }),
 
   report: (targetType: "list" | "user", targetId: string, reason?: string) =>
     apiFetch<{ ok: true }>("/reports", {

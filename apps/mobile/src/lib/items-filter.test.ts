@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { filterItems, type FilterMode } from "./items-filter";
 import type { Item } from "../types";
+import { type FilterMode, filterItems } from "./items-filter";
 
 function item(id: string, done: boolean): Item {
   return {

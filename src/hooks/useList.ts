@@ -26,9 +26,7 @@ type MyListsPage = {
 };
 type MyListsInfiniteData = { pages: MyListsPage[]; pageParams: unknown[] };
 
-type CollaboratorsData = Awaited<
-  ReturnType<typeof listsService.collaborators>
->;
+type CollaboratorsData = Awaited<ReturnType<typeof listsService.collaborators>>;
 
 export function useCollaborators(listId: string, enabled: boolean) {
   return useQuery({
@@ -359,7 +357,6 @@ export function useAcceptChallenge() {
     },
   });
 }
-
 
 export function useUserProfile(userId: string) {
   return useQuery({

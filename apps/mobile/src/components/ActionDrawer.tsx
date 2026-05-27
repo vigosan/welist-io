@@ -29,14 +29,8 @@ export function ActionDrawer({ visible, title, actions, onClose }: Props) {
       animationType="slide"
       onRequestClose={onClose}
     >
-      <Pressable
-        onPress={onClose}
-        className="flex-1 justify-end bg-black/40"
-      >
-        <Pressable
-          onPress={(e) => e.stopPropagation()}
-          className="px-3 pb-2"
-        >
+      <Pressable onPress={onClose} className="flex-1 justify-end bg-black/40">
+        <Pressable onPress={(e) => e.stopPropagation()} className="px-3 pb-2">
           <View className="mb-2 items-center">
             <View className="h-1 w-10 rounded-full bg-white/60" />
           </View>

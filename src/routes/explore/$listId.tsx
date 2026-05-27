@@ -65,13 +65,28 @@ function ExploreDetailPage() {
       <div className="h-dvh bg-canvas dark:bg-canvas-dark flex flex-col">
         <AppNav />
         <main className="flex-1 w-full max-w-3xl mx-auto px-4 py-6 flex flex-col gap-5">
-          <div data-testid="skeleton" className="h-4 w-24 rounded bg-gray-200 animate-pulse" />
+          <div
+            data-testid="skeleton"
+            className="h-4 w-24 rounded bg-gray-200 animate-pulse"
+          />
           <div className="flex flex-col gap-2">
-            <div data-testid="skeleton" className="h-6 w-2/3 rounded-lg bg-gray-200 animate-pulse" />
-            <div data-testid="skeleton" className="h-4 w-1/3 rounded-lg bg-gray-200 animate-pulse" />
+            <div
+              data-testid="skeleton"
+              className="h-6 w-2/3 rounded-lg bg-gray-200 animate-pulse"
+            />
+            <div
+              data-testid="skeleton"
+              className="h-4 w-1/3 rounded-lg bg-gray-200 animate-pulse"
+            />
           </div>
-          <div data-testid="skeleton" className="h-40 rounded-2xl bg-gray-200 animate-pulse" />
-          <div data-testid="skeleton" className="h-10 rounded-xl bg-gray-200 animate-pulse" />
+          <div
+            data-testid="skeleton"
+            className="h-40 rounded-2xl bg-gray-200 animate-pulse"
+          />
+          <div
+            data-testid="skeleton"
+            className="h-10 rounded-xl bg-gray-200 animate-pulse"
+          />
         </main>
       </div>
     );

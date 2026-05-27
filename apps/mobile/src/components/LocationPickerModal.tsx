@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
   FlatList,
@@ -8,7 +9,6 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { useTranslation } from "react-i18next";
 import { useGeocodingSearch } from "@/hooks/geocoding";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import type { Place } from "@/services/geocoding";
@@ -48,7 +48,9 @@ export function LocationPickerModal({
       <View className="flex-1 bg-canvas dark:bg-canvas-dark">
         <View className="flex-row items-center justify-between border-b border-gray-200 px-6 pt-16 pb-3 dark:border-gray-700">
           <Text className="text-lg font-bold text-gray-900 dark:text-gray-100">
-            {currentPlaceName ? t("list.changeLocation") : t("list.setLocation")}
+            {currentPlaceName
+              ? t("list.changeLocation")
+              : t("list.setLocation")}
           </Text>
           <Pressable onPress={close}>
             <Text className="text-sm text-gray-500 dark:text-gray-400">

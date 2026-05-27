@@ -11,10 +11,11 @@
     "ios": {
       "bundleIdentifier": "io.wilist.app",
       "supportsTablet": true,
-      "associatedDomains": [
-        "applinks:wilist.io"
-      ],
-      "usesAppleSignIn": true
+      "associatedDomains": ["applinks:wilist.io", "applinks:wilist.io"],
+      "usesAppleSignIn": true,
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "package": "io.wilist.app",
@@ -44,10 +45,7 @@
               "pathPrefix": "/u/"
             }
           ],
-          "category": [
-            "BROWSABLE",
-            "DEFAULT"
-          ]
+          "category": ["BROWSABLE", "DEFAULT"]
         }
       ]
     },

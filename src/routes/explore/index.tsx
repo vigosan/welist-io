@@ -226,8 +226,7 @@ function ExplorePage() {
   const visibleCategories = useMemo(
     () =>
       LIST_CATEGORIES.filter(
-        (c) =>
-          !(ADULT_CATEGORIES as readonly string[]).includes(c) || showAdult
+        (c) => !(ADULT_CATEGORIES as readonly string[]).includes(c) || showAdult
       ),
     [showAdult]
   );

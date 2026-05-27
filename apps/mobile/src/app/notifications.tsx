@@ -1,5 +1,6 @@
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
+import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
   FlatList,
@@ -8,7 +9,6 @@ import {
   Text,
   View,
 } from "react-native";
-import { useTranslation } from "react-i18next";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import {
@@ -36,7 +36,10 @@ export default function NotificationsScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-canvas dark:bg-canvas-dark" edges={["top"]}>
+    <SafeAreaView
+      className="flex-1 bg-canvas dark:bg-canvas-dark"
+      edges={["top"]}
+    >
       <ScreenHeader
         title={t("notifications.title")}
         back

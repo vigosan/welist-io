@@ -55,9 +55,7 @@ export function useRemoveCollaborator(listId: string) {
       if (previous) {
         qc.setQueryData<CollabsShape>(["collaborators", listId], {
           ...previous,
-          collaborators: previous.collaborators.filter(
-            (c) => c.id !== userId
-          ),
+          collaborators: previous.collaborators.filter((c) => c.id !== userId),
         });
       }
       return { previous };

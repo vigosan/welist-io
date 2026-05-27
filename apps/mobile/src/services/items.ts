@@ -24,9 +24,7 @@ export const itemsService = {
   setLocation: (
     listId: string,
     itemId: string,
-    coords:
-      | { latitude: string; longitude: string; placeName: string }
-      | null
+    coords: { latitude: string; longitude: string; placeName: string } | null
   ) =>
     apiFetch<Item>(`/lists/${listId}/items/${itemId}`, {
       method: "PATCH",

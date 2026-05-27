@@ -1,5 +1,5 @@
-import { Linking, Text } from "react-native";
 import type { ReactNode } from "react";
+import { Linking, Text } from "react-native";
 
 const CODE_RE = /`([^`]+)`/g;
 const LINK_RE = /\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g;

@@ -110,9 +110,7 @@ export function AppNav() {
         open={globalSearchOpen}
         onClose={() => setGlobalSearchOpen(false)}
       />
-      <nav
-        className="shrink-0 sticky top-0 z-50 h-[52px] bg-canvas dark:bg-canvas-dark border-b border-black/[0.08] dark:border-white/[0.08]"
-      >
+      <nav className="shrink-0 sticky top-0 z-50 h-[52px] bg-canvas dark:bg-canvas-dark border-b border-black/[0.08] dark:border-white/[0.08]">
         <div className="flex items-center justify-between px-4 sm:px-12 h-full">
           <Link
             to="/"

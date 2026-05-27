@@ -1,8 +1,8 @@
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import { ChevronRight, ListFilter } from "lucide-react-native";
-import { useIsDark } from "@/hooks/useIsDark";
 import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
   FlatList,
@@ -12,7 +12,6 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { useTranslation } from "react-i18next";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Avatar } from "@/components/Avatar";
 import { PressableCard } from "@/components/Card";
@@ -20,8 +19,9 @@ import { EmptyState } from "@/components/EmptyState";
 import { Input } from "@/components/Input";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { UserCardSkeleton } from "@/components/Skeleton";
-import { useUserDirectory } from "@/hooks/users";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
+import { useIsDark } from "@/hooks/useIsDark";
+import { useUserDirectory } from "@/hooks/users";
 
 export default function UsersScreen() {
   const { t } = useTranslation();
@@ -45,7 +45,10 @@ export default function UsersScreen() {
   }, [query.data]);
 
   return (
-    <SafeAreaView className="flex-1 bg-canvas dark:bg-canvas-dark" edges={["top"]}>
+    <SafeAreaView
+      className="flex-1 bg-canvas dark:bg-canvas-dark"
+      edges={["top"]}
+    >
       <ScreenHeader
         title={t("nav.community")}
         right={
@@ -99,7 +102,9 @@ export default function UsersScreen() {
           />
         }
         onEndReached={() =>
-          query.hasNextPage && !query.isFetchingNextPage && query.fetchNextPage()
+          query.hasNextPage &&
+          !query.isFetchingNextPage &&
+          query.fetchNextPage()
         }
         onEndReachedThreshold={0.4}
         ListEmptyComponent={
@@ -115,7 +120,9 @@ export default function UsersScreen() {
           )
         }
         ListFooterComponent={
-          query.isFetchingNextPage ? <ActivityIndicator className="my-4" /> : null
+          query.isFetchingNextPage ? (
+            <ActivityIndicator className="my-4" />
+          ) : null
         }
         renderItem={({ item }) => (
           <PressableCard

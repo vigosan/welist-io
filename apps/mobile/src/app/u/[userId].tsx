@@ -1,6 +1,6 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Check, ChevronRight, Flag, Lock } from "lucide-react-native";
-import { useIsDark } from "@/hooks/useIsDark";
+import { useTranslation } from "react-i18next";
 import {
   ActionSheetIOS,
   Alert,
@@ -10,12 +10,12 @@ import {
   Text,
   View,
 } from "react-native";
-import { useTranslation } from "react-i18next";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Avatar } from "@/components/Avatar";
 import { PressableCard } from "@/components/Card";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { Skeleton } from "@/components/Skeleton";
+import { useIsDark } from "@/hooks/useIsDark";
 import {
   useFollowStatus,
   useReport,
@@ -169,7 +169,8 @@ export default function UserProfileScreen() {
           )}
         </View>
 
-        <View className="mx-5 mb-2 flex-row rounded-2xl bg-white p-2 dark:bg-gray-900"
+        <View
+          className="mx-5 mb-2 flex-row rounded-2xl bg-white p-2 dark:bg-gray-900"
           style={{
             shadowColor: "#000",
             shadowOpacity: 0.04,

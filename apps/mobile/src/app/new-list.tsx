@@ -1,7 +1,7 @@
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { Alert, Pressable, Text, TextInput, View } from "react-native";
 import { useTranslation } from "react-i18next";
+import { Alert, Pressable, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useCreateList } from "@/hooks/lists";
 

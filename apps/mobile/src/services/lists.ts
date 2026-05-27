@@ -15,7 +15,8 @@ export const listsService = {
     if (cursor) params.set("cursor", cursor);
     if (q) params.set("q", q);
     if (sort && sort !== "recent") params.set("sort", sort);
-    if (visibility && visibility !== "all") params.set("visibility", visibility);
+    if (visibility && visibility !== "all")
+      params.set("visibility", visibility);
     const qs = params.toString();
     return apiFetch<Page<MyListItem>>(`/my-lists${qs ? `?${qs}` : ""}`);
   },

@@ -4,13 +4,19 @@ import { mapsUrl } from "./maps";
 describe("mapsUrl", () => {
   it("returns an Apple Maps URL on iOS so the system map app handles it natively", () => {
     expect(
-      mapsUrl({ latitude: "41.39", longitude: "2.16", placeName: "Plaça Catalunya" }, "ios")
+      mapsUrl(
+        { latitude: "41.39", longitude: "2.16", placeName: "Plaça Catalunya" },
+        "ios"
+      )
     ).toBe("https://maps.apple.com/?ll=41.39,2.16&q=Pla%C3%A7a%20Catalunya");
   });
 
   it("returns a Google Maps geo URL on Android so any installed maps app can handle it", () => {
     expect(
-      mapsUrl({ latitude: "41.39", longitude: "2.16", placeName: "Plaça Catalunya" }, "android")
+      mapsUrl(
+        { latitude: "41.39", longitude: "2.16", placeName: "Plaça Catalunya" },
+        "android"
+      )
     ).toBe("https://www.google.com/maps/search/?api=1&query=41.39%2C2.16");
   });
 

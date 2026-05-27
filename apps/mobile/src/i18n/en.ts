@@ -208,10 +208,8 @@ export const en = {
       "Get a bi-weekly reminder with a random pending item from your lists.",
     password: "Password",
     passwordSet: "Change password",
-    passwordHintNew:
-      "Set a password to also sign in with email and password.",
-    passwordHintSet:
-      "You already have a password set. You can change it here.",
+    passwordHintNew: "Set a password to also sign in with email and password.",
+    passwordHintSet: "You already have a password set. You can change it here.",
     newPassword: "New password",
     confirmPassword: "Repeat password",
     minLength: "Minimum 8 characters.",

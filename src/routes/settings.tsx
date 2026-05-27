@@ -444,7 +444,9 @@ function SettingsPage() {
             data-testid="delete-account-button"
             disabled={deleteAccount.isPending}
             onClick={() => {
-              if (!window.confirm(t("settings.dangerZone.deleteAccountConfirm"))) {
+              if (
+                !window.confirm(t("settings.dangerZone.deleteAccountConfirm"))
+              ) {
                 return;
               }
               deleteAccount.mutate(undefined, {

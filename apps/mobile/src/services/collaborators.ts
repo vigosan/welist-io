@@ -1,6 +1,10 @@
 import { apiFetch } from "@/lib/api";
 
-export type Collaborator = { id: string; name: string | null; image: string | null };
+export type Collaborator = {
+  id: string;
+  name: string | null;
+  image: string | null;
+};
 
 export type Challenger = Collaborator & {
   completedAt: string | null;

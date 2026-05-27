@@ -51,28 +51,26 @@ function TermsPage() {
 
           <Section title="3. Cuenta">
             <p>
-              Debes tener al menos 13 años para usar Welist. Eres responsable
-              de la actividad realizada con tu cuenta y de mantener tu
-              contraseña en secreto. Puedes eliminar tu cuenta en cualquier
-              momento desde Ajustes; la eliminación es permanente.
+              Debes tener al menos 13 años para usar Welist. Eres responsable de
+              la actividad realizada con tu cuenta y de mantener tu contraseña
+              en secreto. Puedes eliminar tu cuenta en cualquier momento desde
+              Ajustes; la eliminación es permanente.
             </p>
           </Section>
 
           <Section title="4. Contenido de usuario">
             <p>
-              Conservas la propiedad del contenido que publiques (listas,
-              items, comentarios, valoraciones). Al publicarlo, nos otorgas una
+              Conservas la propiedad del contenido que publiques (listas, items,
+              comentarios, valoraciones). Al publicarlo, nos otorgas una
               licencia mundial, no exclusiva y gratuita para alojarlo, mostrarlo
               y distribuirlo dentro del Servicio.
             </p>
-            <p>
-              No puedes publicar contenido que:
-            </p>
+            <p>No puedes publicar contenido que:</p>
             <ul className="list-disc pl-5 flex flex-col gap-1">
               <li>Sea ilegal, fraudulento, difamatorio o engañoso.</li>
               <li>
-                Contenga material sexualmente explícito, pornografía o
-                contenido que sexualice a menores.
+                Contenga material sexualmente explícito, pornografía o contenido
+                que sexualice a menores.
               </li>
               <li>Incite al odio, la violencia o la discriminación.</li>
               <li>
@@ -83,8 +81,8 @@ function TermsPage() {
               <li>Suplante la identidad de otra persona o entidad.</li>
             </ul>
             <p>
-              Nos reservamos el derecho de eliminar contenido que infrinja
-              estas reglas y de suspender o cerrar cuentas reincidentes.
+              Nos reservamos el derecho de eliminar contenido que infrinja estas
+              reglas y de suspender o cerrar cuentas reincidentes.
             </p>
           </Section>
 
@@ -93,8 +91,8 @@ function TermsPage() {
               Puedes reportar contenido o usuarios que infrinjan estos Términos
               desde la propia app. Revisamos los reportes en un plazo razonable
               (objetivo: 24 horas) y tomamos las medidas que consideremos
-              proporcionadas: ocultar contenido, advertir, suspender o
-              eliminar la cuenta.
+              proporcionadas: ocultar contenido, advertir, suspender o eliminar
+              la cuenta.
             </p>
           </Section>
 
@@ -102,9 +100,9 @@ function TermsPage() {
             <p>
               En la web, los creadores pueden conectar una cuenta de Stripe
               Connect para vender el acceso a sus listas. Welist actúa como
-              plataforma y aplica una comisión sobre cada transacción. Los
-              pagos están sujetos a los términos de Stripe. Los reembolsos
-              dependen del creador.
+              plataforma y aplica una comisión sobre cada transacción. Los pagos
+              están sujetos a los términos de Stripe. Los reembolsos dependen
+              del creador.
             </p>
             <p>
               <strong>App móvil</strong>: en la app de iOS y Android la
@@ -115,10 +113,10 @@ function TermsPage() {
 
           <Section title="7. Disponibilidad y cambios">
             <p>
-              Hacemos esfuerzos razonables para mantener el Servicio
-              disponible, pero no garantizamos una operación ininterrumpida.
-              Podemos modificar, suspender o discontinuar funciones del
-              Servicio en cualquier momento.
+              Hacemos esfuerzos razonables para mantener el Servicio disponible,
+              pero no garantizamos una operación ininterrumpida. Podemos
+              modificar, suspender o discontinuar funciones del Servicio en
+              cualquier momento.
             </p>
           </Section>
 
@@ -128,18 +126,18 @@ function TermsPage() {
               tipo. En la máxima medida permitida por la ley, no seremos
               responsables de daños indirectos, incidentales, especiales o
               consecuentes derivados del uso del Servicio. Nuestra
-              responsabilidad máxima frente a ti, en cualquier circunstancia,
-              se limita a la cantidad que hayas pagado a Welist en los 12 meses
-              anteriores al hecho que origina la reclamación (o cero, si no
-              has hecho ningún pago).
+              responsabilidad máxima frente a ti, en cualquier circunstancia, se
+              limita a la cantidad que hayas pagado a Welist en los 12 meses
+              anteriores al hecho que origina la reclamación (o cero, si no has
+              hecho ningún pago).
             </p>
           </Section>
 
           <Section title="9. Indemnidad">
             <p>
               Aceptas indemnizar a Welist frente a cualquier reclamación
-              derivada de tu uso del Servicio, del contenido que publiques o
-              del incumplimiento de estos Términos.
+              derivada de tu uso del Servicio, del contenido que publiques o del
+              incumplimiento de estos Términos.
             </p>
           </Section>
 
@@ -154,17 +152,17 @@ function TermsPage() {
           <Section title="11. Ley aplicable">
             <p>
               Estos Términos se rigen por la legislación española. Cualquier
-              disputa se someterá a los juzgados y tribunales competentes
-              según ley.
+              disputa se someterá a los juzgados y tribunales competentes según
+              ley.
             </p>
           </Section>
 
           <Section title="12. Cambios en los Términos">
             <p>
               Podemos actualizar estos Términos. Si los cambios son
-              sustanciales, te avisaremos por email o desde la app antes de
-              que entren en vigor. El uso continuado del Servicio tras la
-              entrada en vigor implica tu aceptación.
+              sustanciales, te avisaremos por email o desde la app antes de que
+              entren en vigor. El uso continuado del Servicio tras la entrada en
+              vigor implica tu aceptación.
             </p>
           </Section>
 

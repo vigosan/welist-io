@@ -1,5 +1,6 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
   Alert,
@@ -10,7 +11,6 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { useTranslation } from "react-i18next";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
   useAddCollaborator,
@@ -24,8 +24,8 @@ import {
   useListActivity,
   useUpdateList,
 } from "@/hooks/lists";
-import { useUserSearch } from "@/hooks/users";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
+import { useUserSearch } from "@/hooks/users";
 import { useSession } from "@/lib/auth";
 import { LIST_CATEGORIES, type ListCategory } from "@/lib/categories";
 import { formatRelativeTime } from "@/lib/relative-time";
@@ -119,7 +119,10 @@ export default function ListSettingsScreen() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-canvas dark:bg-canvas-dark" edges={["top"]}>
+    <SafeAreaView
+      className="flex-1 bg-canvas dark:bg-canvas-dark"
+      edges={["top"]}
+    >
       <View className="items-center pt-2 pb-1">
         <View className="h-1 w-10 rounded-full bg-gray-300 dark:bg-gray-700" />
       </View>
@@ -397,7 +400,9 @@ function CollaboratorsSection({ listId }: { listId: string }) {
             }
             className="px-2"
           >
-            <Text className="text-xs font-semibold text-gray-900 dark:text-gray-100">{t("common.remove")}</Text>
+            <Text className="text-xs font-semibold text-gray-900 dark:text-gray-100">
+              {t("common.remove")}
+            </Text>
           </Pressable>
         </View>
       ))}
@@ -439,7 +444,10 @@ function CollaboratorsSection({ listId }: { listId: string }) {
               add.mutate(u.id, {
                 onSuccess: () => setQ(""),
                 onError: (e) =>
-                  Alert.alert(t("settings.couldNotAddCollab"), String((e as Error).message)),
+                  Alert.alert(
+                    t("settings.couldNotAddCollab"),
+                    String((e as Error).message)
+                  ),
               })
             }
             disabled={add.isPending}

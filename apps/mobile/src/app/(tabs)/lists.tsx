@@ -2,6 +2,7 @@ import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import { ChevronRight, ListFilter, Plus } from "lucide-react-native";
 import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
   Alert,
@@ -12,7 +13,6 @@ import {
   Text,
   View,
 } from "react-native";
-import { useTranslation } from "react-i18next";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { PressableCard } from "@/components/Card";
 import { CategoryTag } from "@/components/CategoryTag";
@@ -77,9 +77,7 @@ export default function MyListsScreen() {
               accessibilityLabel={t("common.search")}
               hitSlop={8}
               className={`h-9 w-9 items-center justify-center rounded-full active:bg-black/[0.05] dark:active:bg-white/[0.06] ${
-                filtersOpen || isFiltered
-                  ? "bg-gray-900 dark:bg-gray-100"
-                  : ""
+                filtersOpen || isFiltered ? "bg-gray-900 dark:bg-gray-100" : ""
               }`}
             >
               <ListFilter
@@ -111,7 +109,6 @@ export default function MyListsScreen() {
         }
       />
 
-
       {filtersOpen && (
         <>
           <View className="mx-5 mb-3">
@@ -125,72 +122,74 @@ export default function MyListsScreen() {
           </View>
 
           <View className="mx-6 mb-3 flex-row gap-1 rounded-xl bg-gray-100 p-1 dark:bg-gray-800">
-        {VISIBILITIES.map((v) => {
-          const active = visibility === v;
-          return (
-            <Pressable
-              key={v}
-              onPress={() => setVisibility(v)}
-              className={`flex-1 items-center rounded-lg py-1.5 ${
-                active ? "bg-white dark:bg-gray-900" : ""
-              }`}
-              style={
-                active
-                  ? {
-                      shadowColor: "#000",
-                      shadowOpacity: 0.06,
-                      shadowRadius: 2,
-                      shadowOffset: { width: 0, height: 1 },
-                      elevation: 1,
-                    }
-                  : undefined
-              }
-            >
-              <Text
-                className={`text-xs font-medium ${
-                  active
-                    ? "text-gray-900 dark:text-gray-100"
-                    : "text-gray-500 dark:text-gray-400"
-                }`}
-              >
-                {t(`lists.visibility${v[0].toUpperCase()}${v.slice(1)}` as never)}
-              </Text>
-            </Pressable>
-          );
-        })}
-      </View>
+            {VISIBILITIES.map((v) => {
+              const active = visibility === v;
+              return (
+                <Pressable
+                  key={v}
+                  onPress={() => setVisibility(v)}
+                  className={`flex-1 items-center rounded-lg py-1.5 ${
+                    active ? "bg-white dark:bg-gray-900" : ""
+                  }`}
+                  style={
+                    active
+                      ? {
+                          shadowColor: "#000",
+                          shadowOpacity: 0.06,
+                          shadowRadius: 2,
+                          shadowOffset: { width: 0, height: 1 },
+                          elevation: 1,
+                        }
+                      : undefined
+                  }
+                >
+                  <Text
+                    className={`text-xs font-medium ${
+                      active
+                        ? "text-gray-900 dark:text-gray-100"
+                        : "text-gray-500 dark:text-gray-400"
+                    }`}
+                  >
+                    {t(
+                      `lists.visibility${v[0].toUpperCase()}${v.slice(1)}` as never
+                    )}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </View>
 
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerClassName="px-6 gap-1.5"
-        style={{ flexGrow: 0, flexShrink: 0, marginBottom: 12 }}
-      >
-        {SORTS.map((s) => {
-          const active = sort === s;
-          return (
-            <Pressable
-              key={s}
-              onPress={() => setSort(s)}
-              className={`rounded-full px-3 py-1 ${
-                active
-                  ? "bg-gray-900 dark:bg-gray-100"
-                  : "bg-gray-100 dark:bg-gray-800"
-              }`}
-            >
-              <Text
-                className={`text-xs font-medium ${
-                  active
-                    ? "text-white dark:text-gray-900"
-                    : "text-gray-700 dark:text-gray-300"
-                }`}
-              >
-                {t(`lists.sort${s[0].toUpperCase()}${s.slice(1)}` as never)}
-              </Text>
-            </Pressable>
-          );
-        })}
-      </ScrollView>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerClassName="px-6 gap-1.5"
+            style={{ flexGrow: 0, flexShrink: 0, marginBottom: 12 }}
+          >
+            {SORTS.map((s) => {
+              const active = sort === s;
+              return (
+                <Pressable
+                  key={s}
+                  onPress={() => setSort(s)}
+                  className={`rounded-full px-3 py-1 ${
+                    active
+                      ? "bg-gray-900 dark:bg-gray-100"
+                      : "bg-gray-100 dark:bg-gray-800"
+                  }`}
+                >
+                  <Text
+                    className={`text-xs font-medium ${
+                      active
+                        ? "text-white dark:text-gray-900"
+                        : "text-gray-700 dark:text-gray-300"
+                    }`}
+                  >
+                    {t(`lists.sort${s[0].toUpperCase()}${s.slice(1)}` as never)}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </ScrollView>
         </>
       )}
 
@@ -208,7 +207,9 @@ export default function MyListsScreen() {
           />
         }
         onEndReached={() =>
-          query.hasNextPage && !query.isFetchingNextPage && query.fetchNextPage()
+          query.hasNextPage &&
+          !query.isFetchingNextPage &&
+          query.fetchNextPage()
         }
         onEndReachedThreshold={0.4}
         ListEmptyComponent={
@@ -238,7 +239,9 @@ export default function MyListsScreen() {
           )
         }
         ListFooterComponent={
-          query.isFetchingNextPage ? <ActivityIndicator className="my-4" /> : null
+          query.isFetchingNextPage ? (
+            <ActivityIndicator className="my-4" />
+          ) : null
         }
         renderItem={({ item }) => (
           <PressableCard

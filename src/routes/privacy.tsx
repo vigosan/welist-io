@@ -73,19 +73,23 @@ function PrivacyPage() {
           <Section title="3. Para qué usamos tus datos">
             <ul className="list-disc pl-5 flex flex-col gap-1">
               <li>Identificarte y permitirte acceder a tu cuenta.</li>
-              <li>Mostrar tu contenido y permitir interactuar con otros usuarios.</li>
+              <li>
+                Mostrar tu contenido y permitir interactuar con otros usuarios.
+              </li>
               <li>
                 Enviarte notificaciones operativas (resultados de pago, cambios
                 en tu cuenta) y, si lo aceptas, recordatorios periódicos.
               </li>
-              <li>Detectar y prevenir abusos, fraude y violaciones de los términos.</li>
+              <li>
+                Detectar y prevenir abusos, fraude y violaciones de los
+                términos.
+              </li>
               <li>Cumplir con obligaciones legales.</li>
             </ul>
             <p>
-              <strong>Base legal (GDPR)</strong>: ejecución del contrato
-              (cuenta y servicio), consentimiento (notificaciones por email,
-              perfil público), interés legítimo (seguridad y mejora del
-              servicio).
+              <strong>Base legal (GDPR)</strong>: ejecución del contrato (cuenta
+              y servicio), consentimiento (notificaciones por email, perfil
+              público), interés legítimo (seguridad y mejora del servicio).
             </p>
           </Section>
 
@@ -100,17 +104,16 @@ function PrivacyPage() {
                 API.
               </li>
               <li>
-                <strong>Neon Inc.</strong> (EE. UU.) — base de datos
-                PostgreSQL.
+                <strong>Neon Inc.</strong> (EE. UU.) — base de datos PostgreSQL.
               </li>
               <li>
                 <strong>Google LLC</strong> y <strong>Apple Inc.</strong> — para
                 el inicio de sesión OAuth.
               </li>
               <li>
-                <strong>Stripe, Inc.</strong> (EE. UU.) — procesamiento de
-                pagos cuando un creador conecta su cuenta para monetizar listas
-                (solo en la web).
+                <strong>Stripe, Inc.</strong> (EE. UU.) — procesamiento de pagos
+                cuando un creador conecta su cuenta para monetizar listas (solo
+                en la web).
               </li>
               <li>
                 <strong>Resend, Inc.</strong> (EE. UU.) — envío de emails
@@ -127,11 +130,11 @@ function PrivacyPage() {
           <Section title="5. Cuánto tiempo guardamos los datos">
             <p>
               Mantenemos tus datos mientras tu cuenta esté activa. Cuando
-              eliminas tu cuenta (desde Ajustes en la app o la web), borramos
-              de forma permanente tu perfil, tus listas y demás contenido
-              asociado. Algunas obligaciones legales (contabilidad fiscal en el
-              caso de transacciones) pueden requerir conservar registros
-              específicos durante el plazo legal aplicable.
+              eliminas tu cuenta (desde Ajustes en la app o la web), borramos de
+              forma permanente tu perfil, tus listas y demás contenido asociado.
+              Algunas obligaciones legales (contabilidad fiscal en el caso de
+              transacciones) pueden requerir conservar registros específicos
+              durante el plazo legal aplicable.
             </p>
           </Section>
 
@@ -143,7 +146,9 @@ function PrivacyPage() {
             <ul className="list-disc pl-5 flex flex-col gap-1">
               <li>Acceder a tus datos personales.</li>
               <li>Solicitar su rectificación.</li>
-              <li>Solicitar su supresión (puedes hacerlo tú mismo desde Ajustes).</li>
+              <li>
+                Solicitar su supresión (puedes hacerlo tú mismo desde Ajustes).
+              </li>
               <li>Limitar u oponerte al tratamiento.</li>
               <li>Portabilidad de tus datos.</li>
               <li>
@@ -189,16 +194,16 @@ function PrivacyPage() {
               Aplicamos medidas técnicas y organizativas razonables para
               proteger tus datos: cifrado en tránsito (HTTPS), contraseñas
               almacenadas como hash con sal, control de acceso a la
-              infraestructura. Ningún sistema es 100 % seguro; en caso de
-              brecha que afecte tus derechos, te informaremos conforme exige la
+              infraestructura. Ningún sistema es 100 % seguro; en caso de brecha
+              que afecte tus derechos, te informaremos conforme exige la
               normativa.
             </p>
           </Section>
 
           <Section title="10. Cambios en esta política">
             <p>
-              Podemos actualizar esta política para reflejar cambios en la app
-              o en la normativa. Indicaremos siempre la fecha de la última
+              Podemos actualizar esta política para reflejar cambios en la app o
+              en la normativa. Indicaremos siempre la fecha de la última
               actualización al inicio del documento. Si los cambios son
               sustanciales, te lo notificaremos por email o desde la app antes
               de que entren en vigor.

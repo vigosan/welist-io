@@ -1,6 +1,7 @@
 import { Eye, EyeOff } from "lucide-react-native";
 import { useColorScheme } from "nativewind";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Alert,
   Linking,
@@ -11,7 +12,6 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { useTranslation } from "react-i18next";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Avatar } from "@/components/Avatar";
 import { ScreenHeader } from "@/components/ScreenHeader";
@@ -21,11 +21,7 @@ import {
   useUpdateProfile,
   useUserMe,
 } from "@/hooks/users";
-import {
-  currentLanguage,
-  setLanguage,
-  type SupportedLanguage,
-} from "@/i18n";
+import { currentLanguage, type SupportedLanguage, setLanguage } from "@/i18n";
 import { useSession } from "@/lib/auth";
 import { setStoredTheme, type ThemePreference } from "@/lib/theme";
 
@@ -181,7 +177,9 @@ export default function SettingsScreen() {
                       : "text-gray-700 dark:text-gray-300"
                   }`}
                 >
-                  {t(`profile.theme${theme[0].toUpperCase()}${theme.slice(1)}` as never)}
+                  {t(
+                    `profile.theme${theme[0].toUpperCase()}${theme.slice(1)}` as never
+                  )}
                 </Text>
               </Pressable>
             ))}
@@ -346,9 +344,7 @@ function Row({ children }: { children: React.ReactNode }) {
 }
 
 function Divider() {
-  return (
-    <View className="my-3 h-px bg-gray-100 dark:bg-gray-800" />
-  );
+  return <View className="my-3 h-px bg-gray-100 dark:bg-gray-800" />;
 }
 
 function PasswordField({

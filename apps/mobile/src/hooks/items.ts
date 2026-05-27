@@ -26,9 +26,7 @@ export function useToggleItem(listId: string) {
       await qc.cancelQueries({ queryKey: ["items", listId] });
       const previous = qc.getQueryData<Item[]>(["items", listId]);
       qc.setQueryData<Item[]>(["items", listId], (old) =>
-        old?.map((it) =>
-          it.id === itemId ? { ...it, done: !it.done } : it
-        )
+        old?.map((it) => (it.id === itemId ? { ...it, done: !it.done } : it))
       );
       return { previous };
     },
@@ -67,9 +65,7 @@ export function useSetItemLocation(listId: string) {
       coords,
     }: {
       itemId: string;
-      coords:
-        | { latitude: string; longitude: string; placeName: string }
-        | null;
+      coords: { latitude: string; longitude: string; placeName: string } | null;
     }) => itemsService.setLocation(listId, itemId, coords),
     onMutate: async ({ itemId, coords }) => {
       await qc.cancelQueries({ queryKey: ["items", listId] });

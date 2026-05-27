@@ -1,7 +1,7 @@
 import * as AppleAuthentication from "expo-apple-authentication";
 import { useState } from "react";
-import { Alert, Platform, Pressable, Text, View } from "react-native";
 import { useTranslation } from "react-i18next";
+import { Alert, Platform, Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Input } from "@/components/Input";
 import { useSession } from "@/lib/auth";
@@ -62,7 +62,10 @@ export default function SignInScreen() {
   };
 
   const submitDisabled =
-    submitting || !email || !password || (mode === "signUp" && password.length < 8);
+    submitting ||
+    !email ||
+    !password ||
+    (mode === "signUp" && password.length < 8);
 
   return (
     <SafeAreaView className="flex-1 bg-canvas dark:bg-canvas-dark">

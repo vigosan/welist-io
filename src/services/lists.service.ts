@@ -234,8 +234,7 @@ export const usersService = {
       body: JSON.stringify({ password }),
     }),
 
-  deleteAccount: () =>
-    apiClient<{ ok: true }>("/api/me", { method: "DELETE" }),
+  deleteAccount: () => apiClient<{ ok: true }>("/api/me", { method: "DELETE" }),
 
   search: (q: string) =>
     apiClient<{

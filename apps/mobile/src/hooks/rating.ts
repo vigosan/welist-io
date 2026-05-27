@@ -9,7 +9,9 @@ export function useRateList(listId: string) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (value: number) =>
-      value === 0 ? ratingService.unrate(listId) : ratingService.rate(listId, value),
+      value === 0
+        ? ratingService.unrate(listId)
+        : ratingService.rate(listId, value),
     onMutate: async (value) => {
       await qc.cancelQueries({ queryKey: ["list", listId] });
       await qc.cancelQueries({ queryKey: ["explore-detail", listId] });
@@ -39,7 +41,8 @@ export function useRateList(listId: string) {
       return { previousList, previousExplore };
     },
     onError: (_err, _value, ctx) => {
-      if (ctx?.previousList) qc.setQueryData(["list", listId], ctx.previousList);
+      if (ctx?.previousList)
+        qc.setQueryData(["list", listId], ctx.previousList);
       if (ctx?.previousExplore)
         qc.setQueryData(["explore-detail", listId], ctx.previousExplore);
     },

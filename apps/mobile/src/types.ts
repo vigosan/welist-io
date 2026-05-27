@@ -54,7 +54,11 @@ export type ExploreItem = {
   participants: { id: string; name: string | null; image: string | null }[];
   isParticipating: boolean;
   rating: { avg: number | null; count: number };
-  owner: { id: string | null; name: string | null; image: string | null } | null;
+  owner: {
+    id: string | null;
+    name: string | null;
+    image: string | null;
+  } | null;
 };
 
 export type NotificationType =

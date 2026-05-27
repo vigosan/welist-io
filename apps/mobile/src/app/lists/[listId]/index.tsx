@@ -1,7 +1,7 @@
-import { useLocalSearchParams, useRouter } from "expo-router";
-import { ListFilter, MoreVertical, Plus } from "lucide-react-native";
 import * as Clipboard from "expo-clipboard";
 import * as Haptics from "expo-haptics";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { ListFilter, MoreVertical, Plus } from "lucide-react-native";
 import { useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
@@ -28,12 +28,10 @@ import { ActionDrawer, type DrawerAction } from "@/components/ActionDrawer";
 import { AnimatedCheckbox } from "@/components/AnimatedCheckbox";
 import { EmptyState } from "@/components/EmptyState";
 import { LocationPickerModal } from "@/components/LocationPickerModal";
-import { ItemRowSkeleton } from "@/components/Skeleton";
+import { RateSheet } from "@/components/RateSheet";
+import { RatingBadge } from "@/components/RatingBadge";
 import { ScreenHeader } from "@/components/ScreenHeader";
-import {
-  renderInlineMarkdown,
-  stripInlineMarkdown,
-} from "@/lib/inline-markdown";
+import { ItemRowSkeleton } from "@/components/Skeleton";
 import {
   useDeleteItem,
   useItems,
@@ -42,20 +40,18 @@ import {
   useToggleItem,
   useUpdateItem,
 } from "@/hooks/items";
-import {
-  useActiveParticipants,
-  useDeleteList,
-  useList,
-} from "@/hooks/lists";
-import { useReport } from "@/hooks/users";
+import { useActiveParticipants, useDeleteList, useList } from "@/hooks/lists";
 import { useRateList } from "@/hooks/rating";
 import { useIsDark } from "@/hooks/useIsDark";
+import { useReport } from "@/hooks/users";
 import { useSession } from "@/lib/auth";
+import {
+  renderInlineMarkdown,
+  stripInlineMarkdown,
+} from "@/lib/inline-markdown";
 import { type FilterMode, filterItems } from "@/lib/items-filter";
 import { mapsUrl } from "@/lib/maps";
 import type { Item } from "@/types";
-import { RateSheet } from "@/components/RateSheet";
-import { RatingBadge } from "@/components/RatingBadge";
 
 const FILTERS: FilterMode[] = ["all", "pending", "done"];
 
@@ -276,7 +272,10 @@ export default function ListDetailScreen() {
   ];
 
   return (
-    <SafeAreaView className="flex-1 bg-canvas dark:bg-canvas-dark" edges={["top"]}>
+    <SafeAreaView
+      className="flex-1 bg-canvas dark:bg-canvas-dark"
+      edges={["top"]}
+    >
       <ScreenHeader
         title={list.data?.name ?? ""}
         back
@@ -334,12 +333,10 @@ export default function ListDetailScreen() {
         }
       />
 
-      {((list.data?.rating &&
-        (list.data.rating.count > 0 || !isOwner)) ||
+      {((list.data?.rating && (list.data.rating.count > 0 || !isOwner)) ||
         (participants.data && participants.data.total > 0)) && (
         <View className="mx-6 mb-2 flex-row items-center justify-between">
-          {list.data?.rating &&
-          (list.data.rating.count > 0 || !isOwner) ? (
+          {list.data?.rating && (list.data.rating.count > 0 || !isOwner) ? (
             <RatingBadge
               avg={list.data.rating.avg ?? 0}
               count={list.data.rating.count}
@@ -359,40 +356,39 @@ export default function ListDetailScreen() {
         </View>
       )}
 
-
       {filtersOpen && (
-      <View className="mx-6 mb-3 flex-row gap-2">
-        {FILTERS.map((f) => {
-          const active = filter === f;
-          const label =
-            f === "all"
-              ? t("list.filterAll")
-              : f === "pending"
-                ? t("list.filterPending")
-                : t("list.filterDone");
-          return (
-            <Pressable
-              key={f}
-              onPress={() => setFilter(f)}
-              className={`rounded-full border px-3 py-1.5 ${
-                active
-                  ? "border-gray-900 bg-gray-900 dark:border-gray-100 dark:bg-gray-100"
-                  : "border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900"
-              }`}
-            >
-              <Text
-                className={`text-xs font-medium ${
+        <View className="mx-6 mb-3 flex-row gap-2">
+          {FILTERS.map((f) => {
+            const active = filter === f;
+            const label =
+              f === "all"
+                ? t("list.filterAll")
+                : f === "pending"
+                  ? t("list.filterPending")
+                  : t("list.filterDone");
+            return (
+              <Pressable
+                key={f}
+                onPress={() => setFilter(f)}
+                className={`rounded-full border px-3 py-1.5 ${
                   active
-                    ? "text-white dark:text-gray-900"
-                    : "text-gray-500 dark:text-gray-400"
+                    ? "border-gray-900 bg-gray-900 dark:border-gray-100 dark:bg-gray-100"
+                    : "border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900"
                 }`}
               >
-                {label}
-              </Text>
-            </Pressable>
-          );
-        })}
-      </View>
+                <Text
+                  className={`text-xs font-medium ${
+                    active
+                      ? "text-white dark:text-gray-900"
+                      : "text-gray-500 dark:text-gray-400"
+                  }`}
+                >
+                  {label}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
       )}
 
       <DraggableFlatList
@@ -464,10 +460,7 @@ export default function ListDetailScreen() {
               className="rounded-xl border border-gray-200 px-3 py-2 text-gray-900 dark:border-gray-700 dark:text-gray-100"
             />
             <View className="mt-4 flex-row justify-end gap-3">
-              <Pressable
-                onPress={() => setEditing(null)}
-                className="px-4 py-2"
-              >
+              <Pressable onPress={() => setEditing(null)} className="px-4 py-2">
                 <Text className="text-sm text-gray-500 dark:text-gray-400">
                   {t("common.cancel")}
                 </Text>

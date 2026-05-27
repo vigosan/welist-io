@@ -369,9 +369,7 @@ export const reports = pgTable(
     targetType: reportTargetEnum("target_type").notNull(),
     targetId: text("target_id").notNull(),
     reason: text("reason"),
-    createdAt: timestamp("created_at", { mode: "date" })
-      .defaultNow()
-      .notNull(),
+    createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
     resolvedAt: timestamp("resolved_at", { mode: "date" }),
   },
   (t) => [

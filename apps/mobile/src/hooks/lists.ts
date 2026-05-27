@@ -43,7 +43,12 @@ export function useList(listId: string) {
         if (!data) continue;
         for (const page of data.pages) {
           const found = page.items?.find((x) => x.id === listId);
-          if (found) return found as unknown as ReturnType<typeof listsService.get> extends Promise<infer T> ? T : never;
+          if (found)
+            return found as unknown as ReturnType<
+              typeof listsService.get
+            > extends Promise<infer T>
+              ? T
+              : never;
         }
       }
       return undefined;
@@ -62,9 +67,8 @@ export function useCreateList() {
 export function useUpdateList(listId: string) {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (
-      patch: Parameters<typeof listsService.update>[1]
-    ) => listsService.update(listId, patch),
+    mutationFn: (patch: Parameters<typeof listsService.update>[1]) =>
+      listsService.update(listId, patch),
     onMutate: async (patch) => {
       await qc.cancelQueries({ queryKey: ["list", listId] });
       const previousList = qc.getQueryData<Record<string, unknown>>([
