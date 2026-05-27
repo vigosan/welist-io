@@ -99,7 +99,7 @@ function SettingsPage() {
       <div className="min-h-dvh bg-canvas dark:bg-canvas-dark flex flex-col">
         <AppNav />
         <main className="flex-1 flex items-center justify-center px-4">
-          <p className="text-sm text-gray-500 dark:text-[#a0a09c]">
+          <p className="text-sm text-gray-500 dark:text-muted">
             Inicia sesión para ver la configuración.
           </p>
         </main>
@@ -115,21 +115,21 @@ function SettingsPage() {
         <div>
           <Link
             to="/lists"
-            className="text-xs text-gray-500 dark:text-[#a0a09c] hover:text-[#0c0c0b] dark:hover:text-[#f0ede8] transition"
+            className="text-xs text-gray-500 dark:text-muted hover:text-ink dark:hover:text-paper transition"
           >
             ← Mis listas
           </Link>
-          <h1 className="mt-4 text-xl font-bold tracking-tight text-[#0c0c0b] dark:text-[#f0ede8]">
+          <h1 className="mt-4 text-xl font-bold tracking-tight text-ink dark:text-paper">
             Configuración
           </h1>
         </div>
 
         <section className="bg-white dark:bg-white/[0.02] border border-black/[0.08] dark:border-white/[0.08] rounded-2xl p-5 flex flex-col gap-4">
           <div>
-            <p className="text-sm font-semibold text-[#0c0c0b] dark:text-[#f0ede8]">
+            <p className="text-sm font-semibold text-ink dark:text-paper">
               Cuenta
             </p>
-            <p className="text-sm text-gray-500 dark:text-[#a0a09c] mt-0.5">
+            <p className="text-sm text-gray-500 dark:text-muted mt-0.5">
               {session.user.email}
             </p>
           </div>
@@ -145,15 +145,15 @@ function SettingsPage() {
 
         <section className="bg-white dark:bg-white/[0.02] border border-black/[0.08] dark:border-white/[0.08] rounded-2xl p-5 flex flex-col gap-4">
           <div>
-            <p className="text-sm font-semibold text-[#0c0c0b] dark:text-[#f0ede8]">
+            <p className="text-sm font-semibold text-ink dark:text-paper">
               Perfil
             </p>
-            <p className="text-xs text-gray-500 dark:text-[#a0a09c] mt-0.5 leading-relaxed">
+            <p className="text-xs text-gray-500 dark:text-muted mt-0.5 leading-relaxed">
               Controla si apareces en el directorio público de usuarios.
             </p>
           </div>
           <label className="flex items-center justify-between gap-3 cursor-pointer">
-            <span className="text-sm text-[#0c0c0b] dark:text-[#f0ede8]">
+            <span className="text-sm text-ink dark:text-paper">
               Aparecer en el directorio de usuarios
             </span>
             <button
@@ -169,12 +169,12 @@ function SettingsPage() {
               disabled={updateProfile.isPending || userMe === undefined}
               className={`cursor-pointer relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors duration-150 focus:outline-none disabled:opacity-40 ${
                 (userMe?.publicProfile ?? true)
-                  ? "bg-[#0c0c0b] dark:bg-[#f0ede8]"
+                  ? "bg-ink dark:bg-paper"
                   : "bg-black/[0.10] dark:bg-white/[0.10]"
               }`}
             >
               <span
-                className={`inline-block h-3.5 w-3.5 rounded-full bg-white dark:bg-[#0c0c0b] shadow transition-transform duration-150 ${
+                className={`inline-block h-3.5 w-3.5 rounded-full bg-white dark:bg-ink shadow transition-transform duration-150 ${
                   (userMe?.publicProfile ?? true)
                     ? "translate-x-4.5"
                     : "translate-x-0.5"
@@ -186,16 +186,16 @@ function SettingsPage() {
 
         <section className="bg-white dark:bg-white/[0.02] border border-black/[0.08] dark:border-white/[0.08] rounded-2xl p-5 flex flex-col gap-4">
           <div>
-            <p className="text-sm font-semibold text-[#0c0c0b] dark:text-[#f0ede8]">
+            <p className="text-sm font-semibold text-ink dark:text-paper">
               Contenido para adultos
             </p>
-            <p className="text-xs text-gray-500 dark:text-[#a0a09c] mt-0.5 leading-relaxed">
+            <p className="text-xs text-gray-500 dark:text-muted mt-0.5 leading-relaxed">
               Si lo activas, las listas marcadas como +18 aparecerán en Explore.
               Por defecto está desactivado.
             </p>
           </div>
           <label className="flex items-center justify-between gap-3 cursor-pointer">
-            <span className="text-sm text-[#0c0c0b] dark:text-[#f0ede8]">
+            <span className="text-sm text-ink dark:text-paper">
               Mostrar contenido para adultos (+18)
             </span>
             <button
@@ -211,12 +211,12 @@ function SettingsPage() {
               disabled={updateSettings.isPending || userSettings === undefined}
               className={`cursor-pointer relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors duration-150 focus:outline-none disabled:opacity-40 ${
                 (userSettings?.showAdult ?? false)
-                  ? "bg-[#0c0c0b] dark:bg-[#f0ede8]"
+                  ? "bg-ink dark:bg-paper"
                   : "bg-black/[0.10] dark:bg-white/[0.10]"
               }`}
             >
               <span
-                className={`inline-block h-3.5 w-3.5 rounded-full bg-white dark:bg-[#0c0c0b] shadow transition-transform duration-150 ${
+                className={`inline-block h-3.5 w-3.5 rounded-full bg-white dark:bg-ink shadow transition-transform duration-150 ${
                   (userSettings?.showAdult ?? false)
                     ? "translate-x-4.5"
                     : "translate-x-0.5"
@@ -228,16 +228,16 @@ function SettingsPage() {
 
         <section className="bg-white dark:bg-white/[0.02] border border-black/[0.08] dark:border-white/[0.08] rounded-2xl p-5 flex flex-col gap-4">
           <div>
-            <p className="text-sm font-semibold text-[#0c0c0b] dark:text-[#f0ede8]">
+            <p className="text-sm font-semibold text-ink dark:text-paper">
               Notificaciones por email
             </p>
-            <p className="text-xs text-gray-500 dark:text-[#a0a09c] mt-0.5 leading-relaxed">
+            <p className="text-xs text-gray-500 dark:text-muted mt-0.5 leading-relaxed">
               Recibe un recordatorio quincenal con un ítem aleatorio pendiente
               de tus listas para que no se te olvide.
             </p>
           </div>
           <label className="flex items-center justify-between gap-3 cursor-pointer">
-            <span className="text-sm text-[#0c0c0b] dark:text-[#f0ede8]">
+            <span className="text-sm text-ink dark:text-paper">
               Recibir recordatorios por email
             </span>
             <button
@@ -253,12 +253,12 @@ function SettingsPage() {
               disabled={updateProfile.isPending || userMe === undefined}
               className={`cursor-pointer relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors duration-150 focus:outline-none disabled:opacity-40 ${
                 (userMe?.emailOptIn ?? true)
-                  ? "bg-[#0c0c0b] dark:bg-[#f0ede8]"
+                  ? "bg-ink dark:bg-paper"
                   : "bg-black/[0.10] dark:bg-white/[0.10]"
               }`}
             >
               <span
-                className={`inline-block h-3.5 w-3.5 rounded-full bg-white dark:bg-[#0c0c0b] shadow transition-transform duration-150 ${
+                className={`inline-block h-3.5 w-3.5 rounded-full bg-white dark:bg-ink shadow transition-transform duration-150 ${
                   (userMe?.emailOptIn ?? true)
                     ? "translate-x-4.5"
                     : "translate-x-0.5"
@@ -270,12 +270,12 @@ function SettingsPage() {
 
         <section className="bg-white dark:bg-white/[0.02] border border-black/[0.08] dark:border-white/[0.08] rounded-2xl p-5 flex flex-col gap-4">
           <div>
-            <p className="text-sm font-semibold text-[#0c0c0b] dark:text-[#f0ede8]">
+            <p className="text-sm font-semibold text-ink dark:text-paper">
               {hasPassword
                 ? t("settings.password.titleChange")
                 : t("settings.password.title")}
             </p>
-            <p className="text-xs text-gray-500 dark:text-[#a0a09c] mt-0.5 leading-relaxed">
+            <p className="text-xs text-gray-500 dark:text-muted mt-0.5 leading-relaxed">
               {hasPassword
                 ? t("settings.password.descriptionSet")
                 : t("settings.password.description")}
@@ -294,7 +294,7 @@ function SettingsPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 data-testid="password-input"
-                className="w-full px-3 py-2 pr-10 text-sm bg-black/[0.03] dark:bg-white/[0.04] border border-black/[0.08] dark:border-white/[0.08] rounded-xl text-[#0c0c0b] dark:text-[#f0ede8] outline-none focus:border-gray-400"
+                className="w-full px-3 py-2 pr-10 text-sm bg-black/[0.03] dark:bg-white/[0.04] border border-black/[0.08] dark:border-white/[0.08] rounded-xl text-ink dark:text-paper outline-none focus:border-gray-400"
               />
               <button
                 type="button"
@@ -305,7 +305,7 @@ function SettingsPage() {
                     : t("settings.password.show")
                 }
                 data-testid="toggle-password-visibility"
-                className="cursor-pointer absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-gray-500 dark:text-[#a0a09c] hover:text-[#0c0c0b] dark:hover:text-[#f0ede8] transition-colors"
+                className="cursor-pointer absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-gray-500 dark:text-muted hover:text-ink dark:hover:text-paper transition-colors"
               >
                 {showPassword ? (
                   <EyeOff className="w-4 h-4" />
@@ -322,7 +322,7 @@ function SettingsPage() {
                 value={passwordConfirm}
                 onChange={(e) => setPasswordConfirm(e.target.value)}
                 data-testid="password-confirm-input"
-                className="w-full px-3 py-2 pr-10 text-sm bg-black/[0.03] dark:bg-white/[0.04] border border-black/[0.08] dark:border-white/[0.08] rounded-xl text-[#0c0c0b] dark:text-[#f0ede8] outline-none focus:border-gray-400"
+                className="w-full px-3 py-2 pr-10 text-sm bg-black/[0.03] dark:bg-white/[0.04] border border-black/[0.08] dark:border-white/[0.08] rounded-xl text-ink dark:text-paper outline-none focus:border-gray-400"
               />
               <button
                 type="button"
@@ -333,7 +333,7 @@ function SettingsPage() {
                     : t("settings.password.show")
                 }
                 data-testid="toggle-password-confirm-visibility"
-                className="cursor-pointer absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-gray-500 dark:text-[#a0a09c] hover:text-[#0c0c0b] dark:hover:text-[#f0ede8] transition-colors"
+                className="cursor-pointer absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-gray-500 dark:text-muted hover:text-ink dark:hover:text-paper transition-colors"
               >
                 {showPasswordConfirm ? (
                   <EyeOff className="w-4 h-4" />
@@ -343,17 +343,17 @@ function SettingsPage() {
               </button>
             </div>
             {passwordError && (
-              <p className="text-xs text-red-600 dark:text-red-400">
+              <p className="text-xs text-ink dark:text-paper">
                 {passwordError}
               </p>
             )}
             {setPasswordMutation.isSuccess && (
-              <p className="text-xs text-gray-500 dark:text-[#a0a09c]">
+              <p className="text-xs text-gray-500 dark:text-muted">
                 {t("settings.password.saved")}
               </p>
             )}
             {setPasswordMutation.isError && !passwordError && (
-              <p className="text-xs text-red-600 dark:text-red-400">
+              <p className="text-xs text-ink dark:text-paper">
                 {t("settings.password.genericError")}
               </p>
             )}
@@ -361,7 +361,7 @@ function SettingsPage() {
               type="submit"
               disabled={setPasswordMutation.isPending || !password}
               data-testid="save-password-button"
-              className="cursor-pointer self-start px-4 py-2 text-sm font-medium bg-[#0c0c0b] text-[#f8f7f5] dark:bg-[#f0ede8] dark:text-[#0c0c0b] rounded-xl hover:opacity-90 disabled:opacity-40 transition-[opacity,transform] duration-150 active:scale-[0.96]"
+              className="cursor-pointer self-start px-4 py-2 text-sm font-medium bg-ink text-canvas dark:bg-paper dark:text-ink rounded-xl hover:opacity-90 disabled:opacity-40 transition-[opacity,transform] duration-150 active:scale-[0.96]"
             >
               {setPasswordMutation.isPending
                 ? t("settings.password.saving")
@@ -372,22 +372,22 @@ function SettingsPage() {
 
         <section className="bg-white dark:bg-white/[0.02] border border-black/[0.08] dark:border-white/[0.08] rounded-2xl p-5 flex flex-col gap-4">
           <div>
-            <p className="text-sm font-semibold text-[#0c0c0b] dark:text-[#f0ede8]">
+            <p className="text-sm font-semibold text-ink dark:text-paper">
               Pagos con Stripe
             </p>
-            <p className="text-xs text-gray-500 dark:text-[#a0a09c] mt-0.5 leading-relaxed">
+            <p className="text-xs text-gray-500 dark:text-muted mt-0.5 leading-relaxed">
               Conecta tu cuenta de Stripe para vender el acceso a tus listas. El
               dinero va directo a tu cuenta.
             </p>
           </div>
 
           {stripeParam === "success" && (
-            <div className="px-3 py-2 bg-black/[0.03] dark:bg-white/[0.04] border border-black/[0.08] dark:border-white/[0.08] rounded-xl text-xs text-gray-600 dark:text-[#a0a09c]">
+            <div className="px-3 py-2 bg-black/[0.03] dark:bg-white/[0.04] border border-black/[0.08] dark:border-white/[0.08] rounded-xl text-xs text-gray-600 dark:text-muted">
               Cuenta conectada correctamente.
             </div>
           )}
           {stripeParam === "refresh" && (
-            <div className="px-3 py-2 bg-black/[0.03] dark:bg-white/[0.04] border border-black/[0.08] dark:border-white/[0.08] rounded-xl text-xs text-gray-500 dark:text-[#a0a09c]">
+            <div className="px-3 py-2 bg-black/[0.03] dark:bg-white/[0.04] border border-black/[0.08] dark:border-white/[0.08] rounded-xl text-xs text-gray-500 dark:text-muted">
               El proceso fue interrumpido. Vuelve a conectar tu cuenta.
             </div>
           )}
@@ -396,10 +396,10 @@ function SettingsPage() {
             <div className="h-8 w-40 rounded-xl bg-black/[0.04] dark:bg-white/[0.06] animate-pulse" />
           ) : status?.onboardingComplete ? (
             <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 text-xs font-medium text-[#0c0c0b] dark:text-[#f0ede8] px-3 py-1.5 bg-black/[0.03] dark:bg-white/[0.04] border border-black/[0.08] dark:border-white/[0.08] rounded-xl">
+              <span className="inline-flex items-center gap-1.5 text-xs font-medium text-ink dark:text-paper px-3 py-1.5 bg-black/[0.03] dark:bg-white/[0.04] border border-black/[0.08] dark:border-white/[0.08] rounded-xl">
                 <svg
                   aria-hidden="true"
-                  className="w-3 h-3 text-gray-500 dark:text-[#a0a09c]"
+                  className="w-3 h-3 text-gray-500 dark:text-muted"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -419,7 +419,7 @@ function SettingsPage() {
               type="button"
               onClick={handleConnectStripe}
               disabled={connecting}
-              className="cursor-pointer self-start px-4 py-2 text-sm font-medium bg-[#0c0c0b] text-[#f8f7f5] dark:bg-[#f0ede8] dark:text-[#0c0c0b] rounded-xl hover:opacity-90 disabled:opacity-40 transition-[opacity,transform] duration-150 active:scale-[0.96]"
+              className="cursor-pointer self-start px-4 py-2 text-sm font-medium bg-ink text-canvas dark:bg-paper dark:text-ink rounded-xl hover:opacity-90 disabled:opacity-40 transition-[opacity,transform] duration-150 active:scale-[0.96]"
             >
               {connecting
                 ? "Redirigiendo…"
@@ -430,12 +430,12 @@ function SettingsPage() {
           )}
         </section>
 
-        <section className="bg-white dark:bg-white/[0.02] border border-red-200 dark:border-red-900 rounded-2xl p-5 flex flex-col gap-4">
+        <section className="bg-white dark:bg-white/[0.02] border border-black/[0.08] dark:border-white/[0.08] rounded-2xl p-5 flex flex-col gap-4">
           <div>
-            <p className="text-sm font-semibold text-red-700 dark:text-red-400">
+            <p className="text-sm font-semibold text-ink dark:text-paper">
               {t("settings.dangerZone.title")}
             </p>
-            <p className="text-xs text-gray-500 dark:text-[#a0a09c] mt-0.5 leading-relaxed">
+            <p className="text-xs text-gray-500 dark:text-muted mt-0.5 leading-relaxed">
               {t("settings.dangerZone.deleteAccountDescription")}
             </p>
           </div>
@@ -451,14 +451,14 @@ function SettingsPage() {
                 onSuccess: () => signOut({ callbackUrl: "/" }),
               });
             }}
-            className="cursor-pointer self-start px-4 py-2 text-sm font-medium bg-red-600 text-white rounded-xl hover:bg-red-700 disabled:opacity-40 transition-[opacity,transform] duration-150 active:scale-[0.96]"
+            className="cursor-pointer self-start px-4 py-2 text-sm font-medium bg-ink text-canvas dark:bg-paper dark:text-ink rounded-xl hover:opacity-90 disabled:opacity-40 transition-[opacity,transform] duration-150 active:scale-[0.96]"
           >
             {deleteAccount.isPending
               ? t("settings.dangerZone.deleting")
               : t("settings.dangerZone.deleteAccount")}
           </button>
           {deleteAccount.isError && (
-            <p className="text-xs text-red-600 dark:text-red-400">
+            <p className="text-xs text-ink dark:text-paper">
               {t("settings.dangerZone.failed")}
             </p>
           )}
