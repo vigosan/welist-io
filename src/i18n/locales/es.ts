@@ -114,7 +114,7 @@ const es = {
     footLinkStatus: "Estado",
     footLinkAbout: "Sobre nosotros",
     footLinkContact: "Contacto",
-    footMadeIn: "© {{year}} welist · Hecho en Madrid",
+    footMadeIn: "© {{year}} welist · Hecho en Xàtiva (Valencia)",
   },
   list: {
     back: "← Mis listas",

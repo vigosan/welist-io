@@ -116,7 +116,7 @@ const en: Translations = {
     footLinkStatus: "Status",
     footLinkAbout: "About",
     footLinkContact: "Contact",
-    footMadeIn: "© {{year}} welist · Made in Madrid",
+    footMadeIn: "© {{year}} welist · Made in Xàtiva (Valencia)",
   },
   list: {
     back: "← My lists",
