@@ -10,13 +10,14 @@ type MyList = List & {
   participantCount: number;
 };
 
+import { Chip, cardHover, Progress } from "@/components/ui";
+import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import {
   useCreateList,
   useDeleteList,
   useMyLists,
   useStreak,
 } from "@/hooks/useList";
-import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { useSearchInput } from "@/hooks/useSearchInput";
 import { useTranslation } from "@/i18n/service";
 
@@ -70,7 +71,7 @@ function MyListRow({
 
   return (
     <div
-      className="group relative rounded-2xl border border-black/[0.08] dark:border-white/[0.08] bg-white dark:bg-white/[0.02] p-5 transition-colors duration-150 hover:border-black/[0.18] dark:hover:border-white/[0.18]"
+      className={`group relative rounded-2xl border border-black/[0.08] bg-canvas p-5 dark:border-white/[0.08] dark:bg-canvas-dark ${cardHover}`}
       data-testid="my-list-card"
     >
       <Link
@@ -128,19 +129,13 @@ function MyListRow({
                     })}
               </span>
             </div>
-            <div className="h-0.5 overflow-hidden w-full rounded-full bg-black/[0.06] dark:bg-white/[0.06]">
-              <div
-                data-testid="list-progress-bar"
-                className="h-full rounded-full bg-ink dark:bg-paper"
-                style={{
-                  width: `${Math.round((list.doneCount / list.itemCount) * 100)}%`,
-                  transition: "width 600ms cubic-bezier(0.2, 0, 0, 1)",
-                }}
-              />
-            </div>
+            <Progress
+              value={Math.round((list.doneCount / list.itemCount) * 100)}
+              barTestId="list-progress-bar"
+            />
           </div>
         )}
-        <p className="text-[11px] tabular-nums text-gray-400 dark:text-gray-500">
+        <p className="text-[11px] tabular-nums text-muted">
           {list.itemCount} {list.itemCount === 1 ? "item" : "items"}
           {list.participantCount > 0 &&
             ` · ${list.participantCount} ${list.participantCount === 1 ? "participante" : "participantes"}`}
@@ -270,18 +265,14 @@ function FilterChip({
   testId?: string;
 }) {
   return (
-    <button
-      type="button"
+    <Chip
+      active={active}
       onClick={onClick}
       data-testid={testId}
-      className={`cursor-pointer px-3 py-1 rounded-full text-xs transition-all duration-150 whitespace-nowrap shrink-0 border ${
-        active
-          ? "border-black/[0.20] dark:border-white/[0.20] bg-black/[0.12] dark:bg-white/[0.12] text-ink dark:text-paper font-semibold"
-          : "border-black/[0.08] dark:border-white/[0.08] text-gray-500 font-normal hover:border-black/[0.20] dark:hover:border-white/[0.20] hover:bg-black/[0.05] dark:hover:bg-white/[0.05]"
-      }`}
+      className="whitespace-nowrap shrink-0"
     >
       {label}
-    </button>
+    </Chip>
   );
 }
 
@@ -388,10 +379,10 @@ function MyListsPage() {
                   type="button"
                   data-testid="filter-toggle"
                   onClick={() => setFiltersOpen((v) => !v)}
-                  className={`cursor-pointer inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs transition-all duration-150 whitespace-nowrap shrink-0 ${
+                  className={`cursor-pointer inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs transition-colors duration-150 whitespace-nowrap shrink-0 active:scale-[0.97] ${
                     hasNonDefault
-                      ? "border-black/[0.20] dark:border-white/[0.20] bg-black/[0.12] dark:bg-white/[0.12] text-ink dark:text-paper font-semibold"
-                      : "border-black/[0.08] dark:border-white/[0.08] text-gray-500 font-normal hover:border-black/[0.20] dark:hover:border-white/[0.20] hover:bg-black/[0.05] dark:hover:bg-white/[0.05]"
+                      ? "border-ink bg-ink text-canvas dark:border-paper dark:bg-paper dark:text-canvas-dark"
+                      : "border-black/[0.08] bg-canvas text-muted hover:border-black/20 hover:text-ink dark:border-white/[0.08] dark:bg-canvas-dark dark:hover:border-white/20 dark:hover:text-paper"
                   }`}
                 >
                   <svg
