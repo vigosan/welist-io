@@ -184,6 +184,7 @@ export const es = {
     deleteList: "Eliminar lista",
     couldNotSave: "No se pudo guardar",
     couldNotClone: "No se pudo clonar",
+    couldNotAddCollab: "No se pudo añadir el colaborador",
     collaborators: "Colaboradores",
     searchUsers: "Buscar usuarios para invitar",
     removeCollabTitle: "Quitar colaborador",
@@ -245,6 +246,7 @@ export const es = {
     statsChallenges: "Retos",
     statsFollowers: "Seguidores",
     statsFollowing: "Siguiendo",
+    followFailed: "No se pudo actualizar",
   },
   notifications: {
     title: "Notificaciones",

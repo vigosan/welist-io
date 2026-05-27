@@ -74,7 +74,7 @@ export default function UserProfileScreen() {
     if (!status.data) return;
     toggleFollow.mutate(status.data.isFollowing, {
       onError: (e) =>
-        Alert.alert("Could not update", String((e as Error).message)),
+        Alert.alert(t("u.followFailed"), String((e as Error).message)),
     });
   };
 

@@ -439,7 +439,7 @@ function CollaboratorsSection({ listId }: { listId: string }) {
               add.mutate(u.id, {
                 onSuccess: () => setQ(""),
                 onError: (e) =>
-                  Alert.alert("Could not add", String((e as Error).message)),
+                  Alert.alert(t("settings.couldNotAddCollab"), String((e as Error).message)),
               })
             }
             disabled={add.isPending}

@@ -184,6 +184,7 @@ export const en = {
     deleteList: "Delete list",
     couldNotSave: "Could not save",
     couldNotClone: "Could not clone",
+    couldNotAddCollab: "Could not add collaborator",
     collaborators: "Collaborators",
     searchUsers: "Search users to invite",
     removeCollabTitle: "Remove collaborator",
@@ -244,6 +245,7 @@ export const en = {
     statsChallenges: "Challenges",
     statsFollowers: "Followers",
     statsFollowing: "Following",
+    followFailed: "Could not update",
   },
   notifications: {
     title: "Notifications",
