@@ -1,6 +1,6 @@
-import { stripInlineMarkdown } from "./inline-markdown";
-import { parsePlaces } from "./places";
-import { parseTags } from "./tags";
+import { stripInlineMarkdown } from "./inline-markdown.js";
+import { parsePlaces } from "./places.js";
+import { parseTags } from "./tags.js";
 
 export function parseItemText(text: string): {
   display: string;
