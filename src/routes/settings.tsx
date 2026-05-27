@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
 import { AppNav } from "@/components/AppNav";
+import { SectionHeading, SectionKicker } from "@/components/ui";
 import {
   useDeleteAccount,
   useSetPassword,
@@ -99,7 +100,7 @@ function SettingsPage() {
       <div className="min-h-dvh bg-canvas dark:bg-canvas-dark flex flex-col">
         <AppNav />
         <main className="flex-1 flex items-center justify-center px-4">
-          <p className="text-sm text-gray-500 dark:text-muted">
+          <p className="text-sm text-muted">
             Inicia sesión para ver la configuración.
           </p>
         </main>
@@ -115,23 +116,24 @@ function SettingsPage() {
         <div>
           <Link
             to="/lists"
-            className="text-xs text-gray-500 dark:text-muted hover:text-ink dark:hover:text-paper transition"
+            className="text-xs text-muted hover:text-ink dark:hover:text-paper transition"
           >
             ← Mis listas
           </Link>
-          <h1 className="mt-4 text-xl font-bold tracking-tight text-ink dark:text-paper">
-            Configuración
-          </h1>
+          <div className="mt-4">
+            <SectionKicker>Cuenta</SectionKicker>
+          </div>
+          <div className="mt-3.5">
+            <SectionHeading>Configuración</SectionHeading>
+          </div>
         </div>
 
-        <section className="bg-white dark:bg-white/[0.02] border border-black/[0.08] dark:border-white/[0.08] rounded-2xl p-5 flex flex-col gap-4">
+        <section className="bg-canvas dark:bg-canvas-dark border border-black/[0.08] dark:border-white/[0.08] rounded-2xl p-5 flex flex-col gap-4">
           <div>
             <p className="text-sm font-semibold text-ink dark:text-paper">
               Cuenta
             </p>
-            <p className="text-sm text-gray-500 dark:text-muted mt-0.5">
-              {session.user.email}
-            </p>
+            <p className="text-sm text-muted mt-0.5">{session.user.email}</p>
           </div>
 
           {session.user.image && (
@@ -143,12 +145,12 @@ function SettingsPage() {
           )}
         </section>
 
-        <section className="bg-white dark:bg-white/[0.02] border border-black/[0.08] dark:border-white/[0.08] rounded-2xl p-5 flex flex-col gap-4">
+        <section className="bg-canvas dark:bg-canvas-dark border border-black/[0.08] dark:border-white/[0.08] rounded-2xl p-5 flex flex-col gap-4">
           <div>
             <p className="text-sm font-semibold text-ink dark:text-paper">
               Perfil
             </p>
-            <p className="text-xs text-gray-500 dark:text-muted mt-0.5 leading-relaxed">
+            <p className="text-xs text-muted mt-0.5 leading-relaxed">
               Controla si apareces en el directorio público de usuarios.
             </p>
           </div>
@@ -184,12 +186,12 @@ function SettingsPage() {
           </label>
         </section>
 
-        <section className="bg-white dark:bg-white/[0.02] border border-black/[0.08] dark:border-white/[0.08] rounded-2xl p-5 flex flex-col gap-4">
+        <section className="bg-canvas dark:bg-canvas-dark border border-black/[0.08] dark:border-white/[0.08] rounded-2xl p-5 flex flex-col gap-4">
           <div>
             <p className="text-sm font-semibold text-ink dark:text-paper">
               Contenido para adultos
             </p>
-            <p className="text-xs text-gray-500 dark:text-muted mt-0.5 leading-relaxed">
+            <p className="text-xs text-muted mt-0.5 leading-relaxed">
               Si lo activas, las listas marcadas como +18 aparecerán en Explore.
               Por defecto está desactivado.
             </p>
@@ -226,12 +228,12 @@ function SettingsPage() {
           </label>
         </section>
 
-        <section className="bg-white dark:bg-white/[0.02] border border-black/[0.08] dark:border-white/[0.08] rounded-2xl p-5 flex flex-col gap-4">
+        <section className="bg-canvas dark:bg-canvas-dark border border-black/[0.08] dark:border-white/[0.08] rounded-2xl p-5 flex flex-col gap-4">
           <div>
             <p className="text-sm font-semibold text-ink dark:text-paper">
               Notificaciones por email
             </p>
-            <p className="text-xs text-gray-500 dark:text-muted mt-0.5 leading-relaxed">
+            <p className="text-xs text-muted mt-0.5 leading-relaxed">
               Recibe un recordatorio quincenal con un ítem aleatorio pendiente
               de tus listas para que no se te olvide.
             </p>
@@ -268,14 +270,14 @@ function SettingsPage() {
           </label>
         </section>
 
-        <section className="bg-white dark:bg-white/[0.02] border border-black/[0.08] dark:border-white/[0.08] rounded-2xl p-5 flex flex-col gap-4">
+        <section className="bg-canvas dark:bg-canvas-dark border border-black/[0.08] dark:border-white/[0.08] rounded-2xl p-5 flex flex-col gap-4">
           <div>
             <p className="text-sm font-semibold text-ink dark:text-paper">
               {hasPassword
                 ? t("settings.password.titleChange")
                 : t("settings.password.title")}
             </p>
-            <p className="text-xs text-gray-500 dark:text-muted mt-0.5 leading-relaxed">
+            <p className="text-xs text-muted mt-0.5 leading-relaxed">
               {hasPassword
                 ? t("settings.password.descriptionSet")
                 : t("settings.password.description")}
@@ -294,7 +296,7 @@ function SettingsPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 data-testid="password-input"
-                className="w-full px-3 py-2 pr-10 text-sm bg-black/[0.03] dark:bg-white/[0.04] border border-black/[0.08] dark:border-white/[0.08] rounded-xl text-ink dark:text-paper outline-none focus:border-gray-400"
+                className="w-full px-3 py-2 pr-10 text-sm bg-black/[0.03] dark:bg-white/[0.04] border border-black/[0.08] dark:border-white/[0.08] rounded-lg text-ink dark:text-paper outline-none focus:border-ink dark:focus:border-paper"
               />
               <button
                 type="button"
@@ -305,7 +307,7 @@ function SettingsPage() {
                     : t("settings.password.show")
                 }
                 data-testid="toggle-password-visibility"
-                className="cursor-pointer absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-gray-500 dark:text-muted hover:text-ink dark:hover:text-paper transition-colors"
+                className="cursor-pointer absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-muted hover:text-ink dark:hover:text-paper transition-colors"
               >
                 {showPassword ? (
                   <EyeOff className="w-4 h-4" />
@@ -322,7 +324,7 @@ function SettingsPage() {
                 value={passwordConfirm}
                 onChange={(e) => setPasswordConfirm(e.target.value)}
                 data-testid="password-confirm-input"
-                className="w-full px-3 py-2 pr-10 text-sm bg-black/[0.03] dark:bg-white/[0.04] border border-black/[0.08] dark:border-white/[0.08] rounded-xl text-ink dark:text-paper outline-none focus:border-gray-400"
+                className="w-full px-3 py-2 pr-10 text-sm bg-black/[0.03] dark:bg-white/[0.04] border border-black/[0.08] dark:border-white/[0.08] rounded-lg text-ink dark:text-paper outline-none focus:border-ink dark:focus:border-paper"
               />
               <button
                 type="button"
@@ -333,7 +335,7 @@ function SettingsPage() {
                     : t("settings.password.show")
                 }
                 data-testid="toggle-password-confirm-visibility"
-                className="cursor-pointer absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-gray-500 dark:text-muted hover:text-ink dark:hover:text-paper transition-colors"
+                className="cursor-pointer absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-muted hover:text-ink dark:hover:text-paper transition-colors"
               >
                 {showPasswordConfirm ? (
                   <EyeOff className="w-4 h-4" />
@@ -348,7 +350,7 @@ function SettingsPage() {
               </p>
             )}
             {setPasswordMutation.isSuccess && (
-              <p className="text-xs text-gray-500 dark:text-muted">
+              <p className="text-xs text-muted">
                 {t("settings.password.saved")}
               </p>
             )}
@@ -361,7 +363,7 @@ function SettingsPage() {
               type="submit"
               disabled={setPasswordMutation.isPending || !password}
               data-testid="save-password-button"
-              className="cursor-pointer self-start px-4 py-2 text-sm font-medium bg-ink text-canvas dark:bg-paper dark:text-ink rounded-xl hover:opacity-90 disabled:opacity-40 transition-[opacity,transform] duration-150 active:scale-[0.96]"
+              className="cursor-pointer self-start px-4 py-2 text-sm font-medium bg-ink text-canvas dark:bg-paper dark:text-ink rounded-lg hover:opacity-90 disabled:opacity-40 transition-[opacity,transform] duration-150 active:scale-[0.96]"
             >
               {setPasswordMutation.isPending
                 ? t("settings.password.saving")
@@ -370,36 +372,36 @@ function SettingsPage() {
           </form>
         </section>
 
-        <section className="bg-white dark:bg-white/[0.02] border border-black/[0.08] dark:border-white/[0.08] rounded-2xl p-5 flex flex-col gap-4">
+        <section className="bg-canvas dark:bg-canvas-dark border border-black/[0.08] dark:border-white/[0.08] rounded-2xl p-5 flex flex-col gap-4">
           <div>
             <p className="text-sm font-semibold text-ink dark:text-paper">
               Pagos con Stripe
             </p>
-            <p className="text-xs text-gray-500 dark:text-muted mt-0.5 leading-relaxed">
+            <p className="text-xs text-muted mt-0.5 leading-relaxed">
               Conecta tu cuenta de Stripe para vender el acceso a tus listas. El
               dinero va directo a tu cuenta.
             </p>
           </div>
 
           {stripeParam === "success" && (
-            <div className="px-3 py-2 bg-black/[0.03] dark:bg-white/[0.04] border border-black/[0.08] dark:border-white/[0.08] rounded-xl text-xs text-gray-600 dark:text-muted">
+            <div className="px-3 py-2 bg-black/[0.03] dark:bg-white/[0.04] border border-black/[0.08] dark:border-white/[0.08] rounded-lg text-xs text-muted">
               Cuenta conectada correctamente.
             </div>
           )}
           {stripeParam === "refresh" && (
-            <div className="px-3 py-2 bg-black/[0.03] dark:bg-white/[0.04] border border-black/[0.08] dark:border-white/[0.08] rounded-xl text-xs text-gray-500 dark:text-muted">
+            <div className="px-3 py-2 bg-black/[0.03] dark:bg-white/[0.04] border border-black/[0.08] dark:border-white/[0.08] rounded-lg text-xs text-muted">
               El proceso fue interrumpido. Vuelve a conectar tu cuenta.
             </div>
           )}
 
           {loading ? (
-            <div className="h-8 w-40 rounded-xl bg-black/[0.04] dark:bg-white/[0.06] animate-pulse" />
+            <div className="h-8 w-40 rounded-lg bg-black/[0.04] dark:bg-white/[0.06] animate-pulse" />
           ) : status?.onboardingComplete ? (
             <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 text-xs font-medium text-ink dark:text-paper px-3 py-1.5 bg-black/[0.03] dark:bg-white/[0.04] border border-black/[0.08] dark:border-white/[0.08] rounded-xl">
+              <span className="inline-flex items-center gap-1.5 text-xs font-medium text-ink dark:text-paper px-3 py-1.5 bg-black/[0.03] dark:bg-white/[0.04] border border-black/[0.08] dark:border-white/[0.08] rounded-lg">
                 <svg
                   aria-hidden="true"
-                  className="w-3 h-3 text-gray-500 dark:text-muted"
+                  className="w-3 h-3 text-muted"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -419,7 +421,7 @@ function SettingsPage() {
               type="button"
               onClick={handleConnectStripe}
               disabled={connecting}
-              className="cursor-pointer self-start px-4 py-2 text-sm font-medium bg-ink text-canvas dark:bg-paper dark:text-ink rounded-xl hover:opacity-90 disabled:opacity-40 transition-[opacity,transform] duration-150 active:scale-[0.96]"
+              className="cursor-pointer self-start px-4 py-2 text-sm font-medium bg-ink text-canvas dark:bg-paper dark:text-ink rounded-lg hover:opacity-90 disabled:opacity-40 transition-[opacity,transform] duration-150 active:scale-[0.96]"
             >
               {connecting
                 ? "Redirigiendo…"
@@ -430,12 +432,12 @@ function SettingsPage() {
           )}
         </section>
 
-        <section className="bg-white dark:bg-white/[0.02] border border-red-200 dark:border-red-900 rounded-2xl p-5 flex flex-col gap-4">
+        <section className="bg-canvas dark:bg-canvas-dark border border-red-200 dark:border-red-900 rounded-2xl p-5 flex flex-col gap-4">
           <div>
             <p className="text-sm font-semibold text-red-700 dark:text-red-400">
               {t("settings.dangerZone.title")}
             </p>
-            <p className="text-xs text-gray-500 dark:text-muted mt-0.5 leading-relaxed">
+            <p className="text-xs text-muted mt-0.5 leading-relaxed">
               {t("settings.dangerZone.deleteAccountDescription")}
             </p>
           </div>
@@ -453,14 +455,14 @@ function SettingsPage() {
                 onSuccess: () => signOut({ callbackUrl: "/" }),
               });
             }}
-            className="cursor-pointer self-start px-4 py-2 text-sm font-medium bg-red-600 text-white rounded-xl hover:bg-red-700 disabled:opacity-40 transition-[opacity,transform] duration-150 active:scale-[0.96]"
+            className="cursor-pointer self-start px-4 py-2 text-sm font-semibold border border-black/[0.08] bg-canvas text-ink rounded-lg hover:border-ink hover:bg-ink hover:text-paper dark:border-white/[0.08] dark:bg-canvas-dark dark:text-paper dark:hover:border-paper dark:hover:bg-paper dark:hover:text-canvas-dark disabled:opacity-40 transition duration-150 active:scale-[0.96]"
           >
             {deleteAccount.isPending
               ? t("settings.dangerZone.deleting")
               : t("settings.dangerZone.deleteAccount")}
           </button>
           {deleteAccount.isError && (
-            <p className="text-xs text-red-600 dark:text-red-400">
+            <p className="text-xs text-muted">
               {t("settings.dangerZone.failed")}
             </p>
           )}
