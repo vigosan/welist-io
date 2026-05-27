@@ -269,6 +269,7 @@ export const ItemRow = memo(
               {/* biome-ignore lint/a11y/useKeyWithClickEvents: link click passthrough */}
               <span
                 data-testid={`item-text-${item.id}`}
+                data-done={item.done ? "true" : "false"}
                 onDoubleClick={
                   canWrite && !item.done ? () => setEditing(true) : undefined
                 }
@@ -276,11 +277,19 @@ export const ItemRow = memo(
                   if ((e.target as HTMLElement).tagName === "A")
                     e.stopPropagation();
                 }}
-                className={`text-sm font-medium cursor-default select-none leading-snug sm:truncate ${
+                className={`text-sm font-medium cursor-default select-none leading-snug sm:truncate line-through ${
                   item.done
-                    ? "line-through text-gray-400 dark:text-gray-600"
+                    ? "text-gray-400 dark:text-gray-600"
                     : "text-gray-800 dark:text-gray-200"
                 }`}
+                style={{
+                  textDecorationColor: item.done
+                    ? "currentColor"
+                    : "transparent",
+                  textDecorationThickness: "1.5px",
+                  transition:
+                    "text-decoration-color 350ms cubic-bezier(0.4, 0, 0.2, 1), color 250ms cubic-bezier(0.2, 0, 0, 1)",
+                }}
               >
                 {renderInlineMarkdown(display || item.text)}
               </span>

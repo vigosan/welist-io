@@ -55,7 +55,7 @@ describe("ItemRow", () => {
     expect(onToggle).toHaveBeenCalledOnce();
   });
 
-  it("shows line-through when item is done", () => {
+  it("marks the text as done when item is done", () => {
     render(
       <ItemRow
         item={{ ...baseItem, done: true }}
@@ -64,7 +64,10 @@ describe("ItemRow", () => {
         onEdit={vi.fn()}
       />
     );
-    expect(screen.getByTestId("item-text-i1")).toHaveClass("line-through");
+    expect(screen.getByTestId("item-text-i1")).toHaveAttribute(
+      "data-done",
+      "true"
+    );
   });
 
   it("calls onDelete when delete button clicked", async () => {
