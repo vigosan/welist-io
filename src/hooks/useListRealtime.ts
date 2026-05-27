@@ -1,4 +1,3 @@
-import { useSession } from "@hono/auth-js/react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { queryKeys } from "@/lib/query-keys";
@@ -13,8 +12,6 @@ type ListChangePayload = {
 
 export function useListRealtime(listId: string, enabled: boolean) {
   const qc = useQueryClient();
-  const { data: session } = useSession();
-  const userId = session?.user?.id ?? null;
 
   useEffect(() => {
     if (!enabled || !listId) return;
@@ -26,17 +23,19 @@ export function useListRealtime(listId: string, enabled: boolean) {
       } catch {
         return;
       }
-      if (userId && payload.userId === userId) return;
-      qc.setQueryData<ItemWithLikes[]>(queryKeys.items(listId), (old) =>
-        old?.map((i) =>
+      qc.setQueryData<ItemWithLikes[]>(queryKeys.items(listId), (old) => {
+        if (!old) return old;
+        const target = old.find((i) => i.id === payload.itemId);
+        if (!target || target.done === payload.done) return old;
+        return old.map((i) =>
           i.id === payload.itemId ? { ...i, done: payload.done } : i
-        )
-      );
+        );
+      });
     };
     es.addEventListener("item-toggled", onToggled);
     return () => {
       es.removeEventListener("item-toggled", onToggled);
       es.close();
     };
-  }, [listId, enabled, userId, qc]);
+  }, [listId, enabled, qc]);
 }

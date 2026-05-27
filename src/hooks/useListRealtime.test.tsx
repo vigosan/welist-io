@@ -5,11 +5,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { queryKeys } from "@/lib/query-keys";
 import type { ItemWithLikes } from "@/services/items.service";
 
-vi.mock("@hono/auth-js/react", () => ({
-  useSession: vi.fn(),
-}));
-
-import { useSession } from "@hono/auth-js/react";
 import { useListRealtime } from "./useListRealtime";
 
 class FakeEventSource {
@@ -63,19 +58,6 @@ const ITEM_A: ItemWithLikes = {
 
 const ITEM_B: ItemWithLikes = { ...ITEM_A, id: "i2", text: "Tarea B" };
 
-function mockSession(userId: string | null) {
-  vi.mocked(useSession).mockReturnValue({
-    data: userId
-      ? {
-          user: { id: userId, name: null, email: null, image: null },
-          expires: "",
-        }
-      : null,
-    status: userId ? "authenticated" : "unauthenticated",
-    update: vi.fn(),
-  } as never);
-}
-
 function renderWithClient(enabled: boolean) {
   const qc = new QueryClient({
     defaultOptions: { queries: { retry: false } },
@@ -93,7 +75,6 @@ function renderWithClient(enabled: boolean) {
 beforeEach(() => {
   FakeEventSource.instances = [];
   vi.stubGlobal("EventSource", FakeEventSource);
-  mockSession(null);
 });
 
 afterEach(() => {
@@ -115,7 +96,6 @@ describe("useListRealtime", () => {
   });
 
   it("applies a toggle event from another user to the items query", () => {
-    mockSession("me");
     const { qc } = renderWithClient(true);
     const [es] = FakeEventSource.instances;
 
@@ -133,8 +113,7 @@ describe("useListRealtime", () => {
     expect(items?.find((i) => i.id === "i2")?.done).toBe(false);
   });
 
-  it("ignores echo events from the current user", () => {
-    mockSession("me");
+  it("applies events even when payload userId matches the current user (cross-device echo)", () => {
     const { qc } = renderWithClient(true);
     const [es] = FakeEventSource.instances;
 
@@ -148,7 +127,25 @@ describe("useListRealtime", () => {
     });
 
     const items = qc.getQueryData<ItemWithLikes[]>(queryKeys.items(LIST_ID));
-    expect(items?.find((i) => i.id === "i1")?.done).toBe(false);
+    expect(items?.find((i) => i.id === "i1")?.done).toBe(true);
+  });
+
+  it("does not allocate a new array when the done value already matches", () => {
+    const { qc } = renderWithClient(true);
+    const [es] = FakeEventSource.instances;
+    const before = qc.getQueryData<ItemWithLikes[]>(queryKeys.items(LIST_ID));
+
+    act(() => {
+      es.dispatch("item-toggled", {
+        listId: LIST_ID,
+        itemId: "i1",
+        done: false,
+        userId: "anyone",
+      });
+    });
+
+    const after = qc.getQueryData<ItemWithLikes[]>(queryKeys.items(LIST_ID));
+    expect(after).toBe(before);
   });
 
   it("closes the EventSource on unmount", () => {
