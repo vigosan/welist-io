@@ -692,7 +692,24 @@ app.get("/my-lists", async (c) => {
   );
 
   const itemCountExpr = sql<number>`cast((select count(*) from ${items} where ${items.listId} = ${lists.id}) as int)`;
-  const doneCountExpr = sql<number>`cast((select count(*) from ${items} where ${items.listId} = ${lists.id} and ${items.done} = true) as int)`;
+  const doneCountExpr = sql<number>`cast(
+    case
+      when ${lists.ownerId} = ${userId}
+        or exists (
+          select 1 from ${participations}
+          where ${participations.sourceListId} = ${lists.id}
+            and ${participations.userId} = ${userId}
+            and ${participations.role} = 'collaborator'
+        )
+      then (select count(*) from ${items} where ${items.listId} = ${lists.id} and ${items.done} = true)
+      else (
+        select count(*) from ${itemProgress}
+        where ${itemProgress.userId} = ${userId}
+          and ${itemProgress.done} = true
+          and ${itemProgress.itemId} in (select id from ${items} where ${items.listId} = ${lists.id})
+      )
+    end as int
+  )`;
   const participantCountExpr = sql<number>`cast((select count(*) from ${participations} where ${participations.sourceListId} = ${lists.id}) as int)`;
   const likeCountExpr = sql<number>`cast((select count(*) from ${itemLikes} il join ${items} i on i.id = il.item_id where i.list_id = ${lists.id}) as int)`;
 
