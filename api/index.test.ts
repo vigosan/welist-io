@@ -36,6 +36,11 @@ vi.mock("./email", () => ({
   sendEmail: vi.fn().mockResolvedValue({ skipped: false, id: "test-msg" }),
 }));
 
+vi.mock("./realtime", () => ({
+  notifyListChange: vi.fn().mockResolvedValue(undefined),
+  listChangesStream: vi.fn(),
+}));
+
 const mockStripeConstructEvent = vi.fn();
 vi.mock("stripe", () => {
   const StripeMock = vi.fn().mockImplementation(() => ({
