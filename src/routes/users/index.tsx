@@ -3,6 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppNav } from "@/components/AppNav";
 import { Skeleton } from "@/components/Skeleton";
+import { cardHover } from "@/components/ui";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { useToggleFollow, useUserDirectory } from "@/hooks/useList";
 import { useSearchInput } from "@/hooks/useSearchInput";
@@ -46,8 +47,8 @@ function SlimFollowButton({
       disabled={toggle.isPending}
       className={`shrink-0 cursor-pointer rounded-full px-3 py-1 text-xs font-medium transition active:scale-[0.96] disabled:opacity-50 ${
         isFollowing
-          ? "border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:border-gray-900 hover:text-gray-900 dark:hover:border-gray-300 dark:hover:text-gray-100"
-          : "bg-gray-900 text-white hover:bg-black dark:bg-paper dark:text-ink"
+          ? "border border-black/[0.08] bg-canvas text-muted hover:border-ink hover:text-ink dark:border-white/[0.08] dark:bg-canvas-dark dark:hover:border-paper dark:hover:text-paper"
+          : "bg-ink text-paper hover:bg-black dark:bg-paper dark:text-ink dark:hover:bg-white"
       }`}
     >
       {isFollowing ? t("profile.following") : t("profile.follow")}
@@ -107,7 +108,7 @@ function UserRow({ user }: { user: DirectoryUser }) {
   return (
     <article
       data-testid={`user-card-${user.id}`}
-      className="group relative flex items-center gap-4 rounded-2xl border border-black/[0.08] dark:border-white/[0.08] bg-white dark:bg-white/[0.02] p-4 transition-colors duration-150 hover:border-black/[0.18] dark:hover:border-white/[0.18]"
+      className={`group relative flex items-center gap-4 rounded-2xl border border-black/[0.08] bg-canvas p-4 dark:border-white/[0.08] dark:bg-canvas-dark ${cardHover}`}
     >
       <Link
         to="/u/$userId"
@@ -155,7 +156,7 @@ function UserRow({ user }: { user: DirectoryUser }) {
               aria-hidden="true"
             >
               <div
-                className="h-full bg-gray-900 dark:bg-paper"
+                className="h-full bg-ink dark:bg-paper"
                 style={{ width: `${achievementsPct}%` }}
               />
             </div>
