@@ -2,7 +2,6 @@ import { signIn, signOut } from "@hono/auth-js/react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useCachedSession } from "@/hooks/useCachedSession";
-import { useStats } from "@/hooks/useList";
 import { useTheme } from "@/hooks/useTheme";
 import { setLanguage, useLanguage, useTranslation } from "@/i18n/service";
 import { GlobalCommandPalette } from "./GlobalCommandPalette";
@@ -87,25 +86,6 @@ const LogoMark = () => (
     </svg>
   </span>
 );
-
-function BetaPill() {
-  const stats = useStats();
-  const { t } = useTranslation();
-  const users = stats?.data?.users;
-  if (!users) return null;
-  return (
-    <span
-      data-testid="beta-pill"
-      className="hidden md:inline-flex items-center gap-1.5 rounded-full border border-black/[0.08] bg-canvas px-2.5 py-1 text-[11px] text-muted dark:border-white/[0.08] dark:bg-canvas-dark"
-    >
-      <span className="relative inline-flex h-1.5 w-1.5">
-        <span className="absolute inset-0 animate-ping rounded-full bg-ink/40 dark:bg-paper/40" />
-        <span className="relative inline-block h-1.5 w-1.5 rounded-full bg-ink dark:bg-paper" />
-      </span>
-      {t("home.betaPill", { count: users })}
-    </span>
-  );
-}
 
 function NavLink({
   to,
@@ -202,8 +182,6 @@ export function AppNav() {
             <NavLink to="/help" label={t("help.nav")} testId="nav-help" />
 
             <div className="w-px h-3.5 bg-black/[0.08] dark:bg-white/[0.08]" />
-
-            <BetaPill />
 
             {session?.user && (
               <button
