@@ -95,13 +95,17 @@ export type AppNotification = {
     | "challenge_completed"
     | "new_follower"
     | "list_purchased"
-    | "added_as_collaborator";
+    | "added_as_collaborator"
+    | "item_added"
+    | "item_done"
+    | "list_completed";
   listId: string | null;
   listName: string | null;
   actorId: string | null;
   actorName: string | null;
   actorImage: string | null;
   actionUrl: string | null;
+  metadata: { count?: number; itemIds?: string[] } | null;
   readAt: string | null;
   createdAt: string;
 };

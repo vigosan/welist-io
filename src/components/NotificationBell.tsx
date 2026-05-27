@@ -11,6 +11,7 @@ function NotificationItem({ n }: { n: AppNotification }) {
   const name = n.actorName ?? t("notifications.someone");
   const list = n.listName ?? "";
 
+  const count = n.metadata?.count ?? 1;
   let label: string;
   if (n.type === "challenge_accepted") {
     label = t("notifications.accepted", { name, list });
@@ -20,6 +21,18 @@ function NotificationItem({ n }: { n: AppNotification }) {
     label = t("notifications.newFollower", { name });
   } else if (n.type === "added_as_collaborator") {
     label = t("notifications.addedAsCollaborator", { name, list });
+  } else if (n.type === "item_added") {
+    label =
+      count === 1
+        ? t("notifications.itemAddedOne", { name, list })
+        : t("notifications.itemAddedMany", { name, list, count });
+  } else if (n.type === "item_done") {
+    label =
+      count === 1
+        ? t("notifications.itemDoneOne", { name, list })
+        : t("notifications.itemDoneMany", { name, list, count });
+  } else if (n.type === "list_completed") {
+    label = t("notifications.listCompleted", { name, list });
   } else {
     label = t("notifications.listPurchased", { name, list });
   }

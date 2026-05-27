@@ -359,6 +359,11 @@ const es = {
     newFollower: "{{name}} ha empezado a seguirte",
     listPurchased: "{{name}} ha comprado tu lista «{{list}}»",
     addedAsCollaborator: "{{name}} te ha añadido como colaborador a «{{list}}»",
+    itemAddedOne: "{{name}} ha añadido un ítem a «{{list}}»",
+    itemAddedMany: "{{name}} ha añadido {{count}} ítems a «{{list}}»",
+    itemDoneOne: "{{name}} ha completado un ítem en «{{list}}»",
+    itemDoneMany: "{{name}} ha completado {{count}} ítems en «{{list}}»",
+    listCompleted: "{{name}} ha completado «{{list}}»",
   },
   profile: {
     publicLists: "Listas públicas",

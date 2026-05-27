@@ -360,6 +360,11 @@ const en: Translations = {
     newFollower: "{{name}} started following you",
     listPurchased: "{{name}} bought your list «{{list}}»",
     addedAsCollaborator: "{{name}} added you as a collaborator to «{{list}}»",
+    itemAddedOne: "{{name}} added an item to «{{list}}»",
+    itemAddedMany: "{{name}} added {{count}} items to «{{list}}»",
+    itemDoneOne: "{{name}} completed an item in «{{list}}»",
+    itemDoneMany: "{{name}} completed {{count}} items in «{{list}}»",
+    listCompleted: "{{name}} completed «{{list}}»",
   },
   profile: {
     publicLists: "Public lists",
