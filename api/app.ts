@@ -33,7 +33,6 @@ import {
   listActivity,
   listPrices,
   listPurchases,
-  listRatings,
   lists,
   notifications,
   participations,
@@ -394,37 +393,6 @@ async function getParticipation(sourceListId: string, userId: string) {
   });
 }
 
-async function getListRatingStats(
-  listId: string,
-  userId: string | null
-): Promise<{ avg: number | null; count: number; userValue: number | null }> {
-  const [stats] = await db
-    .select({
-      avg: sql<number | null>`avg(${listRatings.value})::float8`,
-      count: sql<number>`cast(count(*) as int)`,
-    })
-    .from(listRatings)
-    .where(eq(listRatings.listId, listId));
-
-  let userValue: number | null = null;
-  if (userId) {
-    const rows = await db
-      .select({ value: listRatings.value })
-      .from(listRatings)
-      .where(
-        and(eq(listRatings.userId, userId), eq(listRatings.listId, listId))
-      )
-      .limit(1);
-    userValue = rows[0]?.value ?? null;
-  }
-
-  return {
-    avg: stats?.avg ?? null,
-    count: stats?.count ?? 0,
-    userValue,
-  };
-}
-
 function computeDayStreak(days: string[], now: Date): number {
   if (days.length === 0) return 0;
   const DAY_MS = 86_400_000;
@@ -682,12 +650,10 @@ app.get("/lists/:listId", async (c) => {
       .onConflictDoNothing();
   }
   const participation = userId ? await getParticipation(list.id, userId) : null;
-  const rating = await getListRatingStats(list.id, userId);
   return c.json({
     ...list,
     participated: !!participation,
     participationCompletedAt: participation?.completedAt ?? null,
-    rating,
   });
 });
 
@@ -1239,10 +1205,6 @@ app.get("/explore", async (c) => {
       isParticipating: viewerId
         ? sql<boolean>`exists(select 1 from ${participations} where ${participations.sourceListId} = ${lists.id} and ${participations.userId} = ${viewerId})`
         : sql<boolean>`false`,
-      ratingAvg: sql<
-        number | null
-      >`(select avg(${listRatings.value})::float8 from ${listRatings} where ${listRatings.listId} = ${lists.id})`,
-      ratingCount: sql<number>`cast((select count(*) from ${listRatings} where ${listRatings.listId} = ${lists.id}) as int)`,
       ownerId: users.id,
       ownerName: users.name,
       ownerImage: users.image,
@@ -1263,18 +1225,9 @@ app.get("/explore", async (c) => {
       : null;
 
   const exploreItems = rows.map(
-    ({
-      ownerId,
-      ownerName,
-      ownerImage,
-      completedCount,
-      ratingAvg,
-      ratingCount,
-      ...row
-    }) => ({
+    ({ ownerId, ownerName, ownerImage, completedCount, ...row }) => ({
       ...row,
       completedCount,
-      rating: { avg: ratingAvg, count: ratingCount },
       owner: ownerId
         ? { id: ownerId, name: ownerName, image: ownerImage }
         : null,
@@ -1674,22 +1627,13 @@ app.get("/users/:userId/profile", async (c) => {
       itemCount: sql<number>`cast((select count(*) from ${items} where ${items.listId} = ${lists.id}) as int)`,
       participantCount: sql<number>`cast((select count(*) from ${participations} where ${participations.sourceListId} = ${lists.id}) as int)`,
       completedCount: sql<number>`cast((select count(*) from ${participations} where ${participations.sourceListId} = ${lists.id} and ${participations.completedAt} is not null) as int)`,
-      ratingAvg: sql<
-        number | null
-      >`(select avg(${listRatings.value})::float8 from ${listRatings} where ${listRatings.listId} = ${lists.id})`,
-      ratingCount: sql<number>`cast((select count(*) from ${listRatings} where ${listRatings.listId} = ${lists.id}) as int)`,
     })
     .from(lists)
     .where(and(eq(lists.ownerId, userId), eq(lists.public, true)))
     .orderBy(desc(lists.createdAt))
     .limit(20);
 
-  const publicLists = publicListRows.map(
-    ({ ratingAvg, ratingCount, ...row }) => ({
-      ...row,
-      rating: { avg: ratingAvg, count: ratingCount },
-    })
-  );
+  const publicLists = publicListRows;
 
   const completedChallenges = await db
     .select({
@@ -2764,60 +2708,6 @@ app.delete("/lists/:listId/price", async (c) => {
   if (list.ownerId !== userId) return c.json({ error: "Forbidden" }, 403);
 
   await db.delete(listPrices).where(eq(listPrices.listId, list.id));
-  return c.body(null, 204);
-});
-
-app.post(
-  "/lists/:listId/rating",
-  zValidator("json", z.object({ value: z.number().int().min(1).max(5) })),
-  async (c) => {
-    const authUser = getOptionalUser(c);
-    const userId = authUser?.session?.user?.id;
-    if (!userId) return c.json({ error: "Unauthorized" }, 401);
-
-    const list = await db.query.lists.findFirst({
-      where: listWhere(c.req.param("listId")),
-      columns: {
-        id: true,
-        ownerId: true,
-        public: true,
-        collaborative: true,
-      },
-    });
-    if (!list) return c.json({ error: "Not found" }, 404);
-    if (!(await canViewList(list, userId)))
-      return c.json({ error: "Not found" }, 404);
-
-    const { value } = c.req.valid("json");
-    const [rating] = await db
-      .insert(listRatings)
-      .values({ userId, listId: list.id, value })
-      .onConflictDoUpdate({
-        target: [listRatings.userId, listRatings.listId],
-        set: { value, updatedAt: new Date() },
-      })
-      .returning();
-
-    return c.json(rating);
-  }
-);
-
-app.delete("/lists/:listId/rating", async (c) => {
-  const authUser = getOptionalUser(c);
-  const userId = authUser?.session?.user?.id;
-  if (!userId) return c.json({ error: "Unauthorized" }, 401);
-
-  const list = await db.query.lists.findFirst({
-    where: listWhere(c.req.param("listId")),
-    columns: { id: true },
-  });
-  if (!list) return c.body(null, 204);
-
-  await db
-    .delete(listRatings)
-    .where(
-      and(eq(listRatings.userId, userId), eq(listRatings.listId, list.id))
-    );
   return c.body(null, 204);
 });
 
