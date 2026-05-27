@@ -106,6 +106,7 @@ const es = {
     closeSearch: "Cerrar búsqueda",
     confirmSlug: "URL personalizada",
     cancelSlug: "Cancelar edición de URL",
+    urlLabel: "URL",
     expandMore: "ver más",
     expandLess: "ver menos",
     challengeInProgress: "Estás haciendo este reto",

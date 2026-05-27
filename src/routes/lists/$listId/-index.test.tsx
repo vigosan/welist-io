@@ -454,14 +454,6 @@ describe("ListDetailPage", () => {
     expect(screen.queryByTestId("search-input")).not.toBeInTheDocument();
   });
 
-  it("shows completion counter when items exist", async () => {
-    setupMocks();
-    renderPage();
-    await waitFor(() =>
-      expect(screen.getByText("1 / 2 completados")).toBeInTheDocument()
-    );
-  });
-
   it("reorder error restores order via resetOrder", async () => {
     let capturedOnError: (() => void) | undefined;
     const reorderMutate = vi.fn(

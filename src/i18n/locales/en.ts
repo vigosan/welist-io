@@ -107,6 +107,7 @@ const en: Translations = {
     closeSearch: "Close search",
     confirmSlug: "Custom URL",
     cancelSlug: "Cancel URL editing",
+    urlLabel: "URL",
     expandMore: "show more",
     expandLess: "show less",
     challengeInProgress: "You're taking this challenge",

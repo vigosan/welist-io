@@ -12,6 +12,15 @@ type Props = {
   category: string | null;
   priceInCents: number | null;
   stripeConnected: boolean;
+  slug: string;
+  editingSlug: boolean;
+  slugValue: string;
+  slugError: string;
+  slugSubmitting: boolean;
+  onSetSlugValue: (v: string) => void;
+  onStartEditingSlug: () => void;
+  onCancelEditingSlug: () => void;
+  onSubmitSlug: (e: React.FormEvent) => void;
   onTogglePublic: (v: boolean) => void;
   onToggleCollaborative: (v: boolean) => void;
   onSetCategory: (c: string | null) => void;
@@ -70,6 +79,15 @@ export function ListSettingsPanel({
   category,
   priceInCents,
   stripeConnected,
+  slug,
+  editingSlug,
+  slugValue,
+  slugError,
+  slugSubmitting,
+  onSetSlugValue,
+  onStartEditingSlug,
+  onCancelEditingSlug,
+  onSubmitSlug,
   onTogglePublic,
   onToggleCollaborative,
   onSetCategory,
@@ -167,6 +185,78 @@ export function ListSettingsPanel({
           onChange={(v) => onSetCategory(v)}
         />
       </div>
+
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-xs text-gray-500 shrink-0">
+          {t("list.urlLabel")}
+        </span>
+        {editingSlug ? (
+          <form
+            onSubmit={onSubmitSlug}
+            className="flex items-center gap-1.5 min-w-0"
+          >
+            <span className="text-xs text-gray-400 shrink-0">/lists/</span>
+            <input
+              autoFocus
+              value={slugValue}
+              onChange={(e) =>
+                onSetSlugValue(
+                  e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "")
+                )
+              }
+              placeholder="mi-lista"
+              aria-label={t("list.confirmSlug")}
+              data-testid="slug-input"
+              className="text-xs text-gray-700 bg-white border border-gray-200 rounded-md px-2 py-1 outline-none focus:border-gray-400 w-32 transition"
+            />
+            <button
+              type="submit"
+              aria-label={t("list.confirmSlug")}
+              disabled={!slugValue.trim() || slugSubmitting}
+              className="cursor-pointer text-xs text-gray-500 hover:text-gray-900 transition disabled:opacity-40 p-1"
+            >
+              ✓
+            </button>
+            <button
+              type="button"
+              aria-label={t("list.cancelSlug")}
+              onClick={onCancelEditingSlug}
+              className="cursor-pointer text-xs text-gray-400 hover:text-gray-600 transition p-1"
+            >
+              ✕
+            </button>
+          </form>
+        ) : (
+          <button
+            type="button"
+            onClick={onStartEditingSlug}
+            data-testid="edit-slug-btn"
+            className="cursor-pointer flex items-center gap-1 text-xs text-gray-500 hover:text-gray-900 transition min-w-0"
+          >
+            <span className="truncate">
+              /lists/
+              {slug.length > 20 ? `${slug.slice(0, 12)}…` : slug}
+            </span>
+            <svg
+              aria-hidden="true"
+              className="w-3 h-3 shrink-0"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+              />
+            </svg>
+          </button>
+        )}
+      </div>
+      {slugError && (
+        <p className="text-xs text-gray-400 -mt-2 self-end">{slugError}</p>
+      )}
 
       <div className="flex items-center justify-between">
         <span className="text-xs text-gray-500">{t("list.price")}</span>
