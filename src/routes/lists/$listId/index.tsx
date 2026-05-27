@@ -624,7 +624,7 @@ function ListDetailPage() {
                 </div>
               )}
 
-              {!listLoading && progress > 0 && (
+              {!listLoading && items.length > 0 && (
                 <div className="mt-2 h-0.5 bg-gray-100 dark:bg-gray-700 overflow-hidden rounded-full order-4">
                   <div
                     className="h-full bg-gray-900 dark:bg-gray-100 rounded-full transition-all duration-700"
