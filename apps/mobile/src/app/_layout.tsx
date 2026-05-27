@@ -9,6 +9,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
 import "../global.css";
 import "@/i18n";
+import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { loadStoredLanguage } from "@/i18n";
 import { SessionProvider, useSession } from "@/lib/auth";
 import { loadStoredTheme } from "@/lib/theme";
@@ -50,6 +51,7 @@ function AuthGate({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const segments = useSegments();
   const pendingPath = useRef<string | null>(null);
+  usePushNotifications();
 
   useEffect(() => {
     if (session.status === "loading") return;

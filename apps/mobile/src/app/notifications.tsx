@@ -20,6 +20,24 @@ import { useSession } from "@/lib/auth";
 import { notificationHref } from "@/lib/notification-route";
 import type { AppNotification } from "@/types";
 
+function renderVerb(
+  t: ReturnType<typeof useTranslation>["t"],
+  n: AppNotification
+): string {
+  const count = n.metadata?.count ?? 1;
+  if (n.type === "item_added") {
+    return count === 1
+      ? t("notifications.item_added_one")
+      : t("notifications.item_added_many", { count });
+  }
+  if (n.type === "item_done") {
+    return count === 1
+      ? t("notifications.item_done_one")
+      : t("notifications.item_done_many", { count });
+  }
+  return t(`notifications.${n.type}` as const);
+}
+
 export default function NotificationsScreen() {
   const { t } = useTranslation();
   const { session } = useSession();
@@ -92,7 +110,7 @@ export default function NotificationsScreen() {
                   <Text className="font-medium">
                     {item.actorName ?? t("common.anonymous")}
                   </Text>{" "}
-                  {t(`notifications.${item.type}` as const)}
+                  {renderVerb(t, item)}
                   {item.listName ? ` "${item.listName}"` : ""}
                 </Text>
               </View>

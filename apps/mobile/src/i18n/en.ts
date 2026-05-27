@@ -252,6 +252,11 @@ export const en = {
     new_follower: "followed you",
     list_purchased: "bought your list",
     added_as_collaborator: "added you as a collaborator",
+    item_added_one: "added an item to",
+    item_added_many: "added {{count}} items to",
+    item_done_one: "completed an item in",
+    item_done_many: "completed {{count}} items in",
+    list_completed: "completed",
   },
   users: {
     title: "Users",

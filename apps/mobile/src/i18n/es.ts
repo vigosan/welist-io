@@ -255,6 +255,11 @@ export const es = {
     new_follower: "te ha seguido",
     list_purchased: "compró tu lista",
     added_as_collaborator: "te añadió como colaborador",
+    item_added_one: "añadió un ítem a",
+    item_added_many: "añadió {{count}} ítems a",
+    item_done_one: "completó un ítem en",
+    item_done_many: "completó {{count}} ítems en",
+    list_completed: "completó",
   },
   users: {
     title: "Usuarios",
