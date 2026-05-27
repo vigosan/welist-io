@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { itemsService } from "@/services/items";
+import { type Coords, itemsService } from "@/services/items";
 import type { Item } from "@/types";
 
 export function useItems(listId: string) {
@@ -13,7 +13,8 @@ export function useItems(listId: string) {
 export function useAddItem(listId: string) {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (text: string) => itemsService.add(listId, text),
+    mutationFn: ({ text, coords }: { text: string; coords?: Coords }) =>
+      itemsService.add(listId, text, coords),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["items", listId] }),
   });
 }
@@ -40,13 +41,36 @@ export function useToggleItem(listId: string) {
 export function useUpdateItem(listId: string) {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ itemId, text }: { itemId: string; text: string }) =>
-      itemsService.update(listId, itemId, text),
-    onMutate: async ({ itemId, text }) => {
+    mutationFn: ({
+      itemId,
+      text,
+      coords,
+    }: {
+      itemId: string;
+      text: string;
+      coords?: Coords | null;
+    }) => itemsService.update(listId, itemId, text, coords),
+    onMutate: async ({ itemId, text, coords }) => {
       await qc.cancelQueries({ queryKey: ["items", listId] });
       const previous = qc.getQueryData<Item[]>(["items", listId]);
       qc.setQueryData<Item[]>(["items", listId], (old) =>
-        old?.map((it) => (it.id === itemId ? { ...it, text } : it))
+        old?.map((it) =>
+          it.id === itemId
+            ? {
+                ...it,
+                text,
+                ...(coords !== undefined
+                  ? coords === null
+                    ? { latitude: null, longitude: null, placeName: null }
+                    : {
+                        latitude: coords.latitude,
+                        longitude: coords.longitude,
+                        placeName: coords.placeName,
+                      }
+                  : {}),
+              }
+            : it
+        )
       );
       return { previous };
     },

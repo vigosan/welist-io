@@ -1,15 +1,27 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Alert, Pressable, Text, TextInput, View } from "react-native";
+import {
+  Alert,
+  Keyboard,
+  Pressable,
+  ScrollView,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { PlaceMentionSuggestions } from "@/components/PlaceMentionSuggestions";
 import { useAddItem, useBulkAddItems } from "@/hooks/items";
+import { PARTIAL_PLACE_REGEX } from "@/lib/places";
+import type { Coords } from "@/services/items";
 
 export default function NewItemScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const { listId } = useLocalSearchParams<{ listId: string }>();
   const [text, setText] = useState("");
+  const [pendingCoords, setPendingCoords] = useState<Coords | null>(null);
   const add = useAddItem(listId);
   const bulkAdd = useBulkAddItems(listId);
 
@@ -23,7 +35,10 @@ export default function NewItemScreen() {
     const onError = (e: unknown) =>
       Alert.alert(t("list.couldNotAdd"), String((e as Error).message));
     if (lines.length === 1) {
-      add.mutate(lines[0], { onSuccess, onError });
+      add.mutate(
+        { text: lines[0], coords: pendingCoords ?? undefined },
+        { onSuccess, onError }
+      );
     } else {
       bulkAdd.mutate(lines, { onSuccess, onError });
     }
@@ -31,6 +46,7 @@ export default function NewItemScreen() {
 
   const pending = add.isPending || bulkAdd.isPending;
   const lineCount = text.split("\n").filter((l) => l.trim()).length;
+  const partial = PARTIAL_PLACE_REGEX.exec(text)?.[1] ?? null;
 
   return (
     <SafeAreaView
@@ -69,10 +85,17 @@ export default function NewItemScreen() {
           </Text>
         </Pressable>
       </View>
-      <View className="flex-1 px-5">
+      <ScrollView
+        className="flex-1 px-5"
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={{ paddingBottom: 40 }}
+      >
         <TextInput
           value={text}
-          onChangeText={setText}
+          onChangeText={(val) => {
+            setText(val);
+            if (!PARTIAL_PLACE_REGEX.test(val)) setPendingCoords(null);
+          }}
           placeholder={t("list.addPlaceholder")}
           placeholderTextColor="#a8a39a"
           autoFocus
@@ -81,10 +104,26 @@ export default function NewItemScreen() {
           className="min-h-[160px] rounded-2xl bg-gray-100 px-5 py-4 text-base text-gray-900 dark:bg-gray-800 dark:text-gray-100"
           textAlignVertical="top"
         />
+        {partial !== null && (
+          <PlaceMentionSuggestions
+            query={partial}
+            onSelect={(place) => {
+              setText((prev) =>
+                prev.replace(PARTIAL_PLACE_REGEX, `@${place.name} `)
+              );
+              setPendingCoords({
+                latitude: place.latitude,
+                longitude: place.longitude,
+                placeName: place.name,
+              });
+              Keyboard.dismiss();
+            }}
+          />
+        )}
         <Text className="mt-3 text-xs text-gray-500 dark:text-gray-400">
           {t("list.newItemHint")}
         </Text>
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }

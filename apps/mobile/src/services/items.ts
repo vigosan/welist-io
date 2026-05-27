@@ -1,13 +1,19 @@
 import { apiFetch } from "@/lib/api";
 import type { Item } from "@/types";
 
+export type Coords = {
+  latitude: string;
+  longitude: string;
+  placeName: string;
+};
+
 export const itemsService = {
   list: (listId: string) => apiFetch<Item[]>(`/lists/${listId}/items`),
 
-  add: (listId: string, text: string) =>
+  add: (listId: string, text: string, coords?: Coords) =>
     apiFetch<Item>(`/lists/${listId}/items`, {
       method: "POST",
-      body: JSON.stringify({ text }),
+      body: JSON.stringify({ text, ...coords }),
     }),
 
   toggle: (listId: string, itemId: string) =>
@@ -15,17 +21,25 @@ export const itemsService = {
       method: "PATCH",
     }),
 
-  update: (listId: string, itemId: string, text: string) =>
-    apiFetch<Item>(`/lists/${listId}/items/${itemId}`, {
-      method: "PATCH",
-      body: JSON.stringify({ text }),
-    }),
-
-  setLocation: (
+  update: (
     listId: string,
     itemId: string,
-    coords: { latitude: string; longitude: string; placeName: string } | null
+    text: string,
+    coords?: Coords | null
   ) =>
+    apiFetch<Item>(`/lists/${listId}/items/${itemId}`, {
+      method: "PATCH",
+      body: JSON.stringify({
+        text,
+        ...(coords !== undefined
+          ? coords === null
+            ? { latitude: null, longitude: null, placeName: null }
+            : coords
+          : {}),
+      }),
+    }),
+
+  setLocation: (listId: string, itemId: string, coords: Coords | null) =>
     apiFetch<Item>(`/lists/${listId}/items/${itemId}`, {
       method: "PATCH",
       body: JSON.stringify(

@@ -29,6 +29,7 @@ import { ActionDrawer, type DrawerAction } from "@/components/ActionDrawer";
 import { AnimatedCheckbox } from "@/components/AnimatedCheckbox";
 import { EmptyState } from "@/components/EmptyState";
 import { LocationPickerModal } from "@/components/LocationPickerModal";
+import { PlaceMentionSuggestions } from "@/components/PlaceMentionSuggestions";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { ItemRowSkeleton } from "@/components/Skeleton";
 import {
@@ -51,6 +52,8 @@ import {
 import { displayItemText } from "@/lib/item-text";
 import { type FilterMode, filterItems } from "@/lib/items-filter";
 import { mapsUrl } from "@/lib/maps";
+import { PARTIAL_PLACE_REGEX } from "@/lib/places";
+import type { Coords } from "@/services/items";
 import type { Item } from "@/types";
 
 const FILTERS: FilterMode[] = ["all", "pending", "done"];
@@ -64,6 +67,9 @@ export default function ListDetailScreen() {
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [editing, setEditing] = useState<Item | null>(null);
   const [editingText, setEditingText] = useState("");
+  const [editingCoords, setEditingCoords] = useState<
+    Coords | null | undefined
+  >(undefined);
   const [locating, setLocating] = useState<Item | null>(null);
   const [actionsOpen, setActionsOpen] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
@@ -100,6 +106,7 @@ export default function ListDetailScreen() {
         text: t("common.edit"),
         onPress: () => {
           setEditingText(item.text);
+          setEditingCoords(undefined);
           setEditing(item);
         },
       },
@@ -141,14 +148,17 @@ export default function ListDetailScreen() {
   const saveEdit = () => {
     if (!editing) return;
     const text = editingText.trim();
-    if (!text || text === editing.text) {
+    if (!text || (text === editing.text && editingCoords === undefined)) {
       setEditing(null);
       return;
     }
     update.mutate(
-      { itemId: editing.id, text },
+      { itemId: editing.id, text, coords: editingCoords },
       {
-        onSettled: () => setEditing(null),
+        onSettled: () => {
+          setEditing(null);
+          setEditingCoords(undefined);
+        },
         onError: (e) =>
           Alert.alert(t("list.couldNotSave"), String((e as Error).message)),
       }
@@ -453,12 +463,41 @@ export default function ListDetailScreen() {
             </Text>
             <TextInput
               value={editingText}
-              onChangeText={setEditingText}
+              onChangeText={(val) => {
+                setEditingText(val);
+                if (!PARTIAL_PLACE_REGEX.test(val)) {
+                  setEditingCoords(
+                    editing?.latitude !== null && editing?.latitude !== undefined
+                      ? null
+                      : undefined
+                  );
+                }
+              }}
               autoFocus
               textAlignVertical="center"
               style={{ fontSize: 16, lineHeight: 20 }}
               className="rounded-xl border border-gray-200 px-3 py-2 text-gray-900 dark:border-gray-700 dark:text-gray-100"
             />
+            {(() => {
+              const partial =
+                PARTIAL_PLACE_REGEX.exec(editingText)?.[1] ?? null;
+              if (partial === null) return null;
+              return (
+                <PlaceMentionSuggestions
+                  query={partial}
+                  onSelect={(place) => {
+                    setEditingText((prev) =>
+                      prev.replace(PARTIAL_PLACE_REGEX, `@${place.name} `)
+                    );
+                    setEditingCoords({
+                      latitude: place.latitude,
+                      longitude: place.longitude,
+                      placeName: place.name,
+                    });
+                  }}
+                />
+              );
+            })()}
             <View className="mt-4 flex-row justify-end gap-3">
               <Pressable onPress={() => setEditing(null)} className="px-4 py-2">
                 <Text className="text-sm text-gray-500 dark:text-gray-400">
