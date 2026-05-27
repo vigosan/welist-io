@@ -30,9 +30,7 @@ export function useItemsFilter({
     if (itemsLoading) return items;
     let ids = sortedIds;
     if (ids === null && items.length > 0 && !initializedRef.current) {
-      ids = [...items]
-        .sort((a, b) => Number(a.done) - Number(b.done))
-        .map((i) => i.id);
+      ids = items.map((i) => i.id);
       initializedRef.current = true;
       setSortedIds(ids);
     }

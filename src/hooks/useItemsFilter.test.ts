@@ -111,17 +111,19 @@ describe("useItemsFilter", () => {
     expect(result.current.tagSuggestions).toEqual(["work"]);
   });
 
-  it("places done items after pending in initial stable sort", () => {
+  it("preserves server order on initial load regardless of done state", () => {
     const items = [DONE, PENDING, PLAIN];
     const { result } = renderHook(() =>
       useItemsFilter({ items, ...BASE_OPTS })
     );
-    const ids = result.current.stableItems.map((i) => i.id);
-    expect(ids.indexOf("b")).toBeGreaterThan(ids.indexOf("a"));
-    expect(ids.indexOf("b")).toBeGreaterThan(ids.indexOf("c"));
+    expect(result.current.stableItems.map((i) => i.id)).toEqual([
+      "b",
+      "a",
+      "c",
+    ]);
   });
 
-  it("sorts immediately when items finish loading (no reorder lag)", () => {
+  it("preserves server order when items finish loading", () => {
     const { result, rerender } = renderHook(
       ({
         items,
@@ -133,9 +135,11 @@ describe("useItemsFilter", () => {
       { initialProps: { items: [] as ItemWithLikes[], itemsLoading: true } }
     );
     rerender({ items: [DONE, PENDING, PLAIN], itemsLoading: false });
-    const ids = result.current.stableItems.map((i) => i.id);
-    expect(ids.indexOf("b")).toBeGreaterThan(ids.indexOf("a"));
-    expect(ids.indexOf("b")).toBeGreaterThan(ids.indexOf("c"));
+    expect(result.current.stableItems.map((i) => i.id)).toEqual([
+      "b",
+      "a",
+      "c",
+    ]);
   });
 
   it("resetOrder clears the stable sort reference", () => {
