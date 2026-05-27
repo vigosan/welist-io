@@ -20,6 +20,7 @@
     "submit:android": "eas submit --profile production --platform android"
   },
   "dependencies": {
+    "@react-native-google-signin/google-signin": "^16.1.2",
     "@tanstack/react-query": "^5.74.4",
     "expo": "~54.0.34",
     "expo-apple-authentication": "~8.0.8",

@@ -59,6 +59,12 @@
       "expo-apple-authentication",
       "expo-web-browser",
       [
+        "@react-native-google-signin/google-signin",
+        {
+          "iosUrlScheme": "com.googleusercontent.apps.3382559471-q1bdc5ov3ekjt3ungri7l7jaffi5f94p"
+        }
+      ],
+      [
         "expo-splash-screen",
         {
           "backgroundColor": "#0c0c0b",

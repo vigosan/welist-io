@@ -1,18 +1,13 @@
+import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import * as AppleAuthentication from "expo-apple-authentication";
-import * as Google from "expo-auth-session/providers/google";
-import * as WebBrowser from "expo-web-browser";
 import {
   createContext,
   type ReactNode,
-  useCallback,
   useContext,
   useEffect,
-  useRef,
   useState,
 } from "react";
 import { API_BASE, apiFetch, getToken, setToken } from "./api";
-
-WebBrowser.maybeCompleteAuthSession();
 
 type User = {
   id: string;
@@ -43,8 +38,11 @@ const SessionContext = createContext<SessionContextValue | null>(null);
 
 const GOOGLE_WEB_CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID ?? "";
 const GOOGLE_IOS_CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID ?? "";
-const GOOGLE_ANDROID_CLIENT_ID =
-  process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID ?? "";
+
+GoogleSignin.configure({
+  webClientId: GOOGLE_WEB_CLIENT_ID,
+  iosClientId: GOOGLE_IOS_CLIENT_ID || undefined,
+});
 
 async function exchange(
   provider: "google" | "apple",
@@ -63,18 +61,6 @@ async function exchange(
 
 export function SessionProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<SessionState>({ status: "loading" });
-
-  const [googleRequest, googleResponse, promptGoogle] =
-    Google.useIdTokenAuthRequest({
-      clientId: GOOGLE_WEB_CLIENT_ID,
-      iosClientId: GOOGLE_IOS_CLIENT_ID || undefined,
-      androidClientId: GOOGLE_ANDROID_CLIENT_ID || undefined,
-    });
-
-  const googlePending = useRef<{
-    resolve: () => void;
-    reject: (err: Error) => void;
-  } | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -97,43 +83,14 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     })();
   }, []);
 
-  useEffect(() => {
-    if (!googleResponse) return;
-    const pending = googlePending.current;
-    if (!pending) return;
-    googlePending.current = null;
-
-    (async () => {
-      try {
-        if (googleResponse.type === "success") {
-          const idToken = googleResponse.params.id_token;
-          if (!idToken) throw new Error("Google did not return an id token");
-          const user = await exchange("google", idToken);
-          setSession({ status: "signed-in", user });
-          pending.resolve();
-        } else if (googleResponse.type === "error") {
-          pending.reject(
-            new Error(googleResponse.error?.message ?? "Google sign-in failed")
-          );
-        } else {
-          pending.resolve();
-        }
-      } catch (e) {
-        pending.reject(e instanceof Error ? e : new Error(String(e)));
-      }
-    })();
-  }, [googleResponse]);
-
-  const signInWithGoogle = useCallback(async () => {
-    if (googlePending.current) return;
-    await new Promise<void>((resolve, reject) => {
-      googlePending.current = { resolve, reject };
-      promptGoogle().catch((err) => {
-        googlePending.current = null;
-        reject(err instanceof Error ? err : new Error(String(err)));
-      });
-    });
-  }, [promptGoogle]);
+  const signInWithGoogle = async () => {
+    await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+    const result = await GoogleSignin.signIn();
+    const idToken = result.data?.idToken;
+    if (!idToken) throw new Error("Google did not return an id token");
+    const user = await exchange("google", idToken);
+    setSession({ status: "signed-in", user });
+  };
 
   const signInWithApple = async () => {
     const credential = await AppleAuthentication.signInAsync({
