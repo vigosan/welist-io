@@ -416,7 +416,10 @@ type NotificationType =
   | "challenge_completed"
   | "new_follower"
   | "list_purchased"
-  | "added_as_collaborator";
+  | "added_as_collaborator"
+  | "item_added"
+  | "item_done"
+  | "list_completed";
 
 type CreateNotificationInput = {
   recipientId: string;
@@ -427,6 +430,7 @@ type CreateNotificationInput = {
   actorName?: string | null;
   actorImage?: string | null;
   actionUrl?: string | null;
+  metadata?: Record<string, unknown> | null;
 };
 
 async function createNotification(input: CreateNotificationInput) {
@@ -439,7 +443,91 @@ async function createNotification(input: CreateNotificationInput) {
     actorName: input.actorName ?? null,
     actorImage: input.actorImage ?? null,
     actionUrl: input.actionUrl ?? null,
+    metadata: input.metadata ?? null,
   });
+}
+
+const COALESCE_WINDOW_MS = 15 * 60 * 1000;
+const COALESCE_ITEM_IDS_CAP = 5;
+
+type CoalesceItemMetadata = {
+  count: number;
+  itemIds: string[];
+};
+
+type CoalesceNotificationInput = Omit<CreateNotificationInput, "metadata"> & {
+  itemIds?: string[];
+};
+
+async function insertOrCoalesceNotification(input: CoalesceNotificationInput) {
+  const isCoalescable =
+    input.type === "item_added" || input.type === "item_done";
+  if (!isCoalescable || !input.listId || !input.actorId) {
+    await createNotification(input);
+    return;
+  }
+  const addedItemIds = input.itemIds ?? [];
+  const increment = Math.max(1, addedItemIds.length);
+  const since = new Date(Date.now() - COALESCE_WINDOW_MS);
+  const existing = await db.query.notifications.findFirst({
+    where: and(
+      eq(notifications.userId, input.recipientId),
+      eq(notifications.type, input.type),
+      eq(notifications.listId, input.listId),
+      eq(notifications.actorId, input.actorId),
+      sql`${notifications.readAt} is null`,
+      gt(notifications.createdAt, since)
+    ),
+    columns: { id: true, metadata: true },
+  });
+  if (existing) {
+    const prev = (existing.metadata as CoalesceItemMetadata | null) ?? {
+      count: 0,
+      itemIds: [],
+    };
+    const mergedItemIds = Array.from(
+      new Set([...prev.itemIds, ...addedItemIds])
+    ).slice(0, COALESCE_ITEM_IDS_CAP);
+    await db
+      .update(notifications)
+      .set({
+        metadata: {
+          count: prev.count + increment,
+          itemIds: mergedItemIds,
+        },
+        createdAt: new Date(),
+      })
+      .where(eq(notifications.id, existing.id));
+    return;
+  }
+  await createNotification({
+    ...input,
+    metadata: {
+      count: increment,
+      itemIds: addedItemIds.slice(0, COALESCE_ITEM_IDS_CAP),
+    },
+  });
+}
+
+async function listParticipantRecipients(
+  listId: string,
+  excludeUserId: string | null
+): Promise<string[]> {
+  const [listRow, parts] = await Promise.all([
+    db.query.lists.findFirst({
+      where: eq(lists.id, listId),
+      columns: { ownerId: true },
+    }),
+    db.query.participations.findMany({
+      where: eq(participations.sourceListId, listId),
+      columns: { userId: true },
+    }),
+  ]);
+  const recipients = new Set<string>();
+  if (listRow?.ownerId) recipients.add(listRow.ownerId);
+  for (const p of parts) recipients.add(p.userId);
+  if (excludeUserId) recipients.delete(excludeUserId);
+  return [...recipients];
 }
 
 async function logActivity(
@@ -1135,9 +1223,52 @@ app.post(
       )
       .returning();
     notifyListChange(list.id).catch(() => {});
+    if (list.collaborative && userId && created.length > 0) {
+      await fanOutItemAdded({
+        listId: list.id,
+        actorId: userId,
+        itemIds: created.map((it) => it.id),
+      });
+    }
     return c.json(created, 201);
   }
 );
+
+async function fanOutItemAdded(input: {
+  listId: string;
+  actorId: string;
+  itemIds: string[];
+}) {
+  const recipients = await listParticipantRecipients(
+    input.listId,
+    input.actorId
+  );
+  if (recipients.length === 0) return;
+  const [actor, listMeta] = await Promise.all([
+    db.query.users.findFirst({
+      where: eq(users.id, input.actorId),
+      columns: { name: true, image: true },
+    }),
+    db.query.lists.findFirst({
+      where: eq(lists.id, input.listId),
+      columns: { name: true },
+    }),
+  ]);
+  await Promise.all(
+    recipients.map((recipientId) =>
+      insertOrCoalesceNotification({
+        recipientId,
+        type: "item_added",
+        listId: input.listId,
+        listName: listMeta?.name,
+        actorId: input.actorId,
+        actorName: actor?.name,
+        actorImage: actor?.image,
+        itemIds: input.itemIds,
+      })
+    )
+  );
+}
 
 app.get("/explore", async (c) => {
   const viewerId = getOptionalUser(c)?.session?.user?.id ?? null;

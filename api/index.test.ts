@@ -4,7 +4,7 @@ const mockDb = {
   query: {
     lists: { findFirst: vi.fn() },
     items: { findMany: vi.fn(), findFirst: vi.fn() },
-    participations: { findFirst: vi.fn() },
+    participations: { findFirst: vi.fn(), findMany: vi.fn() },
     itemProgress: { findFirst: vi.fn(), findMany: vi.fn() },
     itemLikes: { findFirst: vi.fn(), findMany: vi.fn() },
     users: { findFirst: vi.fn() },
@@ -1008,7 +1008,13 @@ describe("Collaborative lists", () => {
 });
 
 describe("POST /api/lists/:listId/items/bulk", () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockGetAuthUser.mockRejectedValue(new Error("no session"));
+  });
+  afterEach(() => {
+    mockGetAuthUser.mockRejectedValue(new Error("no session"));
+  });
 
   it("creates multiple items and returns 201", async () => {
     const created = [
@@ -1101,6 +1107,156 @@ describe("POST /api/lists/:listId/items/bulk", () => {
       headers: { "Content-Type": "application/json" },
     });
     expect(res.status).toBe(400);
+  });
+
+  it("fans out item_added to other participants on collaborative lists", async () => {
+    mockGetAuthUser.mockResolvedValue({
+      session: { user: { id: "collab-1" } },
+    });
+    mockDb.query.lists.findFirst
+      .mockResolvedValueOnce({
+        id: "abc",
+        name: "Lista",
+        ownerId: "owner-1",
+        collaborative: true,
+      })
+      .mockResolvedValueOnce({ ownerId: "owner-1" });
+    mockDb.query.participations.findFirst.mockResolvedValue({
+      role: "collaborator",
+    });
+    mockDb.query.participations.findMany.mockResolvedValue([
+      { userId: "collab-1" },
+      { userId: "collab-2" },
+    ]);
+    mockDb.query.users.findFirst.mockResolvedValue({
+      name: "Ana",
+      image: null,
+    });
+    mockDb.query.notifications.findFirst.mockResolvedValue(null);
+    mockDb.select.mockReturnValue({
+      from: vi.fn().mockReturnValue({
+        where: vi.fn().mockResolvedValue([{ pos: null }]),
+      }),
+    });
+    const itemInsertChain = {
+      values: vi.fn().mockReturnValue({
+        returning: vi
+          .fn()
+          .mockResolvedValue([{ id: "new-item-1", listId: "abc" }]),
+      }),
+    };
+    const notifInsertChain = chainableInsert();
+    mockDb.insert.mockImplementation((tbl: unknown) =>
+      tbl === notifications ? notifInsertChain : itemInsertChain
+    );
+
+    const res = await app.request("/api/lists/abc/items/bulk", {
+      method: "POST",
+      body: JSON.stringify({ texts: ["Leche"] }),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    expect(res.status).toBe(201);
+    expect(mockDb.insert).toHaveBeenCalledWith(notifications);
+    expect(notifInsertChain.values).toHaveBeenCalledTimes(2);
+    const recipients = notifInsertChain.values.mock.calls.map(
+      (call: unknown[]) => (call[0] as { userId: string }).userId
+    );
+    expect(recipients).toEqual(expect.arrayContaining(["owner-1", "collab-2"]));
+    expect(recipients).not.toContain("collab-1");
+  });
+
+  it("does not fan out item_added on non-collaborative lists", async () => {
+    mockGetAuthUser.mockResolvedValue({
+      session: { user: { id: "owner-1" } },
+    });
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "abc",
+      name: "Lista",
+      ownerId: "owner-1",
+      collaborative: false,
+    });
+    mockDb.select.mockReturnValue({
+      from: vi.fn().mockReturnValue({
+        where: vi.fn().mockResolvedValue([{ pos: null }]),
+      }),
+    });
+    mockDb.insert.mockReturnValue({
+      values: vi.fn().mockReturnValue({
+        returning: vi.fn().mockResolvedValue([{ id: "i1", listId: "abc" }]),
+      }),
+    });
+
+    const res = await app.request("/api/lists/abc/items/bulk", {
+      method: "POST",
+      body: JSON.stringify({ texts: ["Leche"] }),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    expect(res.status).toBe(201);
+    expect(mockDb.insert).not.toHaveBeenCalledWith(notifications);
+  });
+
+  it("coalesces item_added into existing unread notification within window", async () => {
+    mockGetAuthUser.mockResolvedValue({
+      session: { user: { id: "collab-1" } },
+    });
+    mockDb.query.lists.findFirst
+      .mockResolvedValueOnce({
+        id: "abc",
+        name: "Lista",
+        ownerId: "owner-1",
+        collaborative: true,
+      })
+      .mockResolvedValueOnce({ ownerId: "owner-1" });
+    mockDb.query.participations.findFirst.mockResolvedValue({
+      role: "collaborator",
+    });
+    mockDb.query.participations.findMany.mockResolvedValue([
+      { userId: "collab-1" },
+    ]);
+    mockDb.query.users.findFirst.mockResolvedValue({
+      name: "Ana",
+      image: null,
+    });
+    mockDb.query.notifications.findFirst.mockResolvedValue({
+      id: "notif-1",
+      metadata: { count: 2, itemIds: ["old-1", "old-2"] },
+    });
+    mockDb.select.mockReturnValue({
+      from: vi.fn().mockReturnValue({
+        where: vi.fn().mockResolvedValue([{ pos: null }]),
+      }),
+    });
+    mockDb.insert.mockReturnValue({
+      values: vi.fn().mockReturnValue({
+        returning: vi
+          .fn()
+          .mockResolvedValue([{ id: "new-1" }, { id: "new-2" }]),
+      }),
+    });
+    const updateSet = vi
+      .fn()
+      .mockReturnValue({ where: vi.fn().mockResolvedValue(undefined) });
+    mockDb.update.mockReturnValue({ set: updateSet });
+
+    const res = await app.request("/api/lists/abc/items/bulk", {
+      method: "POST",
+      body: JSON.stringify({ texts: ["Pan", "Café"] }),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    expect(res.status).toBe(201);
+    expect(mockDb.update).toHaveBeenCalledWith(notifications);
+    expect(updateSet).toHaveBeenCalledWith(
+      expect.objectContaining({
+        metadata: expect.objectContaining({
+          count: 4,
+          itemIds: ["old-1", "old-2", "new-1", "new-2"],
+        }),
+      })
+    );
+    expect(mockDb.insert).not.toHaveBeenCalledWith(notifications);
   });
 });
 
