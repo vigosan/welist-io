@@ -5,6 +5,7 @@ import { AppNav } from "@/components/AppNav";
 import { Skeleton } from "@/components/Skeleton";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { useToggleFollow, useUserDirectory } from "@/hooks/useList";
+import { useSearchInput } from "@/hooks/useSearchInput";
 import { useTranslation } from "@/i18n/service";
 import { privateName } from "@/lib/private-name";
 import type { DirectoryUser } from "@/services/lists.service";
@@ -169,8 +170,7 @@ function UserRow({ user }: { user: DirectoryUser }) {
 }
 
 function UsersDirectoryPage() {
-  const [q, setQ] = useState("");
-  const [search, setSearch] = useState("");
+  const { q, setQ, search, handleSearch } = useSearchInput();
   const [focused, setFocused] = useState(false);
   const { data, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage } =
     useUserDirectory(search || undefined);
@@ -182,11 +182,6 @@ function UsersDirectoryPage() {
   const { t } = useTranslation();
 
   const userList = data?.pages.flatMap((p) => p.users) ?? [];
-
-  function handleSearch(e: React.FormEvent) {
-    e.preventDefault();
-    setSearch(q.trim());
-  }
 
   return (
     <div className="min-h-dvh bg-canvas dark:bg-canvas-dark flex flex-col">

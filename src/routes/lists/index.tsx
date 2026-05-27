@@ -17,6 +17,7 @@ import {
   useStreak,
 } from "@/hooks/useList";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
+import { useSearchInput } from "@/hooks/useSearchInput";
 import { useTranslation } from "@/i18n/service";
 
 export const Route = createFileRoute("/lists/")({
@@ -285,8 +286,7 @@ function FilterChip({
 }
 
 function MyListsPage() {
-  const [q, setQ] = useState("");
-  const [search, setSearch] = useState("");
+  const { q, setQ, search, handleSearch } = useSearchInput();
   const [sort, setSort] = useState<SortOption>("recent");
   const [visibility, setVisibility] = useState<VisibilityFilter>("all");
   const [filtersOpen, setFiltersOpen] = useState(false);
@@ -317,11 +317,6 @@ function MyListsPage() {
   ];
 
   const lists = data?.pages.flatMap((p) => p.items) ?? [];
-
-  function handleSearch(e: React.FormEvent) {
-    e.preventDefault();
-    setSearch(q.trim());
-  }
 
   return (
     <div className="min-h-dvh bg-canvas dark:bg-canvas-dark flex flex-col">

@@ -9,6 +9,7 @@ import {
   useUserSettings,
 } from "@/hooks/useList";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
+import { useSearchInput } from "@/hooks/useSearchInput";
 import { useTrackOnMount } from "@/hooks/useTrackOnMount";
 import { useTranslation } from "@/i18n/service";
 import {
@@ -221,8 +222,7 @@ function ExplorePage() {
       ),
     [showAdult]
   );
-  const [q, setQ] = useState("");
-  const [search, setSearch] = useState("");
+  const { q, setQ, search, handleSearch } = useSearchInput();
   const [focused, setFocused] = useState(false);
   const [sort, setSort] = useState<"created_desc" | "trending">("created_desc");
   const [category, setCategory] = useState<string | undefined>(undefined);
@@ -238,11 +238,6 @@ function ExplorePage() {
   const { t } = useTranslation();
 
   const lists = data?.pages.flatMap((p) => p.items) ?? [];
-
-  function handleSearch(e: React.FormEvent) {
-    e.preventDefault();
-    setSearch(q.trim());
-  }
 
   function handleAccept(listId: string) {
     const list = lists.find((l) => l.id === listId);
