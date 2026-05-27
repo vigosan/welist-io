@@ -166,12 +166,6 @@ function ListDetailPage() {
     [activeTag]
   );
 
-  const handlePlaceClick = useCallback(
-    (place: string) =>
-      setActivePlace((prev) => (prev === place ? undefined : place)),
-    []
-  );
-
   const toggleCollaborative = useToggleCollaborative(listId);
   const updateCategory = useUpdateCategory(listId);
   const rateList = useRateList(listId);
@@ -1023,8 +1017,6 @@ function ListDetailPage() {
                         }
                         onTagClick={handleTagClick}
                         activeTag={activeTag}
-                        onPlaceClick={handlePlaceClick}
-                        activePlace={activePlace}
                         canWrite={canWrite}
                         canToggle={canToggle}
                         canLike={!!session?.user?.id}

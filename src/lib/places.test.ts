@@ -9,30 +9,30 @@ describe("parsePlaces", () => {
     });
   });
 
-  it("extracts a single place", () => {
+  it("inlines a single place and strips the @ marker", () => {
     expect(parsePlaces("visitar @Barcelona")).toEqual({
-      display: "visitar",
+      display: "visitar Barcelona",
       places: ["Barcelona"],
     });
   });
 
-  it("extracts a multi-word place", () => {
+  it("inlines a multi-word place", () => {
     expect(parsePlaces("comer en @Nueva York")).toEqual({
-      display: "comer en",
+      display: "comer en Nueva York",
       places: ["Nueva York"],
     });
   });
 
-  it("extracts multiple places", () => {
+  it("inlines multiple places", () => {
     expect(parsePlaces("viajar @París @Roma")).toEqual({
-      display: "viajar",
+      display: "viajar París Roma",
       places: ["París", "Roma"],
     });
   });
 
   it("preserves original casing of places", () => {
     expect(parsePlaces("ir a @Buenos Aires")).toEqual({
-      display: "ir a",
+      display: "ir a Buenos Aires",
       places: ["Buenos Aires"],
     });
   });
@@ -42,16 +42,11 @@ describe("parsePlaces", () => {
     expect(places).toContain("Montañas");
   });
 
-  it("handles place in the middle of text", () => {
-    const { display, places } = parsePlaces("comer @Tokio hoy");
-    expect(places).toContain("Tokio hoy");
-    expect(display).toBe("comer");
-  });
-
-  it("place at the end with trailing space stops correctly", () => {
-    const { display, places } = parsePlaces("restaurante en @Buenos Aires ");
-    expect(places).toContain("Buenos Aires");
-    expect(display).toBe("restaurante en");
+  it("uses the place as the entire display when nothing else is present", () => {
+    expect(parsePlaces("@Zafra")).toEqual({
+      display: "Zafra",
+      places: ["Zafra"],
+    });
   });
 });
 

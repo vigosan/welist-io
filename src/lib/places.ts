@@ -16,7 +16,7 @@ export function parsePlaces(text: string): {
   const display = text
     .replace(PLACE_RE, (_, place) => {
       places.push(place);
-      return "";
+      return place;
     })
     .replace(/\s+/g, " ")
     .trim();

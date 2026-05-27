@@ -15,8 +15,6 @@ interface Props {
   onLike?: () => void;
   onTagClick?: (tag: string) => void;
   activeTag?: string;
-  onPlaceClick?: (place: string) => void;
-  activePlace?: string;
   canWrite?: boolean;
   canToggle?: boolean;
   canLike?: boolean;
@@ -37,8 +35,6 @@ export const ItemRow = memo(
     onLike,
     onTagClick,
     activeTag,
-    onPlaceClick,
-    activePlace,
     canWrite = true,
     canToggle,
     canLike = true,
@@ -56,7 +52,7 @@ export const ItemRow = memo(
     >(undefined);
     const [geoOpen, setGeoOpen] = useState(false);
     const cancelled = useRef(false);
-    const { display, tags, places } = parseItemText(item.text);
+    const { display, tags } = parseItemText(item.text);
     const { t } = useTranslation();
     const effectiveCanToggle = canToggle ?? canWrite;
 
@@ -288,7 +284,7 @@ export const ItemRow = memo(
               >
                 {renderInlineMarkdown(display || item.text)}
               </span>
-              {(tags.length > 0 || places.length > 0) && (
+              {tags.length > 0 && (
                 <div className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5">
                   {tags.map((tag) => (
                     <button
@@ -303,33 +299,6 @@ export const ItemRow = memo(
                       }`}
                     >
                       #{tag}
-                    </button>
-                  ))}
-                  {places.map((place) => (
-                    <button
-                      type="button"
-                      key={place}
-                      data-testid={`item-place-${item.id}-${place}`}
-                      onClick={() => onPlaceClick?.(place)}
-                      className={`cursor-pointer inline-flex items-center gap-0.5 rounded-full sm:px-2 sm:py-0.5 text-[11px] sm:text-xs font-medium transition-colors active:scale-[0.96] ${
-                        activePlace === place
-                          ? "sm:bg-gray-900 sm:text-white sm:dark:bg-white sm:dark:text-gray-900 text-gray-900 dark:text-gray-100"
-                          : "text-gray-500 dark:text-gray-400 sm:bg-gray-200 sm:dark:bg-gray-700 hover:text-gray-700 dark:hover:text-gray-200 sm:hover:bg-gray-300 sm:dark:hover:bg-gray-600"
-                      }`}
-                    >
-                      <svg
-                        aria-hidden="true"
-                        className="w-2.5 h-2.5 shrink-0"
-                        fill="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M11.54 22.351l.07.04.028.016a.76.76 0 00.723 0l.028-.015.07-.041a16.975 16.975 0 001.144-.742 19.58 19.58 0 002.683-2.282c1.944-2.007 3.864-5.175 3.864-9.15C20.15 5.413 16.415 2 12 2 7.585 2 3.85 5.413 3.85 10.174c0 3.975 1.92 7.143 3.864 9.15a19.58 19.58 0 002.683 2.282 16.975 16.975 0 001.144.742zM12 13.5a3.5 3.5 0 100-7 3.5 3.5 0 000 7z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                      {place}
                     </button>
                   ))}
                 </div>
@@ -439,7 +408,6 @@ export const ItemRow = memo(
     prev.item.likedByMe === next.item.likedByMe &&
     prev.highlighted === next.highlighted &&
     prev.activeTag === next.activeTag &&
-    prev.activePlace === next.activePlace &&
     prev.canWrite === next.canWrite &&
     prev.canToggle === next.canToggle &&
     prev.canLike === next.canLike &&

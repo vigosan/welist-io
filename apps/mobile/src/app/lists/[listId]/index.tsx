@@ -49,6 +49,7 @@ import {
   renderInlineMarkdown,
   stripInlineMarkdown,
 } from "@/lib/inline-markdown";
+import { displayItemText } from "@/lib/item-text";
 import { type FilterMode, filterItems } from "@/lib/items-filter";
 import { mapsUrl } from "@/lib/maps";
 import type { Item } from "@/types";
@@ -680,16 +681,8 @@ function SwipeableItemRow({
                   : "text-gray-900 dark:text-gray-100"
               }`}
             >
-              {renderInlineMarkdown(item.text)}
+              {renderInlineMarkdown(displayItemText(item.text))}
             </Text>
-            {item.placeName && (
-              <Text
-                numberOfLines={1}
-                className="mt-0.5 text-xs text-gray-500 dark:text-gray-400"
-              >
-                📍 {item.placeName}
-              </Text>
-            )}
           </View>
         </Pressable>
 

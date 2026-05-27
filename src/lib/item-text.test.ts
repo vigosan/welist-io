@@ -12,8 +12,12 @@ describe("plainItemText", () => {
     ).toBe("Torre del Visco");
   });
 
-  it("strips places", () => {
-    expect(plainItemText("visitar @Barcelona")).toBe("visitar");
+  it("inlines places into the display text", () => {
+    expect(plainItemText("visitar @Barcelona")).toBe("visitar Barcelona");
+  });
+
+  it("uses the place as display when there is no other text", () => {
+    expect(plainItemText("@Zafra #Badajoz")).toBe("Zafra");
   });
 
   it("drops trailing bare urls", () => {
@@ -40,31 +44,38 @@ describe("parseItemText", () => {
     });
   });
 
-  it("extracts only places", () => {
+  it("inlines a place into the display", () => {
     expect(parseItemText("visitar @Barcelona")).toEqual({
-      display: "visitar",
+      display: "visitar Barcelona",
       tags: [],
       places: ["Barcelona"],
     });
   });
 
-  it("extracts both tags and places", () => {
+  it("inlines a place and extracts a tag", () => {
     expect(parseItemText("comer @Tokyo #gastronomia")).toEqual({
-      display: "comer",
+      display: "comer Tokyo",
       tags: ["gastronomia"],
       places: ["Tokyo"],
     });
   });
 
-  it("extracts multiple tags and multiple places", () => {
+  it("inlines multiple places and extracts multiple tags", () => {
     const result = parseItemText("ver @Roma @París #viajes #europe");
     expect(result.tags).toEqual(["viajes", "europe"]);
-    expect(result.places).toContain("Roma");
-    expect(result.display).toBe("ver");
+    expect(result.places).toEqual(["Roma", "París"]);
+    expect(result.display).toBe("ver Roma París");
   });
 
-  it("strips both tags and places from display", () => {
-    const { display } = parseItemText("ir a @Madrid #urgente");
-    expect(display).toBe("ir a");
+  it("keeps the place inline while stripping the tag", () => {
+    expect(parseItemText("ir a @Madrid #urgente").display).toBe("ir a Madrid");
+  });
+
+  it("uses the place as the entire display when there is no other text", () => {
+    expect(parseItemText("@Zafra #Badajoz")).toEqual({
+      display: "Zafra",
+      tags: ["badajoz"],
+      places: ["Zafra"],
+    });
   });
 });
