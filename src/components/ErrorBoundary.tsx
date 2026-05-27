@@ -22,7 +22,7 @@ export class ErrorBoundary extends Component<Props, State> {
     if (this.state.error) {
       return (
         this.props.fallback ?? (
-          <div className="min-h-screen bg-[#FAFAF8] flex items-center justify-center px-4">
+          <div className="min-h-screen bg-canvas dark:bg-canvas-dark flex items-center justify-center px-4">
             <div className="text-center space-y-3">
               <p className="text-4xl font-bold text-gray-900">
                 {t("error.title")}

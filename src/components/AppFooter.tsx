@@ -7,27 +7,19 @@ export function AppFooter() {
   return (
     <footer className="shrink-0 border-t border-black/[0.08] dark:border-white/[0.08]">
       <div className="flex items-center justify-between px-12 py-4">
-        <span
-          className="text-[11px]"
-          style={{
-            color: "#a0a09c",
-            fontFamily: "'Space Mono', monospace",
-          }}
-        >
+        <span className="text-[11px] font-mono text-muted">
           {t("home.footer", { year: new Date().getFullYear() })}
         </span>
         <div className="flex gap-5">
           <Link
             to="/privacy"
-            className="text-[11px] hover:text-[#0c0c0b] dark:hover:text-[#f0ede8] transition no-underline"
-            style={{ color: "#a0a09c" }}
+            className="text-[11px] text-muted hover:text-ink dark:hover:text-paper transition no-underline"
           >
             Privacidad
           </Link>
           <Link
             to="/terms"
-            className="text-[11px] hover:text-[#0c0c0b] dark:hover:text-[#f0ede8] transition no-underline"
-            style={{ color: "#a0a09c" }}
+            className="text-[11px] text-muted hover:text-ink dark:hover:text-paper transition no-underline"
           >
             Términos
           </Link>

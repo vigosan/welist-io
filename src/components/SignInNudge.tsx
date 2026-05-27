@@ -29,14 +29,14 @@ export function SignInNudge({ storageKey }: { storageKey: string }) {
       data-testid="signin-nudge"
       className="mb-5 flex items-center gap-3 rounded-xl border border-black/[0.08] dark:border-white/[0.08] bg-black/[0.03] dark:bg-white/[0.04] px-4 py-3"
     >
-      <p className="flex-1 text-[12px] leading-[1.6] text-gray-500 dark:text-[#a0a09c]">
+      <p className="flex-1 text-[12px] leading-[1.6] text-gray-500 dark:text-muted">
         {t("nudge.signInToSave")}
       </p>
       <button
         type="button"
         data-testid="signin-nudge-cta"
         onClick={() => signIn("google")}
-        className="cursor-pointer shrink-0 px-3 py-1.5 text-[12px] font-semibold tracking-[0.04em] bg-[#0c0c0b] text-[#f8f7f5] dark:bg-[#f0ede8] dark:text-[#0c0c0b] rounded-lg transition active:scale-[0.96]"
+        className="cursor-pointer shrink-0 px-3 py-1.5 text-[12px] font-semibold tracking-[0.04em] bg-ink text-canvas dark:bg-paper dark:text-ink rounded-lg transition active:scale-[0.96]"
       >
         {t("nudge.signIn")}
       </button>
