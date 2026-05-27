@@ -3,6 +3,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppNav } from "@/components/AppNav";
 import { ParticipantsPanel } from "@/components/lists/ParticipantsPanel";
+import { SectionHeading, SectionKicker } from "@/components/ui";
 import {
   useAcceptChallenge,
   useExploreDetail,
@@ -67,25 +68,25 @@ function ExploreDetailPage() {
         <main className="flex-1 w-full max-w-3xl mx-auto px-4 py-6 flex flex-col gap-5">
           <div
             data-testid="skeleton"
-            className="h-4 w-24 rounded bg-gray-200 animate-pulse"
+            className="h-4 w-24 rounded bg-black/[0.06] dark:bg-white/[0.06] animate-pulse"
           />
           <div className="flex flex-col gap-2">
             <div
               data-testid="skeleton"
-              className="h-6 w-2/3 rounded-lg bg-gray-200 animate-pulse"
+              className="h-6 w-2/3 rounded-lg bg-black/[0.06] dark:bg-white/[0.06] animate-pulse"
             />
             <div
               data-testid="skeleton"
-              className="h-4 w-1/3 rounded-lg bg-gray-200 animate-pulse"
+              className="h-4 w-1/3 rounded-lg bg-black/[0.06] dark:bg-white/[0.06] animate-pulse"
             />
           </div>
           <div
             data-testid="skeleton"
-            className="h-40 rounded-2xl bg-gray-200 animate-pulse"
+            className="h-40 rounded-2xl bg-black/[0.06] dark:bg-white/[0.06] animate-pulse"
           />
           <div
             data-testid="skeleton"
-            className="h-10 rounded-xl bg-gray-200 animate-pulse"
+            className="h-10 rounded-xl bg-black/[0.06] dark:bg-white/[0.06] animate-pulse"
           />
         </main>
       </div>
@@ -97,7 +98,7 @@ function ExploreDetailPage() {
       <div className="h-dvh bg-canvas dark:bg-canvas-dark flex flex-col">
         <AppNav />
         <div className="flex-1 flex items-center justify-center">
-          <p className="text-sm text-gray-400">{t("error.notFound")}</p>
+          <p className="text-sm text-muted">{t("error.notFound")}</p>
         </div>
       </div>
     );
@@ -110,7 +111,7 @@ function ExploreDetailPage() {
       <main className="flex-1 w-full max-w-3xl mx-auto px-4 py-6 flex flex-col gap-5">
         <Link
           to="/explore"
-          className="text-sm text-gray-500 dark:text-muted hover:text-ink dark:hover:text-paper transition-colors duration-150 w-fit"
+          className="text-sm text-muted hover:text-ink dark:hover:text-paper transition-colors duration-150 w-fit"
           data-testid="back-to-explore"
         >
           {t("explore.backToExplore")}
@@ -118,16 +119,17 @@ function ExploreDetailPage() {
 
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0">
-            <h1 className="text-xl font-bold tracking-tight text-gray-900 dark:text-gray-100 leading-snug">
-              {detail.name}
-            </h1>
+            <SectionKicker>{t("nav.explore")}</SectionKicker>
+            <div className="mt-3.5">
+              <SectionHeading size="sm">{detail.name}</SectionHeading>
+            </div>
             {detail.owner?.name && (
-              <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+              <p className="text-xs text-muted mt-2">
                 {detail.ownerId ? (
                   <Link
                     to="/u/$userId"
                     params={{ userId: detail.ownerId }}
-                    className="hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+                    className="hover:text-ink dark:hover:text-paper transition-colors"
                   >
                     {t("explore.createdBy", {
                       name: privateName(detail.owner.name),
@@ -141,7 +143,7 @@ function ExploreDetailPage() {
               </p>
             )}
             {detail.description && (
-              <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed mt-2">
+              <p className="text-sm text-muted leading-relaxed mt-2">
                 {detail.description}
               </p>
             )}
@@ -156,10 +158,10 @@ function ExploreDetailPage() {
         </div>
 
         <div className="flex items-center gap-2 flex-wrap">
-          <div className="flex items-center gap-1 px-2 py-1 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700">
+          <div className="flex items-center gap-1 px-2 py-1 rounded-lg border border-black/[0.08] bg-canvas dark:border-white/[0.08] dark:bg-canvas-dark">
             <svg
               aria-hidden="true"
-              className="w-3 h-3 text-gray-400 dark:text-gray-500"
+              className="w-3 h-3 text-muted"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -171,7 +173,7 @@ function ExploreDetailPage() {
                 d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
               />
             </svg>
-            <span className="text-xs font-medium text-gray-500 dark:text-gray-400 tabular-nums">
+            <span className="text-xs font-medium text-muted tabular-nums">
               {itemCount}
             </span>
           </div>
@@ -196,9 +198,9 @@ function ExploreDetailPage() {
                   ) : (
                     <div
                       key={p.id}
-                      className="w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-700 outline outline-2 outline-canvas dark:outline-canvas-dark flex items-center justify-center"
+                      className="w-6 h-6 rounded-full bg-black/[0.06] dark:bg-white/[0.06] outline outline-2 outline-canvas dark:outline-canvas-dark flex items-center justify-center"
                     >
-                      <span className="text-[8px] text-gray-500 dark:text-gray-400 font-medium">
+                      <span className="text-[8px] text-muted font-medium">
                         {(p.name ?? "?")[0]?.toUpperCase()}
                       </span>
                     </div>
@@ -206,7 +208,7 @@ function ExploreDetailPage() {
                 )}
               </div>
               {extraParticipants > 0 && (
-                <span className="text-xs text-gray-400 dark:text-gray-500 tabular-nums">
+                <span className="text-xs text-muted tabular-nums">
                   {t("explore.moreParticipants", {
                     count: String(extraParticipants),
                   })}
@@ -220,27 +222,23 @@ function ExploreDetailPage() {
           <ParticipantsPanel challengers={challengers} collaborators={[]} />
         )}
 
-        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 overflow-hidden">
+        <div className="rounded-2xl border border-black/[0.08] bg-canvas dark:border-white/[0.08] dark:bg-canvas-dark overflow-hidden">
           <div className="px-4 py-3">
             {itemsLoading && (
-              <p className="text-sm text-gray-400 dark:text-gray-500">
-                {t("explore.loading")}
-              </p>
+              <p className="text-sm text-muted">{t("explore.loading")}</p>
             )}
             {!itemsLoading && exploreItems && exploreItems.length === 0 && (
-              <p className="text-sm text-gray-400 dark:text-gray-500">
-                {t("explore.noItems")}
-              </p>
+              <p className="text-sm text-muted">{t("explore.noItems")}</p>
             )}
             {!itemsLoading && exploreItems && exploreItems.length > 0 && (
-              <ul className="divide-y divide-gray-50 dark:divide-gray-800">
+              <ul className="divide-y divide-black/[0.05] dark:divide-white/[0.05]">
                 {exploreItems.map((item) => (
                   <li key={item.id} className="flex items-center gap-3 py-2.5">
-                    <span className="w-4 h-4 rounded border shrink-0 border-gray-300 dark:border-gray-600" />
+                    <span className="w-4 h-4 rounded border shrink-0 border-black/15 dark:border-white/20" />
                     {/* biome-ignore lint/a11y/noStaticElementInteractions: link click passthrough */}
                     {/* biome-ignore lint/a11y/useKeyWithClickEvents: link click passthrough */}
                     <span
-                      className="text-sm font-medium text-gray-800 dark:text-gray-200"
+                      className="text-sm font-medium text-ink dark:text-paper"
                       onClick={(e) => {
                         if ((e.target as HTMLElement).tagName === "A")
                           e.stopPropagation();
@@ -256,13 +254,13 @@ function ExploreDetailPage() {
         </div>
 
         {completedParticipants.length > 0 && (
-          <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 overflow-hidden">
-            <div className="px-4 py-3 border-b border-gray-50 dark:border-gray-800">
-              <h2 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+          <div className="rounded-2xl border border-black/[0.08] bg-canvas dark:border-white/[0.08] dark:bg-canvas-dark overflow-hidden">
+            <div className="px-4 py-3 border-b border-black/[0.05] dark:border-white/[0.05]">
+              <h2 className="text-xs font-semibold text-muted uppercase tracking-wider">
                 {t("hallOfFame.title")}
               </h2>
             </div>
-            <ul className="divide-y divide-gray-50 dark:divide-gray-800">
+            <ul className="divide-y divide-black/[0.05] dark:divide-white/[0.05]">
               {completedParticipants.map((p, i) => (
                 // biome-ignore lint/suspicious/noArrayIndexKey: no stable ID for completed participants
                 <li key={i} className="flex items-center gap-3 px-4 py-2.5">
@@ -273,17 +271,17 @@ function ExploreDetailPage() {
                       className="w-6 h-6 rounded-full shrink-0 outline outline-1 outline-black/10 dark:outline-white/10"
                     />
                   ) : (
-                    <div className="w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-700 shrink-0 flex items-center justify-center">
-                      <span className="text-[9px] text-gray-500 dark:text-gray-400 font-medium">
+                    <div className="w-6 h-6 rounded-full bg-black/[0.06] dark:bg-white/[0.06] shrink-0 flex items-center justify-center">
+                      <span className="text-[9px] text-muted font-medium">
                         {(p.name ?? "?")[0]?.toUpperCase()}
                       </span>
                     </div>
                   )}
-                  <span className="flex-1 text-sm text-gray-700 dark:text-gray-300 truncate">
+                  <span className="flex-1 text-sm text-ink/85 dark:text-paper/80 truncate">
                     {p.name ?? "Anonymous"}
                   </span>
                   {p.completedAt && (
-                    <span className="text-xs text-gray-400 dark:text-gray-500 tabular-nums shrink-0">
+                    <span className="text-xs text-muted tabular-nums shrink-0">
                       {new Date(p.completedAt).toLocaleDateString()}
                     </span>
                   )}
@@ -306,7 +304,7 @@ function ExploreDetailPage() {
             acceptChallenge.isPending || detail.ownerId === session?.user?.id
           }
           data-testid="accept-challenge-btn"
-          className="cursor-pointer w-full py-3 text-sm font-medium bg-gray-900 text-white dark:bg-white dark:text-gray-900 rounded-xl hover:bg-black dark:hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-[background-color,transform] duration-150 active:scale-[0.96]"
+          className="cursor-pointer w-full py-3 text-sm font-semibold bg-ink text-paper dark:bg-paper dark:text-ink rounded-lg hover:bg-black dark:hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed transition duration-150 active:scale-[0.96]"
         >
           {session?.user ? t("explore.acceptChallenge") : t("explore.signIn")}
         </button>
