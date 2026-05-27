@@ -239,6 +239,13 @@
       "when": 1779893274001,
       "tag": "0033_rainy_thanos",
       "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "7",
+      "when": 1779911712118,
+      "tag": "0034_special_thaddeus_ross",
+      "breakpoints": true
     }
   ]
 }

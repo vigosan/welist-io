@@ -23,6 +23,7 @@ export const lists = pgTable(
     public: boolean("public").notNull().default(false),
     collaborative: boolean("collaborative").notNull().default(false),
     ownerId: text("owner_id").references(() => users.id),
+    completedAt: timestamp("completed_at", { withTimezone: true }),
     createdAt: timestamp("created_at", {
       withTimezone: true,
     })
@@ -224,6 +225,9 @@ export const notificationTypeEnum = pgEnum("notification_type", [
   "new_follower",
   "list_purchased",
   "added_as_collaborator",
+  "item_added",
+  "item_done",
+  "list_completed",
 ]);
 
 export const notifications = pgTable(
@@ -242,6 +246,7 @@ export const notifications = pgTable(
     actorName: text("actor_name"),
     actorImage: text("actor_image"),
     actionUrl: text("action_url"),
+    metadata: jsonb("metadata"),
     readAt: timestamp("read_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true })
       .defaultNow()
@@ -251,6 +256,27 @@ export const notifications = pgTable(
     index("notifications_user_idx").on(t.userId),
     index("notifications_user_read_idx").on(t.userId, t.readAt),
   ]
+);
+
+export const devicePlatformEnum = pgEnum("device_platform", ["ios", "android"]);
+
+export const deviceTokens = pgTable(
+  "device_tokens",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    token: text("token").notNull().unique(),
+    platform: devicePlatformEnum("platform").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => [index("device_tokens_user_idx").on(t.userId)]
 );
 
 export const achievementTypeEnum = pgEnum("achievement_type", [
@@ -381,6 +407,8 @@ export type StripeAccount = typeof stripeAccounts.$inferSelect;
 export type ListPrice = typeof listPrices.$inferSelect;
 export type ListPurchase = typeof listPurchases.$inferSelect;
 export type Notification = typeof notifications.$inferSelect;
+export type DeviceToken = typeof deviceTokens.$inferSelect;
+export type DevicePlatform = DeviceToken["platform"];
 export type Event = typeof events.$inferSelect;
 export type Achievement = typeof achievements.$inferSelect;
 export type AchievementType = Achievement["type"];

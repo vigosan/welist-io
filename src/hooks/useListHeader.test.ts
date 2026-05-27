@@ -32,6 +32,7 @@ const LIST: List = {
   public: false,
   collaborative: false,
   ownerId: null,
+  completedAt: null,
   createdAt: new Date(),
 };
 

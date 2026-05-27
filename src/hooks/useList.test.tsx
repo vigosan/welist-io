@@ -51,6 +51,7 @@ const LIST: ListWithParticipation = {
   public: false,
   collaborative: false,
   ownerId: null,
+  completedAt: null,
   createdAt: new Date(),
   participated: false,
   participationCompletedAt: null,

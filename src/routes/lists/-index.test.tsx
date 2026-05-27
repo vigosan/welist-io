@@ -27,6 +27,7 @@ const LIST_A: List = {
   public: false,
   collaborative: false,
   ownerId: "u1",
+  completedAt: null,
   createdAt: new Date(),
 };
 const LIST_B: List = {
@@ -38,6 +39,7 @@ const LIST_B: List = {
   public: true,
   collaborative: false,
   ownerId: "u1",
+  completedAt: null,
   createdAt: new Date(),
 };
 const LIST_PARTICIPATED: List = {
@@ -49,6 +51,7 @@ const LIST_PARTICIPATED: List = {
   public: true,
   collaborative: false,
   ownerId: "other-user",
+  completedAt: null,
   createdAt: new Date(),
 };
 const LIST_IN_PROGRESS = {
