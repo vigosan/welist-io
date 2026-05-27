@@ -1,9 +1,8 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act, renderHook } from "@testing-library/react";
 import type React from "react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { queryKeys } from "@/lib/query-keys";
-import type { ItemWithLikes } from "@/services/items.service";
 
 import { useListRealtime } from "./useListRealtime";
 
@@ -41,44 +40,23 @@ class FakeEventSource {
 
 const LIST_ID = "list-1";
 
-const ITEM_A: ItemWithLikes = {
-  id: "i1",
-  listId: LIST_ID,
-  text: "Tarea A",
-  done: false,
-  position: 0,
-  latitude: null,
-  longitude: null,
-  placeName: null,
-  createdAt: new Date(),
-  updatedAt: new Date(),
-  likeCount: 0,
-  likedByMe: false,
-};
-
-const ITEM_B: ItemWithLikes = { ...ITEM_A, id: "i2", text: "Tarea B" };
-
 function renderWithClient(enabled: boolean) {
   const qc = new QueryClient({
     defaultOptions: { queries: { retry: false } },
   });
-  qc.setQueryData<ItemWithLikes[]>(queryKeys.items(LIST_ID), [ITEM_A, ITEM_B]);
+  const invalidateSpy = vi.spyOn(qc, "invalidateQueries");
   const wrapper = ({ children }: { children: React.ReactNode }) => (
     <QueryClientProvider client={qc}>{children}</QueryClientProvider>
   );
   const result = renderHook(() => useListRealtime(LIST_ID, enabled), {
     wrapper,
   });
-  return { qc, ...result };
+  return { qc, invalidateSpy, ...result };
 }
 
 beforeEach(() => {
   FakeEventSource.instances = [];
   vi.stubGlobal("EventSource", FakeEventSource);
-});
-
-afterEach(() => {
-  vi.unstubAllGlobals();
 });
 
 describe("useListRealtime", () => {
@@ -95,57 +73,20 @@ describe("useListRealtime", () => {
     );
   });
 
-  it("applies a toggle event from another user to the items query", () => {
-    const { qc } = renderWithClient(true);
+  it("invalidates the items and list queries on list-changed", () => {
+    const { invalidateSpy } = renderWithClient(true);
     const [es] = FakeEventSource.instances;
 
     act(() => {
-      es.dispatch("item-toggled", {
-        listId: LIST_ID,
-        itemId: "i1",
-        done: true,
-        userId: "someone-else",
-      });
+      es.dispatch("list-changed", { listId: LIST_ID });
     });
 
-    const items = qc.getQueryData<ItemWithLikes[]>(queryKeys.items(LIST_ID));
-    expect(items?.find((i) => i.id === "i1")?.done).toBe(true);
-    expect(items?.find((i) => i.id === "i2")?.done).toBe(false);
-  });
-
-  it("applies events even when payload userId matches the current user (cross-device echo)", () => {
-    const { qc } = renderWithClient(true);
-    const [es] = FakeEventSource.instances;
-
-    act(() => {
-      es.dispatch("item-toggled", {
-        listId: LIST_ID,
-        itemId: "i1",
-        done: true,
-        userId: "me",
-      });
+    expect(invalidateSpy).toHaveBeenCalledWith({
+      queryKey: queryKeys.items(LIST_ID),
     });
-
-    const items = qc.getQueryData<ItemWithLikes[]>(queryKeys.items(LIST_ID));
-    expect(items?.find((i) => i.id === "i1")?.done).toBe(true);
-  });
-
-  it("does not allocate a new array when the done value already matches", () => {
-    const { qc } = renderWithClient(true);
-    const [es] = FakeEventSource.instances;
-    const before = qc.getQueryData<ItemWithLikes[]>(queryKeys.items(LIST_ID));
-
-    act(() => {
-      es.dispatch("item-toggled", {
-        listId: LIST_ID,
-        itemId: "i1",
-        done: false,
-        userId: "anyone",
-      });
+    expect(invalidateSpy).toHaveBeenCalledWith({
+      queryKey: queryKeys.list(LIST_ID),
     });
-
-    const after = qc.getQueryData<ItemWithLikes[]>(queryKeys.items(LIST_ID));
-    expect(after).toBe(before);
   });
 
   it("closes the EventSource on unmount", () => {

@@ -233,7 +233,7 @@ function ListDetailPage() {
 
   const { data: items = [], isLoading: itemsLoading } = useItems(listId);
 
-  useListRealtime(listId, !!list?.collaborative);
+  useListRealtime(listId, !!list);
 
   const showSignInNudge =
     !session?.user && list?.ownerId === null && items.length >= 1;
