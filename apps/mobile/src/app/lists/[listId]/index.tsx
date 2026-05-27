@@ -651,8 +651,8 @@ function SwipeableItemRow({
               onDelete();
             }}
           >
-            <View className="h-full items-center justify-center rounded-2xl bg-red-600 px-5">
-              <Text className="text-sm font-semibold text-white">
+            <View className="h-full items-center justify-center rounded-2xl bg-ink px-5 dark:bg-paper">
+              <Text className="text-sm font-semibold text-canvas dark:text-ink">
                 {deleteLabel}
               </Text>
             </View>

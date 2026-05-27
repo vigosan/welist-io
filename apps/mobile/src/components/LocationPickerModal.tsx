@@ -111,9 +111,9 @@ export function LocationPickerModal({
               onRemove();
               close();
             }}
-            className="mx-6 mb-10 rounded-xl border border-red-200 px-6 py-3 active:opacity-80"
+            className="mx-6 mb-10 rounded-xl border border-gray-200 dark:border-gray-700 px-6 py-3 active:opacity-80"
           >
-            <Text className="text-center text-sm font-medium text-red-600">
+            <Text className="text-center text-sm font-semibold text-gray-900 dark:text-gray-100">
               {t("list.removeLocation")}
             </Text>
           </Pressable>

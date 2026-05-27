@@ -65,7 +65,7 @@ export function ActionDrawer({ visible, title, actions, onClose }: Props) {
                   <Text
                     className={`text-base ${
                       action.destructive
-                        ? "font-medium text-red-600 dark:text-red-400"
+                        ? "font-semibold text-gray-900 dark:text-gray-100"
                         : "text-gray-900 dark:text-gray-100"
                     }`}
                   >

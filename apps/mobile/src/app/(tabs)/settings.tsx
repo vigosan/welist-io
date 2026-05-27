@@ -239,7 +239,7 @@ export default function SettingsScreen() {
             />
           </View>
           {passwordError && (
-            <Text className="mb-2 text-xs text-red-600 dark:text-red-400">
+            <Text className="mb-2 text-xs font-medium text-ink dark:text-paper">
               {passwordError}
             </Text>
           )}
@@ -285,9 +285,9 @@ export default function SettingsScreen() {
         <View className="mt-6 gap-3">
           <Pressable
             onPress={signOut}
-            className="items-center rounded-2xl border border-red-200 bg-white px-4 py-3 active:bg-red-50 dark:border-red-900 dark:bg-gray-900 dark:active:bg-red-950"
+            className="items-center rounded-2xl border border-gray-200 bg-white px-4 py-3 active:bg-gray-100 dark:border-gray-700 dark:bg-gray-900 dark:active:bg-gray-800"
           >
-            <Text className="text-sm font-medium text-red-600 dark:text-red-400">
+            <Text className="text-sm font-semibold text-gray-900 dark:text-gray-100">
               {t("common.signOut")}
             </Text>
           </Pressable>
@@ -313,7 +313,7 @@ export default function SettingsScreen() {
             }
             className="items-center rounded-2xl px-4 py-3"
           >
-            <Text className="text-xs font-medium text-red-600 dark:text-red-400">
+            <Text className="text-xs font-medium text-gray-500 dark:text-gray-400">
               {t("profile.deleteAccount")}
             </Text>
           </Pressable>

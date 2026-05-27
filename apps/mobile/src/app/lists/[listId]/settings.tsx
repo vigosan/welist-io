@@ -244,9 +244,9 @@ export default function ListSettingsScreen() {
 
           <Pressable
             onPress={confirmDelete}
-            className="rounded-xl border border-red-200 px-6 py-3 active:opacity-80"
+            className="rounded-xl border border-gray-200 dark:border-gray-700 px-6 py-3 active:opacity-80"
           >
-            <Text className="text-center font-medium text-red-600">
+            <Text className="text-center font-semibold text-gray-900 dark:text-gray-100">
               {t("settings.deleteList")}
             </Text>
           </Pressable>
@@ -397,7 +397,7 @@ function CollaboratorsSection({ listId }: { listId: string }) {
             }
             className="px-2"
           >
-            <Text className="text-xs text-red-600">{t("common.remove")}</Text>
+            <Text className="text-xs font-semibold text-gray-900 dark:text-gray-100">{t("common.remove")}</Text>
           </Pressable>
         </View>
       ))}
