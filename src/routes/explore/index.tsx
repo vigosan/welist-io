@@ -3,12 +3,13 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { AppNav } from "@/components/AppNav";
 import { Skeleton } from "@/components/Skeleton";
+import { cardHover, Progress } from "@/components/ui";
+import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import {
   useAcceptChallenge,
   useExplore,
   useUserSettings,
 } from "@/hooks/useList";
-import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { useSearchInput } from "@/hooks/useSearchInput";
 import { useTrackOnMount } from "@/hooks/useTrackOnMount";
 import { useTranslation } from "@/i18n/service";
@@ -82,7 +83,9 @@ function ExploreListCard({
       : null;
 
   return (
-    <div className="rounded-2xl border border-black/[0.08] dark:border-white/[0.08] bg-white dark:bg-white/[0.02] p-5 transition-colors duration-150 hover:border-black/[0.18] dark:hover:border-white/[0.18]">
+    <div
+      className={`rounded-2xl border border-black/[0.08] bg-canvas p-5 dark:border-white/[0.08] dark:bg-canvas-dark ${cardHover}`}
+    >
       {(list.category || owner) && (
         <div className="mb-2 flex items-center gap-3">
           {list.category && (
@@ -164,18 +167,11 @@ function ExploreListCard({
         </span>
       </div>
       {pct !== null && (
-        <div
+        <Progress
+          value={pct}
+          className="mt-2"
           data-testid={`explore-card-progress-${list.id}`}
-          className="mt-2 h-0.5 w-full overflow-hidden rounded-full bg-black/[0.06] dark:bg-white/[0.06]"
-        >
-          <div
-            className="h-full rounded-full bg-ink dark:bg-paper"
-            style={{
-              width: `${pct}%`,
-              transition: "width 600ms cubic-bezier(0.2, 0, 0, 1)",
-            }}
-          />
-        </div>
+        />
       )}
       <button
         type="button"
@@ -184,10 +180,10 @@ function ExploreListCard({
         data-testid={`accept-btn-${list.id}`}
         className={[
           "mt-3.5 w-full py-2.5 rounded-lg text-[12px] font-semibold tracking-[0.04em]",
-          "transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer",
+          "transition disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer active:scale-[0.97]",
           accepted
-            ? "bg-black/[0.12] dark:bg-white/[0.14] text-ink dark:text-paper border border-black/[0.20] dark:border-white/[0.18]"
-            : "bg-ink dark:bg-paper text-canvas dark:text-ink border border-transparent",
+            ? "bg-canvas text-muted border border-black/[0.08] dark:bg-canvas-dark dark:border-white/[0.08]"
+            : "bg-ink text-paper border border-ink hover:bg-black dark:bg-paper dark:text-ink dark:border-paper dark:hover:bg-white",
         ].join(" ")}
       >
         {session?.user
@@ -201,10 +197,10 @@ function ExploreListCard({
 }
 
 function chipClass(active: boolean): string {
-  return `cursor-pointer px-3 py-1 rounded-full text-xs transition-all duration-150 whitespace-nowrap shrink-0 border ${
+  return `cursor-pointer px-3 py-1 rounded-full text-xs transition-colors duration-150 whitespace-nowrap shrink-0 border active:scale-[0.97] ${
     active
-      ? "border-black/[0.20] dark:border-white/[0.20] bg-black/[0.12] dark:bg-white/[0.12] text-ink dark:text-paper font-semibold"
-      : "border-black/[0.08] dark:border-white/[0.08] text-gray-500 font-normal hover:border-black/[0.20] dark:hover:border-white/[0.20] hover:bg-black/[0.05] dark:hover:bg-white/[0.05]"
+      ? "border-ink bg-ink text-canvas dark:border-paper dark:bg-paper dark:text-canvas-dark"
+      : "border-black/[0.08] bg-canvas text-muted hover:border-black/20 hover:text-ink dark:border-white/[0.08] dark:bg-canvas-dark dark:hover:border-white/20 dark:hover:text-paper"
   }`;
 }
 
@@ -304,10 +300,10 @@ function ExplorePage() {
                 type="button"
                 data-testid="filter-toggle"
                 onClick={() => setFiltersOpen((v) => !v)}
-                className={`cursor-pointer inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs transition-all duration-150 whitespace-nowrap shrink-0 ${
+                className={`cursor-pointer inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs transition-colors duration-150 whitespace-nowrap shrink-0 active:scale-[0.97] ${
                   hasNonDefault
-                    ? "border-black/[0.20] dark:border-white/[0.20] bg-black/[0.12] dark:bg-white/[0.12] text-ink dark:text-paper font-semibold"
-                    : "border-black/[0.08] dark:border-white/[0.08] text-gray-500 font-normal hover:border-black/[0.20] dark:hover:border-white/[0.20] hover:bg-black/[0.05] dark:hover:bg-white/[0.05]"
+                    ? "border-ink bg-ink text-canvas dark:border-paper dark:bg-paper dark:text-canvas-dark"
+                    : "border-black/[0.08] bg-canvas text-muted hover:border-black/20 hover:text-ink dark:border-white/[0.08] dark:bg-canvas-dark dark:hover:border-white/20 dark:hover:text-paper"
                 }`}
               >
                 <svg
