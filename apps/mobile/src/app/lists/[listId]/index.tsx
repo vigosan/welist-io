@@ -66,6 +66,7 @@ export default function ListDetailScreen() {
   const [editingText, setEditingText] = useState("");
   const [locating, setLocating] = useState<Item | null>(null);
   const [actionsOpen, setActionsOpen] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   const { session } = useSession();
   const list = useList(listId);
@@ -383,11 +384,15 @@ export default function ListDetailScreen() {
         contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 40 }}
         refreshControl={
           <RefreshControl
-            refreshing={items.isRefetching}
-            onRefresh={() => {
+            refreshing={refreshing}
+            onRefresh={async () => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-              items.refetch();
-              list.refetch();
+              setRefreshing(true);
+              try {
+                await Promise.all([items.refetch(), list.refetch()]);
+              } finally {
+                setRefreshing(false);
+              }
             }}
           />
         }
