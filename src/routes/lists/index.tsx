@@ -1,6 +1,6 @@
 import { useSession } from "@hono/auth-js/react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { AppNav } from "@/components/AppNav";
 import type { List } from "@/db/schema/lists.schema";
 
@@ -16,6 +16,7 @@ import {
   useMyLists,
   useStreak,
 } from "@/hooks/useList";
+import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { useTranslation } from "@/i18n/service";
 
 export const Route = createFileRoute("/lists/")({
@@ -292,7 +293,11 @@ function MyListsPage() {
   const [creating, setCreating] = useState(false);
   const { data, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage } =
     useMyLists(search || undefined, sort, visibility);
-  const sentinelRef = useRef<HTMLDivElement>(null);
+  const sentinelRef = useInfiniteScroll({
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+  });
   const { t } = useTranslation();
   const { data: session } = useSession();
   const userId = session?.user?.id;
@@ -310,21 +315,6 @@ function MyListsPage() {
     { value: "public", label: t("myLists.filterPublic") },
     { value: "private", label: t("myLists.filterPrivate") },
   ];
-
-  useEffect(() => {
-    const el = sentinelRef.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && hasNextPage && !isFetchingNextPage) {
-          fetchNextPage();
-        }
-      },
-      { threshold: 0.1 }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const lists = data?.pages.flatMap((p) => p.items) ?? [];
 

@@ -1,8 +1,9 @@
 import { useSession } from "@hono/auth-js/react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { AppNav } from "@/components/AppNav";
 import { Skeleton } from "@/components/Skeleton";
+import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { useToggleFollow, useUserDirectory } from "@/hooks/useList";
 import { useTranslation } from "@/i18n/service";
 import { privateName } from "@/lib/private-name";
@@ -173,23 +174,12 @@ function UsersDirectoryPage() {
   const [focused, setFocused] = useState(false);
   const { data, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage } =
     useUserDirectory(search || undefined);
-  const sentinelRef = useRef<HTMLDivElement>(null);
+  const sentinelRef = useInfiniteScroll({
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+  });
   const { t } = useTranslation();
-
-  useEffect(() => {
-    const el = sentinelRef.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && hasNextPage && !isFetchingNextPage) {
-          fetchNextPage();
-        }
-      },
-      { threshold: 0.1 }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const userList = data?.pages.flatMap((p) => p.users) ?? [];
 

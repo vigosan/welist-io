@@ -1,6 +1,6 @@
 import { signIn, useSession } from "@hono/auth-js/react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { AppNav } from "@/components/AppNav";
 import { Skeleton } from "@/components/Skeleton";
 import {
@@ -8,6 +8,7 @@ import {
   useExplore,
   useUserSettings,
 } from "@/hooks/useList";
+import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { useTrackOnMount } from "@/hooks/useTrackOnMount";
 import { useTranslation } from "@/i18n/service";
 import {
@@ -229,22 +230,12 @@ function ExplorePage() {
   const { data, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage } =
     useExplore(search || undefined, sort, category);
   const acceptChallenge = useAcceptChallenge();
-  const sentinelRef = useRef<HTMLDivElement>(null);
+  const sentinelRef = useInfiniteScroll({
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+  });
   const { t } = useTranslation();
-
-  useEffect(() => {
-    const el = sentinelRef.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && hasNextPage && !isFetchingNextPage)
-          fetchNextPage();
-      },
-      { threshold: 0.1 }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const lists = data?.pages.flatMap((p) => p.items) ?? [];
 
