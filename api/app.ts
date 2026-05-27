@@ -1973,6 +1973,107 @@ function buildNudgeEmail(args: {
   return { subject, html, text };
 }
 
+function buildStreakAtRiskEmail(args: {
+  streak: number;
+  homeLink: string;
+  unsubscribeUrl: string;
+}): { subject: string; html: string; text: string } {
+  const subject = `welist · Tu racha de ${args.streak} días está en riesgo`;
+  const text = [
+    "Hola,",
+    "",
+    `Llevas ${args.streak} días seguidos completando ítems.`,
+    "Marca uno hoy para no perder la racha.",
+    "",
+    `Abrir welist: ${args.homeLink}`,
+    "",
+    `Darte de baja: ${args.unsubscribeUrl}`,
+  ].join("\n");
+  const html = `<!doctype html><html lang="es"><body style="margin:0;padding:0;background:#f8f7f5;color:#0c0c0b;font-family:system-ui,-apple-system,sans-serif">
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f8f7f5">
+  <tr><td align="center" style="padding:40px 16px">
+    <table role="presentation" width="480" cellspacing="0" cellpadding="0" style="max-width:480px;background:#fff;border:1px solid #ebe9e4;border-radius:16px">
+      <tr><td style="padding:32px">
+        <p style="margin:0 0 4px;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#a0a09c">welist</p>
+        <h1 style="margin:0 0 16px;font-size:18px;font-weight:600;letter-spacing:-0.01em">Tu racha está en riesgo</h1>
+        <p style="margin:0 0 8px;font-size:32px;font-weight:700;letter-spacing:-0.02em;color:#0c0c0b">${args.streak} días</p>
+        <p style="margin:0 0 24px;font-size:14px;line-height:1.5;color:#5a5a55">Marca un ítem hoy para no perderla.</p>
+        <a href="${args.homeLink}" style="display:inline-block;background:#0c0c0b;color:#f8f7f5;padding:10px 16px;border-radius:10px;text-decoration:none;font-size:13px;font-weight:600">Abrir welist →</a>
+      </td></tr>
+      <tr><td style="padding:0 32px 24px;border-top:1px solid #ebe9e4">
+        <p style="margin:16px 0 0;font-size:11px;color:#a0a09c">¿Demasiados emails? <a href="${args.unsubscribeUrl}" style="color:#a0a09c;text-decoration:underline">Darte de baja</a>.</p>
+      </td></tr>
+    </table>
+  </td></tr>
+</table>
+</body></html>`;
+  return { subject, html, text };
+}
+
+app.get("/cron/streak-at-risk", async (c) => {
+  const auth = c.req.header("Authorization") ?? "";
+  const cronSecret = process.env.CRON_SECRET ?? "";
+  if (!cronSecret || auth !== `Bearer ${cronSecret}`)
+    return c.json({ error: "Unauthorized" }, 401);
+
+  const eligible = await db
+    .select({ id: users.id, email: users.email, name: users.name })
+    .from(users)
+    .innerJoin(itemProgress, eq(itemProgress.userId, users.id))
+    .where(
+      and(
+        eq(users.emailOptIn, true),
+        isNotNull(users.email),
+        eq(itemProgress.done, true)
+      )
+    )
+    .groupBy(users.id, users.email, users.name)
+    .having(
+      sql`to_char(max(${itemProgress.updatedAt}) at time zone 'UTC', 'YYYY-MM-DD') = to_char((now() at time zone 'UTC') - interval '1 day', 'YYYY-MM-DD')`
+    );
+
+  const authSecret = process.env.AUTH_SECRET ?? "";
+  const appUrl = process.env.APP_URL ?? "https://welist.io";
+  const now = new Date();
+  let sent = 0;
+  for (const u of eligible) {
+    if (!u.email) continue;
+    const dayExpr = sql<string>`to_char(${itemProgress.updatedAt}, 'YYYY-MM-DD')`;
+    const dayRows = await db
+      .select({ day: dayExpr })
+      .from(itemProgress)
+      .where(and(eq(itemProgress.userId, u.id), eq(itemProgress.done, true)))
+      .groupBy(dayExpr)
+      .orderBy(desc(dayExpr));
+    const streak = computeDayStreak(
+      dayRows.map((r) => r.day),
+      now
+    );
+    if (streak < 2) continue;
+    const token = await signUnsubscribeToken(u.id, authSecret);
+    const unsubscribeUrl = `${appUrl}/api/unsubscribe?token=${encodeURIComponent(token)}`;
+    const homeLink = `${appUrl}/`;
+    const email = buildStreakAtRiskEmail({
+      streak,
+      homeLink,
+      unsubscribeUrl,
+    });
+    try {
+      await sendEmail({
+        to: u.email,
+        subject: email.subject,
+        html: email.html,
+        text: email.text,
+        listUnsubscribeUrl: unsubscribeUrl,
+      });
+      sent += 1;
+    } catch {
+      /* skip this user, continue */
+    }
+  }
+  return c.json({ sent });
+});
+
 app.get("/cron/random-item-nudge", async (c) => {
   const auth = c.req.header("Authorization") ?? "";
   const cronSecret = process.env.CRON_SECRET ?? "";

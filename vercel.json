@@ -10,6 +10,7 @@
     }
   ],
   "crons": [
-    { "path": "/api/cron/random-item-nudge", "schedule": "0 9 1,15 * *" }
+    { "path": "/api/cron/random-item-nudge", "schedule": "0 9 1,15 * *" },
+    { "path": "/api/cron/streak-at-risk", "schedule": "0 18 * * *" }
   ]
 }

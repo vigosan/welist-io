@@ -3963,4 +3963,119 @@ describe("POST /api/lists/:listId/checkout on anonymized owner's list", () => {
   });
 });
 
+describe("GET /api/cron/streak-at-risk", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(mockSendEmail).mockResolvedValue({
+      skipped: false,
+      id: "test-msg",
+    });
+    process.env.CRON_SECRET = "cron-test-secret";
+    process.env.AUTH_SECRET = "auth-test-secret";
+  });
+
+  function utcDay(offsetDays: number): string {
+    const d = new Date();
+    d.setUTCDate(d.getUTCDate() + offsetDays);
+    return d.toISOString().slice(0, 10);
+  }
+
+  it("returns 401 without an Authorization header", async () => {
+    const res = await app.request("/api/cron/streak-at-risk");
+    expect(res.status).toBe(401);
+  });
+
+  it("returns 401 with a wrong secret", async () => {
+    const res = await app.request("/api/cron/streak-at-risk", {
+      headers: { Authorization: "Bearer wrong-secret" },
+    });
+    expect(res.status).toBe(401);
+  });
+
+  it("sends one email per eligible user with streak >= 2", async () => {
+    mockDb.select
+      .mockReturnValueOnce({
+        from: vi.fn().mockReturnThis(),
+        innerJoin: vi.fn().mockReturnThis(),
+        where: vi.fn().mockReturnThis(),
+        groupBy: vi.fn().mockReturnThis(),
+        having: vi
+          .fn()
+          .mockResolvedValue([
+            { id: "u1", email: "u1@example.com", name: "Alice" },
+          ]),
+      })
+      .mockReturnValueOnce({
+        from: vi.fn().mockReturnThis(),
+        where: vi.fn().mockReturnThis(),
+        groupBy: vi.fn().mockReturnThis(),
+        orderBy: vi
+          .fn()
+          .mockResolvedValue([
+            { day: utcDay(-1) },
+            { day: utcDay(-2) },
+            { day: utcDay(-3) },
+          ]),
+      });
+
+    const res = await app.request("/api/cron/streak-at-risk", {
+      headers: { Authorization: "Bearer cron-test-secret" },
+    });
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ sent: 1 });
+    expect(mockSendEmail).toHaveBeenCalledTimes(1);
+    const args = vi.mocked(mockSendEmail).mock.calls[0][0];
+    expect(args.to).toBe("u1@example.com");
+    expect(args.subject).toMatch(/racha/i);
+    expect(args.subject).toContain("3");
+    expect(args.text).toContain("3");
+    expect(args.listUnsubscribeUrl).toContain("/api/unsubscribe?token=");
+  });
+
+  it("skips users whose streak is only 1 day", async () => {
+    mockDb.select
+      .mockReturnValueOnce({
+        from: vi.fn().mockReturnThis(),
+        innerJoin: vi.fn().mockReturnThis(),
+        where: vi.fn().mockReturnThis(),
+        groupBy: vi.fn().mockReturnThis(),
+        having: vi
+          .fn()
+          .mockResolvedValue([
+            { id: "u1", email: "u1@example.com", name: "Alice" },
+          ]),
+      })
+      .mockReturnValueOnce({
+        from: vi.fn().mockReturnThis(),
+        where: vi.fn().mockReturnThis(),
+        groupBy: vi.fn().mockReturnThis(),
+        orderBy: vi.fn().mockResolvedValue([{ day: utcDay(-1) }]),
+      });
+
+    const res = await app.request("/api/cron/streak-at-risk", {
+      headers: { Authorization: "Bearer cron-test-secret" },
+    });
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ sent: 0 });
+    expect(mockSendEmail).not.toHaveBeenCalled();
+  });
+
+  it("returns sent: 0 when no users are eligible", async () => {
+    mockDb.select.mockReturnValueOnce({
+      from: vi.fn().mockReturnThis(),
+      innerJoin: vi.fn().mockReturnThis(),
+      where: vi.fn().mockReturnThis(),
+      groupBy: vi.fn().mockReturnThis(),
+      having: vi.fn().mockResolvedValue([]),
+    });
+
+    const res = await app.request("/api/cron/streak-at-risk", {
+      headers: { Authorization: "Bearer cron-test-secret" },
+    });
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ sent: 0 });
+    expect(mockSendEmail).not.toHaveBeenCalled();
+  });
+});
+
 void _sign;
