@@ -40,8 +40,8 @@ export function useItemsFilter({
     const liveById = new Map(items.map((i) => [i.id, i]));
     const sortedSet = new Set(ids);
     const inOrder = ids.flatMap((id) => {
-      // biome-ignore lint/style/noNonNullAssertion: id presence verified by has() check
-      return liveById.has(id) ? [liveById.get(id)!] : [];
+      const item = liveById.get(id);
+      return item ? [item] : [];
     });
     const newItems = items.filter((i) => !sortedSet.has(i.id));
     return [...inOrder, ...newItems];

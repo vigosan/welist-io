@@ -190,11 +190,10 @@ export function useReorderItems(listId: string) {
       qc.setQueryData<ItemWithLikes[]>(queryKeys.items(listId), (old) => {
         if (!old) return old;
         const map = new Map(old.map((i) => [i.id, i]));
-        return ids.map((id, pos) => ({
-          // biome-ignore lint/style/noNonNullAssertion: id presence verified by has() check above
-          ...map.get(id)!,
-          position: pos,
-        }));
+        return ids.flatMap((id, pos) => {
+          const item = map.get(id);
+          return item ? [{ ...item, position: pos }] : [];
+        });
       });
       return { previous };
     },
