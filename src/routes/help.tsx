@@ -2,7 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppFooter } from "@/components/AppFooter";
 import { AppNav } from "@/components/AppNav";
-import { useLanguage } from "@/i18n/service";
+import { SectionHeading, SectionKicker } from "@/components/ui";
+import { useLanguage, useTranslation } from "@/i18n/service";
 import { renderInlineMarkdown } from "@/lib/inline-markdown";
 
 export const Route = createFileRoute("/help")({
@@ -197,17 +198,14 @@ function HelpSection({
   const numberLabel = String(index + 1).padStart(2, "0");
 
   return (
-    <div className="rounded-2xl border border-black/[0.08] dark:border-white/[0.08] bg-white dark:bg-white/[0.02] transition-colors duration-150 hover:border-black/[0.14] dark:hover:border-white/[0.14]">
+    <div className="rounded-2xl border border-black/[0.08] bg-canvas transition-colors duration-200 hover:border-ink/30 dark:border-white/[0.08] dark:bg-canvas-dark dark:hover:border-paper/30">
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
         className="w-full flex items-center gap-4 px-5 py-4 bg-transparent border-none cursor-pointer text-left"
       >
-        <span
-          className="text-[11px] text-gray-400 dark:text-[#6b6b67] tabular-nums shrink-0"
-          style={{ fontFamily: "'Space Mono', monospace" }}
-        >
+        <span className="text-[11px] text-muted tabular-nums shrink-0 font-mono">
           {numberLabel}
         </span>
         <span className="flex-1 text-sm font-semibold text-ink dark:text-paper tracking-[0.01em]">
@@ -223,7 +221,7 @@ function HelpSection({
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
-          className="shrink-0 text-gray-400 dark:text-[#6b6b67] transition-transform duration-200"
+          className="shrink-0 text-muted transition-transform duration-200"
           style={{ transform: open ? "rotate(90deg)" : "none" }}
         >
           <polyline points="9 18 15 12 9 6" />
@@ -233,10 +231,8 @@ function HelpSection({
         <div className="px-5 pb-5 pt-1 border-t border-black/[0.06] dark:border-white/[0.06]">
           {items.map((item) => (
             <div key={item} className="flex gap-2.5 py-1.5">
-              <span className="shrink-0 mt-0.5 text-[11px] text-gray-400 dark:text-[#6b6b67]">
-                →
-              </span>
-              <span className="text-sm leading-[1.6] text-gray-600 dark:text-muted">
+              <span className="shrink-0 mt-0.5 text-[11px] text-muted">→</span>
+              <span className="text-sm leading-[1.6] text-ink/85 dark:text-paper/80">
                 {renderInlineMarkdown(item)}
               </span>
             </div>
@@ -249,6 +245,7 @@ function HelpSection({
 
 function HelpPage() {
   const { language } = useLanguage();
+  const { t } = useTranslation();
   const page = content[language] ?? content.es;
 
   return (
@@ -258,15 +255,11 @@ function HelpPage() {
       <main className="flex-1 py-10">
         <div className="max-w-[760px] mx-auto px-4 sm:px-12">
           <div className="mb-9">
-            <h1
-              className="text-[28px] font-bold text-ink dark:text-paper mb-2"
-              style={{ letterSpacing: "-0.03em" }}
-            >
-              {page.title}
-            </h1>
-            <p className="text-sm text-gray-500 dark:text-muted">
-              {page.subtitle}
-            </p>
+            <SectionKicker>{t("help.nav")}</SectionKicker>
+            <div className="mt-3.5 mb-3">
+              <SectionHeading>{page.title}</SectionHeading>
+            </div>
+            <p className="text-sm text-muted">{page.subtitle}</p>
           </div>
 
           <div className="flex flex-col gap-2.5">
