@@ -27,7 +27,6 @@ import { ListSettingsChip } from "@/components/lists/ListSettingsChip";
 import { ListStatsCard } from "@/components/lists/ListStatsCard";
 import { ParticipantsPanel } from "@/components/lists/ParticipantsPanel";
 import { SignInNudge } from "@/components/SignInNudge";
-import { StarRatingDisplay, StarRatingInput } from "@/components/StarRating";
 
 const ListMap = lazy(() =>
   import("@/components/maps/ListMap").then((m) => ({ default: m.ListMap }))
@@ -50,9 +49,7 @@ import {
   useActiveParticipants,
   useCollaborators,
   useDeleteList,
-  useRateList,
   useToggleCollaborative,
-  useUnrateList,
   useUpdateCategory,
 } from "@/hooks/useList";
 import { useListHeader } from "@/hooks/useListHeader";
@@ -61,6 +58,7 @@ import {
   useRemovePrice,
   useSetPrice,
 } from "@/hooks/useListPrice";
+import { useListRealtime } from "@/hooks/useListRealtime";
 import { useStripeAccountStatus } from "@/hooks/useStripeAccount";
 import { useTranslation } from "@/i18n/service";
 
@@ -168,8 +166,6 @@ function ListDetailPage() {
 
   const toggleCollaborative = useToggleCollaborative(listId);
   const updateCategory = useUpdateCategory(listId);
-  const rateList = useRateList(listId);
-  const unrateList = useUnrateList(listId);
   const { data: session } = useSession();
 
   const { data: listPrice } = useListPrice(listId, settingsOpen);
@@ -238,6 +234,8 @@ function ListDetailPage() {
   const { data: activeParticipantsData } = useActiveParticipants(listId);
 
   const { data: items = [], isLoading: itemsLoading } = useItems(listId);
+
+  useListRealtime(listId, !!list?.collaborative);
 
   const showSignInNudge =
     !session?.user && list?.ownerId === null && items.length >= 1;
@@ -560,260 +558,214 @@ function ListDetailPage() {
                     <div className="h-3.5 w-24 rounded bg-gray-200 animate-pulse" />
                   </>
                 ) : (
-                  <>
-                    <div className="flex items-center gap-2 min-w-0 flex-1">
-                      {items.length > 0 && (
-                        <span className="text-xs text-gray-400 tabular-nums shrink-0">
-                          {t("list.progress", {
-                            done: doneCount,
-                            total: items.length,
-                          })}
-                        </span>
-                      )}
-                      {items.length > 0 && (
-                        <span className="text-gray-200 text-xs shrink-0">
-                          ·
-                        </span>
-                      )}
+                  <div className="flex items-center gap-2 min-w-0 flex-1">
+                    {items.length > 0 && (
+                      <span className="text-xs text-gray-400 tabular-nums shrink-0">
+                        {t("list.progress", {
+                          done: doneCount,
+                          total: items.length,
+                        })}
+                      </span>
+                    )}
+                    {items.length > 0 && (
+                      <span className="text-gray-200 text-xs shrink-0">·</span>
+                    )}
 
-                      <div className="min-w-0">
-                        {isOwner && editingSlug ? (
-                          <form
-                            onSubmit={handleSlugSubmit}
-                            className="flex items-center gap-1.5"
+                    <div className="min-w-0">
+                      {isOwner && editingSlug ? (
+                        <form
+                          onSubmit={handleSlugSubmit}
+                          className="flex items-center gap-1.5"
+                        >
+                          <span className="text-xs text-gray-400 shrink-0">
+                            /lists/
+                          </span>
+                          <input
+                            autoFocus
+                            value={slugValue}
+                            onChange={(e) =>
+                              setSlugValue(
+                                e.target.value
+                                  .toLowerCase()
+                                  .replace(/[^a-z0-9-]/g, "")
+                              )
+                            }
+                            placeholder="mi-lista"
+                            aria-label={t("list.confirmSlug")}
+                            data-testid="slug-input"
+                            className="text-xs text-gray-700 bg-white border border-gray-200 rounded-md px-2 py-1 outline-none focus:border-gray-400 w-32 transition"
+                          />
+                          <button
+                            type="submit"
+                            aria-label={t("list.confirmSlug")}
+                            disabled={!slugValue.trim() || updateSlug.isPending}
+                            className="cursor-pointer text-xs text-gray-500 hover:text-gray-900 transition disabled:opacity-40 p-1"
                           >
-                            <span className="text-xs text-gray-400 shrink-0">
-                              /lists/
-                            </span>
-                            <input
-                              autoFocus
-                              value={slugValue}
-                              onChange={(e) =>
-                                setSlugValue(
-                                  e.target.value
-                                    .toLowerCase()
-                                    .replace(/[^a-z0-9-]/g, "")
-                                )
-                              }
-                              placeholder="mi-lista"
-                              aria-label={t("list.confirmSlug")}
-                              data-testid="slug-input"
-                              className="text-xs text-gray-700 bg-white border border-gray-200 rounded-md px-2 py-1 outline-none focus:border-gray-400 w-32 transition"
-                            />
-                            <button
-                              type="submit"
-                              aria-label={t("list.confirmSlug")}
-                              disabled={
-                                !slugValue.trim() || updateSlug.isPending
-                              }
-                              className="cursor-pointer text-xs text-gray-500 hover:text-gray-900 transition disabled:opacity-40 p-1"
-                            >
-                              ✓
-                            </button>
-                            <button
-                              type="button"
-                              aria-label={t("list.cancelSlug")}
-                              onClick={() => setEditingSlug(false)}
-                              className="cursor-pointer text-xs text-gray-400 hover:text-gray-600 transition p-1"
-                            >
-                              ✕
-                            </button>
-                          </form>
-                        ) : isOwner ? (
+                            ✓
+                          </button>
                           <button
                             type="button"
-                            onClick={startEditingSlug}
-                            data-testid="edit-slug-btn"
-                            className="cursor-pointer flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600 transition truncate max-w-full"
+                            aria-label={t("list.cancelSlug")}
+                            onClick={() => setEditingSlug(false)}
+                            className="cursor-pointer text-xs text-gray-400 hover:text-gray-600 transition p-1"
                           >
-                            <svg
-                              aria-hidden="true"
-                              className="w-3 h-3 shrink-0"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-                              />
-                            </svg>
-                            <span className="truncate">
-                              /lists/
-                              {currentSlug.length > 20
-                                ? `${currentSlug.slice(0, 8)}…`
-                                : currentSlug}
-                            </span>
+                            ✕
                           </button>
-                        ) : (
-                          <span className="text-xs text-gray-400 truncate">
+                        </form>
+                      ) : isOwner ? (
+                        <button
+                          type="button"
+                          onClick={startEditingSlug}
+                          data-testid="edit-slug-btn"
+                          className="cursor-pointer flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600 transition truncate max-w-full"
+                        >
+                          <svg
+                            aria-hidden="true"
+                            className="w-3 h-3 shrink-0"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                            />
+                          </svg>
+                          <span className="truncate">
                             /lists/
                             {currentSlug.length > 20
                               ? `${currentSlug.slice(0, 8)}…`
                               : currentSlug}
                           </span>
-                        )}
-                        {slugError && (
-                          <p className="text-xs text-gray-400 mt-1">
-                            {slugError}
-                          </p>
-                        )}
-                      </div>
-
-                      {!isOwner && activeParticipantsData && (
-                        <>
-                          <span className="text-gray-200 text-xs shrink-0">
-                            ·
-                          </span>
-                          <ActiveParticipants
-                            participants={activeParticipantsData.participants}
-                            total={activeParticipantsData.total}
-                          />
-                        </>
+                        </button>
+                      ) : (
+                        <span className="text-xs text-gray-400 truncate">
+                          /lists/
+                          {currentSlug.length > 20
+                            ? `${currentSlug.slice(0, 8)}…`
+                            : currentSlug}
+                        </span>
                       )}
-
-                      {isOwner && challengers.length > 0 && (
-                        <>
-                          <span className="text-gray-200 text-xs shrink-0">
-                            ·
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setParticipantsPanel((p) =>
-                                p === "challengers" ? null : "challengers"
-                              )
-                            }
-                            className="cursor-pointer flex items-center gap-1 shrink-0 hover:opacity-70 transition-opacity"
-                            aria-label={`${challengers.length} challengers`}
-                          >
-                            <div className="flex -space-x-1">
-                              {challengers.slice(0, 5).map((c) =>
-                                c.image ? (
-                                  <img
-                                    key={c.id}
-                                    src={c.image}
-                                    alt={c.name ?? ""}
-                                    className="w-4 h-4 rounded-full outline outline-1 outline-white"
-                                  />
-                                ) : (
-                                  <div
-                                    key={c.id}
-                                    className="w-4 h-4 rounded-full bg-gray-200 outline outline-1 outline-white flex items-center justify-center"
-                                  >
-                                    <span className="text-[6px] text-gray-500 font-medium">
-                                      {(c.name ?? "?")[0]?.toUpperCase()}
-                                    </span>
-                                  </div>
-                                )
-                              )}
-                            </div>
-                            <span className="text-xs text-gray-400 tabular-nums">
-                              {challengers.length}
-                            </span>
-                          </button>
-                        </>
+                      {slugError && (
+                        <p className="text-xs text-gray-400 mt-1">
+                          {slugError}
+                        </p>
                       )}
-
-                      {isOwner && collaborators.length > 0 && (
-                        <>
-                          <span className="text-gray-200 text-xs shrink-0">
-                            ·
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setParticipantsPanel((p) =>
-                                p === "collaborators" ? null : "collaborators"
-                              )
-                            }
-                            className="cursor-pointer flex items-center gap-1 shrink-0 hover:opacity-70 transition-opacity"
-                            aria-label={`${collaborators.length} collaborators`}
-                          >
-                            <div className="flex -space-x-1">
-                              {collaborators.slice(0, 5).map((c) =>
-                                c.image ? (
-                                  <img
-                                    key={c.id}
-                                    src={c.image}
-                                    alt={c.name ?? ""}
-                                    className="w-4 h-4 rounded-full outline outline-1 outline-white"
-                                  />
-                                ) : (
-                                  <div
-                                    key={c.id}
-                                    className="w-4 h-4 rounded-full bg-gray-200 outline outline-1 outline-white flex items-center justify-center"
-                                  >
-                                    <span className="text-[6px] text-gray-500 font-medium">
-                                      {(c.name ?? "?")[0]?.toUpperCase()}
-                                    </span>
-                                  </div>
-                                )
-                              )}
-                            </div>
-                            <span className="text-xs text-gray-400 tabular-nums">
-                              {collaborators.length}
-                            </span>
-                          </button>
-                        </>
-                      )}
-
-                      {isParticipant && (
-                        <>
-                          <span className="text-gray-200 text-xs shrink-0">
-                            ·
-                          </span>
-                          <span className="text-xs text-gray-400 shrink-0">
-                            {list?.participationCompletedAt
-                              ? t("list.challengeCompleted")
-                              : t("list.challengeInProgress")}
-                          </span>
-                        </>
-                      )}
-
-                      {!isOwner &&
-                        (session?.user || (list?.rating?.count ?? 0) > 0) && (
-                          <>
-                            <span className="text-gray-200 text-xs shrink-0">
-                              ·
-                            </span>
-                            {session?.user && (
-                              <span className="shrink-0">
-                                <StarRatingInput
-                                  value={list?.rating?.userValue ?? null}
-                                  onChange={(v) => rateList.mutate(v)}
-                                  onClear={() => unrateList.mutate()}
-                                  disabled={
-                                    rateList.isPending || unrateList.isPending
-                                  }
-                                  size="sm"
-                                />
-                              </span>
-                            )}
-                            {(list?.rating?.count ?? 0) > 0 &&
-                              (session?.user ? (
-                                <span className="shrink-0 text-xs text-gray-500 dark:text-gray-400 tabular-nums">
-                                  <span data-testid="rating-avg">
-                                    {(list?.rating?.avg ?? 0).toFixed(1)}
-                                  </span>
-                                  <span className="ml-1 text-gray-400 dark:text-gray-500">
-                                    ({list?.rating?.count ?? 0})
-                                  </span>
-                                </span>
-                              ) : (
-                                <span className="shrink-0">
-                                  <StarRatingDisplay
-                                    avg={list?.rating?.avg ?? null}
-                                    count={list?.rating?.count ?? 0}
-                                  />
-                                </span>
-                              ))}
-                          </>
-                        )}
                     </div>
-                  </>
+
+                    {!isOwner && activeParticipantsData && (
+                      <>
+                        <span className="text-gray-200 text-xs shrink-0">
+                          ·
+                        </span>
+                        <ActiveParticipants
+                          participants={activeParticipantsData.participants}
+                          total={activeParticipantsData.total}
+                        />
+                      </>
+                    )}
+
+                    {isOwner && challengers.length > 0 && (
+                      <>
+                        <span className="text-gray-200 text-xs shrink-0">
+                          ·
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setParticipantsPanel((p) =>
+                              p === "challengers" ? null : "challengers"
+                            )
+                          }
+                          className="cursor-pointer flex items-center gap-1 shrink-0 hover:opacity-70 transition-opacity"
+                          aria-label={`${challengers.length} challengers`}
+                        >
+                          <div className="flex -space-x-1">
+                            {challengers.slice(0, 5).map((c) =>
+                              c.image ? (
+                                <img
+                                  key={c.id}
+                                  src={c.image}
+                                  alt={c.name ?? ""}
+                                  className="w-4 h-4 rounded-full outline outline-1 outline-white"
+                                />
+                              ) : (
+                                <div
+                                  key={c.id}
+                                  className="w-4 h-4 rounded-full bg-gray-200 outline outline-1 outline-white flex items-center justify-center"
+                                >
+                                  <span className="text-[6px] text-gray-500 font-medium">
+                                    {(c.name ?? "?")[0]?.toUpperCase()}
+                                  </span>
+                                </div>
+                              )
+                            )}
+                          </div>
+                          <span className="text-xs text-gray-400 tabular-nums">
+                            {challengers.length}
+                          </span>
+                        </button>
+                      </>
+                    )}
+
+                    {isOwner && collaborators.length > 0 && (
+                      <>
+                        <span className="text-gray-200 text-xs shrink-0">
+                          ·
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setParticipantsPanel((p) =>
+                              p === "collaborators" ? null : "collaborators"
+                            )
+                          }
+                          className="cursor-pointer flex items-center gap-1 shrink-0 hover:opacity-70 transition-opacity"
+                          aria-label={`${collaborators.length} collaborators`}
+                        >
+                          <div className="flex -space-x-1">
+                            {collaborators.slice(0, 5).map((c) =>
+                              c.image ? (
+                                <img
+                                  key={c.id}
+                                  src={c.image}
+                                  alt={c.name ?? ""}
+                                  className="w-4 h-4 rounded-full outline outline-1 outline-white"
+                                />
+                              ) : (
+                                <div
+                                  key={c.id}
+                                  className="w-4 h-4 rounded-full bg-gray-200 outline outline-1 outline-white flex items-center justify-center"
+                                >
+                                  <span className="text-[6px] text-gray-500 font-medium">
+                                    {(c.name ?? "?")[0]?.toUpperCase()}
+                                  </span>
+                                </div>
+                              )
+                            )}
+                          </div>
+                          <span className="text-xs text-gray-400 tabular-nums">
+                            {collaborators.length}
+                          </span>
+                        </button>
+                      </>
+                    )}
+
+                    {isParticipant && (
+                      <>
+                        <span className="text-gray-200 text-xs shrink-0">
+                          ·
+                        </span>
+                        <span className="text-xs text-gray-400 shrink-0">
+                          {list?.participationCompletedAt
+                            ? t("list.challengeCompleted")
+                            : t("list.challengeInProgress")}
+                        </span>
+                      </>
+                    )}
+                  </div>
                 )}
               </div>
 

@@ -3,7 +3,6 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AppNav } from "@/components/AppNav";
 import { Skeleton } from "@/components/Skeleton";
-import { StarRatingDisplay } from "@/components/StarRating";
 import {
   useAcceptChallenge,
   useExplore,
@@ -161,15 +160,6 @@ function ExploreListCard({
             .filter(Boolean)
             .join(" · ")}
         </span>
-        {list.rating.count > 0 && (
-          <>
-            <span className="text-gray-300 dark:text-gray-600">·</span>
-            <StarRatingDisplay
-              avg={list.rating.avg}
-              count={list.rating.count}
-            />
-          </>
-        )}
       </div>
       {pct !== null && (
         <div

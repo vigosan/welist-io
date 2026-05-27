@@ -46,7 +46,6 @@ const EXPLORE_A: ExploreItem = {
     { id: "p2", name: "Leo", image: "https://img/leo.jpg" },
   ],
   isParticipating: false,
-  rating: { avg: null, count: 0 },
   owner: { id: "u2", name: "Bob", image: null },
 };
 const EXPLORE_B: ExploreItem = {
@@ -63,7 +62,6 @@ const EXPLORE_B: ExploreItem = {
   previewItems: [],
   participants: [],
   isParticipating: false,
-  rating: { avg: null, count: 0 },
   owner: null,
 };
 

@@ -16,6 +16,7 @@ vi.mock("@/hooks/usePullToRefresh");
 vi.mock("@/hooks/useList");
 vi.mock("@/hooks/useListPrice");
 vi.mock("@/hooks/useStripeAccount");
+vi.mock("@/hooks/useListRealtime", () => ({ useListRealtime: vi.fn() }));
 vi.mock("@/hooks/useGeocodingSearch", () => ({
   useGeocodingSearch: () => ({ results: [], isLoading: false }),
 }));
@@ -43,10 +44,8 @@ import {
   useActiveParticipants,
   useAddCollaborator,
   useCollaborators,
-  useRateList,
   useRemoveCollaborator,
   useToggleCollaborative,
-  useUnrateList,
   useUpdateCategory,
   useUserSearch,
 } from "@/hooks/useList";
@@ -74,7 +73,6 @@ const LIST: ListWithParticipation = {
   createdAt: new Date(),
   participated: false,
   participationCompletedAt: null,
-  rating: { avg: null, count: 0, userValue: null },
 };
 
 function makeItem(id: string, text: string, done = false): ItemWithLikes {
@@ -256,14 +254,6 @@ function setupMocks({
   } as never);
   vi.mocked(useUpdateCategory).mockReturnValue({
     mutate: categoryMutate,
-    isPending: false,
-  } as never);
-  vi.mocked(useRateList).mockReturnValue({
-    mutate: vi.fn(),
-    isPending: false,
-  } as never);
-  vi.mocked(useUnrateList).mockReturnValue({
-    mutate: vi.fn(),
     isPending: false,
   } as never);
   vi.mocked(useCollaborators).mockReturnValue({

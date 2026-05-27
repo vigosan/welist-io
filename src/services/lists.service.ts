@@ -10,16 +10,9 @@ export type StripeAccountStatus = {
   onboardingComplete: boolean;
 };
 
-export type ListRating = {
-  avg: number | null;
-  count: number;
-  userValue: number | null;
-};
-
 export type ListWithParticipation = List & {
   participated: boolean;
   participationCompletedAt: string | null;
-  rating: ListRating;
 };
 
 export type ExploreItem = Pick<
@@ -37,7 +30,6 @@ export type ExploreItem = Pick<
     image: string | null;
   }>;
   isParticipating: boolean;
-  rating: { avg: number | null; count: number };
   owner: {
     id: string | null;
     name: string | null;
@@ -86,7 +78,6 @@ export type UserProfile = {
     itemCount: number;
     participantCount: number;
     completedCount: number;
-    rating: { avg: number | null; count: number };
   }>;
   completedChallenges: Array<{
     id: string;
@@ -323,17 +314,6 @@ export const listsService = {
 
   removePrice: (listId: string) =>
     apiClient<void>(`/api/lists/${listId}/price`, {
-      method: "DELETE",
-    }),
-
-  rate: (listId: string, value: number) =>
-    apiClient<{ value: number }>(`/api/lists/${listId}/rating`, {
-      method: "POST",
-      body: JSON.stringify({ value }),
-    }),
-
-  unrate: (listId: string) =>
-    apiClient<void>(`/api/lists/${listId}/rating`, {
       method: "DELETE",
     }),
 
