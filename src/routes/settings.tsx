@@ -430,9 +430,9 @@ function SettingsPage() {
           )}
         </section>
 
-        <section className="bg-white dark:bg-white/[0.02] border border-black/[0.08] dark:border-white/[0.08] rounded-2xl p-5 flex flex-col gap-4">
+        <section className="bg-white dark:bg-white/[0.02] border border-red-200 dark:border-red-900 rounded-2xl p-5 flex flex-col gap-4">
           <div>
-            <p className="text-sm font-semibold text-ink dark:text-paper">
+            <p className="text-sm font-semibold text-red-700 dark:text-red-400">
               {t("settings.dangerZone.title")}
             </p>
             <p className="text-xs text-gray-500 dark:text-muted mt-0.5 leading-relaxed">
@@ -451,14 +451,14 @@ function SettingsPage() {
                 onSuccess: () => signOut({ callbackUrl: "/" }),
               });
             }}
-            className="cursor-pointer self-start px-4 py-2 text-sm font-medium bg-ink text-canvas dark:bg-paper dark:text-ink rounded-xl hover:opacity-90 disabled:opacity-40 transition-[opacity,transform] duration-150 active:scale-[0.96]"
+            className="cursor-pointer self-start px-4 py-2 text-sm font-medium bg-red-600 text-white rounded-xl hover:bg-red-700 disabled:opacity-40 transition-[opacity,transform] duration-150 active:scale-[0.96]"
           >
             {deleteAccount.isPending
               ? t("settings.dangerZone.deleting")
               : t("settings.dangerZone.deleteAccount")}
           </button>
           {deleteAccount.isError && (
-            <p className="text-xs text-ink dark:text-paper">
+            <p className="text-xs text-red-600 dark:text-red-400">
               {t("settings.dangerZone.failed")}
             </p>
           )}

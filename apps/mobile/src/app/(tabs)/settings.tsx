@@ -313,7 +313,7 @@ export default function SettingsScreen() {
             }
             className="items-center rounded-2xl px-4 py-3"
           >
-            <Text className="text-xs font-medium text-gray-500 dark:text-gray-400">
+            <Text className="text-xs font-medium text-red-600 dark:text-red-400">
               {t("profile.deleteAccount")}
             </Text>
           </Pressable>
