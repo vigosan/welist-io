@@ -128,7 +128,12 @@ export type DirectoryUser = {
   isFollowing: boolean;
 };
 
-export type AppStats = { users: number; lists: number; challenges: number };
+export type AppStats = {
+  users: number;
+  lists: number;
+  challenges: number;
+  itemsCompleted: number;
+};
 
 export type AchievementType =
   | "first_list_created"

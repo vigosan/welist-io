@@ -1240,7 +1240,13 @@ app.get("/explore", async (c) => {
 });
 
 app.get("/stats", async (c) => {
-  const [userCount, listCount, challengeCount] = await Promise.all([
+  const [
+    userCount,
+    listCount,
+    challengeCount,
+    sharedItemsDone,
+    progressItemsDone,
+  ] = await Promise.all([
     db
       .select({ count: sql<number>`count(*)::int` })
       .from(users)
@@ -1255,11 +1261,22 @@ app.get("/stats", async (c) => {
       .from(participations)
       .where(sql`${participations.completedAt} is not null`)
       .then(([r]) => r?.count ?? 0),
+    db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(items)
+      .where(eq(items.done, true))
+      .then(([r]) => r?.count ?? 0),
+    db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(itemProgress)
+      .where(eq(itemProgress.done, true))
+      .then(([r]) => r?.count ?? 0),
   ]);
   return c.json({
     users: userCount,
     lists: listCount,
     challenges: challengeCount,
+    itemsCompleted: sharedItemsDone + progressItemsDone,
   });
 });
 
