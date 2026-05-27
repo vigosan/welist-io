@@ -1164,7 +1164,7 @@ describe("GET /api/explore", () => {
   });
 
   it("returns nextCursor when results equal the limit", async () => {
-    const rows = Array.from({ length: 6 }, (_, i) => ({
+    const rows = Array.from({ length: 20 }, (_, i) => ({
       id: `l${i}`,
       name: `Lista ${i}`,
       slug: null,
@@ -2084,7 +2084,7 @@ describe("GET /api/users", () => {
   });
 
   it("returns nextCursor when page is full", async () => {
-    const fullPage = Array.from({ length: 6 }, (_, i) => ({
+    const fullPage = Array.from({ length: 20 }, (_, i) => ({
       id: `u${i}`,
       name: `User ${i}`,
       image: null,
@@ -2105,7 +2105,7 @@ describe("GET /api/users", () => {
     const res = await app.request("/api/users");
     expect(res.status).toBe(200);
     const body = (await res.json()) as Record<string, unknown>;
-    expect(body.nextCursor).toBe("u5");
+    expect(body.nextCursor).toBe("u19");
   });
 
   it("returns isFollowing=false for everyone when unauthenticated", async () => {
