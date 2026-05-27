@@ -17,7 +17,9 @@
     "db:status:prod": "tsx scripts/db-status.ts prod",
     "db:studio": "drizzle-kit studio",
     "lint": "biome check .",
-    "lint:fix": "biome check --write ."
+    "lint:fix": "biome check --write .",
+    "format": "biome format --write .",
+    "format:check": "biome format ."
   },
   "dependencies": {
     "@auth/core": "^0.41.1",
