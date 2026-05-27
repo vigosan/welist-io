@@ -217,11 +217,7 @@ function ExploreDetailPage() {
         </div>
 
         {showChallengers && challengers.length > 0 && (
-          <ParticipantsPanel
-            panel="challengers"
-            challengers={challengers}
-            collaborators={[]}
-          />
+          <ParticipantsPanel challengers={challengers} collaborators={[]} />
         )}
 
         <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 overflow-hidden">

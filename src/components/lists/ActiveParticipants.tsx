@@ -10,22 +10,20 @@ interface Participant {
 interface Props {
   participants: Participant[];
   total: number;
+  onClick?: () => void;
 }
 
 export const ActiveParticipants = memo(function ActiveParticipants({
   participants,
   total,
+  onClick,
 }: Props) {
   const { t } = useTranslation();
   if (total === 0) return null;
   const overflow = total - participants.length;
 
-  return (
-    <div
-      data-testid="active-participants"
-      className="flex items-center gap-1.5"
-      aria-label={t("list.activeParticipants", { count: total })}
-    >
+  const content = (
+    <>
       <div className="flex -space-x-1.5">
         {participants.map((p) => (
           <div
@@ -56,6 +54,32 @@ export const ActiveParticipants = memo(function ActiveParticipants({
           +{overflow}
         </span>
       )}
+    </>
+  );
+
+  const label = t("list.activeParticipants", { count: total });
+
+  if (onClick) {
+    return (
+      <button
+        type="button"
+        onClick={onClick}
+        data-testid="active-participants"
+        className="cursor-pointer flex items-center gap-1.5 hover:opacity-70 transition-opacity"
+        aria-label={label}
+      >
+        {content}
+      </button>
+    );
+  }
+
+  return (
+    <div
+      data-testid="active-participants"
+      className="flex items-center gap-1.5"
+      aria-label={label}
+    >
+      {content}
     </div>
   );
 });

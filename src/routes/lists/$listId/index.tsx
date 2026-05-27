@@ -89,9 +89,7 @@ function ListDetailPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchActive, setSearchActive] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [participantsPanel, setParticipantsPanel] = useState<
-    "challengers" | "collaborators" | null
-  >(null);
+  const [participantsPanelOpen, setParticipantsPanelOpen] = useState(false);
   const [pendingCoords, setPendingCoords] = useState<Coords | null>(null);
   const [placeDropdownOpen, setPlaceDropdownOpen] = useState(false);
   const [activePlace, setActivePlace] = useState<string | undefined>(undefined);
@@ -552,108 +550,31 @@ function ListDetailPage() {
               )}
 
               {!listLoading &&
-                ((!isOwner && activeParticipantsData) ||
-                  (isOwner &&
-                    (challengers.length > 0 || collaborators.length > 0)) ||
+                ((activeParticipantsData && activeParticipantsData.total > 0) ||
                   isParticipant) && (
                   <div className="flex items-center gap-2 mt-2 order-3 min-w-0 flex-1">
-                    {!isOwner && activeParticipantsData && (
-                      <ActiveParticipants
-                        participants={activeParticipantsData.participants}
-                        total={activeParticipantsData.total}
-                      />
-                    )}
-
-                    {isOwner && challengers.length > 0 && (
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setParticipantsPanel((p) =>
-                            p === "challengers" ? null : "challengers"
-                          )
-                        }
-                        className="cursor-pointer flex items-center gap-1 shrink-0 hover:opacity-70 transition-opacity"
-                        aria-label={`${challengers.length} challengers`}
-                      >
-                        <div className="flex -space-x-1">
-                          {challengers.slice(0, 5).map((c) =>
-                            c.image ? (
-                              <img
-                                key={c.id}
-                                src={c.image}
-                                alt={c.name ?? ""}
-                                className="w-4 h-4 rounded-full outline outline-1 outline-white"
-                              />
-                            ) : (
-                              <div
-                                key={c.id}
-                                className="w-4 h-4 rounded-full bg-gray-200 outline outline-1 outline-white flex items-center justify-center"
-                              >
-                                <span className="text-[6px] text-gray-500 font-medium">
-                                  {(c.name ?? "?")[0]?.toUpperCase()}
-                                </span>
-                              </div>
-                            )
-                          )}
-                        </div>
-                        <span className="text-xs text-gray-400 tabular-nums">
-                          {challengers.length}
-                        </span>
-                      </button>
-                    )}
-
-                    {isOwner && collaborators.length > 0 && (
-                      <>
-                        {challengers.length > 0 && (
-                          <span className="text-gray-200 text-xs shrink-0">
-                            ·
-                          </span>
-                        )}
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setParticipantsPanel((p) =>
-                              p === "collaborators" ? null : "collaborators"
-                            )
+                    {activeParticipantsData &&
+                      activeParticipantsData.total > 0 && (
+                        <ActiveParticipants
+                          participants={activeParticipantsData.participants}
+                          total={activeParticipantsData.total}
+                          onClick={
+                            isOwner &&
+                            (challengers.length > 0 || collaborators.length > 0)
+                              ? () => setParticipantsPanelOpen((open) => !open)
+                              : undefined
                           }
-                          className="cursor-pointer flex items-center gap-1 shrink-0 hover:opacity-70 transition-opacity"
-                          aria-label={`${collaborators.length} collaborators`}
-                        >
-                          <div className="flex -space-x-1">
-                            {collaborators.slice(0, 5).map((c) =>
-                              c.image ? (
-                                <img
-                                  key={c.id}
-                                  src={c.image}
-                                  alt={c.name ?? ""}
-                                  className="w-4 h-4 rounded-full outline outline-1 outline-white"
-                                />
-                              ) : (
-                                <div
-                                  key={c.id}
-                                  className="w-4 h-4 rounded-full bg-gray-200 outline outline-1 outline-white flex items-center justify-center"
-                                >
-                                  <span className="text-[6px] text-gray-500 font-medium">
-                                    {(c.name ?? "?")[0]?.toUpperCase()}
-                                  </span>
-                                </div>
-                              )
-                            )}
-                          </div>
-                          <span className="text-xs text-gray-400 tabular-nums">
-                            {collaborators.length}
-                          </span>
-                        </button>
-                      </>
-                    )}
+                        />
+                      )}
 
                     {isParticipant && (
                       <>
-                        {activeParticipantsData && (
-                          <span className="text-gray-200 text-xs shrink-0">
-                            ·
-                          </span>
-                        )}
+                        {activeParticipantsData &&
+                          activeParticipantsData.total > 0 && (
+                            <span className="text-gray-200 text-xs shrink-0">
+                              ·
+                            </span>
+                          )}
                         <span className="text-xs text-gray-400 shrink-0">
                           {list?.participationCompletedAt
                             ? t("list.challengeCompleted")
@@ -664,9 +585,8 @@ function ListDetailPage() {
                   </div>
                 )}
 
-              {!listLoading && isOwner && participantsPanel && (
+              {!listLoading && isOwner && participantsPanelOpen && (
                 <ParticipantsPanel
-                  panel={participantsPanel}
                   challengers={challengers}
                   collaborators={collaborators}
                 />
