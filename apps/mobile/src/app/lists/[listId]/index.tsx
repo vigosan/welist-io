@@ -12,6 +12,7 @@ import {
   Modal,
   Platform,
   Pressable,
+  RefreshControl,
   Share,
   Text,
   TextInput,
@@ -40,6 +41,7 @@ import {
 } from "@/hooks/items";
 import { useActiveParticipants, useDeleteList, useList } from "@/hooks/lists";
 import { useIsDark } from "@/hooks/useIsDark";
+import { useListRealtime } from "@/hooks/useListRealtime";
 import { useReport } from "@/hooks/users";
 import { useSession } from "@/lib/auth";
 import {
@@ -76,6 +78,7 @@ export default function ListDetailScreen() {
   const participants = useActiveParticipants(listId);
   const deleteList = useDeleteList();
   const report = useReport();
+  useListRealtime(listId, !!list.data);
 
   const isOwner =
     session.status === "signed-in" &&
@@ -378,6 +381,16 @@ export default function ListDetailScreen() {
         keyExtractor={(it) => it.id}
         containerStyle={{ flex: 1 }}
         contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 40 }}
+        refreshControl={
+          <RefreshControl
+            refreshing={items.isRefetching}
+            onRefresh={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+              items.refetch();
+              list.refetch();
+            }}
+          />
+        }
         onDragEnd={({ data }) => {
           if (!dragEnabled) return;
           reorder.mutate(data);
