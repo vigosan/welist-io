@@ -28,6 +28,8 @@ const es = {
     exploreHeadline: "Explora lo que otros ya están completando.",
     exploreSubline: "Listas públicas creadas por la comunidad.",
     exploreCtaAll: "Ver todas las listas →",
+    proofCaption: "Ya somos {{count}} creando listas",
+    proofViewAll: "ver todas →",
     heroOr: "o",
     heroExploreCta: "Explora retos",
     heroExploreHint: "Acepta listas creadas por otros.",

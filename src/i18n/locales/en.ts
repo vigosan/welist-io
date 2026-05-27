@@ -30,6 +30,8 @@ const en: Translations = {
     exploreHeadline: "Explore what others are already completing.",
     exploreSubline: "Public lists created by the community.",
     exploreCtaAll: "Browse all lists →",
+    proofCaption: "We're {{count}} already creating lists",
+    proofViewAll: "see all →",
     heroOr: "or",
     heroExploreCta: "Explore challenges",
     heroExploreHint: "Take on lists created by others.",
