@@ -58,7 +58,7 @@ function MyListRow({
           data-testid="delete-confirm-btn"
           onClick={() => deleteList.mutate(list.id)}
           disabled={deleteList.isPending}
-          className="cursor-pointer px-3 py-1.5 text-xs font-semibold text-[#f8f7f5] bg-[#0c0c0b] rounded-lg disabled:opacity-50 transition-opacity duration-150"
+          className="cursor-pointer px-3 py-1.5 text-xs font-semibold text-canvas bg-ink rounded-lg disabled:opacity-50 transition-opacity duration-150"
         >
           {isOwner ? t("myLists.deleteYes") : t("myLists.leaveYes")}
         </button>
@@ -87,7 +87,7 @@ function MyListRow({
           </p>
         )}
         <p
-          className="text-sm font-semibold text-[#0c0c0b] dark:text-[#f0ede8] mb-1.5 leading-snug tracking-[-0.01em]"
+          className="text-sm font-semibold text-ink dark:text-paper mb-1.5 leading-snug tracking-[-0.01em]"
           style={{ paddingRight: "2rem" }}
         >
           {list.name}
@@ -129,7 +129,7 @@ function MyListRow({
             <div className="h-0.5 overflow-hidden w-full rounded-full bg-black/[0.06] dark:bg-white/[0.06]">
               <div
                 data-testid="list-progress-bar"
-                className="h-full rounded-full bg-[#0c0c0b] dark:bg-[#f0ede8]"
+                className="h-full rounded-full bg-ink dark:bg-paper"
                 style={{
                   width: `${Math.round((list.doneCount / list.itemCount) * 100)}%`,
                   transition: "width 600ms cubic-bezier(0.2, 0, 0, 1)",
@@ -229,14 +229,14 @@ function CreateListInline({ onClose }: { onClose: () => void }) {
         placeholder={t("myLists.newListPlaceholder")}
         aria-label={t("myLists.newListAriaLabel")}
         data-testid="new-list-name-input"
-        className="flex-1 px-4 py-2.5 text-sm text-[#0c0c0b] dark:text-[#f0ede8] placeholder-[#a0a09c] bg-transparent outline-none min-w-0"
+        className="flex-1 px-4 py-2.5 text-sm text-ink dark:text-paper placeholder-muted bg-transparent outline-none min-w-0"
         onKeyDown={(e) => e.key === "Escape" && onClose()}
       />
       <button
         type="button"
         aria-label={t("myLists.cancelCreate")}
         onClick={onClose}
-        className="cursor-pointer px-3 py-2.5 text-sm text-gray-500 hover:text-[#0c0c0b] transition-colors bg-transparent border-none"
+        className="cursor-pointer px-3 py-2.5 text-sm text-gray-500 hover:text-ink transition-colors bg-transparent border-none"
       >
         ✕
       </button>
@@ -244,7 +244,7 @@ function CreateListInline({ onClose }: { onClose: () => void }) {
         type="submit"
         disabled={!name.trim() || createList.isPending}
         data-testid="new-list-create-btn"
-        className="cursor-pointer px-4 py-2.5 text-xs font-semibold tracking-[0.04em] bg-[#0c0c0b] text-[#f8f7f5] dark:bg-[#f0ede8] dark:text-[#0c0c0b] border-none disabled:opacity-30 disabled:cursor-not-allowed transition-opacity duration-150 shrink-0"
+        className="cursor-pointer px-4 py-2.5 text-xs font-semibold tracking-[0.04em] bg-ink text-canvas dark:bg-paper dark:text-ink border-none disabled:opacity-30 disabled:cursor-not-allowed transition-opacity duration-150 shrink-0"
         style={{ borderRadius: 0 }}
       >
         {createList.isPending ? "…" : t("myLists.createList")}
@@ -274,7 +274,7 @@ function FilterChip({
       data-testid={testId}
       className={`cursor-pointer px-3 py-1 rounded-full text-xs transition-all duration-150 whitespace-nowrap shrink-0 border ${
         active
-          ? "border-black/[0.20] dark:border-white/[0.20] bg-black/[0.12] dark:bg-white/[0.12] text-[#0c0c0b] dark:text-[#f0ede8] font-semibold"
+          ? "border-black/[0.20] dark:border-white/[0.20] bg-black/[0.12] dark:bg-white/[0.12] text-ink dark:text-paper font-semibold"
           : "border-black/[0.08] dark:border-white/[0.08] text-gray-500 font-normal hover:border-black/[0.20] dark:hover:border-white/[0.20] hover:bg-black/[0.05] dark:hover:bg-white/[0.05]"
       }`}
     >
@@ -365,11 +365,11 @@ function MyListsPage() {
                   placeholder={t("myLists.searchPlaceholder")}
                   aria-label={t("myLists.searchAriaLabel")}
                   data-testid="my-lists-search-input"
-                  className="flex-1 px-4 py-2.5 text-sm text-[#0c0c0b] dark:text-[#f0ede8] placeholder-[#a0a09c] bg-transparent outline-none"
+                  className="flex-1 px-4 py-2.5 text-sm text-ink dark:text-paper placeholder-muted bg-transparent outline-none"
                 />
                 <button
                   type="submit"
-                  className="px-5 py-2.5 text-xs font-semibold tracking-[0.04em] bg-[#0c0c0b] text-[#f8f7f5] dark:bg-[#f0ede8] dark:text-[#0c0c0b] border-none cursor-pointer transition-opacity duration-150"
+                  className="px-5 py-2.5 text-xs font-semibold tracking-[0.04em] bg-ink text-canvas dark:bg-paper dark:text-ink border-none cursor-pointer transition-opacity duration-150"
                   style={{ borderRadius: 0 }}
                 >
                   {t("myLists.search")}
@@ -379,7 +379,7 @@ function MyListsPage() {
                 type="button"
                 data-testid="new-list-btn"
                 onClick={() => setCreating(true)}
-                className="cursor-pointer flex items-center justify-center rounded-lg text-gray-500 hover:text-[#0c0c0b] dark:hover:text-[#f0ede8] transition-colors duration-150 shrink-0 w-9 self-stretch text-lg border border-black/[0.08] dark:border-white/[0.08] bg-transparent"
+                className="cursor-pointer flex items-center justify-center rounded-lg text-gray-500 hover:text-ink dark:hover:text-paper transition-colors duration-150 shrink-0 w-9 self-stretch text-lg border border-black/[0.08] dark:border-white/[0.08] bg-transparent"
                 aria-label={t("myLists.newList")}
               >
                 +
@@ -405,7 +405,7 @@ function MyListsPage() {
                   onClick={() => setFiltersOpen((v) => !v)}
                   className={`cursor-pointer inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs transition-all duration-150 whitespace-nowrap shrink-0 ${
                     hasNonDefault
-                      ? "border-black/[0.20] dark:border-white/[0.20] bg-black/[0.12] dark:bg-white/[0.12] text-[#0c0c0b] dark:text-[#f0ede8] font-semibold"
+                      ? "border-black/[0.20] dark:border-white/[0.20] bg-black/[0.12] dark:bg-white/[0.12] text-ink dark:text-paper font-semibold"
                       : "border-black/[0.08] dark:border-white/[0.08] text-gray-500 font-normal hover:border-black/[0.20] dark:hover:border-white/[0.20] hover:bg-black/[0.05] dark:hover:bg-white/[0.05]"
                   }`}
                 >

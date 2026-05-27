@@ -57,6 +57,7 @@ import { sendEmail } from "./email.js";
 import { signUnsubscribeToken, verifyUnsubscribeToken } from "./email-token.js";
 import { hashPassword, verifyPassword } from "./password.js";
 import { rateLimit } from "./rate-limit.js";
+import { listChangesStream, notifyListChange } from "./realtime.js";
 
 type Variables = { authUser: AuthUser | null };
 
@@ -1034,7 +1035,24 @@ app.patch("/lists/:listId/items/:itemId/toggle", async (c) => {
     .returning();
   if (!updated) return c.json({ error: "Not found" }, 404);
 
+  notifyListChange({
+    listId: list.id,
+    itemId: updated.id,
+    done: updated.done,
+    userId,
+  }).catch(() => {});
+
   return c.json(updated);
+});
+
+app.get("/lists/:listId/stream", async (c) => {
+  const list = await resolveList(c.req.param("listId"));
+  if (!list) return c.json({ error: "Not found" }, 404);
+  const authUser = getOptionalUser(c);
+  const userId = authUser?.session?.user?.id ?? null;
+  if (!(await canViewList(list, userId)))
+    return c.json({ error: "Not found" }, 404);
+  return listChangesStream(list.id);
 });
 
 app.post("/lists/:listId/items/:itemId/like", async (c) => {
@@ -1914,7 +1932,7 @@ async function handleUnsubscribe(c: Context<{ Variables: Variables }>) {
   await db.update(users).set({ emailOptIn: false }).where(eq(users.id, userId));
   if (c.req.method === "POST") return c.json({ ok: true });
   return c.html(
-    `<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Te has dado de baja — welist</title><style>html,body{margin:0;padding:0;background:#f8f7f5;color:#0c0c0b;font-family:system-ui,-apple-system,sans-serif}main{max-width:480px;margin:80px auto;padding:0 24px;text-align:center}h1{font-size:24px;margin:0 0 12px;letter-spacing:-0.02em}p{color:#a0a09c;line-height:1.6;margin:0}</style></head><body><main><h1>Te has dado de baja</h1><p>Ya no recibirás emails de empujón. Puedes reactivarlos cuando quieras desde los ajustes de tu perfil.</p></main></body></html>`
+    `<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Te has dado de baja — welist</title><style>html,body{margin:0;padding:0;background:#fbfbfd;color:#1d1d1f;font-family:system-ui,-apple-system,sans-serif}main{max-width:480px;margin:80px auto;padding:0 24px;text-align:center}h1{font-size:24px;margin:0 0 12px;letter-spacing:-0.02em}p{color:#86868b;line-height:1.6;margin:0}</style></head><body><main><h1>Te has dado de baja</h1><p>Ya no recibirás emails de empujón. Puedes reactivarlos cuando quieras desde los ajustes de tu perfil.</p></main></body></html>`
   );
 }
 
@@ -1954,19 +1972,19 @@ function buildNudgeEmail(args: {
     "",
     `Darte de baja: ${args.unsubscribeUrl}`,
   ].join("\n");
-  const html = `<!doctype html><html lang="es"><body style="margin:0;padding:0;background:#f8f7f5;color:#0c0c0b;font-family:system-ui,-apple-system,sans-serif">
-<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f8f7f5">
+  const html = `<!doctype html><html lang="es"><body style="margin:0;padding:0;background:#fbfbfd;color:#1d1d1f;font-family:system-ui,-apple-system,sans-serif">
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#fbfbfd">
   <tr><td align="center" style="padding:40px 16px">
     <table role="presentation" width="480" cellspacing="0" cellpadding="0" style="max-width:480px;background:#fff;border:1px solid #ebe9e4;border-radius:16px">
       <tr><td style="padding:32px">
-        <p style="margin:0 0 4px;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#a0a09c">welist</p>
+        <p style="margin:0 0 4px;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#86868b">welist</p>
         <h1 style="margin:0 0 16px;font-size:18px;font-weight:600;letter-spacing:-0.01em">No olvides este ítem</h1>
-        <p style="margin:0 0 4px;font-size:11px;text-transform:uppercase;letter-spacing:0.12em;color:#a0a09c">${escapeHtml(args.listName)}</p>
-        <p style="margin:0 0 24px;font-size:16px;line-height:1.5;color:#0c0c0b">${escapeHtml(args.item)}</p>
-        <a href="${args.listLink}" style="display:inline-block;background:#0c0c0b;color:#f8f7f5;padding:10px 16px;border-radius:10px;text-decoration:none;font-size:13px;font-weight:600">Abrir la lista →</a>
+        <p style="margin:0 0 4px;font-size:11px;text-transform:uppercase;letter-spacing:0.12em;color:#86868b">${escapeHtml(args.listName)}</p>
+        <p style="margin:0 0 24px;font-size:16px;line-height:1.5;color:#1d1d1f">${escapeHtml(args.item)}</p>
+        <a href="${args.listLink}" style="display:inline-block;background:#1d1d1f;color:#fbfbfd;padding:10px 16px;border-radius:10px;text-decoration:none;font-size:13px;font-weight:600">Abrir la lista →</a>
       </td></tr>
       <tr><td style="padding:0 32px 24px;border-top:1px solid #ebe9e4">
-        <p style="margin:16px 0 0;font-size:11px;color:#a0a09c">¿Demasiados emails? <a href="${args.unsubscribeUrl}" style="color:#a0a09c;text-decoration:underline">Darte de baja</a>.</p>
+        <p style="margin:16px 0 0;font-size:11px;color:#86868b">¿Demasiados emails? <a href="${args.unsubscribeUrl}" style="color:#86868b;text-decoration:underline">Darte de baja</a>.</p>
       </td></tr>
     </table>
   </td></tr>
@@ -1991,19 +2009,19 @@ function buildStreakAtRiskEmail(args: {
     "",
     `Darte de baja: ${args.unsubscribeUrl}`,
   ].join("\n");
-  const html = `<!doctype html><html lang="es"><body style="margin:0;padding:0;background:#f8f7f5;color:#0c0c0b;font-family:system-ui,-apple-system,sans-serif">
-<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f8f7f5">
+  const html = `<!doctype html><html lang="es"><body style="margin:0;padding:0;background:#fbfbfd;color:#1d1d1f;font-family:system-ui,-apple-system,sans-serif">
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#fbfbfd">
   <tr><td align="center" style="padding:40px 16px">
     <table role="presentation" width="480" cellspacing="0" cellpadding="0" style="max-width:480px;background:#fff;border:1px solid #ebe9e4;border-radius:16px">
       <tr><td style="padding:32px">
-        <p style="margin:0 0 4px;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#a0a09c">welist</p>
+        <p style="margin:0 0 4px;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#86868b">welist</p>
         <h1 style="margin:0 0 16px;font-size:18px;font-weight:600;letter-spacing:-0.01em">Tu racha está en riesgo</h1>
-        <p style="margin:0 0 8px;font-size:32px;font-weight:700;letter-spacing:-0.02em;color:#0c0c0b">${args.streak} días</p>
+        <p style="margin:0 0 8px;font-size:32px;font-weight:700;letter-spacing:-0.02em;color:#1d1d1f">${args.streak} días</p>
         <p style="margin:0 0 24px;font-size:14px;line-height:1.5;color:#5a5a55">Marca un ítem hoy para no perderla.</p>
-        <a href="${args.homeLink}" style="display:inline-block;background:#0c0c0b;color:#f8f7f5;padding:10px 16px;border-radius:10px;text-decoration:none;font-size:13px;font-weight:600">Abrir welist →</a>
+        <a href="${args.homeLink}" style="display:inline-block;background:#1d1d1f;color:#fbfbfd;padding:10px 16px;border-radius:10px;text-decoration:none;font-size:13px;font-weight:600">Abrir welist →</a>
       </td></tr>
       <tr><td style="padding:0 32px 24px;border-top:1px solid #ebe9e4">
-        <p style="margin:16px 0 0;font-size:11px;color:#a0a09c">¿Demasiados emails? <a href="${args.unsubscribeUrl}" style="color:#a0a09c;text-decoration:underline">Darte de baja</a>.</p>
+        <p style="margin:16px 0 0;font-size:11px;color:#86868b">¿Demasiados emails? <a href="${args.unsubscribeUrl}" style="color:#86868b;text-decoration:underline">Darte de baja</a>.</p>
       </td></tr>
     </table>
   </td></tr>

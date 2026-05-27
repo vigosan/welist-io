@@ -110,7 +110,7 @@ function ExploreDetailPage() {
       <main className="flex-1 w-full max-w-3xl mx-auto px-4 py-6 flex flex-col gap-5">
         <Link
           to="/explore"
-          className="text-sm text-gray-500 dark:text-[#a0a09c] hover:text-[#0c0c0b] dark:hover:text-[#f0ede8] transition-colors duration-150 w-fit"
+          className="text-sm text-gray-500 dark:text-muted hover:text-ink dark:hover:text-paper transition-colors duration-150 w-fit"
           data-testid="back-to-explore"
         >
           {t("explore.backToExplore")}

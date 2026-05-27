@@ -17,11 +17,11 @@
   --color-gray-700: #363636;
   /* Semantic surface/text tokens — single source of truth for the
      black & white palette. Replaces scattered hex literals. */
-  --color-canvas: #f8f7f5;
+  --color-canvas: #fbfbfd;
   --color-canvas-dark: #0d0d0d;
-  --color-ink: #0c0c0b;
-  --color-paper: #f0ede8;
-  --color-muted: #a0a09c;
+  --color-ink: #1d1d1f;
+  --color-paper: #f5f5f7;
+  --color-muted: #86868b;
 }
 
 @keyframes fadeInUp {

@@ -102,7 +102,7 @@ function ExploreListCard({
               to="/u/$userId"
               params={{ userId: owner.id }}
               data-testid={`explore-card-author-${list.id}`}
-              className="ml-auto flex items-center gap-1.5 text-[11px] text-gray-500 hover:text-[#0c0c0b] dark:text-[#6b6b67] dark:hover:text-[#f0ede8] no-underline transition-colors"
+              className="ml-auto flex items-center gap-1.5 text-[11px] text-gray-500 hover:text-ink dark:text-[#6b6b67] dark:hover:text-paper no-underline transition-colors"
             >
               {owner.image ? (
                 <img
@@ -121,7 +121,7 @@ function ExploreListCard({
       <Link
         to="/explore/$listId"
         params={{ listId: list.slug ?? list.id }}
-        className="block text-[14px] font-semibold text-[#0c0c0b] dark:text-[#f0ede8] mb-1.5 leading-snug tracking-[-0.01em] hover:opacity-70 transition-opacity duration-150 no-underline"
+        className="block text-[14px] font-semibold text-ink dark:text-paper mb-1.5 leading-snug tracking-[-0.01em] hover:opacity-70 transition-opacity duration-150 no-underline"
       >
         {list.name}
       </Link>
@@ -177,7 +177,7 @@ function ExploreListCard({
           className="mt-2 h-0.5 w-full overflow-hidden rounded-full bg-black/[0.06] dark:bg-white/[0.06]"
         >
           <div
-            className="h-full rounded-full bg-[#0c0c0b] dark:bg-[#f0ede8]"
+            className="h-full rounded-full bg-ink dark:bg-paper"
             style={{
               width: `${pct}%`,
               transition: "width 600ms cubic-bezier(0.2, 0, 0, 1)",
@@ -194,8 +194,8 @@ function ExploreListCard({
           "mt-3.5 w-full py-2.5 rounded-lg text-[12px] font-semibold tracking-[0.04em]",
           "transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer",
           accepted
-            ? "bg-black/[0.12] dark:bg-white/[0.14] text-[#0c0c0b] dark:text-[#f0ede8] border border-black/[0.20] dark:border-white/[0.18]"
-            : "bg-[#0c0c0b] dark:bg-[#f0ede8] text-[#f8f7f5] dark:text-[#0c0c0b] border border-transparent",
+            ? "bg-black/[0.12] dark:bg-white/[0.14] text-ink dark:text-paper border border-black/[0.20] dark:border-white/[0.18]"
+            : "bg-ink dark:bg-paper text-canvas dark:text-ink border border-transparent",
         ].join(" ")}
       >
         {session?.user
@@ -211,7 +211,7 @@ function ExploreListCard({
 function chipClass(active: boolean): string {
   return `cursor-pointer px-3 py-1 rounded-full text-xs transition-all duration-150 whitespace-nowrap shrink-0 border ${
     active
-      ? "border-black/[0.20] dark:border-white/[0.20] bg-black/[0.12] dark:bg-white/[0.12] text-[#0c0c0b] dark:text-[#f0ede8] font-semibold"
+      ? "border-black/[0.20] dark:border-white/[0.20] bg-black/[0.12] dark:bg-white/[0.12] text-ink dark:text-paper font-semibold"
       : "border-black/[0.08] dark:border-white/[0.08] text-gray-500 font-normal hover:border-black/[0.20] dark:hover:border-white/[0.20] hover:bg-black/[0.05] dark:hover:bg-white/[0.05]"
   }`;
 }
@@ -303,11 +303,11 @@ function ExplorePage() {
             placeholder={t("explore.searchPlaceholder")}
             aria-label={t("explore.searchAriaLabel")}
             data-testid="explore-search-input"
-            className="flex-1 px-4 py-2.5 text-sm text-[#0c0c0b] dark:text-[#f0ede8] placeholder-[#a0a09c] dark:placeholder-[#6b6b67] bg-transparent outline-none"
+            className="flex-1 px-4 py-2.5 text-sm text-ink dark:text-paper placeholder-muted dark:placeholder-[#6b6b67] bg-transparent outline-none"
           />
           <button
             type="submit"
-            className="px-5 py-2.5 text-[12px] font-semibold tracking-[0.04em] bg-[#0c0c0b] dark:bg-[#f0ede8] text-[#f8f7f5] dark:text-[#0c0c0b] border-none cursor-pointer"
+            className="px-5 py-2.5 text-[12px] font-semibold tracking-[0.04em] bg-ink dark:bg-paper text-canvas dark:text-ink border-none cursor-pointer"
             style={{ borderRadius: 0 }}
           >
             {t("explore.search")}
@@ -330,7 +330,7 @@ function ExplorePage() {
                 onClick={() => setFiltersOpen((v) => !v)}
                 className={`cursor-pointer inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs transition-all duration-150 whitespace-nowrap shrink-0 ${
                   hasNonDefault
-                    ? "border-black/[0.20] dark:border-white/[0.20] bg-black/[0.12] dark:bg-white/[0.12] text-[#0c0c0b] dark:text-[#f0ede8] font-semibold"
+                    ? "border-black/[0.20] dark:border-white/[0.20] bg-black/[0.12] dark:bg-white/[0.12] text-ink dark:text-paper font-semibold"
                     : "border-black/[0.08] dark:border-white/[0.08] text-gray-500 font-normal hover:border-black/[0.20] dark:hover:border-white/[0.20] hover:bg-black/[0.05] dark:hover:bg-white/[0.05]"
                 }`}
               >

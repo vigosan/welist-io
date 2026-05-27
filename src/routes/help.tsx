@@ -210,7 +210,7 @@ function HelpSection({
         >
           {numberLabel}
         </span>
-        <span className="flex-1 text-sm font-semibold text-[#0c0c0b] dark:text-[#f0ede8] tracking-[0.01em]">
+        <span className="flex-1 text-sm font-semibold text-ink dark:text-paper tracking-[0.01em]">
           {title}
         </span>
         <svg
@@ -236,7 +236,7 @@ function HelpSection({
               <span className="shrink-0 mt-0.5 text-[11px] text-gray-400 dark:text-[#6b6b67]">
                 →
               </span>
-              <span className="text-sm leading-[1.6] text-gray-600 dark:text-[#a0a09c]">
+              <span className="text-sm leading-[1.6] text-gray-600 dark:text-muted">
                 {renderInlineMarkdown(item)}
               </span>
             </div>
@@ -259,12 +259,12 @@ function HelpPage() {
         <div className="max-w-[760px] mx-auto px-4 sm:px-12">
           <div className="mb-9">
             <h1
-              className="text-[28px] font-bold text-[#0c0c0b] dark:text-[#f0ede8] mb-2"
+              className="text-[28px] font-bold text-ink dark:text-paper mb-2"
               style={{ letterSpacing: "-0.03em" }}
             >
               {page.title}
             </h1>
-            <p className="text-sm text-gray-500 dark:text-[#a0a09c]">
+            <p className="text-sm text-gray-500 dark:text-muted">
               {page.subtitle}
             </p>
           </div>

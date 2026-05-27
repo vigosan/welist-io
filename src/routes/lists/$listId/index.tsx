@@ -398,7 +398,7 @@ function ListDetailPage() {
               >
                 <Link
                   to="/lists"
-                  className="cursor-pointer text-sm text-gray-500 dark:text-[#a0a09c] hover:text-[#0c0c0b] dark:hover:text-[#f0ede8] transition-colors duration-150 w-fit"
+                  className="cursor-pointer text-sm text-gray-500 dark:text-muted hover:text-ink dark:hover:text-paper transition-colors duration-150 w-fit"
                 >
                   {t("list.back")}
                 </Link>

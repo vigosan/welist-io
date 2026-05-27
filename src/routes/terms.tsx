@@ -13,14 +13,14 @@ function TermsPage() {
       <main className="flex-1 w-full max-w-2xl mx-auto px-4 sm:px-8 py-10">
         <Link
           to="/"
-          className="text-xs text-gray-500 dark:text-[#a0a09c] hover:text-[#0c0c0b] dark:hover:text-[#f0ede8] transition"
+          className="text-xs text-gray-500 dark:text-muted hover:text-ink dark:hover:text-paper transition"
         >
           ← Inicio
         </Link>
-        <h1 className="mt-4 text-3xl font-bold tracking-tight text-[#0c0c0b] dark:text-[#f0ede8]">
+        <h1 className="mt-4 text-3xl font-bold tracking-tight text-ink dark:text-paper">
           Términos del servicio
         </h1>
-        <p className="mt-2 text-sm text-gray-500 dark:text-[#a0a09c]">
+        <p className="mt-2 text-sm text-gray-500 dark:text-muted">
           Última actualización: 26 de mayo de 2026
         </p>
 
@@ -32,7 +32,7 @@ function TermsPage() {
               adelante, el “Servicio”), aceptas estos Términos y nuestra{" "}
               <Link
                 to="/privacy"
-                className="underline hover:text-[#0c0c0b] dark:hover:text-[#f0ede8]"
+                className="underline hover:text-ink dark:hover:text-paper"
               >
                 Política de privacidad
               </Link>
@@ -171,7 +171,7 @@ function TermsPage() {
               Para cualquier consulta sobre estos Términos, escríbenos a{" "}
               <a
                 href="mailto:hola@welist.io"
-                className="underline hover:text-[#0c0c0b] dark:hover:text-[#f0ede8]"
+                className="underline hover:text-ink dark:hover:text-paper"
               >
                 hola@welist.io
               </a>
@@ -180,10 +180,10 @@ function TermsPage() {
           </Section>
         </div>
 
-        <p className="mt-10 text-xs text-gray-500 dark:text-[#a0a09c]">
+        <p className="mt-10 text-xs text-gray-500 dark:text-muted">
           <Link
             to="/privacy"
-            className="underline hover:text-[#0c0c0b] dark:hover:text-[#f0ede8]"
+            className="underline hover:text-ink dark:hover:text-paper"
           >
             Política de privacidad
           </Link>
@@ -203,7 +203,7 @@ function Section({
 }) {
   return (
     <section className="flex flex-col gap-2">
-      <h2 className="text-base font-semibold text-[#0c0c0b] dark:text-[#f0ede8]">
+      <h2 className="text-base font-semibold text-ink dark:text-paper">
         {title}
       </h2>
       {children}

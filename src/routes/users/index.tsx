@@ -45,7 +45,7 @@ function SlimFollowButton({
       className={`shrink-0 cursor-pointer rounded-full px-3 py-1 text-xs font-medium transition active:scale-[0.96] disabled:opacity-50 ${
         isFollowing
           ? "border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:border-gray-900 hover:text-gray-900 dark:hover:border-gray-300 dark:hover:text-gray-100"
-          : "bg-gray-900 text-white hover:bg-black dark:bg-[#f0ede8] dark:text-[#0c0c0b]"
+          : "bg-gray-900 text-white hover:bg-black dark:bg-paper dark:text-ink"
       }`}
     >
       {isFollowing ? t("profile.following") : t("profile.follow")}
@@ -121,18 +121,18 @@ function UserRow({ user }: { user: DirectoryUser }) {
         />
       ) : (
         <div
-          className="pointer-events-none w-12 h-12 rounded-full shrink-0 flex items-center justify-center text-sm font-semibold bg-black/[0.04] dark:bg-white/[0.06] text-[#0c0c0b] dark:text-[#f0ede8] border border-black/[0.08] dark:border-white/[0.10]"
+          className="pointer-events-none w-12 h-12 rounded-full shrink-0 flex items-center justify-center text-sm font-semibold bg-black/[0.04] dark:bg-white/[0.06] text-ink dark:text-paper border border-black/[0.08] dark:border-white/[0.10]"
           style={{ fontFamily: "'Space Mono', monospace" }}
         >
           {initials(user.name)}
         </div>
       )}
       <div className="pointer-events-none flex-1 min-w-0">
-        <p className="text-[15px] font-semibold text-[#0c0c0b] dark:text-[#f0ede8] truncate mb-0.5">
+        <p className="text-[15px] font-semibold text-ink dark:text-paper truncate mb-0.5">
           {privateName(user.name)}
         </p>
         {summary.length > 0 ? (
-          <p className="text-[12px] text-gray-500 dark:text-[#a0a09c] leading-snug">
+          <p className="text-[12px] text-gray-500 dark:text-muted leading-snug">
             {summary.join(" · ")}
           </p>
         ) : (
@@ -153,7 +153,7 @@ function UserRow({ user }: { user: DirectoryUser }) {
               aria-hidden="true"
             >
               <div
-                className="h-full bg-gray-900 dark:bg-[#f0ede8]"
+                className="h-full bg-gray-900 dark:bg-paper"
                 style={{ width: `${achievementsPct}%` }}
               />
             </div>
@@ -220,11 +220,11 @@ function UsersDirectoryPage() {
             placeholder={t("directory.searchPlaceholder")}
             aria-label={t("directory.searchAriaLabel")}
             data-testid="directory-search-input"
-            className="flex-1 px-4 py-2.5 text-sm text-[#0c0c0b] dark:text-[#f0ede8] placeholder-[#a0a09c] dark:placeholder-[#6b6b67] bg-transparent outline-none"
+            className="flex-1 px-4 py-2.5 text-sm text-ink dark:text-paper placeholder-muted dark:placeholder-[#6b6b67] bg-transparent outline-none"
           />
           <button
             type="submit"
-            className="px-5 py-2.5 text-[12px] font-semibold tracking-[0.04em] bg-[#0c0c0b] dark:bg-[#f0ede8] text-[#f8f7f5] dark:text-[#0c0c0b] border-none cursor-pointer"
+            className="px-5 py-2.5 text-[12px] font-semibold tracking-[0.04em] bg-ink dark:bg-paper text-canvas dark:text-ink border-none cursor-pointer"
             style={{ borderRadius: 0 }}
           >
             {t("directory.search")}

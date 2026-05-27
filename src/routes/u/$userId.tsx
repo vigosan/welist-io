@@ -47,7 +47,7 @@ function UserProfilePage() {
       <div className="min-h-dvh bg-canvas dark:bg-canvas-dark flex flex-col">
         <AppNav />
         <div className="flex-1 flex items-center justify-center">
-          <p className="text-sm text-gray-500 dark:text-[#a0a09c]">
+          <p className="text-sm text-gray-500 dark:text-muted">
             {t("error.notFound")}
           </p>
         </div>
@@ -62,7 +62,7 @@ function UserProfilePage() {
       <main className="flex-1 w-full max-w-[760px] mx-auto px-4 sm:px-12 py-10 flex flex-col gap-8">
         <Link
           to="/users"
-          className="text-sm text-gray-500 dark:text-[#a0a09c] hover:text-[#0c0c0b] dark:hover:text-[#f0ede8] transition-colors duration-150 w-fit"
+          className="text-sm text-gray-500 dark:text-muted hover:text-ink dark:hover:text-paper transition-colors duration-150 w-fit"
         >
           {t("directory.backToUsers")}
         </Link>
@@ -76,16 +76,16 @@ function UserProfilePage() {
             />
           ) : (
             <div className="w-14 h-14 rounded-full bg-black/[0.04] dark:bg-white/[0.06] border border-black/[0.08] dark:border-white/[0.10] flex items-center justify-center">
-              <span className="text-xl font-bold text-[#0c0c0b] dark:text-[#f0ede8]">
+              <span className="text-xl font-bold text-ink dark:text-paper">
                 {(profile.name ?? "?")[0]?.toUpperCase()}
               </span>
             </div>
           )}
           <div>
-            <h1 className="text-xl font-bold tracking-tight text-[#0c0c0b] dark:text-[#f0ede8]">
+            <h1 className="text-xl font-bold tracking-tight text-ink dark:text-paper">
               {profile.name ? privateName(profile.name) : "Anonymous"}
             </h1>
-            <p className="text-sm text-gray-500 dark:text-[#a0a09c]">
+            <p className="text-sm text-gray-500 dark:text-muted">
               {profile.publicLists.length}{" "}
               {t("profile.publicLists").toLowerCase()} ·{" "}
               {profile.completedChallenges.length}{" "}
@@ -97,11 +97,11 @@ function UserProfilePage() {
         <FollowButton userId={userId} />
 
         <section className="flex flex-col gap-3">
-          <h2 className="text-[11px] font-semibold text-gray-500 dark:text-[#a0a09c] uppercase tracking-wider">
+          <h2 className="text-[11px] font-semibold text-gray-500 dark:text-muted uppercase tracking-wider">
             {t("profile.achievements")}
           </h2>
           {achievements.length === 0 ? (
-            <p className="text-sm text-gray-500 dark:text-[#a0a09c]">
+            <p className="text-sm text-gray-500 dark:text-muted">
               {t("profile.noAchievements")}
             </p>
           ) : (
@@ -124,7 +124,7 @@ function UserProfilePage() {
                       aria-hidden="true"
                       className={`text-sm shrink-0 ${
                         unlocked
-                          ? "text-[#0c0c0b] dark:text-[#f0ede8]"
+                          ? "text-ink dark:text-paper"
                           : "text-gray-300 dark:text-[#52524e]"
                       }`}
                     >
@@ -135,8 +135,8 @@ function UserProfilePage() {
                         <span
                           className={`text-sm truncate ${
                             unlocked
-                              ? "text-[#0c0c0b] dark:text-[#f0ede8] font-medium"
-                              : "text-gray-500 dark:text-[#a0a09c]"
+                              ? "text-ink dark:text-paper font-medium"
+                              : "text-gray-500 dark:text-muted"
                           }`}
                         >
                           {t(`achievements.${a.type}.title`)}
@@ -155,7 +155,7 @@ function UserProfilePage() {
                         <div
                           className={`h-full ${
                             unlocked
-                              ? "bg-gray-900 dark:bg-[#f0ede8]"
+                              ? "bg-gray-900 dark:bg-paper"
                               : "bg-gray-400 dark:bg-[#6b6b67]"
                           }`}
                           style={{ width: `${pct}%` }}
@@ -170,11 +170,11 @@ function UserProfilePage() {
         </section>
 
         <section className="flex flex-col gap-3">
-          <h2 className="text-[11px] font-semibold text-gray-500 dark:text-[#a0a09c] uppercase tracking-wider">
+          <h2 className="text-[11px] font-semibold text-gray-500 dark:text-muted uppercase tracking-wider">
             {t("profile.publicLists")}
           </h2>
           {profile.publicLists.length === 0 ? (
-            <p className="text-sm text-gray-500 dark:text-[#a0a09c]">
+            <p className="text-sm text-gray-500 dark:text-muted">
               {t("profile.noPublicLists")}
             </p>
           ) : (
@@ -189,18 +189,18 @@ function UserProfilePage() {
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-[#0c0c0b] dark:text-[#f0ede8] leading-snug truncate">
+                      <p className="font-semibold text-ink dark:text-paper leading-snug truncate">
                         {list.name}
                       </p>
                       {list.description && (
-                        <p className="text-sm text-gray-500 dark:text-[#a0a09c] mt-0.5 line-clamp-1">
+                        <p className="text-sm text-gray-500 dark:text-muted mt-0.5 line-clamp-1">
                           {list.description}
                         </p>
                       )}
                     </div>
                     <svg
                       aria-hidden="true"
-                      className="text-gray-300 dark:text-[#6b6b67] group-hover:text-gray-500 dark:group-hover:text-[#a0a09c] w-4 h-4 shrink-0 mt-0.5 transition-colors duration-150"
+                      className="text-gray-300 dark:text-[#6b6b67] group-hover:text-gray-500 dark:group-hover:text-muted w-4 h-4 shrink-0 mt-0.5 transition-colors duration-150"
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="currentColor"
@@ -211,7 +211,7 @@ function UserProfilePage() {
                       <path d="M9 18l6-6-6-6" />
                     </svg>
                   </div>
-                  <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-[#a0a09c] tabular-nums">
+                  <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-muted tabular-nums">
                     <span>
                       {t("profile.items", { count: String(list.itemCount) })}
                     </span>
@@ -242,11 +242,11 @@ function UserProfilePage() {
         </section>
 
         <section className="flex flex-col gap-3">
-          <h2 className="text-[11px] font-semibold text-gray-500 dark:text-[#a0a09c] uppercase tracking-wider">
+          <h2 className="text-[11px] font-semibold text-gray-500 dark:text-muted uppercase tracking-wider">
             {t("profile.completedChallenges")}
           </h2>
           {profile.completedChallenges.length === 0 ? (
-            <p className="text-sm text-gray-500 dark:text-[#a0a09c]">
+            <p className="text-sm text-gray-500 dark:text-muted">
               {t("profile.noCompletedChallenges")}
             </p>
           ) : (
@@ -262,7 +262,7 @@ function UserProfilePage() {
                   <div className="flex items-center gap-2.5 min-w-0">
                     <svg
                       aria-hidden="true"
-                      className="w-4 h-4 text-gray-500 dark:text-[#a0a09c] shrink-0"
+                      className="w-4 h-4 text-gray-500 dark:text-muted shrink-0"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -274,12 +274,12 @@ function UserProfilePage() {
                         d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
                       />
                     </svg>
-                    <span className="text-sm font-medium text-[#0c0c0b] dark:text-[#f0ede8] truncate">
+                    <span className="text-sm font-medium text-ink dark:text-paper truncate">
                       {challenge.name}
                     </span>
                   </div>
                   {challenge.completedAt && (
-                    <span className="text-xs text-gray-500 dark:text-[#a0a09c] shrink-0 tabular-nums">
+                    <span className="text-xs text-gray-500 dark:text-muted shrink-0 tabular-nums">
                       {new Date(challenge.completedAt).toLocaleDateString()}
                     </span>
                   )}
