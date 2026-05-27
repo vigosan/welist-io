@@ -4,6 +4,7 @@ const en: Translations = {
   nav: {
     explore: "Explore",
     myLists: "My lists",
+    search: "Search",
   },
   home: {
     badge: "Collaborative lists → v2.0",

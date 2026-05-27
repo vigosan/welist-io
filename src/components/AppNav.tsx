@@ -2,6 +2,7 @@ import { signIn, signOut } from "@hono/auth-js/react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useCachedSession } from "@/hooks/useCachedSession";
+import { useStats } from "@/hooks/useList";
 import { useTheme } from "@/hooks/useTheme";
 import { setLanguage, useLanguage, useTranslation } from "@/i18n/service";
 import { GlobalCommandPalette } from "./GlobalCommandPalette";
@@ -47,6 +48,63 @@ const MoonIcon = () => (
     <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
   </svg>
 );
+
+const SearchIcon = () => (
+  <svg
+    aria-hidden="true"
+    width="12"
+    height="12"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <circle cx="11" cy="11" r="7" />
+    <path d="m21 21-4.3-4.3" />
+  </svg>
+);
+
+const LogoMark = () => (
+  <span
+    aria-hidden="true"
+    className="inline-grid h-[18px] w-[18px] place-items-center rounded-[5px] bg-ink dark:bg-paper"
+  >
+    <svg
+      aria-hidden="true"
+      width="10"
+      height="10"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="3.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="text-canvas dark:text-canvas-dark"
+    >
+      <polyline points="20 6 9 17 4 12" />
+    </svg>
+  </span>
+);
+
+function BetaPill() {
+  const { data } = useStats();
+  const { t } = useTranslation();
+  if (!data?.users) return null;
+  return (
+    <span
+      data-testid="beta-pill"
+      className="hidden md:inline-flex items-center gap-1.5 rounded-full border border-black/[0.08] bg-canvas px-2.5 py-1 text-[11px] text-muted dark:border-white/[0.08] dark:bg-canvas-dark"
+    >
+      <span className="relative inline-flex h-1.5 w-1.5">
+        <span className="absolute inset-0 animate-ping rounded-full bg-ink/40 dark:bg-paper/40" />
+        <span className="relative inline-block h-1.5 w-1.5 rounded-full bg-ink dark:bg-paper" />
+      </span>
+      {t("home.betaPill", { count: data.users })}
+    </span>
+  );
+}
 
 function NavLink({
   to,
@@ -110,13 +168,14 @@ export function AppNav() {
         open={globalSearchOpen}
         onClose={() => setGlobalSearchOpen(false)}
       />
-      <nav className="shrink-0 sticky top-0 z-50 h-[52px] bg-canvas dark:bg-canvas-dark border-b border-black/[0.08] dark:border-white/[0.08]">
-        <div className="flex items-center justify-between px-4 sm:px-12 h-full">
+      <nav className="shrink-0 sticky top-0 z-50 h-[52px] bg-canvas/80 dark:bg-canvas-dark/80 backdrop-blur-md backdrop-saturate-150 border-b border-black/[0.06] dark:border-white/[0.08]">
+        <div className="flex items-center justify-between px-4 sm:px-12 h-full gap-4">
           <Link
             to="/"
             data-testid="nav-logo"
-            className="cursor-pointer text-[15px] font-bold text-ink dark:text-paper hover:opacity-70 transition-opacity duration-150 no-underline tracking-[-0.01em]"
+            className="cursor-pointer flex items-center gap-2 text-[15px] font-bold text-ink dark:text-paper hover:opacity-70 transition-opacity duration-150 no-underline tracking-[-0.01em]"
           >
+            <LogoMark />
             welist
           </Link>
 
@@ -142,6 +201,24 @@ export function AppNav() {
             <NavLink to="/help" label={t("help.nav")} testId="nav-help" />
 
             <div className="w-px h-3.5 bg-black/[0.08] dark:bg-white/[0.08]" />
+
+            <BetaPill />
+
+            {session?.user && (
+              <button
+                type="button"
+                onClick={() => setGlobalSearchOpen(true)}
+                data-testid="nav-search"
+                aria-label="Open search"
+                className="cursor-pointer hidden lg:inline-flex items-center gap-2 rounded-md border border-black/[0.08] bg-canvas px-2.5 py-1 text-[11px] text-muted hover:border-black/20 hover:text-ink transition-colors duration-150 dark:border-white/[0.08] dark:bg-canvas-dark dark:hover:border-white/20 dark:hover:text-paper"
+              >
+                <SearchIcon />
+                {t("nav.search")}
+                <kbd className="font-mono text-[10px] text-muted/80 border border-black/[0.08] rounded px-1 py-px dark:border-white/[0.08]">
+                  ⌘K
+                </kbd>
+              </button>
+            )}
 
             <button
               type="button"

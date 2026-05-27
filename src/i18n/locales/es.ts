@@ -2,6 +2,7 @@ const es = {
   nav: {
     explore: "Explorar",
     myLists: "Mis listas",
+    search: "Buscar",
   },
   home: {
     badge: "Listas colaborativas → v2.0",
