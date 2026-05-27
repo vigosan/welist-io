@@ -54,7 +54,7 @@ vi.mock("stripe", () => {
 
 const { app } = await import("./app");
 const { sendEmail: mockSendEmail } = await import("./email");
-const { achievements, notifications, participations } = await import(
+const { achievements, lists, notifications, participations } = await import(
   "../src/db/schema/index"
 );
 
@@ -2039,6 +2039,108 @@ describe("PATCH toggle item_done fan-out", () => {
 
     expect(res.status).toBe(200);
     expect(mockDb.insert).not.toHaveBeenCalledWith(notifications);
+  });
+});
+
+describe("PATCH toggle list_completed fan-out", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockGetAuthUser.mockResolvedValue({
+      session: { user: { id: "collab-1" } },
+    });
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "abc",
+      name: "Lista",
+      ownerId: "owner-1",
+      collaborative: true,
+      public: true,
+    });
+    mockDb.query.items.findFirst.mockResolvedValue({ id: "i1", done: false });
+    mockDb.query.participations.findFirst.mockResolvedValue({
+      role: "collaborator",
+    });
+    mockDb.query.participations.findMany.mockResolvedValue([
+      { userId: "collab-1" },
+    ]);
+    mockDb.query.users.findFirst.mockResolvedValue({
+      name: "Ana",
+      image: null,
+    });
+    mockDb.query.notifications.findFirst.mockResolvedValue(null);
+  });
+  afterEach(() => {
+    mockGetAuthUser.mockRejectedValue(new Error("no session"));
+  });
+
+  function mockUpdate(opts: { listClosedRows: number }) {
+    mockDb.update.mockImplementation((tbl: unknown) => {
+      const isLists = tbl === lists;
+      return {
+        set: vi.fn().mockReturnValue({
+          where: vi.fn().mockReturnValue({
+            returning: vi.fn().mockResolvedValue(
+              isLists
+                ? Array.from({ length: opts.listClosedRows }, () => ({
+                    id: "abc",
+                  }))
+                : [{ id: "i1", listId: "abc", done: true }]
+            ),
+          }),
+        }),
+      };
+    });
+  }
+
+  it("fires list_completed once when the last pending item is closed", async () => {
+    mockDb.$count.mockResolvedValue(0);
+    mockUpdate({ listClosedRows: 1 });
+    const notifChain = chainableInsert();
+    mockDb.insert.mockReturnValue(notifChain);
+
+    const res = await app.request("/api/lists/abc/items/i1/toggle", {
+      method: "PATCH",
+    });
+
+    expect(res.status).toBe(200);
+    const types = notifChain.values.mock.calls.map(
+      (call: unknown[]) => (call[0] as { type: string }).type
+    );
+    expect(types).toContain("list_completed");
+    expect(types.filter((t: string) => t === "list_completed")).toHaveLength(1);
+  });
+
+  it("does not fire list_completed when items are still pending", async () => {
+    mockDb.$count.mockResolvedValue(2);
+    mockUpdate({ listClosedRows: 0 });
+    const notifChain = chainableInsert();
+    mockDb.insert.mockReturnValue(notifChain);
+
+    const res = await app.request("/api/lists/abc/items/i1/toggle", {
+      method: "PATCH",
+    });
+
+    expect(res.status).toBe(200);
+    const types = notifChain.values.mock.calls.map(
+      (call: unknown[]) => (call[0] as { type: string }).type
+    );
+    expect(types).not.toContain("list_completed");
+  });
+
+  it("does not fire list_completed when the list was already completed", async () => {
+    mockDb.$count.mockResolvedValue(0);
+    mockUpdate({ listClosedRows: 0 });
+    const notifChain = chainableInsert();
+    mockDb.insert.mockReturnValue(notifChain);
+
+    const res = await app.request("/api/lists/abc/items/i1/toggle", {
+      method: "PATCH",
+    });
+
+    expect(res.status).toBe(200);
+    const types = notifChain.values.mock.calls.map(
+      (call: unknown[]) => (call[0] as { type: string }).type
+    );
+    expect(types).not.toContain("list_completed");
   });
 });
 

@@ -12,6 +12,7 @@ import {
   ilike,
   inArray,
   isNotNull,
+  isNull,
   lt,
   max,
   or,
@@ -1101,10 +1102,55 @@ app.patch("/lists/:listId/items/:itemId/toggle", async (c) => {
       actorId: userId,
       itemId: updated.id,
     });
+    const pending = await db.$count(
+      items,
+      and(eq(items.listId, list.id), eq(items.done, false))
+    );
+    if (pending === 0) {
+      const closed = await db
+        .update(lists)
+        .set({ completedAt: new Date() })
+        .where(and(eq(lists.id, list.id), isNull(lists.completedAt)))
+        .returning({ id: lists.id });
+      if (closed.length > 0) {
+        await fanOutListCompleted({ listId: list.id, actorId: userId });
+      }
+    }
   }
 
   return c.json(updated);
 });
+
+async function fanOutListCompleted(input: { listId: string; actorId: string }) {
+  const recipients = await listParticipantRecipients(
+    input.listId,
+    input.actorId
+  );
+  if (recipients.length === 0) return;
+  const [actor, listMeta] = await Promise.all([
+    db.query.users.findFirst({
+      where: eq(users.id, input.actorId),
+      columns: { name: true, image: true },
+    }),
+    db.query.lists.findFirst({
+      where: eq(lists.id, input.listId),
+      columns: { name: true },
+    }),
+  ]);
+  await Promise.all(
+    recipients.map((recipientId) =>
+      createNotification({
+        recipientId,
+        type: "list_completed",
+        listId: input.listId,
+        listName: listMeta?.name,
+        actorId: input.actorId,
+        actorName: actor?.name,
+        actorImage: actor?.image,
+      })
+    )
+  );
+}
 
 async function fanOutItemDone(input: {
   listId: string;
