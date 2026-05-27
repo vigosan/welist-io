@@ -89,9 +89,10 @@ const LogoMark = () => (
 );
 
 function BetaPill() {
-  const { data } = useStats();
+  const stats = useStats();
   const { t } = useTranslation();
-  if (!data?.users) return null;
+  const users = stats?.data?.users;
+  if (!users) return null;
   return (
     <span
       data-testid="beta-pill"
@@ -101,7 +102,7 @@ function BetaPill() {
         <span className="absolute inset-0 animate-ping rounded-full bg-ink/40 dark:bg-paper/40" />
         <span className="relative inline-block h-1.5 w-1.5 rounded-full bg-ink dark:bg-paper" />
       </span>
-      {t("home.betaPill", { count: data.users })}
+      {t("home.betaPill", { count: users })}
     </span>
   );
 }
