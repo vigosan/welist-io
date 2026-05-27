@@ -64,7 +64,9 @@ export const app = new Hono<{
   Variables: Variables;
 }>().basePath("/api");
 
-app.use(rateLimit({ limit: 120, windowMs: 60_000 }));
+if (process.env.NODE_ENV !== "test") {
+  app.use(rateLimit({ limit: 120, windowMs: 60_000 }));
+}
 
 app.use(
   "*",
