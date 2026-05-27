@@ -147,11 +147,11 @@ export const ItemRow = memo(
           onClick={effectiveCanToggle ? onToggle : undefined}
           data-testid={`item-checkbox-${item.id}`}
           aria-label={item.done ? t("items.markPending") : t("items.markDone")}
-          className={`shrink-0 w-9 h-9 rounded-full flex items-center justify-center ${effectiveCanToggle ? "cursor-pointer active:scale-[0.96]" : "cursor-default"}`}
+          className={`group shrink-0 w-9 h-9 rounded-full flex items-center justify-center focus-visible:outline-none! ${effectiveCanToggle ? "cursor-pointer active:scale-[0.96]" : "cursor-default"}`}
           style={{ transition: "transform 150ms cubic-bezier(0.2, 0, 0, 1)" }}
         >
           <div
-            className={`w-5 h-5 rounded-full flex items-center justify-center ${
+            className={`w-5 h-5 rounded-full flex items-center justify-center group-focus-visible:outline-2 group-focus-visible:outline-offset-2 group-focus-visible:outline-gray-900 dark:group-focus-visible:outline-white ${
               item.done
                 ? "bg-gray-900 dark:bg-white"
                 : "border-2 border-gray-300 dark:border-gray-600 hover:border-gray-600 dark:hover:border-gray-400"
