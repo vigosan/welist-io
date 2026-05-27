@@ -156,8 +156,6 @@ export const en = {
     couldNotAdd: "Could not add item",
     couldNotSave: "Could not save",
     activeCount: "{{count}} active",
-    rateList: "Rate",
-    yourRating: "Your rating",
     swipeDone: "Done",
     swipeUndo: "Undo",
   },

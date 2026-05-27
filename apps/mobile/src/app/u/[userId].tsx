@@ -234,9 +234,6 @@ export default function UserProfileScreen() {
                       items: list.itemCount,
                       participants: list.participantCount,
                     })}
-                    {list.rating.count > 0
-                      ? ` · ★ ${list.rating.avg?.toFixed(1)}`
-                      : ""}
                   </Text>
                 </View>
                 <ChevronRight color="#c7c5be" size={18} />

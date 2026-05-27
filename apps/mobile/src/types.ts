@@ -21,7 +21,6 @@ export type ListWithParticipation = List & {
     role: "challenger" | "collaborator";
     completedAt: string | null;
   } | null;
-  rating: { avg: number | null; count: number; mine: number | null };
 };
 
 export type Item = {
@@ -53,7 +52,6 @@ export type ExploreItem = {
   previewItems: string[];
   participants: { id: string; name: string | null; image: string | null }[];
   isParticipating: boolean;
-  rating: { avg: number | null; count: number };
   owner: {
     id: string | null;
     name: string | null;
@@ -109,7 +107,6 @@ export type UserProfile = {
     itemCount: number;
     participantCount: number;
     completedCount: number;
-    rating: { avg: number | null; count: number };
   }[];
   completedChallenges: {
     id: string;

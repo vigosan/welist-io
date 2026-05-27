@@ -278,9 +278,6 @@ export default function ExploreScreen() {
                   items: item.itemCount,
                   participants: item.participantCount,
                 })}
-                {item.rating.count > 0
-                  ? ` · ★ ${item.rating.avg?.toFixed(1)} (${item.rating.count})`
-                  : ""}
               </Text>
             </View>
             <ChevronRight color="#c7c5be" size={18} />

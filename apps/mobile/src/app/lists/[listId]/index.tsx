@@ -28,8 +28,6 @@ import { ActionDrawer, type DrawerAction } from "@/components/ActionDrawer";
 import { AnimatedCheckbox } from "@/components/AnimatedCheckbox";
 import { EmptyState } from "@/components/EmptyState";
 import { LocationPickerModal } from "@/components/LocationPickerModal";
-import { RateSheet } from "@/components/RateSheet";
-import { RatingBadge } from "@/components/RatingBadge";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { ItemRowSkeleton } from "@/components/Skeleton";
 import {
@@ -41,7 +39,6 @@ import {
   useUpdateItem,
 } from "@/hooks/items";
 import { useActiveParticipants, useDeleteList, useList } from "@/hooks/lists";
-import { useRateList } from "@/hooks/rating";
 import { useIsDark } from "@/hooks/useIsDark";
 import { useReport } from "@/hooks/users";
 import { useSession } from "@/lib/auth";
@@ -66,7 +63,6 @@ export default function ListDetailScreen() {
   const [editing, setEditing] = useState<Item | null>(null);
   const [editingText, setEditingText] = useState("");
   const [locating, setLocating] = useState<Item | null>(null);
-  const [rateOpen, setRateOpen] = useState(false);
   const [actionsOpen, setActionsOpen] = useState(false);
 
   const { session } = useSession();
@@ -77,7 +73,6 @@ export default function ListDetailScreen() {
   const remove = useDeleteItem(listId);
   const reorder = useReorderItems(listId);
   const setLocation = useSetItemLocation(listId);
-  const rate = useRateList(listId);
   const participants = useActiveParticipants(listId);
   const deleteList = useDeleteList();
   const report = useReport();
@@ -334,26 +329,12 @@ export default function ListDetailScreen() {
         }
       />
 
-      {((list.data?.rating && (list.data.rating.count > 0 || !isOwner)) ||
-        (participants.data && participants.data.total > 0)) && (
-        <View className="mx-6 mb-2 flex-row items-center justify-between">
-          {list.data?.rating && (list.data.rating.count > 0 || !isOwner) ? (
-            <RatingBadge
-              avg={list.data.rating.avg ?? 0}
-              count={list.data.rating.count}
-              mine={list.data.rating.mine}
-              rateLabel={isOwner ? undefined : t("list.rateList")}
-              onPress={isOwner ? undefined : () => setRateOpen(true)}
-            />
-          ) : (
-            <View />
-          )}
-          {participants.data && participants.data.total > 0 && (
-            <ParticipantAvatars
-              participants={participants.data.participants}
-              total={participants.data.total}
-            />
-          )}
+      {participants.data && participants.data.total > 0 && (
+        <View className="mx-6 mb-2 flex-row items-center justify-end">
+          <ParticipantAvatars
+            participants={participants.data.participants}
+            total={participants.data.total}
+          />
         </View>
       )}
 
@@ -478,13 +459,6 @@ export default function ListDetailScreen() {
           </View>
         </View>
       </Modal>
-
-      <RateSheet
-        visible={rateOpen}
-        value={list.data?.rating?.mine ?? null}
-        onChange={(v) => rate.mutate(v)}
-        onClose={() => setRateOpen(false)}
-      />
 
       <LocationPickerModal
         visible={locating !== null}
