@@ -705,6 +705,7 @@ app.patch(
       if (body.public === true && !list.public) {
         await checkAchievements(list.ownerId);
       }
+      notifyListChange(list.id).catch(() => {});
       return c.json(updated);
     } catch (e: unknown) {
       if (isUniqueViolation(e)) return c.json({ error: "slug_taken" }, 409);
@@ -811,6 +812,7 @@ app.post(
       await logActivity(list.id, userId, "item_added", item.id, null, { text });
     }
     await checkAchievements(list.ownerId);
+    notifyListChange(list.id).catch(() => {});
     return c.json(item, 201);
   }
 );
@@ -839,6 +841,7 @@ app.patch(
           .where(and(eq(items.id, id), eq(items.listId, list.id)))
       )
     );
+    notifyListChange(list.id).catch(() => {});
     return c.body(null, 204);
   }
 );
@@ -892,6 +895,7 @@ app.patch(
         { text: body.text }
       );
     }
+    notifyListChange(list.id).catch(() => {});
     return c.json(updated);
   }
 );
@@ -1001,12 +1005,7 @@ app.patch("/lists/:listId/items/:itemId/toggle", async (c) => {
     .returning();
   if (!updated) return c.json({ error: "Not found" }, 404);
 
-  notifyListChange({
-    listId: list.id,
-    itemId: updated.id,
-    done: updated.done,
-    userId,
-  }).catch(() => {});
+  notifyListChange(list.id).catch(() => {});
 
   return c.json(updated);
 });
@@ -1076,6 +1075,7 @@ app.delete("/lists/:listId/items/:itemId", async (c) => {
       null
     );
   }
+  notifyListChange(list.id).catch(() => {});
   return c.body(null, 204);
 });
 
@@ -1093,6 +1093,7 @@ app.delete(
     await db
       .delete(items)
       .where(and(eq(items.listId, list.id), inUuids(items.id, ids)));
+    notifyListChange(list.id).catch(() => {});
     return c.body(null, 204);
   }
 );
@@ -1133,6 +1134,7 @@ app.post(
         }))
       )
       .returning();
+    notifyListChange(list.id).catch(() => {});
     return c.json(created, 201);
   }
 );

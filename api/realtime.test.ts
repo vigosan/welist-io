@@ -32,21 +32,14 @@ function emitNotification(payload: unknown) {
 describe("notifyListChange", () => {
   beforeEach(() => mockExecute.mockClear());
 
-  it("emits pg_notify with serialized payload on list_changes channel", async () => {
-    await notifyListChange({
-      listId: "list-1",
-      itemId: "item-1",
-      done: true,
-      userId: "u1",
-    });
+  it("emits pg_notify on the list_changes channel with the listId payload", async () => {
+    await notifyListChange("list-1");
 
     expect(mockExecute).toHaveBeenCalledTimes(1);
     const serialized = JSON.stringify(mockExecute.mock.calls[0][0]);
     expect(serialized).toContain("pg_notify");
     expect(serialized).toContain("list_changes");
     expect(serialized).toContain("list-1");
-    expect(serialized).toContain("item-1");
-    expect(serialized).toContain("u1");
   });
 });
 
@@ -58,7 +51,7 @@ describe("listChangesStream", () => {
     await res.body?.cancel();
   });
 
-  it("delivers a notification to subscribers on the matching listId", async () => {
+  it("delivers a list-changed event to subscribers on the matching listId", async () => {
     const res = await listChangesStream("list-A");
     const reader = res.body?.getReader();
     if (!reader) throw new Error("no body");
@@ -67,18 +60,12 @@ describe("listChangesStream", () => {
     // first chunk is the retry preamble
     await reader.read();
 
-    emitNotification({
-      listId: "list-A",
-      itemId: "item-A",
-      done: true,
-      userId: null,
-    });
+    emitNotification({ listId: "list-A" });
 
     const { value } = await reader.read();
     const text = decoder.decode(value);
-    expect(text).toContain("event: item-toggled");
-    expect(text).toContain('"itemId":"item-A"');
-    expect(text).toContain('"done":true');
+    expect(text).toContain("event: list-changed");
+    expect(text).toContain('"listId":"list-A"');
 
     await reader.cancel();
   });
@@ -90,23 +77,13 @@ describe("listChangesStream", () => {
     const decoder = new TextDecoder();
     await reader.read(); // preamble
 
-    emitNotification({
-      listId: "list-Y",
-      itemId: "item-Y",
-      done: false,
-      userId: null,
-    });
-    emitNotification({
-      listId: "list-X",
-      itemId: "item-X",
-      done: true,
-      userId: null,
-    });
+    emitNotification({ listId: "list-Y" });
+    emitNotification({ listId: "list-X" });
 
     const { value } = await reader.read();
     const text = decoder.decode(value);
-    expect(text).toContain('"itemId":"item-X"');
-    expect(text).not.toContain('"itemId":"item-Y"');
+    expect(text).toContain('"listId":"list-X"');
+    expect(text).not.toContain('"listId":"list-Y"');
 
     await reader.cancel();
   });
@@ -124,18 +101,10 @@ describe("listChangesStream", () => {
     const decoder = new TextDecoder();
     await readerB.read(); // preamble
 
-    emitNotification({
-      listId: "list-Z",
-      itemId: "item-Z",
-      done: true,
-      userId: null,
-    });
+    emitNotification({ listId: "list-Z" });
 
     const { value } = await readerB.read();
-    expect(decoder.decode(value)).toContain('"itemId":"item-Z"');
-    // If the previous subscription had leaked, we'd see two pushes
-    // routed only to the one live reader, but we'd still receive
-    // exactly one event here — the assertion above is the proof.
+    expect(decoder.decode(value)).toContain('"listId":"list-Z"');
     await readerB.cancel();
   });
 });

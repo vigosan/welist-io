@@ -8,9 +8,6 @@ const HEARTBEAT_MS = 25_000;
 
 export type ListChangePayload = {
   listId: string;
-  itemId: string;
-  done: boolean;
-  userId: string | null;
 };
 
 type Subscriber = (payload: ListChangePayload) => void;
@@ -88,11 +85,9 @@ function subscribe(listId: string, fn: Subscriber): () => void {
   };
 }
 
-export async function notifyListChange(
-  payload: ListChangePayload
-): Promise<void> {
+export async function notifyListChange(listId: string): Promise<void> {
   await db.execute(
-    drizzleSql`SELECT pg_notify(${CHANNEL}, ${JSON.stringify(payload)})`
+    drizzleSql`SELECT pg_notify(${CHANNEL}, ${JSON.stringify({ listId })})`
   );
 }
 
@@ -126,7 +121,7 @@ export async function listChangesStream(listId: string): Promise<Response> {
       unsubscribe = subscribe(listId, (payload) => {
         safeEnqueue(
           encoder.encode(
-            `event: item-toggled\ndata: ${JSON.stringify(payload)}\n\n`
+            `event: list-changed\ndata: ${JSON.stringify(payload)}\n\n`
           )
         );
       });
