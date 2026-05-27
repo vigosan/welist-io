@@ -1113,14 +1113,12 @@ describe("POST /api/lists/:listId/items/bulk", () => {
     mockGetAuthUser.mockResolvedValue({
       session: { user: { id: "collab-1" } },
     });
-    mockDb.query.lists.findFirst
-      .mockResolvedValueOnce({
-        id: "abc",
-        name: "Lista",
-        ownerId: "owner-1",
-        collaborative: true,
-      })
-      .mockResolvedValueOnce({ ownerId: "owner-1" });
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "abc",
+      name: "Lista",
+      ownerId: "owner-1",
+      collaborative: true,
+    });
     mockDb.query.participations.findFirst.mockResolvedValue({
       role: "collaborator",
     });
@@ -1201,14 +1199,12 @@ describe("POST /api/lists/:listId/items/bulk", () => {
     mockGetAuthUser.mockResolvedValue({
       session: { user: { id: "collab-1" } },
     });
-    mockDb.query.lists.findFirst
-      .mockResolvedValueOnce({
-        id: "abc",
-        name: "Lista",
-        ownerId: "owner-1",
-        collaborative: true,
-      })
-      .mockResolvedValueOnce({ ownerId: "owner-1" });
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "abc",
+      name: "Lista",
+      ownerId: "owner-1",
+      collaborative: true,
+    });
     mockDb.query.participations.findFirst.mockResolvedValue({
       role: "collaborator",
     });
@@ -1943,6 +1939,106 @@ describe("PATCH /api/lists/:listId/items/:itemId/toggle (participant path)", () 
     expect(res.status).toBe(200);
     const body = (await res.json()) as Record<string, unknown>;
     expect(body.done).toBe(true);
+  });
+});
+
+describe("PATCH toggle item_done fan-out", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockGetAuthUser.mockResolvedValue({
+      session: { user: { id: "collab-1" } },
+    });
+  });
+  afterEach(() => {
+    mockGetAuthUser.mockRejectedValue(new Error("no session"));
+  });
+
+  function setupSharedToggle(opts: {
+    collaborative: boolean;
+    newDone: boolean;
+    isOwner?: boolean;
+  }) {
+    const ownerId = opts.isOwner ? "collab-1" : "owner-1";
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "abc",
+      name: "Lista",
+      ownerId,
+      collaborative: opts.collaborative,
+      public: true,
+    });
+    mockDb.query.items.findFirst.mockResolvedValue({
+      id: "i1",
+      done: !opts.newDone,
+    });
+    mockDb.query.participations.findFirst.mockResolvedValue({
+      role: "collaborator",
+    });
+    mockDb.query.participations.findMany.mockResolvedValue([
+      { userId: "collab-1" },
+      { userId: "collab-2" },
+    ]);
+    mockDb.query.users.findFirst.mockResolvedValue({
+      name: "Ana",
+      image: null,
+    });
+    mockDb.query.notifications.findFirst.mockResolvedValue(null);
+    mockDb.update.mockReturnValue({
+      set: vi.fn().mockReturnValue({
+        where: vi.fn().mockReturnValue({
+          returning: vi
+            .fn()
+            .mockResolvedValue([
+              { id: "i1", listId: "abc", done: opts.newDone },
+            ]),
+        }),
+      }),
+    });
+  }
+
+  it("fans out item_done to other participants when toggled to done", async () => {
+    setupSharedToggle({ collaborative: true, newDone: true });
+    const notifChain = chainableInsert();
+    mockDb.insert.mockReturnValue(notifChain);
+
+    const res = await app.request("/api/lists/abc/items/i1/toggle", {
+      method: "PATCH",
+    });
+
+    expect(res.status).toBe(200);
+    expect(mockDb.insert).toHaveBeenCalledWith(notifications);
+    expect(notifChain.values).toHaveBeenCalledTimes(2);
+    const recipients = notifChain.values.mock.calls.map(
+      (call: unknown[]) => (call[0] as { userId: string }).userId
+    );
+    expect(recipients).toEqual(expect.arrayContaining(["owner-1", "collab-2"]));
+    expect(recipients).not.toContain("collab-1");
+  });
+
+  it("does not fan out when toggling from done to undone", async () => {
+    setupSharedToggle({ collaborative: true, newDone: false });
+    mockDb.insert.mockReturnValue(chainableInsert());
+
+    const res = await app.request("/api/lists/abc/items/i1/toggle", {
+      method: "PATCH",
+    });
+
+    expect(res.status).toBe(200);
+    expect(mockDb.insert).not.toHaveBeenCalledWith(notifications);
+  });
+
+  it("does not fan out item_done on non-collaborative lists", async () => {
+    mockGetAuthUser.mockResolvedValue({
+      session: { user: { id: "owner-1" } },
+    });
+    setupSharedToggle({ collaborative: false, newDone: true, isOwner: true });
+    mockDb.insert.mockReturnValue(chainableInsert());
+
+    const res = await app.request("/api/lists/abc/items/i1/toggle", {
+      method: "PATCH",
+    });
+
+    expect(res.status).toBe(200);
+    expect(mockDb.insert).not.toHaveBeenCalledWith(notifications);
   });
 });
 
