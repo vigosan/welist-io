@@ -4,6 +4,14 @@ import { AppFooter } from "@/components/AppFooter";
 import { AppNav } from "@/components/AppNav";
 import { Skeleton } from "@/components/Skeleton";
 import {
+  Chip,
+  card,
+  Progress,
+  SectionHeading,
+  SectionKicker,
+  StatusPill,
+} from "@/components/ui";
+import {
   useCreateList,
   useExplore,
   useExploreItems,
@@ -328,12 +336,7 @@ function ProductPreview() {
           </div>
 
           {/* progress */}
-          <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-black/[0.06] dark:bg-white/[0.06]">
-            <div
-              className="h-full rounded-full bg-ink transition-[width] duration-1000 dark:bg-paper"
-              style={{ width: `${pct}%` }}
-            />
-          </div>
+          <Progress value={pct} className="mt-4 h-1.5" />
           <div className="mt-2 flex justify-between font-mono text-[11px] text-muted">
             <span>{t("home.previewCompletedShort", { done, total })}</span>
             <span className="font-medium text-ink dark:text-paper">{pct}%</span>
@@ -523,24 +526,10 @@ function HowItWorks() {
       <div ref={ref} className="mx-auto max-w-[1240px]">
         <div className="mb-12 flex flex-wrap items-end justify-between gap-6">
           <div>
-            <span className="inline-flex items-center gap-2.5 font-mono text-[11px] uppercase tracking-[0.14em] text-muted">
-              <span
-                aria-hidden="true"
-                className="inline-block h-px w-7 bg-ink dark:bg-paper"
-              />
-              {t("home.howKicker")}
-            </span>
-            <h2
-              className="mt-3.5 font-bold text-ink dark:text-paper"
-              style={{
-                fontSize: "clamp(32px, 4vw, 52px)",
-                letterSpacing: "-0.03em",
-                lineHeight: 1.0,
-                maxWidth: "16ch",
-              }}
-            >
-              {t("home.howHeadline")}
-            </h2>
+            <SectionKicker>{t("home.howKicker")}</SectionKicker>
+            <div className="mt-3.5 max-w-[16ch]">
+              <SectionHeading size="lg">{t("home.howHeadline")}</SectionHeading>
+            </div>
           </div>
           <Link
             to="/explore"
@@ -608,39 +597,16 @@ function ExploreSection() {
       <div ref={ref} className="mx-auto max-w-[1240px]">
         <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
           <div>
-            <span className="inline-flex items-center gap-2.5 font-mono text-[11px] uppercase tracking-[0.14em] text-muted">
-              <span
-                aria-hidden="true"
-                className="inline-block h-px w-7 bg-ink dark:bg-paper"
-              />
-              {t("nav.explore")}
-            </span>
-            <h2
-              className="mt-3.5 font-bold text-ink dark:text-paper"
-              style={{
-                fontSize: "clamp(28px, 3.5vw, 44px)",
-                letterSpacing: "-0.03em",
-                lineHeight: 1.0,
-                maxWidth: "18ch",
-              }}
-            >
-              {t("home.exploreHeadline")}
-            </h2>
+            <SectionKicker>{t("nav.explore")}</SectionKicker>
+            <div className="mt-3.5 max-w-[18ch]">
+              <SectionHeading>{t("home.exploreHeadline")}</SectionHeading>
+            </div>
           </div>
           <div className="flex flex-wrap gap-1.5">
             {chips.map((c) => (
-              <button
-                key={c.id}
-                type="button"
-                className={[
-                  "rounded-full border px-3.5 py-1.5 text-[13px] transition-colors cursor-pointer",
-                  c.active
-                    ? "border-ink bg-ink text-canvas dark:border-paper dark:bg-paper dark:text-canvas-dark"
-                    : "border-black/[0.08] bg-canvas text-muted hover:border-black/20 hover:text-ink dark:border-white/[0.08] dark:bg-canvas-dark dark:hover:border-white/20 dark:hover:text-paper",
-                ].join(" ")}
-              >
+              <Chip key={c.id} active={c.active}>
                 {c.label}
-              </button>
+              </Chip>
             ))}
           </div>
         </div>
@@ -684,18 +650,12 @@ function ExploreSection() {
                   params={{ listId: list.slug ?? list.id }}
                   className="block no-underline"
                 >
-                  <article className="flex h-full flex-col gap-4 rounded-2xl border border-black/[0.08] bg-canvas p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-ink/30 hover:shadow-[0_18px_36px_-28px_rgba(0,0,0,0.3)] dark:border-white/[0.08] dark:bg-canvas-dark dark:hover:border-paper/30">
+                  <article className={`${card} flex h-full flex-col gap-4 p-5`}>
                     <div className="flex items-center justify-between">
                       <span className="font-mono text-[10.5px] uppercase tracking-[0.1em] text-muted">
                         {list.category ?? "·"}
                       </span>
-                      <span className="inline-flex items-center gap-1.5 rounded-full border border-black/[0.08] px-2 py-0.5 text-[11px] text-muted dark:border-white/[0.08]">
-                        <span
-                          aria-hidden="true"
-                          className="h-1.5 w-1.5 rounded-full bg-ink dark:bg-paper"
-                        />
-                        {statuses[idx % statuses.length]}
-                      </span>
+                      <StatusPill>{statuses[idx % statuses.length]}</StatusPill>
                     </div>
                     <h3 className="text-[18px] font-semibold leading-tight tracking-[-0.02em] text-ink dark:text-paper">
                       {list.name}
@@ -707,12 +667,7 @@ function ExploreSection() {
                     )}
                     <div className="mt-auto flex items-center justify-between border-t border-black/[0.04] pt-3 dark:border-white/[0.04]">
                       <div className="flex items-center gap-2">
-                        <div className="relative h-1 w-[80px] overflow-hidden rounded-full bg-black/[0.06] dark:bg-white/[0.06]">
-                          <div
-                            className="absolute inset-y-0 left-0 bg-ink dark:bg-paper"
-                            style={{ width: `${pct}%` }}
-                          />
-                        </div>
+                        <Progress value={pct} className="w-[80px]" />
                         <span className="font-mono text-[11px] text-ink dark:text-paper">
                           {pct}%
                         </span>
