@@ -1,4 +1,5 @@
-import { memo, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useGeocodingSearch } from "@/hooks/useGeocodingSearch";
 import type { ItemWithLikes } from "@/hooks/useItems";
 import { useTranslation } from "@/i18n/service";
@@ -52,6 +53,12 @@ export const ItemRow = memo(
     >(undefined);
     const [geoOpen, setGeoOpen] = useState(false);
     const cancelled = useRef(false);
+    const inputRef = useRef<HTMLInputElement | null>(null);
+    const [dropdownRect, setDropdownRect] = useState<{
+      left: number;
+      top: number;
+      width: number;
+    } | null>(null);
     const { display, tags } = parseItemText(item.text);
     const { t } = useTranslation();
     const effectiveCanToggle = canToggle ?? canWrite;
@@ -103,6 +110,25 @@ export const ItemRow = memo(
 
     const showGeoDropdown =
       geoOpen && partialPlace !== null && partialPlace.length >= 3;
+
+    useEffect(() => {
+      if (!showGeoDropdown) {
+        setDropdownRect(null);
+        return;
+      }
+      const update = () => {
+        if (!inputRef.current) return;
+        const r = inputRef.current.getBoundingClientRect();
+        setDropdownRect({ left: r.left, top: r.top, width: r.width });
+      };
+      update();
+      window.addEventListener("scroll", update, true);
+      window.addEventListener("resize", update);
+      return () => {
+        window.removeEventListener("scroll", update, true);
+        window.removeEventListener("resize", update);
+      };
+    }, [showGeoDropdown]);
 
     return (
       // biome-ignore lint/a11y/noStaticElementInteractions: drag container
@@ -189,36 +215,50 @@ export const ItemRow = memo(
         <div className="flex-1 min-w-0">
           {editing ? (
             <div className="relative">
-              {showGeoDropdown && (
-                <div className="absolute bottom-full mb-1 left-0 right-0 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm overflow-hidden z-10">
-                  {geocodingLoading && (
-                    <div className="px-3 py-2 text-xs text-gray-400">
-                      {t("list.addPlace")}…
-                    </div>
-                  )}
-                  {!geocodingLoading && geocodingResults.length === 0 && (
-                    <div className="px-3 py-2 text-xs text-gray-400">
-                      {t("list.noResults", { query: partialPlace })}
-                    </div>
-                  )}
-                  {geocodingResults.map((result) => (
-                    <button
-                      key={`${result.latitude}-${result.longitude}`}
-                      type="button"
-                      onMouseDown={(e) => e.preventDefault()}
-                      onClick={() => {
-                        setText((prev) =>
-                          prev.replace(PARTIAL_PLACE_REGEX, `@${result.name} `)
-                        );
-                        setPendingCoords({
-                          latitude: result.latitude,
-                          longitude: result.longitude,
-                          placeName: result.name,
-                        });
-                        setGeoOpen(false);
-                      }}
-                      className="cursor-pointer w-full flex items-start gap-2 px-3 py-2 text-left hover:bg-gray-50 dark:hover:bg-gray-700 transition border-b last:border-0 border-gray-100 dark:border-gray-700"
-                    >
+              {showGeoDropdown &&
+                dropdownRect &&
+                createPortal(
+                  <div
+                    style={{
+                      position: "fixed",
+                      left: dropdownRect.left,
+                      top: dropdownRect.top - 4,
+                      width: dropdownRect.width,
+                      transform: "translateY(-100%)",
+                    }}
+                    className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm overflow-hidden z-50"
+                  >
+                    {geocodingLoading && (
+                      <div className="px-3 py-2 text-xs text-gray-400">
+                        {t("list.addPlace")}…
+                      </div>
+                    )}
+                    {!geocodingLoading && geocodingResults.length === 0 && (
+                      <div className="px-3 py-2 text-xs text-gray-400">
+                        {t("list.noResults", { query: partialPlace })}
+                      </div>
+                    )}
+                    {geocodingResults.map((result) => (
+                      <button
+                        key={`${result.latitude}-${result.longitude}`}
+                        type="button"
+                        onMouseDown={(e) => e.preventDefault()}
+                        onClick={() => {
+                          setText((prev) =>
+                            prev.replace(
+                              PARTIAL_PLACE_REGEX,
+                              `@${result.name} `
+                            )
+                          );
+                          setPendingCoords({
+                            latitude: result.latitude,
+                            longitude: result.longitude,
+                            placeName: result.name,
+                          });
+                          setGeoOpen(false);
+                        }}
+                        className="cursor-pointer w-full flex items-start gap-2 px-3 py-2 text-left hover:bg-gray-50 dark:hover:bg-gray-700 transition border-b last:border-0 border-gray-100 dark:border-gray-700"
+                      >
                       <svg
                         aria-hidden="true"
                         className="w-3.5 h-3.5 shrink-0 mt-0.5 text-gray-400"
@@ -231,24 +271,26 @@ export const ItemRow = memo(
                           clipRule="evenodd"
                         />
                       </svg>
-                      <div className="min-w-0">
-                        <div className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
-                          {result.name}
-                        </div>
-                        {(result.city || result.country) && (
-                          <div className="text-xs text-gray-400 truncate">
-                            {[result.city, result.country]
-                              .filter(Boolean)
-                              .join(", ")}
+                        <div className="min-w-0">
+                          <div className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+                            {result.name}
                           </div>
-                        )}
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              )}
+                          {(result.city || result.country) && (
+                            <div className="text-xs text-gray-400 truncate">
+                              {[result.city, result.country]
+                                .filter(Boolean)
+                                .join(", ")}
+                            </div>
+                          )}
+                        </div>
+                      </button>
+                    ))}
+                  </div>,
+                  document.body
+                )}
               <form onSubmit={handleSubmit}>
                 <input
+                  ref={inputRef}
                   autoFocus
                   value={text}
                   onChange={(e) => handleTextChange(e.target.value)}
