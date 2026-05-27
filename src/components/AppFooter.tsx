@@ -63,7 +63,7 @@ export function AppFooter() {
   return (
     <footer className="shrink-0 border-t border-black/[0.08] dark:border-white/[0.08]">
       <div className="mx-auto max-w-[1240px] px-6 sm:px-12 pt-14 pb-7">
-        <div className="grid grid-cols-2 gap-10 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
+        <div className="grid grid-cols-2 gap-10 md:grid-cols-[1.6fr_1fr_1fr]">
           <div>
             <Link
               to="/"
@@ -72,7 +72,7 @@ export function AppFooter() {
               <LogoMark />
               welist
             </Link>
-            <p className="mt-3.5 max-w-[280px] text-[13.5px] leading-[1.5] text-muted">
+            <p className="mt-3.5 max-w-[320px] text-[13.5px] leading-[1.5] text-muted">
               {t("home.footBrandTagline")}
             </p>
           </div>
@@ -90,43 +90,19 @@ export function AppFooter() {
                 <FootLink to="/users">{t("directory.nav")}</FootLink>
               </li>
               <li>
-                <FootLink to="/help">{t("home.footLinkChanges")}</FootLink>
-              </li>
-            </ul>
-          </div>
-
-          <div>
-            <ColTitle>{t("home.footColResources")}</ColTitle>
-            <ul className="flex flex-col gap-2 list-none p-0">
-              <li>
                 <FootLink to="/help">{t("help.nav")}</FootLink>
               </li>
-              <li>
-                <FootLink to="/help">{t("home.footLinkApi")}</FootLink>
-              </li>
-              <li>
-                <FootLink to="/help">{t("home.footLinkShortcuts")}</FootLink>
-              </li>
-              <li>
-                <FootLink to="/help">{t("home.footLinkStatus")}</FootLink>
-              </li>
             </ul>
           </div>
 
           <div>
-            <ColTitle>{t("home.footColCompany")}</ColTitle>
+            <ColTitle>Legal</ColTitle>
             <ul className="flex flex-col gap-2 list-none p-0">
-              <li>
-                <FootLink to="/help">{t("home.footLinkAbout")}</FootLink>
-              </li>
               <li>
                 <FootLink to="/privacy">Privacidad</FootLink>
               </li>
               <li>
                 <FootLink to="/terms">Términos</FootLink>
-              </li>
-              <li>
-                <FootLink to="/help">{t("home.footLinkContact")}</FootLink>
               </li>
             </ul>
           </div>

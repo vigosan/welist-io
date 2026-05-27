@@ -74,7 +74,7 @@ const es = {
     heroBadgeTag: "Nuevo",
     heroBadgeText: "Comparte una lista, recibe un reto",
     metaNoSignup: "Sin registro",
-    metaFreeStart: "Gratis para empezar",
+    metaFreeStart: "Siempre gratis",
     metaSell: "Vende tus listas",
     betaPill_one: "Beta · {{count}} persona",
     betaPill_other: "Beta · {{count}} personas",
@@ -102,6 +102,7 @@ const es = {
     previewCollaborators_one: "{{count}} colaborador",
     previewCollaborators_other: "{{count}} colaboradores",
     previewChallengers: "{{count}} retando",
+    previewFloatTook: "aceptaron el reto",
     previewCompletedShort: "{{done}} / {{total}} completados",
     footBrandTagline:
       "Listas compartidas para hacer cosas en serio. Crea, comparte, reta.",

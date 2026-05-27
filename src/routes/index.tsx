@@ -14,7 +14,6 @@ import {
 import {
   useCreateList,
   useExplore,
-  useExploreItems,
   useStats,
   useUserDirectory,
 } from "@/hooks/useList";
@@ -23,6 +22,19 @@ import { useTranslation } from "@/i18n/service";
 export const Route = createFileRoute("/")({
   component: HomePage,
 });
+
+const PREVIEW_FEATURED = {
+  name: "Pueblos más bonitos de España",
+  slug: "pueblos-mas-bonitos-espana",
+  items: [
+    { id: "p1", text: "Osuna, Sevilla", done: true },
+    { id: "p2", text: "Zafra, Badajoz", done: true },
+    { id: "p3", text: "Ribadeo, Lugo", done: true },
+    { id: "p4", text: "Sigüenza, Guadalajara", done: false },
+    { id: "p5", text: "Cardona, Barcelona", done: false },
+  ],
+  participantCount: 3,
+};
 
 function useFadeIn() {
   const ref = useRef<HTMLDivElement>(null);
@@ -259,14 +271,12 @@ function PreviewRow({ item, idx }: { item: ExploreItem; idx: number }) {
 
 function ProductPreview() {
   const { t } = useTranslation();
-  const explore = useExplore();
-  const featured = explore.data?.pages?.[0]?.items?.[0];
-  const itemsQuery = useExploreItems(featured?.id ?? "", !!featured);
-  const items = (itemsQuery?.data ?? []) as ExploreItem[];
-  const total = items.length || featured?.itemCount || 0;
+  const featured = PREVIEW_FEATURED;
+  const items = featured.items;
+  const total = items.length;
   const done = items.filter((i) => i.done).length;
   const pct = total > 0 ? Math.round((done / total) * 100) : 0;
-  const slug = featured?.slug ?? featured?.id ?? "tu-lista";
+  const slug = featured.slug;
 
   return (
     <div className="relative" data-testid="product-preview">
@@ -300,13 +310,11 @@ function ProductPreview() {
                 className="truncate text-[18px] font-semibold leading-tight tracking-[-0.02em] text-ink dark:text-paper"
                 data-testid="preview-title"
               >
-                {featured?.name ?? "Pueblos más bonitos de España"}
+                {featured.name}
               </h3>
               <p className="mt-0.5 text-[12.5px] text-muted">
                 {t("home.previewItems", { count: total })}
-                {featured?.participantCount
-                  ? ` · ${t("home.previewChallengers", { count: featured.participantCount })}`
-                  : ""}
+                {` · ${t("home.previewChallengers", { count: featured.participantCount })}`}
               </p>
             </div>
             <div className="flex gap-1.5">
@@ -344,28 +352,15 @@ function ProductPreview() {
 
           {/* items */}
           <div className="mt-5 flex flex-col gap-1">
-            {(items.slice(0, 5).length > 0
-              ? items.slice(0, 5)
-              : [
-                  { id: "p1", text: "Albarracín, Teruel", done: true },
-                  { id: "p2", text: "Cudillero, Asturias", done: true },
-                  { id: "p3", text: "Frigiliana, Málaga", done: false },
-                  { id: "p4", text: "Besalú, Girona", done: false },
-                  {
-                    id: "p5",
-                    text: "Vejer de la Frontera, Cádiz",
-                    done: false,
-                  },
-                ]
-            ).map((item, idx) => (
-              <PreviewRow key={item.id} item={item as ExploreItem} idx={idx} />
+            {items.slice(0, 5).map((item, idx) => (
+              <PreviewRow key={item.id} item={item} idx={idx} />
             ))}
           </div>
         </div>
       </div>
 
       {/* float card */}
-      {featured?.participantCount ? (
+      {featured.participantCount > 0 ? (
         <div
           className="absolute -bottom-6 -right-2 sm:right-0 flex items-center gap-3 rounded-2xl bg-ink px-4 py-3 text-paper shadow-[0_18px_40px_-16px_rgba(0,0,0,0.4)] dark:bg-paper dark:text-canvas-dark"
           style={{ animation: "float-y 4s ease-in-out infinite" }}
@@ -374,7 +369,7 @@ function ProductPreview() {
             +{featured.participantCount}
           </span>
           <span className="text-[12px] leading-tight">
-            {t("home.previewChallengers", { count: featured.participantCount })}
+            {t("home.previewFloatTook")}
           </span>
         </div>
       ) : null}

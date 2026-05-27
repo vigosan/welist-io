@@ -76,7 +76,7 @@ const en: Translations = {
     heroBadgeTag: "New",
     heroBadgeText: "Share a list, get a challenge",
     metaNoSignup: "No sign-up",
-    metaFreeStart: "Free to start",
+    metaFreeStart: "Always free",
     metaSell: "Sell your lists",
     betaPill_one: "Beta · {{count}} person",
     betaPill_other: "Beta · {{count}} people",
@@ -104,6 +104,7 @@ const en: Translations = {
     previewCollaborators_one: "{{count}} collaborator",
     previewCollaborators_other: "{{count}} collaborators",
     previewChallengers: "{{count}} taking it",
+    previewFloatTook: "took the challenge",
     previewCompletedShort: "{{done}} / {{total}} completed",
     footBrandTagline:
       "Shared lists for getting things done. Create, share, challenge.",
