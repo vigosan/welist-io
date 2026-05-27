@@ -256,45 +256,47 @@ export function AppNav() {
               </div>
             )}
 
-            {/* Nav links */}
-            {session?.user && (
+            {/* Primary navigation */}
+            <div className="border-t border-black/[0.08] dark:border-white/[0.08] py-1">
+              {session?.user && (
+                <Link
+                  to="/lists"
+                  data-testid="nav-my-lists-mobile"
+                  className="block px-6 py-3 text-sm font-medium text-ink dark:text-paper hover:bg-black/[0.02] dark:hover:bg-white/[0.03] transition-colors duration-150 no-underline"
+                  onClick={closeMobile}
+                >
+                  {t("nav.myLists")}
+                </Link>
+              )}
               <Link
-                to="/lists"
-                data-testid="nav-my-lists-mobile"
+                to="/explore"
+                data-testid="nav-explore-mobile"
                 className="block px-6 py-3 text-sm font-medium text-ink dark:text-paper hover:bg-black/[0.02] dark:hover:bg-white/[0.03] transition-colors duration-150 no-underline"
                 onClick={closeMobile}
               >
-                {t("nav.myLists")}
+                {t("nav.explore")}
               </Link>
-            )}
-            <Link
-              to="/explore"
-              data-testid="nav-explore-mobile"
-              className="block px-6 py-3 text-sm font-medium text-ink dark:text-paper hover:bg-black/[0.02] dark:hover:bg-white/[0.03] transition-colors duration-150 no-underline"
-              onClick={closeMobile}
-            >
-              {t("nav.explore")}
-            </Link>
-            <Link
-              to="/users"
-              data-testid="nav-users-mobile"
-              className="block px-6 py-3 text-sm font-medium text-ink dark:text-paper hover:bg-black/[0.02] dark:hover:bg-white/[0.03] transition-colors duration-150 no-underline"
-              onClick={closeMobile}
-            >
-              {t("directory.nav")}
-            </Link>
-            <Link
-              to="/help"
-              data-testid="nav-help-mobile"
-              className="block px-6 py-3 text-sm font-medium text-ink dark:text-paper hover:bg-black/[0.02] dark:hover:bg-white/[0.03] transition-colors duration-150 no-underline"
-              onClick={closeMobile}
-            >
-              {t("help.nav")}
-            </Link>
+              <Link
+                to="/users"
+                data-testid="nav-users-mobile"
+                className="block px-6 py-3 text-sm font-medium text-ink dark:text-paper hover:bg-black/[0.02] dark:hover:bg-white/[0.03] transition-colors duration-150 no-underline"
+                onClick={closeMobile}
+              >
+                {t("directory.nav")}
+              </Link>
+            </div>
 
-            {/* User actions / sign in */}
+            {/* Account / support */}
             {session?.user ? (
-              <>
+              <div className="border-t border-black/[0.08] dark:border-white/[0.08] py-1">
+                <Link
+                  to="/help"
+                  data-testid="nav-help-mobile"
+                  className="block px-6 py-3 text-sm font-medium text-ink dark:text-paper hover:bg-black/[0.02] dark:hover:bg-white/[0.03] transition-colors duration-150 no-underline"
+                  onClick={closeMobile}
+                >
+                  {t("help.nav")}
+                </Link>
                 <Link
                   to="/settings"
                   className="block px-6 py-3 text-sm font-medium text-ink dark:text-paper hover:bg-black/[0.02] dark:hover:bg-white/[0.03] transition-colors duration-150 no-underline"
@@ -302,6 +304,23 @@ export function AppNav() {
                 >
                   {t("user.settings")}
                 </Link>
+              </div>
+            ) : (
+              <div className="border-t border-black/[0.08] dark:border-white/[0.08] py-1">
+                <Link
+                  to="/help"
+                  data-testid="nav-help-mobile"
+                  className="block px-6 py-3 text-sm font-medium text-ink dark:text-paper hover:bg-black/[0.02] dark:hover:bg-white/[0.03] transition-colors duration-150 no-underline"
+                  onClick={closeMobile}
+                >
+                  {t("help.nav")}
+                </Link>
+              </div>
+            )}
+
+            {/* Sign in / out */}
+            <div className="border-t border-black/[0.08] dark:border-white/[0.08] py-1">
+              {session?.user ? (
                 <button
                   type="button"
                   onClick={() => {
@@ -309,27 +328,25 @@ export function AppNav() {
                     signOut();
                   }}
                   data-testid="sign-out-btn-mobile"
-                  className="cursor-pointer block w-full text-left px-6 py-3 text-sm font-medium text-ink dark:text-paper hover:bg-black/[0.02] dark:hover:bg-white/[0.03] transition-colors duration-150"
+                  className="cursor-pointer block w-full text-left px-6 py-3 text-sm font-medium text-gray-500 dark:text-muted hover:text-ink dark:hover:text-paper hover:bg-black/[0.02] dark:hover:bg-white/[0.03] transition-colors duration-150"
                 >
                   {t("user.signOut")}
                 </button>
-              </>
-            ) : (
-              <>
-                <div className="px-6 py-3">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      closeMobile();
-                      signIn("google");
-                    }}
-                    className="cursor-pointer text-sm font-medium text-ink dark:text-paper"
-                  >
-                    {t("user.signIn")}
-                  </button>
-                </div>
-              </>
-            )}
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => {
+                    closeMobile();
+                    signIn("google");
+                  }}
+                  className="cursor-pointer block w-full text-left px-6 py-3 text-sm font-medium text-ink dark:text-paper hover:bg-black/[0.02] dark:hover:bg-white/[0.03] transition-colors duration-150"
+                >
+                  {t("user.signIn")}
+                </button>
+              )}
+            </div>
+
+            {/* Footer: preferences */}
             <div className="border-t border-black/[0.08] dark:border-white/[0.08] px-6 py-3 flex items-center gap-3">
               <button
                 type="button"
