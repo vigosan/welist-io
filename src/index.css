@@ -56,6 +56,12 @@
   50%      { transform: translateY(-8px); }
 }
 
+@keyframes hero-drift {
+  0%   { transform: translate3d(0, 0, 0); }
+  50%  { transform: translate3d(-10px, -6px, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+
 @layer base {
   * {
     box-sizing: border-box;

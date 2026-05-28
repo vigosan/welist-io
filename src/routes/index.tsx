@@ -377,10 +377,47 @@ function ProductPreview() {
   );
 }
 
+function HeroBackdrop() {
+  return (
+    <div
+      aria-hidden="true"
+      className="pointer-events-none absolute inset-0 -z-10 overflow-hidden"
+    >
+      <div
+        className="absolute inset-0 opacity-[0.55] dark:opacity-[0.45]"
+        style={{
+          backgroundImage:
+            "radial-gradient(circle at 1px 1px, color-mix(in srgb, var(--color-ink) 10%, transparent) 1px, transparent 0)",
+          backgroundSize: "28px 28px",
+          maskImage:
+            "radial-gradient(ellipse 70% 60% at 30% 35%, black 30%, transparent 75%)",
+          WebkitMaskImage:
+            "radial-gradient(ellipse 70% 60% at 30% 35%, black 30%, transparent 75%)",
+          animation: "hero-drift 28s ease-in-out infinite",
+        }}
+      />
+      <div
+        className="absolute inset-0 hidden dark:block dark:opacity-[0.45]"
+        style={{
+          backgroundImage:
+            "radial-gradient(circle at 1px 1px, color-mix(in srgb, var(--color-paper) 12%, transparent) 1px, transparent 0)",
+          backgroundSize: "28px 28px",
+          maskImage:
+            "radial-gradient(ellipse 70% 60% at 30% 35%, black 30%, transparent 75%)",
+          WebkitMaskImage:
+            "radial-gradient(ellipse 70% 60% at 30% 35%, black 30%, transparent 75%)",
+          animation: "hero-drift 28s ease-in-out infinite",
+        }}
+      />
+    </div>
+  );
+}
+
 function Hero() {
   const { t } = useTranslation();
   return (
-    <section className="px-4 pt-16 pb-16 sm:px-12 sm:pt-24 sm:pb-20">
+    <section className="relative px-4 pt-16 pb-16 sm:px-12 sm:pt-24 sm:pb-20">
+      <HeroBackdrop />
       <div className="mx-auto grid max-w-[1240px] items-center gap-12 lg:grid-cols-[1.05fr_1fr] lg:gap-16">
         <div>
           <div className="mb-7">
