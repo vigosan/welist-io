@@ -142,6 +142,40 @@ describe("useItemsFilter", () => {
     ]);
   });
 
+  it("keeps an item in place after it is toggled done", () => {
+    const { result, rerender } = renderHook(
+      ({ items }: { items: ItemWithLikes[] }) =>
+        useItemsFilter({ ...BASE_OPTS, items }),
+      { initialProps: { items: [DONE, PENDING, PLAIN] } }
+    );
+    expect(result.current.stableItems.map((i) => i.id)).toEqual([
+      "b",
+      "a",
+      "c",
+    ]);
+    rerender({ items: [DONE, makeItem("a", "Tarea #work", true), PLAIN] });
+    expect(result.current.stableItems.map((i) => i.id)).toEqual([
+      "b",
+      "a",
+      "c",
+    ]);
+  });
+
+  it("appends items added after the order is established", () => {
+    const { result, rerender } = renderHook(
+      ({ items }: { items: ItemWithLikes[] }) =>
+        useItemsFilter({ ...BASE_OPTS, items }),
+      { initialProps: { items: [PENDING, DONE] } }
+    );
+    expect(result.current.stableItems.map((i) => i.id)).toEqual(["a", "b"]);
+    rerender({ items: [PENDING, DONE, PLAIN] });
+    expect(result.current.stableItems.map((i) => i.id)).toEqual([
+      "a",
+      "b",
+      "c",
+    ]);
+  });
+
   it("resetOrder clears the stable sort reference", () => {
     const { result } = renderHook(() =>
       useItemsFilter({

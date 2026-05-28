@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import type { ItemWithLikes } from "@/hooks/useItems";
 import { parseItemText } from "@/lib/item-text";
 import { getPartialPlace, parsePlaces } from "@/lib/places";
@@ -24,20 +24,16 @@ export function useItemsFilter({
   newItemText,
 }: Options) {
   const [sortedIds, setSortedIds] = useState<string[] | null>(null);
-  const initializedRef = useRef(false);
+
+  if (sortedIds === null && !itemsLoading && items.length > 0) {
+    setSortedIds(items.map((i) => i.id));
+  }
 
   const stableItems = useMemo(() => {
-    if (itemsLoading) return items;
-    let ids = sortedIds;
-    if (ids === null && items.length > 0 && !initializedRef.current) {
-      ids = items.map((i) => i.id);
-      initializedRef.current = true;
-      setSortedIds(ids);
-    }
-    if (!ids) return items;
+    if (itemsLoading || sortedIds === null) return items;
     const liveById = new Map(items.map((i) => [i.id, i]));
-    const sortedSet = new Set(ids);
-    const inOrder = ids.flatMap((id) => {
+    const sortedSet = new Set(sortedIds);
+    const inOrder = sortedIds.flatMap((id) => {
       const item = liveById.get(id);
       return item ? [item] : [];
     });
@@ -113,7 +109,6 @@ export function useItemsFilter({
   );
 
   function resetOrder() {
-    initializedRef.current = false;
     setSortedIds(null);
   }
 
