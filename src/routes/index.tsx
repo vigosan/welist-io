@@ -277,51 +277,64 @@ function ProductPreview() {
   const featured = PREVIEW_FEATURED;
   const total = featured.items.length;
   const targetDoneCount = featured.items.filter((i) => i.done).length;
-  const [doneCount, setDoneCount] = useState(0);
+  const [doneFlags, setDoneFlags] = useState<boolean[]>(() =>
+    new Array(total).fill(false)
+  );
 
   useEffect(() => {
     const reduced =
       typeof window !== "undefined" &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduced) {
-      setDoneCount(targetDoneCount);
+      setDoneFlags(featured.items.map((_, i) => i < targetDoneCount));
       return;
     }
     let cancelled = false;
     let timer: ReturnType<typeof setTimeout> | undefined;
-    const STEP = 750;
-    const HOLD_FULL = 1800;
-    const HOLD_EMPTY = 1200;
-    const schedule = (delay: number, fn: () => void) => {
-      timer = setTimeout(() => {
-        if (!cancelled) fn();
-      }, delay);
-    };
-    const tickUp = (n: number) => {
-      if (n > total) {
-        schedule(HOLD_FULL, () => tickDown(total - 1));
-        return;
+    let phase: "up" | "down" = "up";
+    let current = new Array(total).fill(false);
+    const HOLD_FULL = 2800;
+    const HOLD_EMPTY = 2000;
+    const MIN_GAP = 1300;
+    const MAX_GAP = 2600;
+    const pickRandom = (arr: number[]) =>
+      arr[Math.floor(Math.random() * arr.length)];
+    const step = () => {
+      if (cancelled) return;
+      if (phase === "up") {
+        const candidates = current.flatMap((v, i) => (v ? [] : [i]));
+        if (candidates.length === 0) {
+          phase = "down";
+          timer = setTimeout(step, HOLD_FULL);
+          return;
+        }
+        const pick = pickRandom(candidates);
+        current = current.map((v, i) => (i === pick ? true : v));
+      } else {
+        const candidates = current.flatMap((v, i) => (v ? [i] : []));
+        if (candidates.length === 0) {
+          phase = "up";
+          timer = setTimeout(step, HOLD_EMPTY);
+          return;
+        }
+        const pick = pickRandom(candidates);
+        current = current.map((v, i) => (i === pick ? false : v));
       }
-      setDoneCount(n);
-      schedule(STEP, () => tickUp(n + 1));
+      setDoneFlags(current);
+      timer = setTimeout(step, MIN_GAP + Math.random() * (MAX_GAP - MIN_GAP));
     };
-    const tickDown = (n: number) => {
-      if (n < 0) {
-        schedule(HOLD_EMPTY, () => tickUp(1));
-        return;
-      }
-      setDoneCount(n);
-      schedule(STEP, () => tickDown(n - 1));
-    };
-    schedule(500, () => tickUp(1));
+    timer = setTimeout(step, 700);
     return () => {
       cancelled = true;
       if (timer) clearTimeout(timer);
     };
-  }, [total, targetDoneCount]);
+  }, [total, targetDoneCount, featured.items]);
 
-  const items = featured.items.map((it, i) => ({ ...it, done: i < doneCount }));
-  const done = doneCount;
+  const items = featured.items.map((it, i) => ({
+    ...it,
+    done: doneFlags[i] ?? false,
+  }));
+  const done = doneFlags.filter(Boolean).length;
   const pct = total > 0 ? Math.round((done / total) * 100) : 0;
   const slug = featured.slug;
 
