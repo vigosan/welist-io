@@ -67,9 +67,7 @@ export function ListMap({ items, activeItems }: Props) {
               <div className="flex flex-col gap-1.5 min-w-0">
                 <span
                   className={`text-sm font-medium leading-snug ${
-                    item.done
-                      ? "text-gray-400 line-through"
-                      : "text-gray-900"
+                    item.done ? "text-gray-400 line-through" : "text-gray-900"
                   }`}
                 >
                   {renderInlineMarkdown(display || item.text)}

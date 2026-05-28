@@ -168,8 +168,7 @@ export function useBulkDeleteItems(listId: string) {
     onError: (_err, _ids, ctx) => {
       qc.setQueryData(queryKeys.items(listId), ctx?.previous);
     },
-    onSettled: () =>
-      qc.invalidateQueries({ queryKey: queryKeys.myListsAll() }),
+    onSettled: () => qc.invalidateQueries({ queryKey: queryKeys.myListsAll() }),
   });
 }
 
@@ -229,7 +228,6 @@ export function useDeleteItem(listId: string) {
       qc.setQueryData(queryKeys.items(listId), ctx?.previous);
       toast.error(t("items.errorDelete"));
     },
-    onSettled: () =>
-      qc.invalidateQueries({ queryKey: queryKeys.myListsAll() }),
+    onSettled: () => qc.invalidateQueries({ queryKey: queryKeys.myListsAll() }),
   });
 }
