@@ -6,6 +6,7 @@ import type { ItemWithLikes } from "./useItems";
 import {
   useAddItem,
   useBulkAddItems,
+  useBulkDeleteItems,
   useDeleteItem,
   useItems,
   useToggleItem,
@@ -21,6 +22,7 @@ vi.mock("@/services/items.service", () => ({
     update: vi.fn(),
     delete: vi.fn(),
     bulkAdd: vi.fn(),
+    bulkDelete: vi.fn(),
   },
 }));
 
@@ -125,6 +127,24 @@ describe("useToggleItem", () => {
     const cached = qc.getQueryData<ItemWithLikes[]>(["items", LIST_ID]);
     expect(cached?.find((i) => i.id === ITEM_A.id)?.done).toBe(false);
   });
+
+  it("invalidates my-lists on settle so list counts refresh", async () => {
+    vi.mocked(itemsService.toggle).mockResolvedValue({ ...ITEM_A, done: true });
+    const { qc, Wrapper } = makeWrapper();
+    qc.setQueryData(["items", LIST_ID], [ITEM_A, ITEM_B]);
+    const invalidate = vi.spyOn(qc, "invalidateQueries");
+
+    const { result } = renderHook(() => useToggleItem(LIST_ID), {
+      wrapper: Wrapper,
+    });
+    await act(async () => {
+      await result.current.mutateAsync(ITEM_A.id);
+    });
+
+    expect(invalidate).toHaveBeenCalledWith(
+      expect.objectContaining({ queryKey: ["my-lists"] })
+    );
+  });
 });
 
 describe("useDeleteItem", () => {
@@ -159,6 +179,24 @@ describe("useDeleteItem", () => {
     await waitFor(() => expect(result.current.isError).toBe(true));
     const cached = qc.getQueryData<ItemWithLikes[]>(["items", LIST_ID]);
     expect(cached?.map((i) => i.id)).toContain(ITEM_A.id);
+  });
+
+  it("invalidates my-lists on settle so list counts refresh", async () => {
+    vi.mocked(itemsService.delete).mockResolvedValue(undefined);
+    const { qc, Wrapper } = makeWrapper();
+    qc.setQueryData(["items", LIST_ID], [ITEM_A, ITEM_B]);
+    const invalidate = vi.spyOn(qc, "invalidateQueries");
+
+    const { result } = renderHook(() => useDeleteItem(LIST_ID), {
+      wrapper: Wrapper,
+    });
+    await act(async () => {
+      await result.current.mutateAsync(ITEM_A.id);
+    });
+
+    expect(invalidate).toHaveBeenCalledWith(
+      expect.objectContaining({ queryKey: ["my-lists"] })
+    );
   });
 });
 
@@ -224,6 +262,9 @@ describe("useAddItem", () => {
         queryKey: ["items", LIST_ID],
       })
     );
+    expect(invalidate).toHaveBeenCalledWith(
+      expect.objectContaining({ queryKey: ["my-lists"] })
+    );
   });
 });
 
@@ -244,6 +285,29 @@ describe("useBulkAddItems", () => {
       expect.objectContaining({
         queryKey: ["items", LIST_ID],
       })
+    );
+    expect(invalidate).toHaveBeenCalledWith(
+      expect.objectContaining({ queryKey: ["my-lists"] })
+    );
+  });
+});
+
+describe("useBulkDeleteItems", () => {
+  it("invalidates my-lists on settle so list counts refresh", async () => {
+    vi.mocked(itemsService.bulkDelete).mockResolvedValue(undefined);
+    const { qc, Wrapper } = makeWrapper();
+    qc.setQueryData(["items", LIST_ID], [ITEM_A, ITEM_B]);
+    const invalidate = vi.spyOn(qc, "invalidateQueries");
+
+    const { result } = renderHook(() => useBulkDeleteItems(LIST_ID), {
+      wrapper: Wrapper,
+    });
+    await act(async () => {
+      await result.current.mutateAsync([ITEM_A.id]);
+    });
+
+    expect(invalidate).toHaveBeenCalledWith(
+      expect.objectContaining({ queryKey: ["my-lists"] })
     );
   });
 });

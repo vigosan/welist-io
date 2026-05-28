@@ -28,10 +28,10 @@ export function useAddItem(listId: string) {
     mutationFn: ({ text, coords }: { text: string; coords?: Coords }) =>
       itemsService.add(listId, text, coords),
     onError: () => toast.error(t("items.errorAdd")),
-    onSettled: () =>
-      qc.invalidateQueries({
-        queryKey: queryKeys.items(listId),
-      }),
+    onSettled: () => {
+      qc.invalidateQueries({ queryKey: queryKeys.items(listId) });
+      qc.invalidateQueries({ queryKey: queryKeys.myListsAll() });
+    },
   });
 }
 
@@ -91,10 +91,10 @@ export function useToggleItem(listId: string) {
       qc.setQueryData(queryKeys.items(listId), ctx?.previous);
       toast.error(t("items.errorToggle"));
     },
-    onSettled: () =>
-      qc.invalidateQueries({
-        queryKey: queryKeys.items(listId),
-      }),
+    onSettled: () => {
+      qc.invalidateQueries({ queryKey: queryKeys.items(listId) });
+      qc.invalidateQueries({ queryKey: queryKeys.myListsAll() });
+    },
   });
 }
 
@@ -142,10 +142,10 @@ export function useBulkAddItems(listId: string) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (texts: string[]) => itemsService.bulkAdd(listId, texts),
-    onSettled: () =>
-      qc.invalidateQueries({
-        queryKey: queryKeys.items(listId),
-      }),
+    onSettled: () => {
+      qc.invalidateQueries({ queryKey: queryKeys.items(listId) });
+      qc.invalidateQueries({ queryKey: queryKeys.myListsAll() });
+    },
   });
 }
 
@@ -168,6 +168,8 @@ export function useBulkDeleteItems(listId: string) {
     onError: (_err, _ids, ctx) => {
       qc.setQueryData(queryKeys.items(listId), ctx?.previous);
     },
+    onSettled: () =>
+      qc.invalidateQueries({ queryKey: queryKeys.myListsAll() }),
   });
 }
 
@@ -227,5 +229,7 @@ export function useDeleteItem(listId: string) {
       qc.setQueryData(queryKeys.items(listId), ctx?.previous);
       toast.error(t("items.errorDelete"));
     },
+    onSettled: () =>
+      qc.invalidateQueries({ queryKey: queryKeys.myListsAll() }),
   });
 }

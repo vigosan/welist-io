@@ -15,7 +15,10 @@ export function useAddItem(listId: string) {
   return useMutation({
     mutationFn: ({ text, coords }: { text: string; coords?: Coords }) =>
       itemsService.add(listId, text, coords),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["items", listId] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["items", listId] });
+      qc.invalidateQueries({ queryKey: ["my-lists"] });
+    },
   });
 }
 
@@ -34,7 +37,10 @@ export function useToggleItem(listId: string) {
     onError: (_err, _itemId, ctx) => {
       if (ctx?.previous) qc.setQueryData(["items", listId], ctx.previous);
     },
-    onSettled: () => qc.invalidateQueries({ queryKey: ["items", listId] }),
+    onSettled: () => {
+      qc.invalidateQueries({ queryKey: ["items", listId] });
+      qc.invalidateQueries({ queryKey: ["my-lists"] });
+    },
   });
 }
 
@@ -119,7 +125,10 @@ export function useBulkAddItems(listId: string) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (texts: string[]) => itemsService.bulkAdd(listId, texts),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["items", listId] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["items", listId] });
+      qc.invalidateQueries({ queryKey: ["my-lists"] });
+    },
   });
 }
 
@@ -159,6 +168,9 @@ export function useDeleteItem(listId: string) {
     onError: (_err, _itemId, ctx) => {
       if (ctx?.previous) qc.setQueryData(["items", listId], ctx.previous);
     },
-    onSettled: () => qc.invalidateQueries({ queryKey: ["items", listId] }),
+    onSettled: () => {
+      qc.invalidateQueries({ queryKey: ["items", listId] });
+      qc.invalidateQueries({ queryKey: ["my-lists"] });
+    },
   });
 }
