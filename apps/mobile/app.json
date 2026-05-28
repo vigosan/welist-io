@@ -77,6 +77,12 @@
         {
           "color": "#0c0c0b"
         }
+      ],
+      [
+        "./plugins/with-android-legacy-icon",
+        {
+          "icon": "./assets/images/icon.png"
+        }
       ]
     ],
     "experiments": {
