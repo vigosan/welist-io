@@ -32,9 +32,7 @@ export function PlaceMentionSuggestions({ query, onSelect }: Props) {
             key={`${place.latitude},${place.longitude},${place.name}`}
             onPress={() => onSelect(place)}
             className={`px-3 py-2 active:bg-gray-50 dark:active:bg-gray-800 ${
-              idx > 0
-                ? "border-t border-gray-100 dark:border-gray-800"
-                : ""
+              idx > 0 ? "border-t border-gray-100 dark:border-gray-800" : ""
             }`}
           >
             <Text

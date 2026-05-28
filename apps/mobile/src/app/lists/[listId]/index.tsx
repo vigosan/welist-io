@@ -67,9 +67,9 @@ export default function ListDetailScreen() {
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [editing, setEditing] = useState<Item | null>(null);
   const [editingText, setEditingText] = useState("");
-  const [editingCoords, setEditingCoords] = useState<
-    Coords | null | undefined
-  >(undefined);
+  const [editingCoords, setEditingCoords] = useState<Coords | null | undefined>(
+    undefined
+  );
   const [locating, setLocating] = useState<Item | null>(null);
   const [actionsOpen, setActionsOpen] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
@@ -467,7 +467,8 @@ export default function ListDetailScreen() {
                 setEditingText(val);
                 if (!PARTIAL_PLACE_REGEX.test(val)) {
                   setEditingCoords(
-                    editing?.latitude !== null && editing?.latitude !== undefined
+                    editing?.latitude !== null &&
+                      editing?.latitude !== undefined
                       ? null
                       : undefined
                   );
