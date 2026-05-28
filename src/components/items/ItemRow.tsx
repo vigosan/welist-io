@@ -74,7 +74,18 @@ export const ItemRow = memo(
     function handleSubmit(e?: React.FormEvent) {
       e?.preventDefault();
       const trimmed = text.trim();
-      if (trimmed && trimmed !== item.text) onEdit(trimmed, pendingCoords);
+      if (trimmed && trimmed !== item.text) {
+        let coordsToSend = pendingCoords;
+        if (
+          coordsToSend === undefined &&
+          item.latitude !== null &&
+          item.placeName &&
+          !trimmed.includes(`@${item.placeName}`)
+        ) {
+          coordsToSend = null;
+        }
+        onEdit(trimmed, coordsToSend);
+      }
       setEditing(false);
       setGeoOpen(false);
       setPendingCoords(undefined);
@@ -90,9 +101,7 @@ export const ItemRow = memo(
 
     function handleTextChange(val: string) {
       setText(val);
-      const hasAt = PARTIAL_PLACE_REGEX.test(val);
-      setGeoOpen(hasAt);
-      if (!hasAt) setPendingCoords(item.latitude !== null ? null : undefined);
+      setGeoOpen(PARTIAL_PLACE_REGEX.test(val));
     }
 
     function handleKeyDown(e: React.KeyboardEvent) {
@@ -101,7 +110,6 @@ export const ItemRow = memo(
         if (geoOpen) {
           setText((v) => v.replace(PARTIAL_PLACE_REGEX, "").trimEnd());
           setGeoOpen(false);
-          setPendingCoords(null);
         } else {
           handleCancel();
         }
@@ -259,18 +267,18 @@ export const ItemRow = memo(
                         }}
                         className="cursor-pointer w-full flex items-start gap-2 px-3 py-2 text-left hover:bg-gray-50 dark:hover:bg-gray-700 transition border-b last:border-0 border-gray-100 dark:border-gray-700"
                       >
-                      <svg
-                        aria-hidden="true"
-                        className="w-3.5 h-3.5 shrink-0 mt-0.5 text-gray-400"
-                        fill="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M11.54 22.351l.07.04.028.016a.76.76 0 00.723 0l.028-.015.07-.041a16.975 16.975 0 001.144-.742 19.58 19.58 0 002.683-2.282c1.944-2.007 3.864-5.175 3.864-9.15C20.15 5.413 16.415 2 12 2 7.585 2 3.85 5.413 3.85 10.174c0 3.975 1.92 7.143 3.864 9.15a19.58 19.58 0 002.683 2.282 16.975 16.975 0 001.144.742zM12 13.5a3.5 3.5 0 100-7 3.5 3.5 0 000 7z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
+                        <svg
+                          aria-hidden="true"
+                          className="w-3.5 h-3.5 shrink-0 mt-0.5 text-gray-400"
+                          fill="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M11.54 22.351l.07.04.028.016a.76.76 0 00.723 0l.028-.015.07-.041a16.975 16.975 0 001.144-.742 19.58 19.58 0 002.683-2.282c1.944-2.007 3.864-5.175 3.864-9.15C20.15 5.413 16.415 2 12 2 7.585 2 3.85 5.413 3.85 10.174c0 3.975 1.92 7.143 3.864 9.15a19.58 19.58 0 002.683 2.282 16.975 16.975 0 001.144.742zM12 13.5a3.5 3.5 0 100-7 3.5 3.5 0 000 7z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
                         <div className="min-w-0">
                           <div className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
                             {result.name}

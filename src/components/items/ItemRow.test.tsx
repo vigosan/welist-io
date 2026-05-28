@@ -282,4 +282,53 @@ describe("ItemRow", () => {
     ).toHaveTextContent("importante");
     expect(screen.getByTestId("item-tag-i1-trabajo")).toBeInTheDocument();
   });
+
+  it("preserves coords when editing text while keeping the @place reference", async () => {
+    const onEdit = vi.fn();
+    const placedItem = {
+      ...baseItem,
+      text: "@Osuna",
+      latitude: "37.2",
+      longitude: "-5.1",
+      placeName: "Osuna",
+    };
+    render(
+      <ItemRow
+        item={placedItem}
+        onToggle={vi.fn()}
+        onDelete={vi.fn()}
+        onEdit={onEdit}
+      />
+    );
+    await userEvent.dblClick(screen.getByTestId("item-text-i1"));
+    const input = screen.getByTestId("item-edit-input-i1");
+    await userEvent.type(input, " #Sevilla");
+    await userEvent.tab();
+    expect(onEdit).toHaveBeenCalledWith("@Osuna #Sevilla", undefined);
+  });
+
+  it("clears coords when editing removes the saved @placeName", async () => {
+    const onEdit = vi.fn();
+    const placedItem = {
+      ...baseItem,
+      text: "@Osuna",
+      latitude: "37.2",
+      longitude: "-5.1",
+      placeName: "Osuna",
+    };
+    render(
+      <ItemRow
+        item={placedItem}
+        onToggle={vi.fn()}
+        onDelete={vi.fn()}
+        onEdit={onEdit}
+      />
+    );
+    await userEvent.dblClick(screen.getByTestId("item-text-i1"));
+    const input = screen.getByTestId("item-edit-input-i1");
+    await userEvent.clear(input);
+    await userEvent.type(input, "Comprar pan");
+    await userEvent.tab();
+    expect(onEdit).toHaveBeenCalledWith("Comprar pan", null);
+  });
 });
