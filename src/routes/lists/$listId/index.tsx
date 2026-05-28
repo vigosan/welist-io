@@ -105,10 +105,10 @@ function ListDetailPage() {
   const searchInputRef = useRef<HTMLInputElement>(null);
   const { t } = useTranslation();
 
-  function openSearch() {
+  const openSearch = useCallback(() => {
     setSearchActive(true);
     requestAnimationFrame(() => searchInputRef.current?.focus());
-  }
+  }, []);
 
   function pickRandomItem() {
     const pending = filteredItems.filter((i) => !i.done);
