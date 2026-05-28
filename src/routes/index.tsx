@@ -224,35 +224,38 @@ function PreviewRow({ item, idx }: { item: ExploreItem; idx: number }) {
       <span
         aria-hidden="true"
         className={[
-          "inline-grid h-5 w-5 shrink-0 place-items-center rounded-md border transition-colors duration-200",
+          "inline-grid h-5 w-5 shrink-0 place-items-center rounded-md border transition-[background-color,border-color,transform] duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]",
           item.done
             ? "bg-ink border-ink dark:bg-paper dark:border-paper"
             : "border-black/15 bg-canvas dark:border-white/20 dark:bg-canvas-dark",
         ].join(" ")}
       >
-        {item.done && (
-          <svg
-            aria-hidden="true"
-            width="11"
-            height="11"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="3.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="text-canvas dark:text-canvas-dark"
-          >
-            <polyline points="20 6 9 17 4 12" />
-          </svg>
-        )}
+        <svg
+          aria-hidden="true"
+          width="11"
+          height="11"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="3.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="text-canvas dark:text-canvas-dark transition-[opacity,transform,filter] duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
+          style={{
+            opacity: item.done ? 1 : 0,
+            transform: item.done ? "scale(1)" : "scale(0.4)",
+            filter: item.done ? "blur(0px)" : "blur(2px)",
+          }}
+        >
+          <polyline points="20 6 9 17 4 12" />
+        </svg>
       </span>
       <span
         className={[
-          "flex-1 text-[14px] leading-tight tracking-[-0.005em]",
+          "flex-1 text-[14px] leading-tight tracking-[-0.005em] transition-[color,text-decoration-color] duration-500",
           item.done
             ? "text-muted line-through decoration-muted"
-            : "text-ink dark:text-paper",
+            : "text-ink decoration-transparent dark:text-paper",
         ].join(" ")}
       >
         {item.text}
@@ -272,9 +275,29 @@ function PreviewRow({ item, idx }: { item: ExploreItem; idx: number }) {
 function ProductPreview() {
   const { t } = useTranslation();
   const featured = PREVIEW_FEATURED;
-  const items = featured.items;
-  const total = items.length;
-  const done = items.filter((i) => i.done).length;
+  const total = featured.items.length;
+  const targetDoneCount = featured.items.filter((i) => i.done).length;
+  const [doneCount, setDoneCount] = useState(0);
+
+  useEffect(() => {
+    const reduced =
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduced) {
+      setDoneCount(targetDoneCount);
+      return;
+    }
+    const timers: ReturnType<typeof setTimeout>[] = [];
+    for (let i = 1; i <= targetDoneCount; i++) {
+      timers.push(setTimeout(() => setDoneCount(i), 500 + (i - 1) * 750));
+    }
+    return () => {
+      for (const id of timers) clearTimeout(id);
+    };
+  }, [targetDoneCount]);
+
+  const items = featured.items.map((it, i) => ({ ...it, done: i < doneCount }));
+  const done = doneCount;
   const pct = total > 0 ? Math.round((done / total) * 100) : 0;
   const slug = featured.slug;
 
