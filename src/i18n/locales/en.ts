@@ -175,6 +175,10 @@ const en: Translations = {
     accessCollaborative: "Collaborative",
     mapView: "Map",
     listView: "List",
+    viewChip: "View",
+    mapEmptyTitle: "No geolocated places yet",
+    mapEmptyHint:
+      "Type @ followed by a place name when adding or editing an item to pin it on the map.",
     addPlace: "Add place",
     removePlace: "Remove place",
     menuAriaLabel: "List actions",

@@ -174,6 +174,10 @@ const es = {
     accessCollaborative: "Colaborativa",
     mapView: "Mapa",
     listView: "Lista",
+    viewChip: "Vista",
+    mapEmptyTitle: "Aún no hay lugares geolocalizados",
+    mapEmptyHint:
+      "Escribe @ seguido del nombre de un lugar al añadir o editar un elemento para situarlo en el mapa.",
     addPlace: "Añadir lugar",
     removePlace: "Quitar lugar",
     menuAriaLabel: "Acciones de la lista",
