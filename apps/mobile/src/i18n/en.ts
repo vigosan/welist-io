@@ -18,6 +18,7 @@ export const en = {
   },
   auth: {
     continueGoogle: "Continue with Google",
+    continueApple: "Continue with Apple",
     signInFailed: "Sign-in failed",
     emailPlaceholder: "Email",
     passwordPlaceholder: "Password",

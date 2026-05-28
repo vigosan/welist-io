@@ -18,6 +18,7 @@ export const es = {
   },
   auth: {
     continueGoogle: "Continuar con Google",
+    continueApple: "Continuar con Apple",
     signInFailed: "Fallo al iniciar sesión",
     emailPlaceholder: "Email",
     passwordPlaceholder: "Contraseña",
