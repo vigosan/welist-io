@@ -287,14 +287,38 @@ function ProductPreview() {
       setDoneCount(targetDoneCount);
       return;
     }
-    const timers: ReturnType<typeof setTimeout>[] = [];
-    for (let i = 1; i <= targetDoneCount; i++) {
-      timers.push(setTimeout(() => setDoneCount(i), 500 + (i - 1) * 750));
-    }
-    return () => {
-      for (const id of timers) clearTimeout(id);
+    let cancelled = false;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const STEP = 750;
+    const HOLD_FULL = 1800;
+    const HOLD_EMPTY = 1200;
+    const schedule = (delay: number, fn: () => void) => {
+      timer = setTimeout(() => {
+        if (!cancelled) fn();
+      }, delay);
     };
-  }, [targetDoneCount]);
+    const tickUp = (n: number) => {
+      if (n > total) {
+        schedule(HOLD_FULL, () => tickDown(total - 1));
+        return;
+      }
+      setDoneCount(n);
+      schedule(STEP, () => tickUp(n + 1));
+    };
+    const tickDown = (n: number) => {
+      if (n < 0) {
+        schedule(HOLD_EMPTY, () => tickUp(1));
+        return;
+      }
+      setDoneCount(n);
+      schedule(STEP, () => tickDown(n - 1));
+    };
+    schedule(500, () => tickUp(1));
+    return () => {
+      cancelled = true;
+      if (timer) clearTimeout(timer);
+    };
+  }, [total, targetDoneCount]);
 
   const items = featured.items.map((it, i) => ({ ...it, done: i < doneCount }));
   const done = doneCount;
