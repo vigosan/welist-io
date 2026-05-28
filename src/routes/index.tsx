@@ -309,7 +309,7 @@ function ProductPreview() {
       cancelled = true;
       if (timer) clearTimeout(timer);
     };
-  }, [total, targetDoneCount, featured.items]);
+  }, [total, targetDoneCount]);
 
   const items = featured.items.map((it, i) => ({
     ...it,

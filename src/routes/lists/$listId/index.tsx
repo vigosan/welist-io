@@ -159,8 +159,15 @@ function ListDetailPage() {
   }
 
   const handleTagClick = useCallback(
-    (tag: string) => setActiveTag(activeTag === tag ? null : tag),
-    [activeTag]
+    (tag: string) =>
+      navigate({
+        search: (prev) => ({
+          ...prev,
+          tag: prev.tag === tag ? undefined : tag,
+        }),
+        replace: true,
+      }),
+    [navigate]
   );
 
   const toggleCollaborative = useToggleCollaborative(listId);
@@ -1057,7 +1064,8 @@ function ListDetailPage() {
         confirmLabel={t("list.deleteYes")}
         cancelLabel={t("list.deleteNo")}
         onConfirm={() => {
-          deleteList.mutate(list!.id, {
+          if (!list) return;
+          deleteList.mutate(list.id, {
             onSuccess: () => navigate({ to: "/lists" }),
           });
           setConfirmDelete(false);

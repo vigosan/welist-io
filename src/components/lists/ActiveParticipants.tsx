@@ -77,7 +77,6 @@ export const ActiveParticipants = memo(function ActiveParticipants({
     <div
       data-testid="active-participants"
       className="flex items-center gap-1.5"
-      aria-label={label}
     >
       {content}
     </div>

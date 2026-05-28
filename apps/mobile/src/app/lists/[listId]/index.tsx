@@ -5,7 +5,6 @@ import { ListFilter, MoreVertical, Plus } from "lucide-react-native";
 import { useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
-  ActivityIndicator,
   Alert,
   Image,
   Linking,

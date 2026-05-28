@@ -39,6 +39,7 @@ export function GlobalCommandPalette({ open, onClose }: Props) {
     setSelectedIndex(0);
   }, [query]);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: scroll only when the selection moves, not when the list data refreshes
   useEffect(() => {
     const el = document.getElementById(
       `global-list-${lists[selectedIndex]?.id}`
