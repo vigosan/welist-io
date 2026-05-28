@@ -3,7 +3,7 @@
     "name": "Welist",
     "slug": "wilist",
     "owner": "vigosan",
-    "version": "0.1.0",
+    "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "wilist",
@@ -11,7 +11,7 @@
     "ios": {
       "bundleIdentifier": "io.wilist.app",
       "supportsTablet": true,
-      "associatedDomains": ["applinks:wilist.io", "applinks:wilist.io"],
+      "associatedDomains": ["applinks:welist.io"],
       "usesAppleSignIn": true,
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false

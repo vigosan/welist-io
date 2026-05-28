@@ -4,7 +4,9 @@
     "target": {
       "namespace": "android_app",
       "package_name": "io.wilist.app",
-      "sha256_cert_fingerprints": ["TODO_ANDROID_SHA256_CERT_FINGERPRINT"]
+      "sha256_cert_fingerprints": [
+        "CA:5E:2B:EA:4F:0B:D5:17:4E:E9:CF:FC:CB:11:4C:40:36:36:92:4F:64:31:D5:0E:4D:79:CD:DC:55:31:48:7C"
+      ]
     }
   }
 ]
