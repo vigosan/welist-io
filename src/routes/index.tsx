@@ -291,35 +291,16 @@ function ProductPreview() {
     }
     let cancelled = false;
     let timer: ReturnType<typeof setTimeout> | undefined;
-    let phase: "up" | "down" = "up";
     let current = new Array(total).fill(false);
-    const HOLD_FULL = 2800;
-    const HOLD_EMPTY = 2000;
+    let lastPick = -1;
     const MIN_GAP = 1300;
     const MAX_GAP = 2600;
-    const pickRandom = (arr: number[]) =>
-      arr[Math.floor(Math.random() * arr.length)];
     const step = () => {
       if (cancelled) return;
-      if (phase === "up") {
-        const candidates = current.flatMap((v, i) => (v ? [] : [i]));
-        if (candidates.length === 0) {
-          phase = "down";
-          timer = setTimeout(step, HOLD_FULL);
-          return;
-        }
-        const pick = pickRandom(candidates);
-        current = current.map((v, i) => (i === pick ? true : v));
-      } else {
-        const candidates = current.flatMap((v, i) => (v ? [i] : []));
-        if (candidates.length === 0) {
-          phase = "up";
-          timer = setTimeout(step, HOLD_EMPTY);
-          return;
-        }
-        const pick = pickRandom(candidates);
-        current = current.map((v, i) => (i === pick ? false : v));
-      }
+      let pick = Math.floor(Math.random() * total);
+      if (pick === lastPick) pick = (pick + 1) % total;
+      lastPick = pick;
+      current = current.map((v, i) => (i === pick ? !v : v));
       setDoneFlags(current);
       timer = setTimeout(step, MIN_GAP + Math.random() * (MAX_GAP - MIN_GAP));
     };
