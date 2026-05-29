@@ -18,6 +18,11 @@ import {
   useUserDirectory,
 } from "@/hooks/useList";
 import { useTranslation } from "@/i18n/service";
+import {
+  doneCountFromProgress,
+  flagsFromOrder,
+  shuffledOrder,
+} from "@/lib/scrollMark";
 
 export const Route = createFileRoute("/")({
   component: HomePage,
@@ -56,6 +61,40 @@ function useFadeIn() {
     return () => observer.disconnect();
   }, []);
   return ref;
+}
+
+function useHeroScroll(ref: React.RefObject<HTMLElement | null>) {
+  const [progress, setProgress] = useState(0);
+  const [reduced, setReduced] = useState(false);
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setReduced(true);
+      return;
+    }
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      const el = ref.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      const distance = rect.height - window.innerHeight;
+      setProgress(
+        distance > 0 ? Math.min(1, Math.max(0, -rect.top / distance)) : 0
+      );
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, [ref]);
+  return { progress, reduced };
 }
 
 function HeroBadge() {
@@ -272,44 +311,21 @@ function PreviewRow({ item, idx }: { item: ExploreItem; idx: number }) {
   );
 }
 
-function ProductPreview() {
+function ProductPreview({
+  progress,
+  reduced,
+}: {
+  progress: number;
+  reduced: boolean;
+}) {
   const { t } = useTranslation();
   const featured = PREVIEW_FEATURED;
   const total = featured.items.length;
-  const targetDoneCount = featured.items.filter((i) => i.done).length;
-  const [doneFlags, setDoneFlags] = useState<boolean[]>(() =>
-    new Array(total).fill(false)
-  );
+  const [order] = useState(() => shuffledOrder(total));
 
-  useEffect(() => {
-    const reduced =
-      typeof window !== "undefined" &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduced) {
-      setDoneFlags(featured.items.map((_, i) => i < targetDoneCount));
-      return;
-    }
-    let cancelled = false;
-    let timer: ReturnType<typeof setTimeout> | undefined;
-    let current = new Array(total).fill(false);
-    let lastPick = -1;
-    const MIN_GAP = 1300;
-    const MAX_GAP = 2600;
-    const step = () => {
-      if (cancelled) return;
-      let pick = Math.floor(Math.random() * total);
-      if (pick === lastPick) pick = (pick + 1) % total;
-      lastPick = pick;
-      current = current.map((v, i) => (i === pick ? !v : v));
-      setDoneFlags(current);
-      timer = setTimeout(step, MIN_GAP + Math.random() * (MAX_GAP - MIN_GAP));
-    };
-    timer = setTimeout(step, 700);
-    return () => {
-      cancelled = true;
-      if (timer) clearTimeout(timer);
-    };
-  }, [total, targetDoneCount]);
+  const doneFlags = reduced
+    ? featured.items.map((i) => i.done)
+    : flagsFromOrder(order, doneCountFromProgress(progress, total));
 
   const items = featured.items.map((it, i) => ({
     ...it,
@@ -456,28 +472,42 @@ function HeroBackdrop() {
 
 function Hero() {
   const { t } = useTranslation();
+  const ref = useRef<HTMLElement>(null);
+  const { progress, reduced } = useHeroScroll(ref);
+  const pinned = !reduced;
   return (
-    <section className="relative px-4 pt-16 pb-16 sm:px-12 sm:pt-24 sm:pb-20">
-      <HeroBackdrop />
-      <div className="mx-auto grid max-w-[1240px] items-center gap-12 lg:grid-cols-[1.05fr_1fr] lg:gap-16">
-        <div>
-          <div className="mb-7">
-            <HeroBadge />
+    <section
+      ref={ref}
+      className={`relative${pinned ? " lg:min-h-[180vh]" : ""}`}
+    >
+      <div
+        className={`px-4 pt-16 pb-16 sm:px-12 sm:pt-24 sm:pb-20${
+          pinned
+            ? " lg:sticky lg:top-0 lg:flex lg:min-h-dvh lg:items-center lg:py-0"
+            : ""
+        }`}
+      >
+        <HeroBackdrop />
+        <div className="mx-auto grid w-full max-w-[1240px] items-center gap-12 lg:grid-cols-[1.05fr_1fr] lg:gap-16">
+          <div>
+            <div className="mb-7">
+              <HeroBadge />
+            </div>
+            <Headline />
+            <p
+              className="mt-7 text-muted"
+              style={{ fontSize: 17, maxWidth: 460, lineHeight: 1.55 }}
+            >
+              {t("home.tagline")}
+            </p>
+            <div className="mt-8 max-w-[520px]">
+              <CreateForm />
+            </div>
+            <MetaRow />
           </div>
-          <Headline />
-          <p
-            className="mt-7 text-muted"
-            style={{ fontSize: 17, maxWidth: 460, lineHeight: 1.55 }}
-          >
-            {t("home.tagline")}
-          </p>
-          <div className="mt-8 max-w-[520px]">
-            <CreateForm />
+          <div className="hidden lg:block">
+            <ProductPreview progress={progress} reduced={reduced} />
           </div>
-          <MetaRow />
-        </div>
-        <div className="hidden lg:block">
-          <ProductPreview />
         </div>
       </div>
     </section>
