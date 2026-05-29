@@ -8,19 +8,12 @@ import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { useToggleFollow, useUserDirectory } from "@/hooks/useList";
 import { useSearchInput } from "@/hooks/useSearchInput";
 import { useTranslation } from "@/i18n/service";
-import { privateName } from "@/lib/private-name";
+import { initials, privateName } from "@/lib/private-name";
 import type { DirectoryUser } from "@/services/lists.service";
 
 export const Route = createFileRoute("/users/")({
   component: UsersDirectoryPage,
 });
-
-function initials(name: string | null): string {
-  if (!name) return "?";
-  const parts = name.trim().split(/\s+/);
-  if (parts.length === 1) return parts[0][0].toUpperCase();
-  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-}
 
 function SlimFollowButton({
   userId,
