@@ -9,6 +9,19 @@ import { PARTIAL_PLACE_REGEX } from "@/lib/places";
 import type { Coords } from "@/services/items.service";
 import { GeocodingDropdown } from "./GeocodingDropdown";
 
+interface ItemCaps {
+  canWrite?: boolean;
+  canToggle?: boolean;
+  canLike?: boolean;
+}
+
+interface ItemDragHandlers {
+  onDragStart: (e: React.DragEvent) => void;
+  onDragOver: (e: React.DragEvent) => void;
+  onDrop: (e: React.DragEvent) => void;
+  onDragEnd: () => void;
+}
+
 interface Props {
   item: ItemWithLikes;
   onToggle: () => void;
@@ -17,13 +30,8 @@ interface Props {
   onLike?: () => void;
   onTagClick?: (tag: string) => void;
   activeTag?: string;
-  canWrite?: boolean;
-  canToggle?: boolean;
-  canLike?: boolean;
-  onDragStart?: (e: React.DragEvent) => void;
-  onDragOver?: (e: React.DragEvent) => void;
-  onDrop?: (e: React.DragEvent) => void;
-  onDragEnd?: () => void;
+  caps?: ItemCaps;
+  dragHandlers?: ItemDragHandlers;
   isDragOver?: boolean;
   highlighted?: boolean;
 }
@@ -37,16 +45,13 @@ export const ItemRow = memo(
     onLike,
     onTagClick,
     activeTag,
-    canWrite = true,
-    canToggle,
-    canLike = true,
-    onDragStart,
-    onDragOver,
-    onDrop,
-    onDragEnd,
+    caps,
+    dragHandlers,
     isDragOver,
     highlighted,
   }: Props) {
+    const { canWrite = true, canToggle, canLike = true } = caps ?? {};
+    const { onDragStart, onDragOver, onDrop, onDragEnd } = dragHandlers ?? {};
     const [editing, setEditing] = useState(false);
     const [text, setText] = useState(item.text);
     const [pendingCoords, setPendingCoords] = useState<
@@ -425,10 +430,10 @@ export const ItemRow = memo(
     prev.item.likedByMe === next.item.likedByMe &&
     prev.highlighted === next.highlighted &&
     prev.activeTag === next.activeTag &&
-    prev.canWrite === next.canWrite &&
-    prev.canToggle === next.canToggle &&
-    prev.canLike === next.canLike &&
+    prev.caps?.canWrite === next.caps?.canWrite &&
+    prev.caps?.canToggle === next.caps?.canToggle &&
+    prev.caps?.canLike === next.caps?.canLike &&
     prev.isDragOver === next.isDragOver &&
-    !!prev.onDragStart === !!next.onDragStart &&
+    !!prev.dragHandlers === !!next.dragHandlers &&
     !!prev.onLike === !!next.onLike
 );

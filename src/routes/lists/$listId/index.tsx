@@ -661,32 +661,26 @@ function ListDetailPage() {
                         }
                         onTagClick={handleTagClick}
                         activeTag={activeTag}
-                        canWrite={canWrite}
-                        canToggle={canToggle}
-                        canLike={!!session?.user?.id}
+                        caps={{
+                          canWrite,
+                          canToggle,
+                          canLike: !!session?.user?.id,
+                        }}
                         onLike={
                           session?.user?.id
                             ? () => toggleItemLike.mutate(item.id)
                             : undefined
                         }
                         highlighted={item.id === highlightedItemId}
-                        onDragStart={
+                        dragHandlers={
                           isOwner && !item.done
-                            ? handleDragStart(item.id)
+                            ? {
+                                onDragStart: handleDragStart(item.id),
+                                onDragOver: handleDragOver(item.id),
+                                onDrop: handleDrop(item.id),
+                                onDragEnd: handleDragEnd,
+                              }
                             : undefined
-                        }
-                        onDragOver={
-                          isOwner && !item.done
-                            ? handleDragOver(item.id)
-                            : undefined
-                        }
-                        onDrop={
-                          isOwner && !item.done
-                            ? handleDrop(item.id)
-                            : undefined
-                        }
-                        onDragEnd={
-                          isOwner && !item.done ? handleDragEnd : undefined
                         }
                         isDragOver={dragOverId === item.id}
                       />
