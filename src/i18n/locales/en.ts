@@ -5,6 +5,11 @@ const en: Translations = {
     explore: "Explore",
     myLists: "My lists",
     search: "Search",
+    openSearch: "Open search",
+    switchToLight: "Switch to light mode",
+    switchToDark: "Switch to dark mode",
+    switchLanguage: "Switch language",
+    toggleMenu: "Toggle menu",
   },
   home: {
     badge: "Collaborative lists → v2.0",
@@ -118,6 +123,10 @@ const en: Translations = {
     footLinkAbout: "About",
     footLinkContact: "Contact",
     footMadeIn: "© {{year}} welist · Made in Xàtiva (Valencia)",
+    footColLegal: "Legal",
+    footLinkPrivacy: "Privacy",
+    footLinkTerms: "Terms",
+    footVersion: "v2.0 · beta",
   },
   list: {
     back: "← My lists",
@@ -192,6 +201,15 @@ const en: Translations = {
       "Set Access = Collaborative to invite collaborators",
     collaboratorsOwnerBadge: "Owner",
     collaboratorsRemove: "Remove collaborator",
+    filters: "Filters",
+    statusLabel: "Status",
+    tagsLabel: "Tags",
+    placesLabel: "Places",
+    closeSettings: "Close settings",
+    challengersCount_one: "{{count}} challenger",
+    challengersCount_other: "{{count}} challengers",
+    collaboratorsCount_one: "{{count}} collaborator",
+    collaboratorsCount_other: "{{count}} collaborators",
   },
   categories: {
     none: "No category",
@@ -257,6 +275,13 @@ const en: Translations = {
     progressPending_other: "{{count}} pending",
     streak_one: "{{count}}-day streak",
     streak_other: "{{count}}-day streak",
+    filters: "Filters",
+    sortLabel: "Sort",
+    showLabel: "Show",
+    itemCount_one: "{{count}} item",
+    itemCount_other: "{{count}} items",
+    participantCount_one: "{{count}} participant",
+    participantCount_other: "{{count}} participants",
   },
   nudge: {
     signInToSave: "Sign in to save this list so you don't lose it.",
@@ -283,6 +308,8 @@ const en: Translations = {
     sortRecent: "Recent",
     sortTrending: "Trending",
     sortLabel: "Sort",
+    filters: "Filters",
+    anonymous: "Anonymous",
     categoryLabel: "Category",
     allCategories: "All",
     previewLabel: "Includes",
@@ -324,6 +351,8 @@ const en: Translations = {
     clearTagFilter: "Clear tag filter",
     clearAllFilters: "Clear all filters",
     testConfetti: "Test confetti",
+    listSummary_one: "{{count}} item · {{done}}/{{total}} done",
+    listSummary_other: "{{count}} items · {{done}}/{{total}} done",
   },
   items: {
     markPending: "Mark as pending",
@@ -362,6 +391,89 @@ const en: Translations = {
   },
   help: {
     nav: "Help",
+    title: "How Welist works",
+    subtitle: "Everything you can do with Welist, explained.",
+    sections: [
+      {
+        title: "Lists",
+        items: [
+          "Create a list and give it a name",
+          "Add items one by one or paste up to 100 at once",
+          "Edit any item by double-clicking it",
+          "Reorder items by dragging them",
+          "Mark items as done or pending",
+          "Tag items with #hashtag to filter them later",
+          "Search inside a list with ⌘K or the search icon",
+          "Set a custom URL slug for your list",
+          "Add a description to give context",
+          "Delete a list from My lists",
+        ],
+      },
+      {
+        title: "Places & Map",
+        items: [
+          "Type `@placename` while adding or editing an item to attach a location",
+          "After 3 characters a geocoding dropdown appears — select a result to save coordinates",
+          "Press Escape to dismiss the dropdown without saving a location",
+          "Items with a location show a pin badge with the place name",
+          "Click the map icon in the list header to switch to map view",
+          "The map view shows all items that have coordinates as pins",
+          "Click a pin on the map to see the item name",
+        ],
+      },
+      {
+        title: "Challenges",
+        items: [
+          "Make a list public and share the link",
+          "Others can accept your list as a challenge",
+          "Each participant gets their own copy to complete",
+          "Progress is tracked independently per person",
+          "Completing all items triggers a confetti celebration",
+        ],
+      },
+      {
+        title: "Collaboration",
+        items: [
+          "Enable Collaborative mode to let anyone with the link add items",
+          "See who's participating and their progress",
+          "Activity is logged: adds, edits, deletes, and completions",
+          "No sign-in required to contribute to a collaborative list",
+        ],
+      },
+      {
+        title: "Sell a list",
+        items: [
+          "Connect your Stripe account from Settings",
+          "Open list settings and switch Price to Paid",
+          "Set a price between $1 and $1000 USD",
+          "The list must be public to be sellable",
+          "Buyers pay via Stripe and get immediate access",
+          "You receive 90% — Welist takes a 10% fee",
+          "You cannot purchase your own list",
+        ],
+      },
+      {
+        title: "Discover",
+        items: [
+          "Browse all public lists on the Explore page",
+          "Search public lists by name",
+          "See how many items, participants, and completions each list has",
+          "Accept any challenge directly from the Explore page",
+          "Sign in with Google to accept challenges and track progress",
+        ],
+      },
+      {
+        title: "Formatting",
+        items: [
+          "Item text supports inline markdown",
+          "**Bold** — wrap text with double asterisks: `**bold**`",
+          "*Italic* — wrap text with single asterisks: `*italic*`",
+          "`Code` — wrap text with backticks (grave accent)",
+          "[Link](url) — write `[label](url)` to add a clickable link",
+          "Bare URLs like `https://…` are automatically turned into links",
+        ],
+      },
+    ],
   },
   notifications: {
     title: "Notifications",
@@ -498,6 +610,42 @@ const en: Translations = {
     errorGeneric: "Something went wrong. Please try again.",
   },
   settings: {
+    signInRequired: "Sign in to view settings.",
+    backToLists: "← My lists",
+    kicker: "Account",
+    title: "Settings",
+    account: {
+      title: "Account",
+    },
+    profile: {
+      title: "Profile",
+      description: "Control whether you appear in the public user directory.",
+      toggle: "Appear in the user directory",
+    },
+    adult: {
+      title: "Adult content",
+      description:
+        "If enabled, lists marked 18+ will appear in Explore. Disabled by default.",
+      toggle: "Show adult content (18+)",
+    },
+    emailNotifications: {
+      title: "Email notifications",
+      description:
+        "Get a fortnightly reminder with a random pending item from your lists so you don't forget.",
+      toggle: "Get email reminders",
+    },
+    stripe: {
+      title: "Stripe payments",
+      description:
+        "Connect your Stripe account to sell access to your lists. The money goes straight to your account.",
+      successMessage: "Account connected successfully.",
+      refreshMessage:
+        "The process was interrupted. Connect your account again.",
+      connected: "Stripe connected",
+      redirecting: "Redirecting…",
+      continueSetup: "Continue setup",
+      connect: "Connect Stripe",
+    },
     password: {
       title: "Password",
       titleChange: "Change password",
@@ -556,6 +704,143 @@ const en: Translations = {
     doesChallenges_other: "Doing {{count}} challenges",
     collaboratesIn_one: "Collaborates on {{count}} list",
     collaboratesIn_other: "Collaborates on {{count}} lists",
+  },
+  privacy: {
+    back: "← Home",
+    title: "Privacy Policy",
+    updated: "Last updated: May 26, 2026",
+    termsLink: "Terms of Service",
+    s1: {
+      title: "1. Data controller",
+      p1: "The controller of your personal data is Vicent Gozalbes (hereinafter, “Welist”), owner of the website <b>welist.io</b> and the “Welist” mobile app.",
+      p2: "You can contact us at <mail>hola@welist.io</mail>.",
+    },
+    s2: {
+      title: "2. What data we collect",
+      i1: "<b>Account data</b>: email, name, profile picture (when you sign in with Google or Apple).",
+      i2: "<b>Password</b>: if you choose to create a password, we store only a hash (never the plain-text password).",
+      i3: "<b>User content</b>: the lists, items, comments, ratings and other content you create or publish on Welist.",
+      i4: "<b>Usage data</b>: technical device information (IP, browser, operating system) collected by our infrastructure providers.",
+      i5: "<b>Notifications</b>: your preference for whether or not to receive email reminders.",
+    },
+    s3: {
+      title: "3. How we use your data",
+      i1: "To identify you and let you access your account.",
+      i2: "To display your content and let you interact with other users.",
+      i3: "To send you operational notifications (payment results, changes to your account) and, if you opt in, periodic reminders.",
+      i4: "To detect and prevent abuse, fraud and violations of the terms.",
+      i5: "To comply with legal obligations.",
+      p1: "<b>Legal basis (GDPR)</b>: performance of the contract (account and service), consent (email notifications, public profile), legitimate interest (security and service improvement).",
+    },
+    s4: {
+      title: "4. Who we share it with",
+      p1: "We only share your data with the processors strictly necessary to operate the service:",
+      i1: "<b>Vercel Inc.</b> (USA) — hosting of the website and API.",
+      i2: "<b>Neon Inc.</b> (USA) — PostgreSQL database.",
+      i3: "<b>Google LLC</b> and <b>Apple Inc.</b> — for OAuth sign-in.",
+      i4: "<b>Stripe, Inc.</b> (USA) — payment processing when a creator connects their account to monetize lists (web only).",
+      i5: "<b>Resend, Inc.</b> (USA) — sending transactional emails.",
+      p2: "All processors outside the EEA rely on standard contractual clauses (SCCs) or equivalent safeguards for international data transfers.",
+    },
+    s5: {
+      title: "5. How long we keep your data",
+      p1: "We keep your data while your account is active. When you delete your account (from Settings in the app or on the web), we permanently erase your profile, your lists and other associated content. Some legal obligations (tax accounting in the case of transactions) may require us to retain specific records for the applicable legal period.",
+    },
+    s6: {
+      title: "6. Your rights",
+      p1: "If you are in the European Economic Area or the United Kingdom, you have the right to:",
+      i1: "Access your personal data.",
+      i2: "Request its rectification.",
+      i3: "Request its erasure (you can do this yourself from Settings).",
+      i4: "Restrict or object to processing.",
+      i5: "Portability of your data.",
+      i6: "Withdraw consent (affects the future only), for example by turning off reminder emails in Settings.",
+      i7: "Lodge a complaint with the competent supervisory authority (in Spain, the AEPD).",
+      p2: "To exercise any of these rights, write to us at <mail>hola@welist.io</mail>.",
+    },
+    s7: {
+      title: "7. Cookies (web only)",
+      p1: "The website uses only cookies strictly necessary to keep your session signed in (authentication cookie). We do not use marketing, advertising or analytics cookies that require prior consent under the GDPR.",
+    },
+    s8: {
+      title: "8. Minors",
+      p1: "Welist is not directed at children under 13. We do not knowingly collect data from minors. If you believe a minor has created an account, contact us and we will delete it.",
+    },
+    s9: {
+      title: "9. Security",
+      p1: "We apply reasonable technical and organizational measures to protect your data: encryption in transit (HTTPS), passwords stored as salted hashes, infrastructure access control. No system is 100% secure; in the event of a breach affecting your rights, we will inform you as required by law.",
+    },
+    s10: {
+      title: "10. Changes to this policy",
+      p1: "We may update this policy to reflect changes in the app or in the law. We will always show the date of the last update at the top of the document. If the changes are substantial, we will notify you by email or from the app before they take effect.",
+    },
+  },
+  terms: {
+    back: "← Home",
+    title: "Terms of Service",
+    updated: "Last updated: May 26, 2026",
+    privacyLink: "Privacy Policy",
+    s1: {
+      title: "1. Acceptance of the terms",
+      p1: "By creating a Welist account or using the website <b>welist.io</b> or the “Welist” mobile app (hereinafter, the “Service”), you accept these Terms and our <privacy>Privacy Policy</privacy>. If you do not agree, do not use the Service.",
+    },
+    s2: {
+      title: "2. Description of the Service",
+      p1: "Welist is a tool to create, share and collaborate on lists (movies, books, places, plans, etc.). Some features let you make your lists public and accept collaborators or challengers.",
+    },
+    s3: {
+      title: "3. Account",
+      p1: "You must be at least 13 years old to use Welist. You are responsible for the activity carried out with your account and for keeping your password secret. You can delete your account at any time from Settings; deletion is permanent.",
+    },
+    s4: {
+      title: "4. User content",
+      p1: "You retain ownership of the content you publish (lists, items, comments, ratings). By publishing it, you grant us a worldwide, non-exclusive and free license to host, display and distribute it within the Service.",
+      p2: "You may not publish content that:",
+      i1: "Is illegal, fraudulent, defamatory or misleading.",
+      i2: "Contains sexually explicit material, pornography or content that sexualizes minors.",
+      i3: "Incites hatred, violence or discrimination.",
+      i4: "Violates third-party rights, including intellectual property and privacy.",
+      i5: "Contains spam, phishing or malicious software.",
+      i6: "Impersonates another person or entity.",
+      p3: "We reserve the right to remove content that breaks these rules and to suspend or close repeat-offender accounts.",
+    },
+    s5: {
+      title: "5. Moderation and reports",
+      p1: "You can report content or users that violate these Terms from within the app. We review reports within a reasonable timeframe (target: 24 hours) and take the measures we consider proportionate: hide content, warn, suspend or delete the account.",
+    },
+    s6: {
+      title: "6. Payments and monetization (web)",
+      p1: "On the web, creators can connect a Stripe Connect account to sell access to their lists. Welist acts as a platform and applies a fee on each transaction. Payments are subject to Stripe's terms. Refunds depend on the creator.",
+      p2: "<b>Mobile app</b>: in the iOS and Android app, monetization is disabled. Purchases are made on the web only.",
+    },
+    s7: {
+      title: "7. Availability and changes",
+      p1: "We make reasonable efforts to keep the Service available, but we do not guarantee uninterrupted operation. We may modify, suspend or discontinue features of the Service at any time.",
+    },
+    s8: {
+      title: "8. Limitation of liability",
+      p1: "The Service is provided “as is”, without warranties of any kind. To the maximum extent permitted by law, we will not be liable for indirect, incidental, special or consequential damages arising from the use of the Service. Our maximum liability towards you, under any circumstances, is limited to the amount you have paid to Welist in the 12 months prior to the event giving rise to the claim (or zero, if you have not made any payment).",
+    },
+    s9: {
+      title: "9. Indemnity",
+      p1: "You agree to indemnify Welist against any claim arising from your use of the Service, the content you publish or the breach of these Terms.",
+    },
+    s10: {
+      title: "10. Termination",
+      p1: "You can close your account at any time. We may suspend or terminate your access if you breach these Terms or if the law requires it.",
+    },
+    s11: {
+      title: "11. Governing law",
+      p1: "These Terms are governed by Spanish law. Any dispute will be submitted to the competent courts and tribunals as provided by law.",
+    },
+    s12: {
+      title: "12. Changes to the Terms",
+      p1: "We may update these Terms. If the changes are substantial, we will notify you by email or from the app before they take effect. Continued use of the Service after they take effect implies your acceptance.",
+    },
+    s13: {
+      title: "13. Contact",
+      p1: "For any query about these Terms, write to us at <mail>hola@welist.io</mail>.",
+    },
   },
 };
 
