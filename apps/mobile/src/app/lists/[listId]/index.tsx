@@ -188,9 +188,6 @@ export default function ListDetailScreen() {
             setEditing(item);
           }}
           onDelete={() => remove.mutate(item.id)}
-          toggleLabel={item.done ? t("list.swipeUndo") : t("list.swipeDone")}
-          editLabel={t("common.edit")}
-          deleteLabel={t("common.delete")}
         />
       </ScaleDecorator>
     );
@@ -610,9 +607,6 @@ function SwipeableItemRow({
   onOpenMenu,
   onEdit,
   onDelete,
-  toggleLabel,
-  editLabel,
-  deleteLabel,
 }: {
   item: Item;
   isActive: boolean;
@@ -622,10 +616,9 @@ function SwipeableItemRow({
   onOpenMenu: () => void;
   onEdit: () => void;
   onDelete: () => void;
-  toggleLabel: string;
-  editLabel: string;
-  deleteLabel: string;
 }) {
+  const { t } = useTranslation();
+  const toggleLabel = item.done ? t("list.swipeUndo") : t("list.swipeDone");
   const swipeRef = useRef<Swipeable>(null);
   const close = () => swipeRef.current?.close();
   return (
@@ -665,7 +658,7 @@ function SwipeableItemRow({
           >
             <View className="h-full items-center justify-center rounded-2xl bg-gray-200 px-5 dark:bg-gray-800">
               <Text className="text-sm font-semibold text-gray-900 dark:text-gray-100">
-                {editLabel}
+                {t("common.edit")}
               </Text>
             </View>
           </TouchableOpacity>
@@ -678,7 +671,7 @@ function SwipeableItemRow({
           >
             <View className="h-full items-center justify-center rounded-2xl bg-ink px-5 dark:bg-paper">
               <Text className="text-sm font-semibold text-canvas dark:text-ink">
-                {deleteLabel}
+                {t("common.delete")}
               </Text>
             </View>
           </TouchableOpacity>
