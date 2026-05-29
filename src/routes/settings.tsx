@@ -100,9 +100,7 @@ function SettingsPage() {
       <div className="min-h-dvh bg-canvas dark:bg-canvas-dark flex flex-col">
         <AppNav />
         <main className="flex-1 flex items-center justify-center px-4">
-          <p className="text-sm text-muted">
-            Inicia sesión para ver la configuración.
-          </p>
+          <p className="text-sm text-muted">{t("settings.signInRequired")}</p>
         </main>
       </div>
     );
@@ -118,20 +116,20 @@ function SettingsPage() {
             to="/lists"
             className="text-xs text-muted hover:text-ink dark:hover:text-paper transition"
           >
-            ← Mis listas
+            {t("settings.backToLists")}
           </Link>
           <div className="mt-4">
-            <SectionKicker>Cuenta</SectionKicker>
+            <SectionKicker>{t("settings.kicker")}</SectionKicker>
           </div>
           <div className="mt-3.5">
-            <SectionHeading>Configuración</SectionHeading>
+            <SectionHeading>{t("settings.title")}</SectionHeading>
           </div>
         </div>
 
         <section className="bg-canvas dark:bg-canvas-dark border border-black/[0.08] dark:border-white/[0.08] rounded-2xl p-5 flex flex-col gap-4">
           <div>
             <p className="text-sm font-semibold text-ink dark:text-paper">
-              Cuenta
+              {t("settings.account.title")}
             </p>
             <p className="text-sm text-muted mt-0.5">{session.user.email}</p>
           </div>
@@ -148,15 +146,15 @@ function SettingsPage() {
         <section className="bg-canvas dark:bg-canvas-dark border border-black/[0.08] dark:border-white/[0.08] rounded-2xl p-5 flex flex-col gap-4">
           <div>
             <p className="text-sm font-semibold text-ink dark:text-paper">
-              Perfil
+              {t("settings.profile.title")}
             </p>
             <p className="text-xs text-muted mt-0.5 leading-relaxed">
-              Controla si apareces en el directorio público de usuarios.
+              {t("settings.profile.description")}
             </p>
           </div>
           <label className="flex items-center justify-between gap-3 cursor-pointer">
             <span className="text-sm text-ink dark:text-paper">
-              Aparecer en el directorio de usuarios
+              {t("settings.profile.toggle")}
             </span>
             <button
               type="button"
@@ -189,16 +187,15 @@ function SettingsPage() {
         <section className="bg-canvas dark:bg-canvas-dark border border-black/[0.08] dark:border-white/[0.08] rounded-2xl p-5 flex flex-col gap-4">
           <div>
             <p className="text-sm font-semibold text-ink dark:text-paper">
-              Contenido para adultos
+              {t("settings.adult.title")}
             </p>
             <p className="text-xs text-muted mt-0.5 leading-relaxed">
-              Si lo activas, las listas marcadas como +18 aparecerán en Explore.
-              Por defecto está desactivado.
+              {t("settings.adult.description")}
             </p>
           </div>
           <label className="flex items-center justify-between gap-3 cursor-pointer">
             <span className="text-sm text-ink dark:text-paper">
-              Mostrar contenido para adultos (+18)
+              {t("settings.adult.toggle")}
             </span>
             <button
               type="button"
@@ -231,16 +228,15 @@ function SettingsPage() {
         <section className="bg-canvas dark:bg-canvas-dark border border-black/[0.08] dark:border-white/[0.08] rounded-2xl p-5 flex flex-col gap-4">
           <div>
             <p className="text-sm font-semibold text-ink dark:text-paper">
-              Notificaciones por email
+              {t("settings.emailNotifications.title")}
             </p>
             <p className="text-xs text-muted mt-0.5 leading-relaxed">
-              Recibe un recordatorio quincenal con un ítem aleatorio pendiente
-              de tus listas para que no se te olvide.
+              {t("settings.emailNotifications.description")}
             </p>
           </div>
           <label className="flex items-center justify-between gap-3 cursor-pointer">
             <span className="text-sm text-ink dark:text-paper">
-              Recibir recordatorios por email
+              {t("settings.emailNotifications.toggle")}
             </span>
             <button
               type="button"
@@ -375,22 +371,21 @@ function SettingsPage() {
         <section className="bg-canvas dark:bg-canvas-dark border border-black/[0.08] dark:border-white/[0.08] rounded-2xl p-5 flex flex-col gap-4">
           <div>
             <p className="text-sm font-semibold text-ink dark:text-paper">
-              Pagos con Stripe
+              {t("settings.stripe.title")}
             </p>
             <p className="text-xs text-muted mt-0.5 leading-relaxed">
-              Conecta tu cuenta de Stripe para vender el acceso a tus listas. El
-              dinero va directo a tu cuenta.
+              {t("settings.stripe.description")}
             </p>
           </div>
 
           {stripeParam === "success" && (
             <div className="px-3 py-2 bg-black/[0.03] dark:bg-white/[0.04] border border-black/[0.08] dark:border-white/[0.08] rounded-lg text-xs text-muted">
-              Cuenta conectada correctamente.
+              {t("settings.stripe.successMessage")}
             </div>
           )}
           {stripeParam === "refresh" && (
             <div className="px-3 py-2 bg-black/[0.03] dark:bg-white/[0.04] border border-black/[0.08] dark:border-white/[0.08] rounded-lg text-xs text-muted">
-              El proceso fue interrumpido. Vuelve a conectar tu cuenta.
+              {t("settings.stripe.refreshMessage")}
             </div>
           )}
 
@@ -413,7 +408,7 @@ function SettingsPage() {
                     d="M5 13l4 4L19 7"
                   />
                 </svg>
-                Stripe conectado
+                {t("settings.stripe.connected")}
               </span>
             </div>
           ) : (
@@ -424,10 +419,10 @@ function SettingsPage() {
               className="cursor-pointer self-start px-4 py-2 text-sm font-medium bg-ink text-canvas dark:bg-paper dark:text-ink rounded-lg hover:opacity-90 disabled:opacity-40 transition-[opacity,transform] duration-150 active:scale-[0.96]"
             >
               {connecting
-                ? "Redirigiendo…"
+                ? t("settings.stripe.redirecting")
                 : status?.connected
-                  ? "Continuar configuración"
-                  : "Conectar Stripe"}
+                  ? t("settings.stripe.continueSetup")
+                  : t("settings.stripe.connect")}
             </button>
           )}
         </section>

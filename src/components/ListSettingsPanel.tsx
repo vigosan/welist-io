@@ -317,7 +317,7 @@ export function ListSettingsPanel({ listId, onClose, onSlugUpdated }: Props) {
           type="button"
           onClick={onClose}
           data-testid="settings-close-btn"
-          aria-label="Close settings"
+          aria-label={t("list.closeSettings")}
           className="cursor-pointer h-6 w-6 flex items-center justify-center rounded-md text-gray-400 hover:text-gray-700 transition"
         >
           <svg

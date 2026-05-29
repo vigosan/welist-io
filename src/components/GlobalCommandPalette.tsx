@@ -187,8 +187,11 @@ export function GlobalCommandPalette({ open, onClose }: Props) {
                     className={`text-xs mt-0.5 font-variant-numeric tabular-nums ${i === selectedIndex ? "text-gray-300 dark:text-gray-600" : "text-gray-400 dark:text-gray-500"}`}
                     style={{ fontVariantNumeric: "tabular-nums" }}
                   >
-                    {list.itemCount} items · {list.doneCount}/{list.itemCount}{" "}
-                    done
+                    {t("command.listSummary", {
+                      count: list.itemCount,
+                      done: list.doneCount,
+                      total: list.itemCount,
+                    })}
                   </p>
                 )}
               </button>

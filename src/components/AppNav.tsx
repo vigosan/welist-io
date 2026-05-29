@@ -188,7 +188,7 @@ export function AppNav() {
                 type="button"
                 onClick={() => setGlobalSearchOpen(true)}
                 data-testid="nav-search"
-                aria-label="Open search"
+                aria-label={t("nav.openSearch")}
                 className="cursor-pointer hidden lg:inline-flex items-center gap-2 rounded-md border border-black/[0.08] bg-canvas px-2.5 py-1 text-[11px] text-muted hover:border-black/20 hover:text-ink transition-colors duration-150 dark:border-white/[0.08] dark:bg-canvas-dark dark:hover:border-white/20 dark:hover:text-paper"
               >
                 <SearchIcon />
@@ -205,8 +205,8 @@ export function AppNav() {
               data-testid="theme-toggle"
               aria-label={
                 theme === "dark"
-                  ? "Switch to light mode"
-                  : "Switch to dark mode"
+                  ? t("nav.switchToLight")
+                  : t("nav.switchToDark")
               }
               className="cursor-pointer text-gray-500 dark:text-muted hover:text-ink dark:hover:text-paper transition-colors duration-150"
             >
@@ -216,11 +216,7 @@ export function AppNav() {
               type="button"
               onClick={() => setLanguage(language === "es" ? "en" : "es")}
               data-testid="lang-switcher"
-              aria-label={
-                language === "es"
-                  ? "Switch language to English"
-                  : "Cambiar idioma a español"
-              }
+              aria-label={t("nav.switchLanguage")}
               className="cursor-pointer text-[11px] font-medium font-mono text-gray-500 dark:text-muted hover:text-ink dark:hover:text-paper transition-colors duration-150 tabular-nums"
             >
               {language === "es" ? "EN" : "ES"}
@@ -250,7 +246,7 @@ export function AppNav() {
               type="button"
               onClick={() => setMobileOpen((o) => !o)}
               data-testid="nav-burger"
-              aria-label="Toggle menu"
+              aria-label={t("nav.toggleMenu")}
               className="cursor-pointer h-8 w-8 flex items-center justify-center rounded-md text-gray-500 dark:text-muted hover:text-ink dark:hover:text-paper transition-colors duration-150"
             >
               {mobileOpen ? (
@@ -286,6 +282,18 @@ export function AppNav() {
             </button>
           </div>
         </div>
+
+        {/* Mobile backdrop */}
+        {mobileOpen && (
+          <button
+            type="button"
+            tabIndex={-1}
+            aria-hidden="true"
+            data-testid="nav-mobile-backdrop"
+            onClick={closeMobile}
+            className="sm:hidden fixed inset-x-0 top-[52px] bottom-0 z-40 bg-canvas/40 dark:bg-canvas-dark/40 backdrop-blur-sm"
+          />
+        )}
 
         {/* Mobile dropdown */}
         {mobileOpen && (
@@ -407,8 +415,8 @@ export function AppNav() {
                 data-testid="theme-toggle-mobile"
                 aria-label={
                   theme === "dark"
-                    ? "Switch to light mode"
-                    : "Switch to dark mode"
+                    ? t("nav.switchToLight")
+                    : t("nav.switchToDark")
                 }
                 className="cursor-pointer p-1.5 text-gray-500 dark:text-muted hover:text-ink dark:hover:text-paper transition-colors duration-150"
               >
@@ -421,11 +429,7 @@ export function AppNav() {
                   closeMobile();
                 }}
                 data-testid="lang-switcher-mobile"
-                aria-label={
-                  language === "es"
-                    ? "Switch language to English"
-                    : "Cambiar idioma a español"
-                }
+                aria-label={t("nav.switchLanguage")}
                 className="cursor-pointer text-[11px] font-medium font-mono text-gray-500 dark:text-muted hover:text-ink dark:hover:text-paper transition-colors duration-150 tabular-nums"
               >
                 {language === "es" ? "EN" : "ES"}

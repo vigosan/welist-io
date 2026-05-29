@@ -96,13 +96,13 @@ export function AppFooter() {
           </div>
 
           <div>
-            <ColTitle>Legal</ColTitle>
+            <ColTitle>{t("home.footColLegal")}</ColTitle>
             <ul className="flex flex-col gap-2 list-none p-0">
               <li>
-                <FootLink to="/privacy">Privacidad</FootLink>
+                <FootLink to="/privacy">{t("home.footLinkPrivacy")}</FootLink>
               </li>
               <li>
-                <FootLink to="/terms">Términos</FootLink>
+                <FootLink to="/terms">{t("home.footLinkTerms")}</FootLink>
               </li>
             </ul>
           </div>
@@ -110,7 +110,7 @@ export function AppFooter() {
 
         <div className="mt-12 flex flex-wrap items-center justify-between gap-3 border-t border-black/[0.05] dark:border-white/[0.05] pt-6 font-mono text-[11px] text-muted tracking-[0.04em]">
           <span>{t("home.footMadeIn", { year })}</span>
-          <span className="opacity-70">v2.0 · beta</span>
+          <span className="opacity-70">{t("home.footVersion")}</span>
         </div>
       </div>
     </footer>

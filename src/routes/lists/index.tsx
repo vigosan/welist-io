@@ -136,9 +136,9 @@ function MyListRow({
           </div>
         )}
         <p className="text-[11px] tabular-nums text-muted">
-          {list.itemCount} {list.itemCount === 1 ? "item" : "items"}
+          {t("myLists.itemCount", { count: list.itemCount })}
           {list.participantCount > 0 &&
-            ` · ${list.participantCount} ${list.participantCount === 1 ? "participante" : "participantes"}`}
+            ` · ${t("myLists.participantCount", { count: list.participantCount })}`}
         </p>
       </Link>
       <button
@@ -399,7 +399,7 @@ function MyListsPage() {
                       d="M3 4h18M7 9h10M11 14h2"
                     />
                   </svg>
-                  Filters
+                  {t("myLists.filters")}
                   {hasNonDefault && (
                     <span className="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-black/[0.15] dark:bg-white/[0.15] text-[10px] font-bold leading-none">
                       {(sort !== "recent" ? 1 : 0) +
@@ -469,7 +469,7 @@ function MyListsPage() {
             >
               <div className="flex items-center gap-1.5 flex-wrap">
                 <span className="text-[10px] font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider w-10 shrink-0">
-                  Sort
+                  {t("myLists.sortLabel")}
                 </span>
                 {SORT_OPTIONS.map((opt) => (
                   <FilterChip
@@ -486,7 +486,7 @@ function MyListsPage() {
                 data-testid="visibility-filter"
               >
                 <span className="text-[10px] font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider w-10 shrink-0">
-                  Show
+                  {t("myLists.showLabel")}
                 </span>
                 {VISIBILITY_OPTIONS.map((opt) => (
                   <FilterChip

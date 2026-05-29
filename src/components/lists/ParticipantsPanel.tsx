@@ -1,4 +1,5 @@
 import { Avatar } from "@/components/ui";
+import { useTranslation } from "@/i18n/service";
 import { privateName } from "@/lib/private-name";
 
 type Challenger = {
@@ -22,6 +23,7 @@ interface Props {
 }
 
 export function ParticipantsPanel({ challengers, collaborators }: Props) {
+  const { t } = useTranslation();
   if (challengers.length === 0 && collaborators.length === 0) return null;
 
   return (
@@ -30,8 +32,7 @@ export function ParticipantsPanel({ challengers, collaborators }: Props) {
         <div className="border border-gray-100 rounded-xl overflow-hidden">
           <div className="px-3 py-2 border-b border-gray-100">
             <span className="text-xs font-medium text-gray-500">
-              {challengers.length}{" "}
-              {challengers.length === 1 ? "challenger" : "challengers"}
+              {t("list.challengersCount", { count: challengers.length })}
             </span>
           </div>
           <ul className="divide-y divide-gray-50">
@@ -66,8 +67,7 @@ export function ParticipantsPanel({ challengers, collaborators }: Props) {
         <div className="border border-gray-100 rounded-xl overflow-hidden">
           <div className="px-3 py-2 border-b border-gray-100">
             <span className="text-xs font-medium text-gray-500">
-              {collaborators.length}{" "}
-              {collaborators.length === 1 ? "collaborator" : "collaborators"}
+              {t("list.collaboratorsCount", { count: collaborators.length })}
             </span>
           </div>
           <ul className="divide-y divide-gray-50">

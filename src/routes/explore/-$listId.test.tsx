@@ -127,14 +127,14 @@ describe("ExploreDetailPage", () => {
     await waitFor(() =>
       expect(screen.getByText("Lista Detalle")).toBeInTheDocument()
     );
-    expect(screen.queryByText("2 challengers")).not.toBeInTheDocument();
+    expect(screen.queryByText("2 retadores")).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByTestId("challengers-toggle"));
-    expect(screen.getByText("2 challengers")).toBeInTheDocument();
+    expect(screen.getByText("2 retadores")).toBeInTheDocument();
     expect(screen.getByText("1/3")).toBeInTheDocument();
     expect(screen.getByText("0/3")).toBeInTheDocument();
 
     fireEvent.click(screen.getByTestId("challengers-toggle"));
-    expect(screen.queryByText("2 challengers")).not.toBeInTheDocument();
+    expect(screen.queryByText("2 retadores")).not.toBeInTheDocument();
   });
 });

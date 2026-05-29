@@ -278,7 +278,7 @@ function ExploreDetailPage() {
                     </div>
                   )}
                   <span className="flex-1 text-sm text-ink/85 dark:text-paper/80 truncate">
-                    {p.name ?? "Anonymous"}
+                    {p.name ?? t("explore.anonymous")}
                   </span>
                   {p.completedAt && (
                     <span className="text-xs text-muted tabular-nums shrink-0">

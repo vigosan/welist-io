@@ -79,7 +79,7 @@ export function ListFilterBar({
                 d="M3 4h18M7 9h10M11 14h2"
               />
             </svg>
-            Filters
+            {t("list.filters")}
             {hasFilters && (
               <span className="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-white/20 dark:bg-black/20 text-[10px] font-bold leading-none">
                 {(statusFilter !== "all" ? 1 : 0) +
@@ -178,7 +178,7 @@ export function ListFilterBar({
             {/* Status */}
             <div className="flex items-center gap-1.5 flex-wrap">
               <span className="text-[10px] font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider w-10 shrink-0">
-                Status
+                {t("list.statusLabel")}
               </span>
               {(["pending", "done"] as const).map((s) => (
                 <button
@@ -203,7 +203,7 @@ export function ListFilterBar({
             {allTags.length > 0 && (
               <div className="flex items-start gap-1.5 flex-wrap">
                 <span className="text-[10px] font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider w-10 shrink-0 pt-0.5">
-                  Tags
+                  {t("list.tagsLabel")}
                 </span>
                 <div className="flex flex-wrap gap-1.5">
                   {allTags.map((tag) => (
@@ -231,7 +231,7 @@ export function ListFilterBar({
             {allPlaces.length > 0 && (
               <div className="flex items-start gap-1.5 flex-wrap">
                 <span className="text-[10px] font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider w-10 shrink-0 pt-0.5">
-                  Places
+                  {t("list.placesLabel")}
                 </span>
                 <div className="flex flex-wrap gap-1.5">
                   {allPlaces.map((place) => (

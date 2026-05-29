@@ -320,7 +320,7 @@ function ExplorePage() {
                     d="M3 4h18M7 9h10M11 14h2"
                   />
                 </svg>
-                Filters
+                {t("explore.filters")}
                 {hasNonDefault && (
                   <span className="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-black/[0.15] dark:bg-white/[0.15] text-[10px] font-bold leading-none">
                     {(sort !== "created_desc" ? 1 : 0) + (category ? 1 : 0)}
