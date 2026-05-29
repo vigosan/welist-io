@@ -29,7 +29,6 @@ const BASE_OPTS = {
   statusFilter: undefined as "all" | "pending" | "done" | undefined,
   activeTag: undefined as string | undefined,
   searchQuery: "",
-  newItemText: "",
 };
 
 describe("useItemsFilter", () => {
@@ -98,17 +97,6 @@ describe("useItemsFilter", () => {
       })
     );
     expect(result.current.allTags).toEqual(["personal", "work"]);
-  });
-
-  it("returns tagSuggestions matching newItemText partial tag", () => {
-    const { result } = renderHook(() =>
-      useItemsFilter({
-        items: [PENDING, DONE, PLAIN],
-        ...BASE_OPTS,
-        newItemText: "#wo",
-      })
-    );
-    expect(result.current.tagSuggestions).toEqual(["work"]);
   });
 
   it("preserves server order on initial load regardless of done state", () => {

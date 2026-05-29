@@ -1,62 +1,105 @@
-import type { Dispatch, SetStateAction } from "react";
+import { useMemo, useState } from "react";
+import { useGeocodingSearch } from "@/hooks/useGeocodingSearch";
+import { useAddItem, useBulkAddItems } from "@/hooks/useItems";
 import { useTranslation } from "@/i18n/service";
-import { PARTIAL_PLACE_REGEX } from "@/lib/places";
-import { tagColor } from "@/lib/tags";
-import type { Place } from "@/services/geocoding.service";
+import { BULK_ITEM_LIMIT } from "@/lib/constants";
+import { getPartialPlace, PARTIAL_PLACE_REGEX } from "@/lib/places";
+import { getPartialTag, tagColor } from "@/lib/tags";
 import type { Coords } from "@/services/items.service";
 import { BulkPastePreview } from "./BulkPastePreview";
 import { GeocodingDropdown } from "./GeocodingDropdown";
 
 interface Props {
-  newItem: string;
-  setNewItem: Dispatch<SetStateAction<string>>;
-  pendingBulk: string[] | null;
-  setPendingBulk: Dispatch<SetStateAction<string[] | null>>;
-  placeDropdownOpen: boolean;
-  setPlaceDropdownOpen: (open: boolean) => void;
-  setPendingCoords: Dispatch<SetStateAction<Coords | null>>;
-  partialPlace: string | null;
-  tagSuggestions: string[];
-  placeSuggestions: string[];
-  geocodingResults: Place[];
-  geocodingLoading: boolean;
+  listId: string;
+  allTags: string[];
+  allPlaces: string[];
   addInputRef: React.RefObject<HTMLInputElement | null>;
-  addPending: boolean;
-  bulkPending: boolean;
-  onSubmit: (e: React.FormEvent) => void;
-  onPaste: (e: React.ClipboardEvent<HTMLInputElement>) => void;
-  onBulkConfirm: () => void;
 }
 
 export function AddItemForm({
-  newItem,
-  setNewItem,
-  pendingBulk,
-  setPendingBulk,
-  placeDropdownOpen,
-  setPlaceDropdownOpen,
-  setPendingCoords,
-  partialPlace,
-  tagSuggestions,
-  placeSuggestions,
-  geocodingResults,
-  geocodingLoading,
+  listId,
+  allTags,
+  allPlaces,
   addInputRef,
-  addPending,
-  bulkPending,
-  onSubmit,
-  onPaste,
-  onBulkConfirm,
 }: Props) {
   const { t } = useTranslation();
+  const [newItem, setNewItem] = useState("");
+  const [pendingBulk, setPendingBulk] = useState<string[] | null>(null);
+  const [pendingCoords, setPendingCoords] = useState<Coords | null>(null);
+  const [placeDropdownOpen, setPlaceDropdownOpen] = useState(false);
+
+  const addItem = useAddItem(listId);
+  const bulkAddItems = useBulkAddItems(listId);
+
+  const partialTag = useMemo(() => getPartialTag(newItem), [newItem]);
+  const partialPlace = useMemo(() => getPartialPlace(newItem), [newItem]);
+  const tagSuggestions = useMemo(
+    () =>
+      partialTag !== null
+        ? allTags.filter((tag) => tag.startsWith(partialTag))
+        : [],
+    [partialTag, allTags]
+  );
+  const placeSuggestions = useMemo(
+    () =>
+      partialPlace !== null
+        ? allPlaces.filter((place) =>
+            place.toLowerCase().startsWith(partialPlace.toLowerCase())
+          )
+        : [],
+    [partialPlace, allPlaces]
+  );
+
+  const geocodingQuery =
+    placeDropdownOpen && partialPlace !== null && partialPlace.length >= 3
+      ? partialPlace
+      : "";
+  const { results: geocodingResults, isLoading: geocodingLoading } =
+    useGeocodingSearch(geocodingQuery);
+
+  function handleAdd(e: React.FormEvent) {
+    e.preventDefault();
+    const trimmed = newItem.trim();
+    if (!trimmed) return;
+    addItem.mutate(
+      { text: trimmed, coords: pendingCoords ?? undefined },
+      {
+        onSuccess: () => {
+          setNewItem("");
+          setPendingCoords(null);
+          setPlaceDropdownOpen(false);
+        },
+      }
+    );
+  }
+
+  function handlePaste(e: React.ClipboardEvent<HTMLInputElement>) {
+    const text = e.clipboardData.getData("text");
+    const lines = text
+      .split("\n")
+      .map((l) => l.trim())
+      .filter(Boolean);
+    if (lines.length < 2) return;
+    e.preventDefault();
+    setPendingBulk(lines.slice(0, BULK_ITEM_LIMIT));
+    setNewItem("");
+  }
+
+  function handleBulkConfirm() {
+    if (!pendingBulk) return;
+    bulkAddItems.mutate(pendingBulk, {
+      onSuccess: () => setPendingBulk(null),
+    });
+  }
+
   return (
     <div className="relative shrink-0 px-4 pt-3 pb-6 space-y-2">
       {pendingBulk ? (
         <BulkPastePreview
           texts={pendingBulk}
-          isPending={bulkPending}
+          isPending={bulkAddItems.isPending}
           onChange={setPendingBulk}
-          onConfirm={onBulkConfirm}
+          onConfirm={handleBulkConfirm}
           onCancel={() => setPendingBulk(null)}
         />
       ) : (
@@ -135,7 +178,7 @@ export function AddItemForm({
               />
             )}
           <form
-            onSubmit={onSubmit}
+            onSubmit={handleAdd}
             className="flex gap-2 p-1.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl"
           >
             <input
@@ -157,7 +200,7 @@ export function AddItemForm({
                   setPlaceDropdownOpen(false);
                 }
               }}
-              onPaste={onPaste}
+              onPaste={handlePaste}
               placeholder={t("list.addItemPlaceholder")}
               aria-label={t("list.addItemAriaLabel")}
               data-testid="add-item-input"
@@ -165,7 +208,7 @@ export function AddItemForm({
             />
             <button
               type="submit"
-              disabled={!newItem.trim() || addPending}
+              disabled={!newItem.trim() || addItem.isPending}
               data-testid="add-item-submit"
               className="cursor-pointer px-5 py-2.5 text-sm font-medium bg-gray-900 text-white dark:bg-white dark:text-gray-900 rounded-xl hover:bg-black dark:hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition active:scale-[0.96]"
             >

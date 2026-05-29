@@ -35,11 +35,8 @@ const ListMap = lazy(() =>
 );
 
 import { useCommandPalette } from "@/hooks/useCommandPalette";
-import { useGeocodingSearch } from "@/hooks/useGeocodingSearch";
 import { useItemDragAndDrop } from "@/hooks/useItemDragAndDrop";
 import {
-  useAddItem,
-  useBulkAddItems,
   useDeleteItem,
   useItems,
   useReorderItems,
@@ -68,9 +65,6 @@ import { useTranslation } from "@/i18n/service";
 const fireConfetti = () =>
   import("@/lib/confetti").then((m) => m.fireConfetti());
 
-import { BULK_ITEM_LIMIT } from "@/lib/constants";
-import type { Coords } from "@/services/items.service";
-
 const searchSchema = z.object({
   status: z.enum(["all", "pending", "done"]).optional().default("all"),
   tag: z.string().optional(),
@@ -85,14 +79,10 @@ function ListDetailPage() {
   const { listId } = Route.useParams();
   const navigate = useNavigate({ from: Route.fullPath });
   const { status: statusFilter, tag: activeTag } = Route.useSearch();
-  const [newItem, setNewItem] = useState("");
-  const [pendingBulk, setPendingBulk] = useState<string[] | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchActive, setSearchActive] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [participantsPanelOpen, setParticipantsPanelOpen] = useState(false);
-  const [pendingCoords, setPendingCoords] = useState<Coords | null>(null);
-  const [placeDropdownOpen, setPlaceDropdownOpen] = useState(false);
   const [activePlace, setActivePlace] = useState<string | undefined>(undefined);
   const [viewMode, setViewMode] = useState<"list" | "map">("list");
   const [highlightedItemId, setHighlightedItemId] = useState<string | null>(
@@ -246,31 +236,15 @@ function ListDetailPage() {
   const showSignInNudge =
     !session?.user && list?.ownerId === null && items.length >= 1;
 
-  const {
-    allTags,
-    allPlaces,
-    tagSuggestions,
-    placeSuggestions,
-    partialPlace,
-    filteredItems,
-    resetOrder,
-    setOrder,
-  } = useItemsFilter({
-    items,
-    itemsLoading,
-    statusFilter,
-    activeTag,
-    activePlace,
-    searchQuery,
-    newItemText: newItem,
-  });
-
-  const geocodingQuery =
-    placeDropdownOpen && partialPlace !== null && partialPlace.length >= 3
-      ? partialPlace
-      : "";
-  const { results: geocodingResults, isLoading: geocodingLoading } =
-    useGeocodingSearch(geocodingQuery);
+  const { allTags, allPlaces, filteredItems, resetOrder, setOrder } =
+    useItemsFilter({
+      items,
+      itemsLoading,
+      statusFilter,
+      activeTag,
+      activePlace,
+      searchQuery,
+    });
 
   const { paletteOpen, setPaletteOpen, paletteActions } = useCommandPalette({
     list,
@@ -297,8 +271,6 @@ function ListDetailPage() {
     onSearch: openSearch,
   });
 
-  const addItem = useAddItem(listId);
-  const bulkAddItems = useBulkAddItems(listId);
   const toggleItem = useToggleItem(listId);
   const toggleItemLike = useToggleItemLike(listId);
   const deleteItem = useDeleteItem(listId);
@@ -319,41 +291,6 @@ function ListDetailPage() {
       reorderItems.mutate(ids, { onError: () => resetOrder() });
     },
   });
-
-  function handleAdd(e: React.FormEvent) {
-    e.preventDefault();
-    const trimmed = newItem.trim();
-    if (!trimmed) return;
-    addItem.mutate(
-      { text: trimmed, coords: pendingCoords ?? undefined },
-      {
-        onSuccess: () => {
-          setNewItem("");
-          setPendingCoords(null);
-          setPlaceDropdownOpen(false);
-        },
-      }
-    );
-  }
-
-  function handlePaste(e: React.ClipboardEvent<HTMLInputElement>) {
-    const text = e.clipboardData.getData("text");
-    const lines = text
-      .split("\n")
-      .map((l) => l.trim())
-      .filter(Boolean);
-    if (lines.length < 2) return;
-    e.preventDefault();
-    setPendingBulk(lines.slice(0, BULK_ITEM_LIMIT));
-    setNewItem("");
-  }
-
-  function handleBulkConfirm() {
-    if (!pendingBulk) return;
-    bulkAddItems.mutate(pendingBulk, {
-      onSuccess: () => setPendingBulk(null),
-    });
-  }
 
   const doneCount = items.filter((i) => i.done).length;
   const progress = items.length > 0 ? (doneCount / items.length) * 100 : 0;
@@ -804,24 +741,10 @@ function ListDetailPage() {
 
             {canWrite && (
               <AddItemForm
-                newItem={newItem}
-                setNewItem={setNewItem}
-                pendingBulk={pendingBulk}
-                setPendingBulk={setPendingBulk}
-                placeDropdownOpen={placeDropdownOpen}
-                setPlaceDropdownOpen={setPlaceDropdownOpen}
-                setPendingCoords={setPendingCoords}
-                partialPlace={partialPlace}
-                tagSuggestions={tagSuggestions}
-                placeSuggestions={placeSuggestions}
-                geocodingResults={geocodingResults}
-                geocodingLoading={geocodingLoading}
+                listId={listId}
+                allTags={allTags}
+                allPlaces={allPlaces}
                 addInputRef={addInputRef}
-                addPending={addItem.isPending}
-                bulkPending={bulkAddItems.isPending}
-                onSubmit={handleAdd}
-                onPaste={handlePaste}
-                onBulkConfirm={handleBulkConfirm}
               />
             )}
           </div>

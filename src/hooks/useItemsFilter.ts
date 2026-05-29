@@ -1,8 +1,8 @@
 import { useMemo, useState } from "react";
 import type { ItemWithLikes } from "@/hooks/useItems";
 import { parseItemText } from "@/lib/item-text";
-import { getPartialPlace, parsePlaces } from "@/lib/places";
-import { getPartialTag, parseTags } from "@/lib/tags";
+import { parsePlaces } from "@/lib/places";
+import { parseTags } from "@/lib/tags";
 
 interface Options {
   items: ItemWithLikes[];
@@ -11,7 +11,6 @@ interface Options {
   activeTag: string | undefined;
   activePlace?: string;
   searchQuery: string;
-  newItemText: string;
 }
 
 export function useItemsFilter({
@@ -21,7 +20,6 @@ export function useItemsFilter({
   activeTag,
   activePlace,
   searchQuery,
-  newItemText,
 }: Options) {
   const [sortedIds, setSortedIds] = useState<string[] | null>(null);
 
@@ -61,30 +59,6 @@ export function useItemsFilter({
     return [...seen].sort();
   }, [stableItems]);
 
-  const partialTag = useMemo(() => getPartialTag(newItemText), [newItemText]);
-  const partialPlace = useMemo(
-    () => getPartialPlace(newItemText),
-    [newItemText]
-  );
-
-  const tagSuggestions = useMemo(
-    () =>
-      partialTag !== null
-        ? allTags.filter((t) => t.startsWith(partialTag))
-        : [],
-    [partialTag, allTags]
-  );
-
-  const placeSuggestions = useMemo(
-    () =>
-      partialPlace !== null
-        ? allPlaces.filter((p) =>
-            p.toLowerCase().startsWith(partialPlace.toLowerCase())
-          )
-        : [],
-    [partialPlace, allPlaces]
-  );
-
   const normalizedSearch = searchQuery.trim().toLowerCase();
 
   const filteredItems = useMemo(
@@ -120,10 +94,6 @@ export function useItemsFilter({
     stableItems,
     allTags,
     allPlaces,
-    partialTag,
-    partialPlace,
-    tagSuggestions,
-    placeSuggestions,
     filteredItems,
     resetOrder,
     setOrder,
