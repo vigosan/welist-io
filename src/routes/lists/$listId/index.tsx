@@ -50,16 +50,9 @@ import {
   useCollaborators,
   useDeleteList,
   useToggleCollaborative,
-  useUpdateCategory,
 } from "@/hooks/useList";
 import { useListHeader } from "@/hooks/useListHeader";
-import {
-  useListPrice,
-  useRemovePrice,
-  useSetPrice,
-} from "@/hooks/useListPrice";
 import { useListRealtime } from "@/hooks/useListRealtime";
-import { useStripeAccountStatus } from "@/hooks/useStripeAccount";
 import { useTranslation } from "@/i18n/service";
 
 const fireConfetti = () =>
@@ -161,13 +154,7 @@ function ListDetailPage() {
   );
 
   const toggleCollaborative = useToggleCollaborative(listId);
-  const updateCategory = useUpdateCategory(listId);
   const { data: session } = useSession();
-
-  const { data: listPrice } = useListPrice(listId, settingsOpen);
-  const setPrice = useSetPrice(listId);
-  const removePrice = useRemovePrice(listId);
-  const { data: stripeStatus } = useStripeAccountStatus(settingsOpen);
 
   const {
     list,
@@ -178,14 +165,6 @@ function ListDetailPage() {
     nameValue,
     setNameValue,
     updateName,
-    editingSlug,
-    setEditingSlug,
-    slugValue,
-    setSlugValue,
-    slugError,
-    startEditingSlug,
-    handleSlugSubmit,
-    updateSlug,
     editingDescription,
     setEditingDescription,
     descriptionValue,
@@ -194,14 +173,7 @@ function ListDetailPage() {
     copied,
     handleShare,
     togglePublic,
-  } = useListHeader({
-    listId,
-    onSlugUpdated: (updated) =>
-      navigate({
-        to: "/lists/$listId",
-        params: { listId: updated.slug ?? updated.id },
-      }),
-  });
+  } = useListHeader({ listId });
 
   useEffect(() => {
     if (list?.name) document.title = `${list.name} — Welist`;
@@ -303,8 +275,6 @@ function ListDetailPage() {
       fireConfetti();
     prevProgress.current = progress;
   }, [progress, items.length]);
-
-  const currentSlug = list?.slug ?? listId;
 
   return (
     <>
@@ -526,26 +496,13 @@ function ListDetailPage() {
                 <div className="mt-3 flex flex-col gap-2 order-7">
                   <ListSettingsPanel
                     listId={list?.id ?? listId}
-                    isPublic={!!list?.public}
-                    isCollaborative={!!list?.collaborative}
-                    category={list?.category ?? null}
-                    priceInCents={listPrice?.priceInCents ?? null}
-                    stripeConnected={!!stripeStatus?.onboardingComplete}
-                    slug={currentSlug}
-                    editingSlug={editingSlug}
-                    slugValue={slugValue}
-                    slugError={slugError}
-                    slugSubmitting={updateSlug.isPending}
-                    onSetSlugValue={setSlugValue}
-                    onStartEditingSlug={startEditingSlug}
-                    onCancelEditingSlug={() => setEditingSlug(false)}
-                    onSubmitSlug={handleSlugSubmit}
-                    onTogglePublic={(v) => togglePublic.mutate(v)}
-                    onToggleCollaborative={(v) => toggleCollaborative.mutate(v)}
-                    onSetCategory={(cat) => updateCategory.mutate(cat)}
-                    onSetPrice={(cents) => setPrice.mutate(cents)}
-                    onRemovePrice={() => removePrice.mutate()}
                     onClose={() => setSettingsOpen(false)}
+                    onSlugUpdated={(updated) =>
+                      navigate({
+                        to: "/lists/$listId",
+                        params: { listId: updated.slug ?? updated.id },
+                      })
+                    }
                   />
                   <ListStatsCard
                     challengers={challengers}

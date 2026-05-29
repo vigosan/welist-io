@@ -44,8 +44,10 @@ import {
   useActiveParticipants,
   useAddCollaborator,
   useCollaborators,
+  useList,
   useRemoveCollaborator,
   useToggleCollaborative,
+  useTogglePublic,
   useUpdateCategory,
   useUserSearch,
 } from "@/hooks/useList";
@@ -203,17 +205,6 @@ function setupMocks({
       mutate: vi.fn(),
       isPending: false,
     } as never,
-    editingSlug: false,
-    setEditingSlug: vi.fn(),
-    slugValue: "",
-    setSlugValue: vi.fn(),
-    slugError: "",
-    startEditingSlug: vi.fn(),
-    handleSlugSubmit: vi.fn(),
-    updateSlug: {
-      mutate: vi.fn(),
-      isPending: false,
-    } as never,
     editingDescription: false,
     setEditingDescription: vi.fn(),
     descriptionValue: "",
@@ -245,6 +236,16 @@ function setupMocks({
     refreshing: false,
   } as never);
 
+  vi.mocked(useList).mockReturnValue({
+    data: list,
+    isLoading: false,
+    isError: false,
+    refetch: vi.fn(),
+  } as never);
+  vi.mocked(useTogglePublic).mockReturnValue({
+    mutate: vi.fn(),
+    isPending: false,
+  } as never);
   vi.mocked(useToggleCollaborative).mockReturnValue({
     mutate: vi.fn(),
     isPending: false,

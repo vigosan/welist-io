@@ -2,31 +2,26 @@ import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { CategoryCombobox } from "@/components/lists/CategoryCombobox";
 import { CollaboratorsManager } from "@/components/lists/CollaboratorsManager";
+import {
+  useList,
+  useToggleCollaborative,
+  useTogglePublic,
+  useUpdateCategory,
+} from "@/hooks/useList";
+import {
+  useListPrice,
+  useRemovePrice,
+  useSetPrice,
+} from "@/hooks/useListPrice";
+import { useListSlugEditor } from "@/hooks/useListSlugEditor";
+import { useStripeAccountStatus } from "@/hooks/useStripeAccount";
 import { useTranslation } from "@/i18n/service";
 import type { ListCategory } from "@/lib/categories";
 
 type Props = {
   listId: string;
-  isPublic: boolean;
-  isCollaborative: boolean;
-  category: string | null;
-  priceInCents: number | null;
-  stripeConnected: boolean;
-  slug: string;
-  editingSlug: boolean;
-  slugValue: string;
-  slugError: string;
-  slugSubmitting: boolean;
-  onSetSlugValue: (v: string) => void;
-  onStartEditingSlug: () => void;
-  onCancelEditingSlug: () => void;
-  onSubmitSlug: (e: React.FormEvent) => void;
-  onTogglePublic: (v: boolean) => void;
-  onToggleCollaborative: (v: boolean) => void;
-  onSetCategory: (c: string | null) => void;
-  onSetPrice: (cents: number) => void;
-  onRemovePrice: () => void;
   onClose: () => void;
+  onSlugUpdated: (updated: { slug: string | null; id: string }) => void;
 };
 
 function SegmentedToggle({
@@ -72,127 +67,87 @@ function SegmentedToggle({
   );
 }
 
-export function ListSettingsPanel({
-  listId,
-  isPublic,
-  isCollaborative,
-  category,
-  priceInCents,
-  stripeConnected,
-  slug,
-  editingSlug,
-  slugValue,
-  slugError,
-  slugSubmitting,
-  onSetSlugValue,
-  onStartEditingSlug,
-  onCancelEditingSlug,
-  onSubmitSlug,
-  onTogglePublic,
-  onToggleCollaborative,
-  onSetCategory,
-  onSetPrice,
-  onRemovePrice,
-  onClose,
-}: Props) {
+function VisibilitySection({ listId }: { listId: string }) {
   const { t } = useTranslation();
-  const isPaid = priceInCents !== null;
-  const [priceInput, setPriceInput] = useState(
-    priceInCents !== null ? String(Math.round(priceInCents / 100)) : ""
+  const { data: list } = useList(listId);
+  const togglePublic = useTogglePublic(listId);
+  return (
+    <div className="flex items-center justify-between">
+      <span className="text-xs text-gray-500">{t("list.visibility")}</span>
+      <SegmentedToggle
+        leftLabel={t("list.visibilityPrivate")}
+        rightLabel={t("list.visibilityPublic")}
+        rightActive={!!list?.public}
+        onLeft={() => togglePublic.mutate(false)}
+        onRight={() => togglePublic.mutate(true)}
+      />
+    </div>
   );
+}
 
-  function handlePriceTogglePaid() {
-    if (!stripeConnected) return;
-    if (!isPaid) {
-      const cents = Math.round((parseFloat(priceInput) || 1) * 100);
-      const clamped = Math.max(100, Math.min(100_000, cents));
-      if (!isPublic) onTogglePublic(true);
-      onSetPrice(clamped);
-    }
-  }
+function AccessSection({ listId }: { listId: string }) {
+  const { t } = useTranslation();
+  const { data: list } = useList(listId);
+  const toggleCollaborative = useToggleCollaborative(listId);
+  return (
+    <div className="flex items-center justify-between">
+      <span className="text-xs text-gray-500">{t("list.access")}</span>
+      <SegmentedToggle
+        leftLabel={t("list.accessSolo")}
+        rightLabel={t("list.accessCollaborative")}
+        rightActive={!!list?.collaborative}
+        onLeft={() => toggleCollaborative.mutate(false)}
+        onRight={() => toggleCollaborative.mutate(true)}
+      />
+    </div>
+  );
+}
 
-  function handlePriceToggleFree() {
-    onRemovePrice();
-  }
+function CategorySection({ listId }: { listId: string }) {
+  const { t } = useTranslation();
+  const { data: list } = useList(listId);
+  const updateCategory = useUpdateCategory(listId);
+  return (
+    <div className="flex items-center justify-between">
+      <span className="text-xs text-gray-500">{t("list.category")}</span>
+      <CategoryCombobox
+        value={(list?.category ?? null) as ListCategory | null}
+        onChange={(v) => updateCategory.mutate(v)}
+      />
+    </div>
+  );
+}
 
-  function handlePriceBlur() {
-    const dollars = parseFloat(priceInput);
-    if (!Number.isNaN(dollars) && dollars >= 1) {
-      const cents = Math.round(dollars * 100);
-      const clamped = Math.max(100, Math.min(100_000, cents));
-      onSetPrice(clamped);
-    }
-  }
+function SlugSection({
+  listId,
+  onSlugUpdated,
+}: {
+  listId: string;
+  onSlugUpdated: Props["onSlugUpdated"];
+}) {
+  const { t } = useTranslation();
+  const {
+    list,
+    editingSlug,
+    setEditingSlug,
+    slugValue,
+    setSlugValue,
+    slugError,
+    startEditingSlug,
+    handleSlugSubmit,
+    updateSlug,
+  } = useListSlugEditor({ listId, onSlugUpdated });
+  const slug = list?.slug ?? listId;
 
   return (
-    <div
-      data-testid="list-settings-panel"
-      className="bg-gray-50 border border-gray-100 rounded-xl p-4 flex flex-col gap-3"
-    >
-      <div className="flex items-center justify-between">
-        <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-          {t("list.settings")}
-        </span>
-        <button
-          type="button"
-          onClick={onClose}
-          data-testid="settings-close-btn"
-          aria-label="Close settings"
-          className="cursor-pointer h-6 w-6 flex items-center justify-center rounded-md text-gray-400 hover:text-gray-700 transition"
-        >
-          <svg
-            aria-hidden="true"
-            className="w-4 h-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M6 18L18 6M6 6l12 12"
-            />
-          </svg>
-        </button>
-      </div>
-      <div className="flex items-center justify-between">
-        <span className="text-xs text-gray-500">{t("list.visibility")}</span>
-        <SegmentedToggle
-          leftLabel={t("list.visibilityPrivate")}
-          rightLabel={t("list.visibilityPublic")}
-          rightActive={isPublic}
-          onLeft={() => onTogglePublic(false)}
-          onRight={() => onTogglePublic(true)}
-        />
-      </div>
-
-      <div className="flex items-center justify-between">
-        <span className="text-xs text-gray-500">{t("list.access")}</span>
-        <SegmentedToggle
-          leftLabel={t("list.accessSolo")}
-          rightLabel={t("list.accessCollaborative")}
-          rightActive={isCollaborative}
-          onLeft={() => onToggleCollaborative(false)}
-          onRight={() => onToggleCollaborative(true)}
-        />
-      </div>
-
-      <div className="flex items-center justify-between">
-        <span className="text-xs text-gray-500">{t("list.category")}</span>
-        <CategoryCombobox
-          value={(category ?? null) as ListCategory | null}
-          onChange={(v) => onSetCategory(v)}
-        />
-      </div>
-
+    <>
       <div className="flex items-center justify-between gap-2">
         <span className="text-xs text-gray-500 shrink-0">
           {t("list.urlLabel")}
         </span>
         {editingSlug ? (
           <form
-            onSubmit={onSubmitSlug}
+            onSubmit={handleSlugSubmit}
             className="flex items-center gap-1.5 min-w-0"
           >
             <span className="text-xs text-gray-400 shrink-0">/lists/</span>
@@ -200,7 +155,7 @@ export function ListSettingsPanel({
               autoFocus
               value={slugValue}
               onChange={(e) =>
-                onSetSlugValue(
+                setSlugValue(
                   e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "")
                 )
               }
@@ -212,7 +167,7 @@ export function ListSettingsPanel({
             <button
               type="submit"
               aria-label={t("list.confirmSlug")}
-              disabled={!slugValue.trim() || slugSubmitting}
+              disabled={!slugValue.trim() || updateSlug.isPending}
               className="cursor-pointer text-xs text-gray-500 hover:text-gray-900 transition disabled:opacity-40 p-1"
             >
               ✓
@@ -220,7 +175,7 @@ export function ListSettingsPanel({
             <button
               type="button"
               aria-label={t("list.cancelSlug")}
-              onClick={onCancelEditingSlug}
+              onClick={() => setEditingSlug(false)}
               className="cursor-pointer text-xs text-gray-400 hover:text-gray-600 transition p-1"
             >
               ✕
@@ -229,7 +184,7 @@ export function ListSettingsPanel({
         ) : (
           <button
             type="button"
-            onClick={onStartEditingSlug}
+            onClick={startEditingSlug}
             data-testid="edit-slug-btn"
             className="cursor-pointer flex items-center gap-1 text-xs text-gray-500 hover:text-gray-900 transition min-w-0"
           >
@@ -257,7 +212,52 @@ export function ListSettingsPanel({
       {slugError && (
         <p className="text-xs text-gray-400 -mt-2 self-end">{slugError}</p>
       )}
+    </>
+  );
+}
 
+function PriceSection({ listId }: { listId: string }) {
+  const { t } = useTranslation();
+  const { data: list } = useList(listId);
+  const { data: listPrice } = useListPrice(listId, true);
+  const { data: stripeStatus } = useStripeAccountStatus(true);
+  const togglePublic = useTogglePublic(listId);
+  const setPrice = useSetPrice(listId);
+  const removePrice = useRemovePrice(listId);
+
+  const priceInCents = listPrice?.priceInCents ?? null;
+  const stripeConnected = !!stripeStatus?.onboardingComplete;
+  const isPublic = !!list?.public;
+  const isPaid = priceInCents !== null;
+  const [priceInput, setPriceInput] = useState(
+    priceInCents !== null ? String(Math.round(priceInCents / 100)) : ""
+  );
+
+  function handlePriceTogglePaid() {
+    if (!stripeConnected) return;
+    if (!isPaid) {
+      const cents = Math.round((parseFloat(priceInput) || 1) * 100);
+      const clamped = Math.max(100, Math.min(100_000, cents));
+      if (!isPublic) togglePublic.mutate(true);
+      setPrice.mutate(clamped);
+    }
+  }
+
+  function handlePriceToggleFree() {
+    removePrice.mutate();
+  }
+
+  function handlePriceBlur() {
+    const dollars = parseFloat(priceInput);
+    if (!Number.isNaN(dollars) && dollars >= 1) {
+      const cents = Math.round(dollars * 100);
+      const clamped = Math.max(100, Math.min(100_000, cents));
+      setPrice.mutate(clamped);
+    }
+  }
+
+  return (
+    <>
       <div className="flex items-center justify-between">
         <span className="text-xs text-gray-500">{t("list.price")}</span>
         {!stripeConnected ? (
@@ -296,8 +296,57 @@ export function ListSettingsPanel({
           <span className="text-xs text-gray-400">USD</span>
         </div>
       )}
+    </>
+  );
+}
 
-      <CollaboratorsManager listId={listId} isCollaborative={isCollaborative} />
+export function ListSettingsPanel({ listId, onClose, onSlugUpdated }: Props) {
+  const { t } = useTranslation();
+  const { data: list } = useList(listId);
+
+  return (
+    <div
+      data-testid="list-settings-panel"
+      className="bg-gray-50 border border-gray-100 rounded-xl p-4 flex flex-col gap-3"
+    >
+      <div className="flex items-center justify-between">
+        <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+          {t("list.settings")}
+        </span>
+        <button
+          type="button"
+          onClick={onClose}
+          data-testid="settings-close-btn"
+          aria-label="Close settings"
+          className="cursor-pointer h-6 w-6 flex items-center justify-center rounded-md text-gray-400 hover:text-gray-700 transition"
+        >
+          <svg
+            aria-hidden="true"
+            className="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
+      </div>
+
+      <VisibilitySection listId={listId} />
+      <AccessSection listId={listId} />
+      <CategorySection listId={listId} />
+      <SlugSection listId={listId} onSlugUpdated={onSlugUpdated} />
+      <PriceSection listId={listId} />
+
+      <CollaboratorsManager
+        listId={listId}
+        isCollaborative={!!list?.collaborative}
+      />
     </div>
   );
 }

@@ -11,47 +11,66 @@ vi.mock("@/hooks/useCachedSession", () => ({
   }),
 }));
 
+const categoryMutate = vi.fn();
+
 vi.mock("@/hooks/useList", () => ({
+  useList: vi.fn(),
+  useTogglePublic: () => ({ mutate: vi.fn(), isPending: false }),
+  useToggleCollaborative: () => ({ mutate: vi.fn(), isPending: false }),
+  useUpdateCategory: () => ({ mutate: categoryMutate, isPending: false }),
   useCollaborators: () => ({ data: { collaborators: [] } }),
   useUserSearch: () => ({ data: { users: [] }, isFetching: false }),
   useAddCollaborator: () => ({ mutate: vi.fn(), isPending: false }),
   useRemoveCollaborator: () => ({ mutate: vi.fn(), isPending: false }),
 }));
 
-function renderPanel(
-  overrides: Partial<Parameters<typeof ListSettingsPanel>[0]> = {}
-) {
-  const props = {
-    listId: "abc",
-    isPublic: true,
-    isCollaborative: false,
-    category: null as string | null,
-    priceInCents: null,
-    stripeConnected: true,
-    slug: "abc",
+vi.mock("@/hooks/useListPrice", () => ({
+  useListPrice: () => ({ data: { priceInCents: null } }),
+  useSetPrice: () => ({ mutate: vi.fn(), isPending: false }),
+  useRemovePrice: () => ({ mutate: vi.fn(), isPending: false }),
+}));
+
+vi.mock("@/hooks/useStripeAccount", () => ({
+  useStripeAccountStatus: () => ({ data: { onboardingComplete: true } }),
+}));
+
+vi.mock("@/hooks/useListSlugEditor", () => ({
+  useListSlugEditor: () => ({
+    list: { slug: "abc" },
     editingSlug: false,
+    setEditingSlug: vi.fn(),
     slugValue: "",
+    setSlugValue: vi.fn(),
     slugError: "",
-    slugSubmitting: false,
-    onSetSlugValue: vi.fn(),
-    onStartEditingSlug: vi.fn(),
-    onCancelEditingSlug: vi.fn(),
-    onSubmitSlug: vi.fn(),
-    onTogglePublic: vi.fn(),
-    onToggleCollaborative: vi.fn(),
-    onSetCategory: vi.fn(),
-    onSetPrice: vi.fn(),
-    onRemovePrice: vi.fn(),
-    onClose: vi.fn(),
-    ...overrides,
-  };
+    startEditingSlug: vi.fn(),
+    handleSlugSubmit: vi.fn(),
+    updateSlug: { isPending: false },
+  }),
+}));
+
+import { useList } from "@/hooks/useList";
+
+function renderPanel(listOverrides: Record<string, unknown> = {}) {
+  vi.mocked(useList).mockReturnValue({
+    data: {
+      id: "abc",
+      slug: "abc",
+      public: true,
+      collaborative: false,
+      category: null,
+      ...listOverrides,
+    },
+  } as never);
   const qc = new QueryClient();
   render(
     <QueryClientProvider client={qc}>
-      <ListSettingsPanel {...props} />
+      <ListSettingsPanel
+        listId="abc"
+        onClose={vi.fn()}
+        onSlugUpdated={vi.fn()}
+      />
     </QueryClientProvider>
   );
-  return props;
 }
 
 beforeEach(() => vi.clearAllMocks());
@@ -69,17 +88,17 @@ describe("ListSettingsPanel category selector", () => {
     );
   });
 
-  it("calls onSetCategory with the chosen category", async () => {
-    const props = renderPanel({ category: null });
+  it("calls updateCategory with the chosen category", async () => {
+    renderPanel({ category: null });
     await userEvent.click(screen.getByTestId("category-select"));
     await userEvent.click(screen.getByTestId("category-option-books"));
-    expect(props.onSetCategory).toHaveBeenCalledWith("books");
+    expect(categoryMutate).toHaveBeenCalledWith("books");
   });
 
-  it("calls onSetCategory with null when cleared", async () => {
-    const props = renderPanel({ category: "music" });
+  it("calls updateCategory with null when cleared", async () => {
+    renderPanel({ category: "music" });
     await userEvent.click(screen.getByTestId("category-select"));
     await userEvent.click(screen.getByTestId("category-option-none"));
-    expect(props.onSetCategory).toHaveBeenCalledWith(null);
+    expect(categoryMutate).toHaveBeenCalledWith(null);
   });
 });
