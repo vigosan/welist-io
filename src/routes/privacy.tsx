@@ -1,12 +1,24 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { Trans } from "react-i18next";
 import { AppFooter } from "@/components/AppFooter";
 import { AppNav } from "@/components/AppNav";
+import { useTranslation } from "@/i18n/service";
 
 export const Route = createFileRoute("/privacy")({
   component: PrivacyPage,
 });
 
+const linkClass = "underline hover:text-ink dark:hover:text-paper";
+
+const md = {
+  b: <strong />,
+  // biome-ignore lint/a11y/useAnchorContent: content is injected by Trans
+  mail: <a href="mailto:hola@welist.io" className={linkClass} />,
+};
+
 function PrivacyPage() {
+  const { t } = useTranslation();
+
   return (
     <div className="min-h-dvh bg-canvas dark:bg-canvas-dark flex flex-col">
       <AppNav />
@@ -15,208 +27,130 @@ function PrivacyPage() {
           to="/"
           className="text-xs text-gray-500 dark:text-muted hover:text-ink dark:hover:text-paper transition"
         >
-          ← Inicio
+          {t("privacy.back")}
         </Link>
         <h1 className="mt-4 text-3xl font-bold tracking-tight text-ink dark:text-paper">
-          Política de privacidad
+          {t("privacy.title")}
         </h1>
         <p className="mt-2 text-sm text-gray-500 dark:text-muted">
-          Última actualización: 26 de mayo de 2026
+          {t("privacy.updated")}
         </p>
 
         <div className="mt-8 flex flex-col gap-6 text-sm text-gray-700 dark:text-[#d4d2cd] leading-relaxed">
-          <Section title="1. Responsable del tratamiento">
+          <Section title={t("privacy.s1.title")}>
             <p>
-              El responsable del tratamiento de tus datos personales es Vicent
-              Gozalbes (en adelante, “Welist”), titular del sitio web{" "}
-              <strong>welist.io</strong> y de la aplicación móvil “Welist”.
+              <Trans i18nKey="privacy.s1.p1" components={md} />
             </p>
             <p>
-              Puedes contactar con nosotros en{" "}
-              <a
-                href="mailto:hola@welist.io"
-                className="underline hover:text-ink dark:hover:text-paper"
-              >
-                hola@welist.io
-              </a>
-              .
+              <Trans i18nKey="privacy.s1.p2" components={md} />
             </p>
           </Section>
 
-          <Section title="2. Qué datos recogemos">
+          <Section title={t("privacy.s2.title")}>
             <ul className="list-disc pl-5 flex flex-col gap-1">
               <li>
-                <strong>Datos de cuenta</strong>: email, nombre, imagen de
-                perfil (cuando inicias sesión con Google o Apple).
+                <Trans i18nKey="privacy.s2.i1" components={md} />
               </li>
               <li>
-                <strong>Contraseña</strong>: si decides crear una contraseña,
-                guardamos solo un hash (no la contraseña en claro).
+                <Trans i18nKey="privacy.s2.i2" components={md} />
               </li>
               <li>
-                <strong>Contenido de usuario</strong>: las listas, items,
-                comentarios, valoraciones y demás contenido que crees o
-                publiques en Welist.
+                <Trans i18nKey="privacy.s2.i3" components={md} />
               </li>
               <li>
-                <strong>Datos de uso</strong>: información técnica del
-                dispositivo (IP, navegador, sistema operativo) recogida por
-                nuestros proveedores de infraestructura.
+                <Trans i18nKey="privacy.s2.i4" components={md} />
               </li>
               <li>
-                <strong>Notificaciones</strong>: tu preferencia para recibir o
-                no recordatorios por email.
+                <Trans i18nKey="privacy.s2.i5" components={md} />
               </li>
             </ul>
           </Section>
 
-          <Section title="3. Para qué usamos tus datos">
-            <ul className="list-disc pl-5 flex flex-col gap-1">
-              <li>Identificarte y permitirte acceder a tu cuenta.</li>
-              <li>
-                Mostrar tu contenido y permitir interactuar con otros usuarios.
-              </li>
-              <li>
-                Enviarte notificaciones operativas (resultados de pago, cambios
-                en tu cuenta) y, si lo aceptas, recordatorios periódicos.
-              </li>
-              <li>
-                Detectar y prevenir abusos, fraude y violaciones de los
-                términos.
-              </li>
-              <li>Cumplir con obligaciones legales.</li>
-            </ul>
-            <p>
-              <strong>Base legal (GDPR)</strong>: ejecución del contrato (cuenta
-              y servicio), consentimiento (notificaciones por email, perfil
-              público), interés legítimo (seguridad y mejora del servicio).
-            </p>
-          </Section>
-
-          <Section title="4. Con quién los compartimos">
-            <p>
-              Solo compartimos tus datos con los procesadores estrictamente
-              necesarios para operar el servicio:
-            </p>
+          <Section title={t("privacy.s3.title")}>
             <ul className="list-disc pl-5 flex flex-col gap-1">
               <li>
-                <strong>Vercel Inc.</strong> (EE. UU.) — hosting de la web y la
-                API.
+                <Trans i18nKey="privacy.s3.i1" components={md} />
               </li>
               <li>
-                <strong>Neon Inc.</strong> (EE. UU.) — base de datos PostgreSQL.
+                <Trans i18nKey="privacy.s3.i2" components={md} />
               </li>
               <li>
-                <strong>Google LLC</strong> y <strong>Apple Inc.</strong> — para
-                el inicio de sesión OAuth.
+                <Trans i18nKey="privacy.s3.i3" components={md} />
               </li>
               <li>
-                <strong>Stripe, Inc.</strong> (EE. UU.) — procesamiento de pagos
-                cuando un creador conecta su cuenta para monetizar listas (solo
-                en la web).
+                <Trans i18nKey="privacy.s3.i4" components={md} />
               </li>
               <li>
-                <strong>Resend, Inc.</strong> (EE. UU.) — envío de emails
-                transaccionales.
+                <Trans i18nKey="privacy.s3.i5" components={md} />
               </li>
             </ul>
             <p>
-              Todos los procesadores fuera del EEE cuentan con cláusulas
-              contractuales tipo (SCC) o salvaguardas equivalentes para las
-              transferencias internacionales de datos.
+              <Trans i18nKey="privacy.s3.p1" components={md} />
             </p>
           </Section>
 
-          <Section title="5. Cuánto tiempo guardamos los datos">
-            <p>
-              Mantenemos tus datos mientras tu cuenta esté activa. Cuando
-              eliminas tu cuenta (desde Ajustes en la app o la web), borramos de
-              forma permanente tu perfil, tus listas y demás contenido asociado.
-              Algunas obligaciones legales (contabilidad fiscal en el caso de
-              transacciones) pueden requerir conservar registros específicos
-              durante el plazo legal aplicable.
-            </p>
-          </Section>
-
-          <Section title="6. Tus derechos">
-            <p>
-              Si estás en el Espacio Económico Europeo o en el Reino Unido,
-              tienes derecho a:
-            </p>
+          <Section title={t("privacy.s4.title")}>
+            <p>{t("privacy.s4.p1")}</p>
             <ul className="list-disc pl-5 flex flex-col gap-1">
-              <li>Acceder a tus datos personales.</li>
-              <li>Solicitar su rectificación.</li>
               <li>
-                Solicitar su supresión (puedes hacerlo tú mismo desde Ajustes).
-              </li>
-              <li>Limitar u oponerte al tratamiento.</li>
-              <li>Portabilidad de tus datos.</li>
-              <li>
-                Retirar el consentimiento (afecta solo a futuro), por ejemplo
-                desactivando los emails de recordatorio en Ajustes.
+                <Trans i18nKey="privacy.s4.i1" components={md} />
               </li>
               <li>
-                Presentar una reclamación ante la autoridad de control
-                competente (en España, la AEPD).
+                <Trans i18nKey="privacy.s4.i2" components={md} />
+              </li>
+              <li>
+                <Trans i18nKey="privacy.s4.i3" components={md} />
+              </li>
+              <li>
+                <Trans i18nKey="privacy.s4.i4" components={md} />
+              </li>
+              <li>
+                <Trans i18nKey="privacy.s4.i5" components={md} />
               </li>
             </ul>
+            <p>{t("privacy.s4.p2")}</p>
+          </Section>
+
+          <Section title={t("privacy.s5.title")}>
+            <p>{t("privacy.s5.p1")}</p>
+          </Section>
+
+          <Section title={t("privacy.s6.title")}>
+            <p>{t("privacy.s6.p1")}</p>
+            <ul className="list-disc pl-5 flex flex-col gap-1">
+              <li>{t("privacy.s6.i1")}</li>
+              <li>{t("privacy.s6.i2")}</li>
+              <li>{t("privacy.s6.i3")}</li>
+              <li>{t("privacy.s6.i4")}</li>
+              <li>{t("privacy.s6.i5")}</li>
+              <li>{t("privacy.s6.i6")}</li>
+              <li>{t("privacy.s6.i7")}</li>
+            </ul>
             <p>
-              Para ejercer cualquiera de estos derechos, escríbenos a{" "}
-              <a
-                href="mailto:hola@welist.io"
-                className="underline hover:text-ink dark:hover:text-paper"
-              >
-                hola@welist.io
-              </a>
-              .
+              <Trans i18nKey="privacy.s6.p2" components={md} />
             </p>
           </Section>
 
-          <Section title="7. Cookies (solo web)">
-            <p>
-              La web utiliza únicamente cookies estrictamente necesarias para
-              mantener tu sesión iniciada (cookie de autenticación). No usamos
-              cookies de marketing, publicidad ni analítica que requieran
-              consentimiento previo bajo el RGPD.
-            </p>
+          <Section title={t("privacy.s7.title")}>
+            <p>{t("privacy.s7.p1")}</p>
           </Section>
 
-          <Section title="8. Menores">
-            <p>
-              Welist no está dirigido a menores de 13 años. No recogemos
-              intencionadamente datos de menores. Si crees que un menor ha
-              creado una cuenta, contacta con nosotros y la eliminaremos.
-            </p>
+          <Section title={t("privacy.s8.title")}>
+            <p>{t("privacy.s8.p1")}</p>
           </Section>
 
-          <Section title="9. Seguridad">
-            <p>
-              Aplicamos medidas técnicas y organizativas razonables para
-              proteger tus datos: cifrado en tránsito (HTTPS), contraseñas
-              almacenadas como hash con sal, control de acceso a la
-              infraestructura. Ningún sistema es 100 % seguro; en caso de brecha
-              que afecte tus derechos, te informaremos conforme exige la
-              normativa.
-            </p>
+          <Section title={t("privacy.s9.title")}>
+            <p>{t("privacy.s9.p1")}</p>
           </Section>
 
-          <Section title="10. Cambios en esta política">
-            <p>
-              Podemos actualizar esta política para reflejar cambios en la app o
-              en la normativa. Indicaremos siempre la fecha de la última
-              actualización al inicio del documento. Si los cambios son
-              sustanciales, te lo notificaremos por email o desde la app antes
-              de que entren en vigor.
-            </p>
+          <Section title={t("privacy.s10.title")}>
+            <p>{t("privacy.s10.p1")}</p>
           </Section>
         </div>
 
         <p className="mt-10 text-xs text-gray-500 dark:text-muted">
-          <Link
-            to="/terms"
-            className="underline hover:text-ink dark:hover:text-paper"
-          >
-            Términos del servicio
+          <Link to="/terms" className={linkClass}>
+            {t("privacy.termsLink")}
           </Link>
         </p>
       </main>
