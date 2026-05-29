@@ -16,7 +16,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { PressableCard } from "@/components/Card";
 import { CategoryTag } from "@/components/CategoryTag";
-import { EmptyState } from "@/components/EmptyState";
+import { EmptyState, EmptyStateListIcon } from "@/components/EmptyState";
 import { Input } from "@/components/Input";
 import { ProgressDonut } from "@/components/ProgressDonut";
 import { ScreenHeader } from "@/components/ScreenHeader";
@@ -222,7 +222,7 @@ export default function MyListsScreen() {
             </View>
           ) : (
             <EmptyState
-              icon="list"
+              icon={<EmptyStateListIcon />}
               title={t("lists.empty")}
               subtitle={t("lists.emptySubtitle")}
               action={

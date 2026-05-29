@@ -14,7 +14,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Avatar } from "@/components/Avatar";
 import { PressableCard } from "@/components/Card";
-import { EmptyState } from "@/components/EmptyState";
+import { EmptyState, EmptyStateUsersIcon } from "@/components/EmptyState";
 import { Input } from "@/components/Input";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { UserCardSkeleton } from "@/components/Skeleton";
@@ -115,7 +115,10 @@ export default function UsersScreen() {
               <UserCardSkeleton />
             </View>
           ) : (
-            <EmptyState icon="users" title={t("users.empty")} />
+            <EmptyState
+              icon={<EmptyStateUsersIcon />}
+              title={t("users.empty")}
+            />
           )
         }
         ListFooterComponent={

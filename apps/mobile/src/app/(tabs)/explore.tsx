@@ -15,7 +15,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { PressableCard } from "@/components/Card";
 import { CategoryTag } from "@/components/CategoryTag";
-import { EmptyState } from "@/components/EmptyState";
+import { EmptyState, EmptyStateCompassIcon } from "@/components/EmptyState";
 import { Input } from "@/components/Input";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { ExploreCardSkeleton } from "@/components/Skeleton";
@@ -221,7 +221,7 @@ export default function ExploreScreen() {
             </View>
           ) : (
             <EmptyState
-              icon="compass"
+              icon={<EmptyStateCompassIcon />}
               title={t("explore.empty")}
               subtitle={isFiltered ? t("explore.emptySubtitle") : undefined}
               action={

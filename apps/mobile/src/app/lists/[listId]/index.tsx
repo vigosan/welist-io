@@ -26,7 +26,7 @@ import Swipeable from "react-native-gesture-handler/Swipeable";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ActionDrawer, type DrawerAction } from "@/components/ActionDrawer";
 import { AnimatedCheckbox } from "@/components/AnimatedCheckbox";
-import { EmptyState } from "@/components/EmptyState";
+import { EmptyState, EmptyStateListIcon } from "@/components/EmptyState";
 import { LocationPickerModal } from "@/components/LocationPickerModal";
 import { PlaceMentionSuggestions } from "@/components/PlaceMentionSuggestions";
 import { ScreenHeader } from "@/components/ScreenHeader";
@@ -421,7 +421,7 @@ export default function ListDetailScreen() {
             </View>
           ) : filter === "all" ? (
             <EmptyState
-              icon="list"
+              icon={<EmptyStateListIcon />}
               title={t("list.emptyTitle")}
               subtitle={t("list.emptySubtitle")}
               action={
