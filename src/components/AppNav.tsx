@@ -149,6 +149,17 @@ export function AppNav() {
         open={globalSearchOpen}
         onClose={() => setGlobalSearchOpen(false)}
       />
+      {/* Mobile backdrop */}
+      {mobileOpen && (
+        <button
+          type="button"
+          tabIndex={-1}
+          aria-hidden="true"
+          data-testid="nav-mobile-backdrop"
+          onClick={closeMobile}
+          className="sm:hidden fixed inset-x-0 top-[52px] bottom-0 z-40 bg-canvas/40 dark:bg-canvas-dark/40 backdrop-blur-sm"
+        />
+      )}
       <nav className="shrink-0 sticky top-0 z-50 h-[52px] bg-canvas/80 dark:bg-canvas-dark/80 backdrop-blur-md backdrop-saturate-150 border-b border-black/[0.06] dark:border-white/[0.08]">
         <div className="flex items-center justify-between px-4 sm:px-12 h-full gap-4">
           <Link
@@ -282,18 +293,6 @@ export function AppNav() {
             </button>
           </div>
         </div>
-
-        {/* Mobile backdrop */}
-        {mobileOpen && (
-          <button
-            type="button"
-            tabIndex={-1}
-            aria-hidden="true"
-            data-testid="nav-mobile-backdrop"
-            onClick={closeMobile}
-            className="sm:hidden fixed inset-x-0 top-[52px] bottom-0 z-40 bg-canvas/40 dark:bg-canvas-dark/40 backdrop-blur-sm"
-          />
-        )}
 
         {/* Mobile dropdown */}
         {mobileOpen && (
