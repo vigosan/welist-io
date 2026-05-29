@@ -1,4 +1,4 @@
-import { signIn, signOut } from "@hono/auth-js/react";
+import { signOut } from "@hono/auth-js/react";
 import { Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { useCachedSession } from "@/hooks/useCachedSession";
@@ -85,13 +85,12 @@ export function UserMenu() {
   }
 
   return (
-    <button
-      type="button"
-      onClick={() => signIn("google")}
+    <Link
+      to="/login"
       data-testid="sign-in-btn"
       className="cursor-pointer h-7 flex items-center px-2.5 rounded-md border border-gray-200 dark:border-gray-700 text-xs font-medium text-gray-500 dark:text-gray-400 hover:border-gray-400 dark:hover:border-gray-500 hover:text-gray-900 dark:hover:text-gray-100 transition-[border-color,color] duration-150 active:scale-[0.96]"
     >
       {t("user.signIn")}
-    </button>
+    </Link>
   );
 }

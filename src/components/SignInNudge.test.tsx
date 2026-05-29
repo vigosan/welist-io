@@ -2,11 +2,15 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("@hono/auth-js/react", () => ({
-  signIn: vi.fn(),
+vi.mock("@tanstack/react-router", () => ({
+  Link: ({
+    children,
+    ...props
+  }: React.PropsWithChildren<Record<string, unknown>>) => (
+    <a {...props}>{children}</a>
+  ),
 }));
 
-import { signIn } from "@hono/auth-js/react";
 import { SignInNudge } from "./SignInNudge";
 
 beforeEach(() => {
@@ -21,10 +25,12 @@ describe("SignInNudge", () => {
     expect(screen.getByTestId("signin-nudge-cta")).toBeInTheDocument();
   });
 
-  it("calls signIn with google when the CTA is clicked", async () => {
+  it("links to /login from the CTA", () => {
     render(<SignInNudge storageKey="l1" />);
-    await userEvent.click(screen.getByTestId("signin-nudge-cta"));
-    expect(signIn).toHaveBeenCalledWith("google");
+    expect(screen.getByTestId("signin-nudge-cta")).toHaveAttribute(
+      "to",
+      "/login"
+    );
   });
 
   it("hides the nudge and persists dismissal when dismissed", async () => {

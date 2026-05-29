@@ -1,4 +1,4 @@
-import { signIn } from "@hono/auth-js/react";
+import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useTranslation } from "@/i18n/service";
 
@@ -32,14 +32,13 @@ export function SignInNudge({ storageKey }: { storageKey: string }) {
       <p className="flex-1 text-[12px] leading-[1.6] text-gray-500 dark:text-muted">
         {t("nudge.signInToSave")}
       </p>
-      <button
-        type="button"
+      <Link
+        to="/login"
         data-testid="signin-nudge-cta"
-        onClick={() => signIn("google")}
         className="cursor-pointer shrink-0 px-3 py-1.5 text-[12px] font-semibold tracking-[0.04em] bg-ink text-canvas dark:bg-paper dark:text-ink rounded-lg transition active:scale-[0.96]"
       >
         {t("nudge.signIn")}
-      </button>
+      </Link>
       <button
         type="button"
         data-testid="signin-nudge-dismiss"

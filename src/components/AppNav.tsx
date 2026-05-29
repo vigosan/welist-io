@@ -1,4 +1,4 @@
-import { signIn, signOut } from "@hono/auth-js/react";
+import { signOut } from "@hono/auth-js/react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useCachedSession } from "@/hooks/useCachedSession";
@@ -234,14 +234,13 @@ export function AppNav() {
                 </div>
               </>
             ) : (
-              <button
-                type="button"
-                onClick={() => signIn("google")}
+              <Link
+                to="/login"
                 data-testid="sign-in-btn"
                 className="cursor-pointer text-[12px] font-medium px-3.5 py-[5px] rounded-md border border-black/20 dark:border-white/[0.18] text-ink dark:text-paper bg-transparent hover:bg-ink dark:hover:bg-paper hover:text-canvas dark:hover:text-ink hover:border-transparent transition-all duration-150"
               >
                 {t("user.signIn")}
-              </button>
+              </Link>
             )}
           </div>
 
@@ -387,16 +386,13 @@ export function AppNav() {
                   {t("user.signOut")}
                 </button>
               ) : (
-                <button
-                  type="button"
-                  onClick={() => {
-                    closeMobile();
-                    signIn("google");
-                  }}
+                <Link
+                  to="/login"
+                  onClick={closeMobile}
                   className="cursor-pointer block w-full text-left px-6 py-3 text-sm font-medium text-ink dark:text-paper hover:bg-black/[0.02] dark:hover:bg-white/[0.03] transition-colors duration-150"
                 >
                   {t("user.signIn")}
-                </button>
+                </Link>
               )}
             </div>
 

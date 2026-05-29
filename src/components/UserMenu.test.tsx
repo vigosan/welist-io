@@ -21,7 +21,7 @@ vi.mock("@tanstack/react-router", () => ({
   ),
 }));
 
-import { signIn, signOut } from "@hono/auth-js/react";
+import { signOut } from "@hono/auth-js/react";
 import { useCachedSession } from "@/hooks/useCachedSession";
 import { UserMenu } from "./UserMenu";
 
@@ -78,7 +78,7 @@ describe("UserMenu", () => {
     );
   });
 
-  it("calls signIn when sign-in button is clicked", async () => {
+  it("links to /login from the sign-in button", () => {
     vi.mocked(useCachedSession).mockReturnValue({
       data: null,
       status: "unauthenticated",
@@ -86,8 +86,7 @@ describe("UserMenu", () => {
     } as never);
 
     render(<UserMenu />);
-    await userEvent.click(screen.getByTestId("sign-in-btn"));
 
-    expect(signIn).toHaveBeenCalledWith("google");
+    expect(screen.getByTestId("sign-in-btn")).toHaveAttribute("to", "/login");
   });
 });
