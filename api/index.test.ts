@@ -4365,4 +4365,60 @@ describe("GET /api/cron/streak-at-risk", () => {
   });
 });
 
+describe("POST /api/auth-web/signup", () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it("creates a user with a hashed password and returns ok", async () => {
+    mockDb.query.users.findFirst.mockResolvedValue(undefined);
+    const valuesMock = vi.fn().mockReturnValue({
+      returning: vi.fn().mockResolvedValue([{ id: "new-user" }]),
+    });
+    mockDb.insert.mockReturnValue({ values: valuesMock });
+
+    const res = await app.request("/api/auth-web/signup", {
+      method: "POST",
+      body: JSON.stringify({
+        email: "new@example.com",
+        password: "supersecret",
+        name: "New User",
+      }),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ ok: true });
+    const inserted = valuesMock.mock.calls[0][0];
+    expect(inserted.email).toBe("new@example.com");
+    expect(inserted.name).toBe("New User");
+    expect(inserted.passwordHash).toMatch(/^pbkdf2_sha256\$/);
+    expect(inserted.passwordHash).not.toContain("supersecret");
+  });
+
+  it("returns 409 when the email is already in use", async () => {
+    mockDb.query.users.findFirst.mockResolvedValue({ id: "existing" });
+
+    const res = await app.request("/api/auth-web/signup", {
+      method: "POST",
+      body: JSON.stringify({
+        email: "taken@example.com",
+        password: "supersecret",
+      }),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    expect(res.status).toBe(409);
+    expect(mockDb.insert).not.toHaveBeenCalled();
+  });
+
+  it("returns 400 when the password is shorter than 8 characters", async () => {
+    const res = await app.request("/api/auth-web/signup", {
+      method: "POST",
+      body: JSON.stringify({ email: "short@example.com", password: "short" }),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    expect(res.status).toBe(400);
+  });
+});
+
 void _sign;

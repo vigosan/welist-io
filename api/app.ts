@@ -1,3 +1,4 @@
+import Credentials from "@auth/core/providers/credentials";
 import Google from "@auth/core/providers/google";
 import type { AuthUser } from "@hono/auth-js";
 import { authHandler, getAuthUser, initAuthConfig } from "@hono/auth-js";
@@ -81,6 +82,40 @@ app.use(
         clientId: c.env?.GOOGLE_CLIENT_ID ?? process.env.GOOGLE_CLIENT_ID ?? "",
         clientSecret:
           c.env?.GOOGLE_CLIENT_SECRET ?? process.env.GOOGLE_CLIENT_SECRET ?? "",
+      }),
+      Credentials({
+        credentials: {
+          email: { type: "email" },
+          password: { type: "password" },
+        },
+        async authorize(credentials) {
+          const email =
+            typeof credentials?.email === "string" ? credentials.email : "";
+          const password =
+            typeof credentials?.password === "string"
+              ? credentials.password
+              : "";
+          if (!email || !password) return null;
+          const existing = await db.query.users.findFirst({
+            where: eq(users.email, email),
+            columns: {
+              id: true,
+              name: true,
+              email: true,
+              image: true,
+              passwordHash: true,
+            },
+          });
+          if (!existing?.passwordHash) return null;
+          const ok = await verifyPassword(password, existing.passwordHash);
+          if (!ok) return null;
+          return {
+            id: existing.id,
+            name: existing.name,
+            email: existing.email,
+            image: existing.image,
+          };
+        },
       }),
     ],
     session: { strategy: "jwt" },
@@ -317,6 +352,29 @@ app.post(
     return c.json({ token, user: created });
   }
 );
+
+const webSignupSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(8).max(200),
+  name: z.string().min(1).max(100).optional(),
+});
+
+app.post("/auth-web/signup", zValidator("json", webSignupSchema), async (c) => {
+  const { email, password, name } = c.req.valid("json");
+  const existing = await db.query.users.findFirst({
+    where: eq(users.email, email),
+    columns: { id: true },
+  });
+  if (existing) return c.json({ error: "Email already in use" }, 409);
+  const passwordHash = await hashPassword(password);
+  await db.insert(users).values({
+    id: crypto.randomUUID(),
+    email,
+    name: name ?? null,
+    passwordHash,
+  });
+  return c.json({ ok: true });
+});
 
 function isUniqueViolation(e: unknown): boolean {
   if (typeof e !== "object" || e === null || !("code" in e)) return false;
