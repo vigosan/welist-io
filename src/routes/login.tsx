@@ -67,7 +67,7 @@ export function LoginPage() {
     <div className="min-h-dvh bg-canvas text-ink flex flex-col dark:bg-canvas-dark dark:text-paper">
       <AppNav />
 
-      <main className="flex-1 flex flex-col items-center justify-center px-4 py-16 sm:py-20">
+      <main className="flex-1 flex flex-col items-center px-4 pt-16 pb-16 sm:pt-24 sm:pb-20">
         <div className="w-full max-w-[400px] flex flex-col gap-8">
           <div className="flex flex-col gap-5">
             <span className="self-start inline-flex items-center gap-2 rounded-full border border-black/[0.08] bg-canvas px-2.5 py-1 text-[12px] text-muted dark:border-white/[0.08] dark:bg-canvas-dark">
