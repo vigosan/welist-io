@@ -135,7 +135,7 @@ export function AppNav() {
       return () => cancelAnimationFrame(id);
     }
     setMobileVisible(false);
-    const id = setTimeout(() => setMobileMounted(false), 200);
+    const id = setTimeout(() => setMobileMounted(false), 100);
     return () => clearTimeout(id);
   }, [mobileOpen]);
 
@@ -173,7 +173,7 @@ export function AppNav() {
           className={[
             "sm:hidden fixed inset-x-0 top-[52px] bottom-0 z-40",
             "bg-canvas/40 dark:bg-canvas-dark/40 backdrop-blur-sm",
-            "transition-opacity duration-200",
+            "transition-opacity duration-100",
             mobileVisible ? "opacity-100" : "opacity-0",
           ].join(" ")}
         />
@@ -318,7 +318,7 @@ export function AppNav() {
             className={[
               "sm:hidden absolute top-[52px] left-0 right-0 z-50",
               "bg-canvas dark:bg-canvas-dark border-t border-black/[0.08] dark:border-white/[0.08]",
-              "transition duration-200 ease-out",
+              "transition duration-100 ease-out",
               mobileVisible
                 ? "opacity-100 translate-y-0"
                 : "opacity-0 -translate-y-2",
