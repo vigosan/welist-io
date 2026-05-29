@@ -474,8 +474,11 @@ const es = {
     settings: "Configuración",
   },
   auth: {
+    badge: "Tu cuenta",
     loginTitle: "Entra en Wilist",
     signupTitle: "Crea tu cuenta",
+    loginSubtitle: "Accede para guardar tus listas y sincronizar tu progreso.",
+    signupSubtitle: "Empieza gratis. Sin tarjeta, sin complicaciones.",
     google: "Continuar con Google",
     or: "o",
     name: "Nombre",

@@ -475,8 +475,11 @@ const en: Translations = {
     settings: "Settings",
   },
   auth: {
+    badge: "Your account",
     loginTitle: "Sign in to Wilist",
     signupTitle: "Create your account",
+    loginSubtitle: "Sign in to save your lists and sync your progress.",
+    signupSubtitle: "Start free. No card, no hassle.",
     google: "Continue with Google",
     or: "or",
     name: "Name",
