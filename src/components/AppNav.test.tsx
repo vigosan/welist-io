@@ -1,4 +1,8 @@
-import { render, screen } from "@testing-library/react";
+import {
+  render,
+  screen,
+  waitForElementToBeRemoved,
+} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
@@ -76,6 +80,30 @@ describe("AppNav mobile menu", () => {
 
     await userEvent.click(screen.getByTestId("nav-mobile-backdrop"));
 
-    expect(screen.queryByTestId("nav-explore-mobile")).not.toBeInTheDocument();
+    await waitForElementToBeRemoved(() =>
+      screen.queryByTestId("nav-explore-mobile")
+    );
+  });
+
+  it("animates the menu out instead of removing it abruptly on close", async () => {
+    vi.mocked(useCachedSession).mockReturnValue({
+      data: null,
+      status: "unauthenticated",
+      update: vi.fn(),
+    } as never);
+
+    render(<AppNav />);
+
+    await userEvent.click(screen.getByTestId("nav-burger"));
+    const backdrop = screen.getByTestId("nav-mobile-backdrop");
+
+    await userEvent.click(backdrop);
+
+    expect(backdrop).toBeInTheDocument();
+    expect(backdrop).toHaveClass("opacity-0");
+
+    await waitForElementToBeRemoved(() =>
+      screen.queryByTestId("nav-mobile-backdrop")
+    );
   });
 });

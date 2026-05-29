@@ -125,6 +125,19 @@ export function AppNav() {
   const { theme, toggle } = useTheme();
   const [globalSearchOpen, setGlobalSearchOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [mobileMounted, setMobileMounted] = useState(false);
+  const [mobileVisible, setMobileVisible] = useState(false);
+
+  useEffect(() => {
+    if (mobileOpen) {
+      setMobileMounted(true);
+      const id = requestAnimationFrame(() => setMobileVisible(true));
+      return () => cancelAnimationFrame(id);
+    }
+    setMobileVisible(false);
+    const id = setTimeout(() => setMobileMounted(false), 200);
+    return () => clearTimeout(id);
+  }, [mobileOpen]);
 
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
@@ -150,14 +163,19 @@ export function AppNav() {
         onClose={() => setGlobalSearchOpen(false)}
       />
       {/* Mobile backdrop */}
-      {mobileOpen && (
+      {mobileMounted && (
         <button
           type="button"
           tabIndex={-1}
           aria-hidden="true"
           data-testid="nav-mobile-backdrop"
           onClick={closeMobile}
-          className="sm:hidden fixed inset-x-0 top-[52px] bottom-0 z-40 bg-canvas/40 dark:bg-canvas-dark/40 backdrop-blur-sm"
+          className={[
+            "sm:hidden fixed inset-x-0 top-[52px] bottom-0 z-40",
+            "bg-canvas/40 dark:bg-canvas-dark/40 backdrop-blur-sm",
+            "transition-opacity duration-200",
+            mobileVisible ? "opacity-100" : "opacity-0",
+          ].join(" ")}
         />
       )}
       <nav className="shrink-0 sticky top-0 z-50 h-[52px] bg-canvas/80 dark:bg-canvas-dark/80 backdrop-blur-md backdrop-saturate-150 border-b border-black/[0.06] dark:border-white/[0.08]">
@@ -295,8 +313,17 @@ export function AppNav() {
         </div>
 
         {/* Mobile dropdown */}
-        {mobileOpen && (
-          <div className="sm:hidden absolute top-[52px] left-0 right-0 z-50 bg-canvas dark:bg-canvas-dark border-t border-black/[0.08] dark:border-white/[0.08]">
+        {mobileMounted && (
+          <div
+            className={[
+              "sm:hidden absolute top-[52px] left-0 right-0 z-50",
+              "bg-canvas dark:bg-canvas-dark border-t border-black/[0.08] dark:border-white/[0.08]",
+              "transition duration-200 ease-out",
+              mobileVisible
+                ? "opacity-100 translate-y-0"
+                : "opacity-0 -translate-y-2",
+            ].join(" ")}
+          >
             {/* User identity row */}
             {session?.user && (
               <div className="px-6 py-3 flex items-center gap-3">
