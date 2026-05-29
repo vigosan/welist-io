@@ -452,6 +452,13 @@ export function useDeleteAccount() {
   });
 }
 
+export function useSignup() {
+  return useMutation({
+    mutationFn: (data: { email: string; password: string; name?: string }) =>
+      usersService.signup(data),
+  });
+}
+
 export function useStats() {
   return useQuery({
     queryKey: queryKeys.stats(),

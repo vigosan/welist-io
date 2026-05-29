@@ -234,6 +234,12 @@ export const usersService = {
       body: JSON.stringify({ password }),
     }),
 
+  signup: (data: { email: string; password: string; name?: string }) =>
+    apiClient<{ ok: true }>("/api/auth-web/signup", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+
   deleteAccount: () => apiClient<{ ok: true }>("/api/me", { method: "DELETE" }),
 
   search: (q: string) =>
