@@ -21,15 +21,13 @@ import {
   useUpdateProfile,
   useUserMe,
 } from "@/hooks/users";
-import { currentLanguage, type SupportedLanguage, setLanguage } from "@/i18n";
 import { useSession } from "@/lib/auth";
 import { setStoredTheme, type ThemePreference } from "@/lib/theme";
 
-const LANGS: SupportedLanguage[] = ["en", "es"];
 const THEMES: ThemePreference[] = ["system", "light", "dark"];
 
 export default function SettingsScreen() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const { session, signOut } = useSession();
   const { colorScheme, setColorScheme } = useColorScheme();
   const enabled = session.status === "signed-in";
@@ -46,7 +44,6 @@ export default function SettingsScreen() {
 
   if (session.status !== "signed-in") return null;
 
-  const currentLang = (i18n.language as SupportedLanguage) || currentLanguage();
   const currentTheme: ThemePreference =
     colorScheme === "light"
       ? "light"
@@ -125,35 +122,6 @@ export default function SettingsScreen() {
 
         <SectionLabel>{t("profile.preferences")}</SectionLabel>
         <Card>
-          <View className="mb-2">
-            <Text className="text-xs text-gray-500 dark:text-gray-400">
-              {t("profile.language")}
-            </Text>
-          </View>
-          <View className="flex-row gap-2">
-            {LANGS.map((lng) => (
-              <Pressable
-                key={lng}
-                onPress={() => setLanguage(lng)}
-                className={`rounded-full px-4 py-1.5 ${
-                  currentLang === lng
-                    ? "bg-gray-900 dark:bg-gray-100"
-                    : "bg-gray-100 dark:bg-gray-800"
-                }`}
-              >
-                <Text
-                  className={`text-xs font-medium ${
-                    currentLang === lng
-                      ? "text-white dark:text-gray-900"
-                      : "text-gray-700 dark:text-gray-300"
-                  }`}
-                >
-                  {lng.toUpperCase()}
-                </Text>
-              </Pressable>
-            ))}
-          </View>
-          <Divider />
           <View className="mb-2">
             <Text className="text-xs text-gray-500 dark:text-gray-400">
               {t("profile.appearance")}

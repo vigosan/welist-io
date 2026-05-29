@@ -10,7 +10,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import "../global.css";
 import "@/i18n";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
-import { loadStoredLanguage } from "@/i18n";
 import { SessionProvider, useSession } from "@/lib/auth";
 import { loadStoredTheme } from "@/lib/theme";
 
@@ -74,7 +73,6 @@ export default function RootLayout() {
   const { setColorScheme } = useColorScheme();
 
   useEffect(() => {
-    loadStoredLanguage();
     loadStoredTheme().then((theme) => setColorScheme(theme));
   }, [setColorScheme]);
 

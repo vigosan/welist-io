@@ -56,6 +56,12 @@
     "plugins": [
       "expo-router",
       "expo-secure-store",
+      [
+        "expo-localization",
+        {
+          "supportedLocales": ["en", "es"]
+        }
+      ],
       "expo-apple-authentication",
       "expo-web-browser",
       [
