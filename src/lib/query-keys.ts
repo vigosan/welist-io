@@ -5,8 +5,14 @@ export const queryKeys = {
     ["explore", q ?? "", sort ?? "created_desc", category ?? ""] as const,
   exploreItems: (listId: string) => ["explore-items", listId] as const,
   exploreDetail: (id: string) => ["explore-detail", id] as const,
-  myLists: (q?: string, sort?: string, visibility?: string) =>
-    ["my-lists", q ?? "", sort ?? "recent", visibility ?? "all"] as const,
+  myLists: (q?: string, sort?: string, visibility?: string, role?: string) =>
+    [
+      "my-lists",
+      q ?? "",
+      sort ?? "recent",
+      visibility ?? "all",
+      role ?? "all",
+    ] as const,
   myListsAll: () => ["my-lists"] as const,
   listPrice: (listId: string) => ["list-price", listId] as const,
   listCollaborators: (listId: string) =>

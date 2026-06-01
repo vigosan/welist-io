@@ -305,12 +305,13 @@ export function useExploreItems(listId: string, enabled: boolean) {
 export function useMyLists(
   search?: string,
   sort?: string,
-  visibility?: string
+  visibility?: string,
+  role?: string
 ) {
   return useInfiniteQuery({
-    queryKey: queryKeys.myLists(search, sort, visibility),
+    queryKey: queryKeys.myLists(search, sort, visibility, role),
     queryFn: ({ pageParam }) =>
-      listsService.myLists(pageParam, search, sort, visibility),
+      listsService.myLists(pageParam, search, sort, visibility, role),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (last) => last.nextCursor ?? undefined,
   });

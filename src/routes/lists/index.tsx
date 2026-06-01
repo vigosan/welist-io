@@ -10,7 +10,7 @@ type MyList = List & {
   participantCount: number;
 };
 
-import { Chip, cardHover, Progress } from "@/components/ui";
+import { Chip, ListCard, Progress } from "@/components/ui";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import {
   useCreateList,
@@ -70,17 +70,11 @@ function MyListRow({
   }
 
   return (
-    <div
-      className={`group relative rounded-2xl border border-black/[0.08] bg-canvas p-5 dark:border-white/[0.08] dark:bg-canvas-dark ${cardHover}`}
+    <ListCard
       data-testid="my-list-card"
-    >
-      <Link
-        to="/lists/$listId"
-        params={{ listId: list.slug ?? list.id }}
-        className="block"
-      >
-        {(list.public || list.collaborative) && (
-          <p className="mb-2 text-[10px] font-medium uppercase tracking-wider text-gray-400 dark:text-gray-500">
+      eyebrow={
+        list.public || list.collaborative ? (
+          <p className="text-[10px] font-medium uppercase tracking-wider text-gray-400 dark:text-gray-500">
             {[
               list.public ? t("myLists.public") : null,
               list.collaborative ? t("myLists.collaborative") : null,
@@ -88,40 +82,26 @@ function MyListRow({
               .filter(Boolean)
               .join(" · ")}
           </p>
-        )}
-        <p
-          className="text-sm font-semibold text-ink dark:text-paper mb-1.5 leading-snug tracking-[-0.01em]"
-          style={{ paddingRight: "2rem" }}
+        ) : undefined
+      }
+      title={
+        <Link
+          to="/lists/$listId"
+          params={{ listId: list.slug ?? list.id }}
+          className="text-inherit no-underline transition-opacity hover:opacity-70 before:absolute before:inset-0 before:content-['']"
         >
           {list.name}
-        </p>
-        {list.description && (
-          <p
-            className="text-xs leading-[1.6] mb-2.5 text-gray-500 dark:text-[#6b6b67]"
-            style={{ maxWidth: 480 }}
-          >
-            {list.description}
-          </p>
-        )}
-        {list.itemCount > 0 && (
-          <div className="mb-2.5" data-testid="list-progress">
-            <div className="flex items-center justify-between mb-1.5">
-              <span
-                className="text-[10px] tabular-nums"
-                style={{
-                  color: "#a0a09c",
-                  fontFamily: "'Space Mono', monospace",
-                }}
-              >
+        </Link>
+      }
+      description={list.description || undefined}
+      progress={
+        list.itemCount > 0 ? (
+          <div data-testid="list-progress">
+            <div className="mb-1.5 flex items-center justify-between font-mono text-[10px] tabular-nums text-muted">
+              <span>
                 {list.doneCount}/{list.itemCount}
               </span>
-              <span
-                className="text-[10px] tabular-nums"
-                style={{
-                  color: "#a0a09c",
-                  fontFamily: "'Space Mono', monospace",
-                }}
-              >
+              <span>
                 {list.doneCount >= list.itemCount
                   ? t("myLists.progressComplete")
                   : t("myLists.progressPending", {
@@ -134,64 +114,68 @@ function MyListRow({
               barTestId="list-progress-bar"
             />
           </div>
-        )}
+        ) : undefined
+      }
+      footerLeft={
         <p className="text-[11px] tabular-nums text-muted">
           {t("myLists.itemCount", { count: list.itemCount })}
           {list.participantCount > 0 &&
             ` · ${t("myLists.participantCount", { count: list.participantCount })}`}
         </p>
-      </Link>
-      <button
-        type="button"
-        data-testid="delete-list-btn"
-        aria-label={
-          isOwner
-            ? t("myLists.deleteList", { name: list.name })
-            : t("myLists.leaveList", { name: list.name })
-        }
-        onClick={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          setConfirming(true);
-        }}
-        className="absolute top-4 right-4 cursor-pointer h-7 w-7 flex items-center justify-center rounded-md text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors duration-150 opacity-0 group-hover:opacity-100"
-      >
-        {isOwner ? (
-          <svg
-            aria-hidden="true"
-            width="13"
-            height="13"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <polyline points="3 6 5 6 21 6" />
-            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
-            <path d="M10 11v6M14 11v6" />
-            <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
-          </svg>
-        ) : (
-          <svg
-            aria-hidden="true"
-            width="13"
-            height="13"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-            <polyline points="16 17 21 12 16 7" />
-            <line x1="21" y1="12" x2="9" y2="12" />
-          </svg>
-        )}
-      </button>
-    </div>
+      }
+      footerRight={
+        <button
+          type="button"
+          data-testid="delete-list-btn"
+          aria-label={
+            isOwner
+              ? t("myLists.deleteList", { name: list.name })
+              : t("myLists.leaveList", { name: list.name })
+          }
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setConfirming(true);
+          }}
+          className="relative z-10 flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-md text-gray-400 opacity-0 transition-colors duration-150 hover:text-gray-700 group-hover:opacity-100 focus-visible:opacity-100 dark:hover:text-gray-300"
+        >
+          {isOwner ? (
+            <svg
+              aria-hidden="true"
+              width="13"
+              height="13"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <polyline points="3 6 5 6 21 6" />
+              <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+              <path d="M10 11v6M14 11v6" />
+              <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+            </svg>
+          ) : (
+            <svg
+              aria-hidden="true"
+              width="13"
+              height="13"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
+          )}
+        </button>
+      }
+    />
   );
 }
 
@@ -252,6 +236,7 @@ function CreateListInline({ onClose }: { onClose: () => void }) {
 
 type SortOption = "recent" | "created_desc" | "created_asc" | "likes";
 type VisibilityFilter = "all" | "public" | "private";
+type RoleFilter = "all" | "created" | "participating";
 
 function FilterChip({
   label,
@@ -280,10 +265,11 @@ function MyListsPage() {
   const { q, setQ, search, handleSearch } = useSearchInput();
   const [sort, setSort] = useState<SortOption>("recent");
   const [visibility, setVisibility] = useState<VisibilityFilter>("all");
+  const [role, setRole] = useState<RoleFilter>("all");
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [creating, setCreating] = useState(false);
   const { data, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage } =
-    useMyLists(search || undefined, sort, visibility);
+    useMyLists(search || undefined, sort, visibility, role);
   const sentinelRef = useInfiniteScroll({
     hasNextPage,
     isFetchingNextPage,
@@ -305,6 +291,12 @@ function MyListsPage() {
     { value: "all", label: t("myLists.filterAll") },
     { value: "public", label: t("myLists.filterPublic") },
     { value: "private", label: t("myLists.filterPrivate") },
+  ];
+
+  const ROLE_OPTIONS: { value: RoleFilter; label: string }[] = [
+    { value: "all", label: t("myLists.filterAll") },
+    { value: "created", label: t("myLists.roleCreated") },
+    { value: "participating", label: t("myLists.roleParticipating") },
   ];
 
   const lists = data?.pages.flatMap((p) => p.items) ?? [];
@@ -365,13 +357,18 @@ function MyListsPage() {
 
           {/* Filter toggle row */}
           {(() => {
-            const hasNonDefault = sort !== "recent" || visibility !== "all";
+            const hasNonDefault =
+              sort !== "recent" || visibility !== "all" || role !== "all";
             const activeSortLabel = SORT_OPTIONS.find(
               (o) => o.value === sort
             )?.label;
             const activeVisibilityLabel =
               visibility !== "all"
                 ? VISIBILITY_OPTIONS.find((o) => o.value === visibility)?.label
+                : undefined;
+            const activeRoleLabel =
+              role !== "all"
+                ? ROLE_OPTIONS.find((o) => o.value === role)?.label
                 : undefined;
             return (
               <div className="mt-3 flex items-center gap-2 flex-wrap">
@@ -403,7 +400,8 @@ function MyListsPage() {
                   {hasNonDefault && (
                     <span className="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-black/[0.15] dark:bg-white/[0.15] text-[10px] font-bold leading-none">
                       {(sort !== "recent" ? 1 : 0) +
-                        (visibility !== "all" ? 1 : 0)}
+                        (visibility !== "all" ? 1 : 0) +
+                        (role !== "all" ? 1 : 0)}
                     </span>
                   )}
                   <svg
@@ -455,6 +453,21 @@ function MyListsPage() {
                         </span>
                       </button>
                     )}
+                    {role !== "all" && (
+                      <button
+                        type="button"
+                        onClick={() => setRole("all")}
+                        className="cursor-pointer inline-flex items-center gap-1 rounded-full border border-black/[0.10] dark:border-white/[0.10] px-2 py-0.5 text-xs text-gray-500 hover:border-black/[0.25] hover:text-gray-700 transition"
+                      >
+                        {activeRoleLabel}
+                        <span
+                          aria-hidden
+                          className="text-gray-300 dark:text-gray-600 leading-none"
+                        >
+                          ×
+                        </span>
+                      </button>
+                    )}
                   </div>
                 )}
               </div>
@@ -494,6 +507,23 @@ function MyListsPage() {
                     label={opt.label}
                     active={visibility === opt.value}
                     onClick={() => setVisibility(opt.value)}
+                  />
+                ))}
+              </div>
+              <div
+                className="flex items-center gap-1.5 flex-wrap"
+                data-testid="role-filter"
+              >
+                <span className="text-[10px] font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider w-10 shrink-0">
+                  {t("myLists.typeLabel")}
+                </span>
+                {ROLE_OPTIONS.map((opt) => (
+                  <FilterChip
+                    key={opt.value}
+                    label={opt.label}
+                    active={role === opt.value}
+                    onClick={() => setRole(opt.value)}
+                    testId={`role-${opt.value}`}
                   />
                 ))}
               </div>

@@ -726,6 +726,7 @@ app.get("/my-lists", async (c) => {
   const q = c.req.query("q")?.trim();
   const sort = c.req.query("sort") ?? "recent";
   const visibility = c.req.query("visibility");
+  const role = c.req.query("role");
   const visibilityFilter =
     visibility === "public"
       ? eq(lists.public, true)
@@ -740,9 +741,15 @@ app.get("/my-lists", async (c) => {
     .map((p) => p.sourceListId)
     .filter((id): id is string => id !== null);
   const ownerOrParticipant =
-    participatedIds.length > 0
-      ? or(eq(lists.ownerId, userId), inUuids(lists.id, participatedIds))
-      : eq(lists.ownerId, userId);
+    role === "created"
+      ? eq(lists.ownerId, userId)
+      : role === "participating"
+        ? participatedIds.length > 0
+          ? inUuids(lists.id, participatedIds)
+          : sql`false`
+        : participatedIds.length > 0
+          ? or(eq(lists.ownerId, userId), inUuids(lists.id, participatedIds))
+          : eq(lists.ownerId, userId);
   const baseWhere = and(
     ownerOrParticipant,
     q ? ilike(lists.name, `%${q}%`) : undefined,

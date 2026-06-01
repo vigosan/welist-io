@@ -370,7 +370,8 @@ export const listsService = {
     cursor?: string,
     q?: string,
     sort?: string,
-    visibility?: string
+    visibility?: string,
+    role?: string
   ) => {
     const params = new URLSearchParams();
     if (cursor) params.set("cursor", cursor);
@@ -378,6 +379,7 @@ export const listsService = {
     if (sort) params.set("sort", sort);
     if (visibility && visibility !== "all")
       params.set("visibility", visibility);
+    if (role && role !== "all") params.set("role", role);
     const qs = params.toString();
     return apiClient<{
       items: (List & {
