@@ -481,7 +481,7 @@ function MyListsPage() {
               data-testid="sort-options"
             >
               <div className="flex items-center gap-1.5 flex-wrap">
-                <span className="text-[10px] font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider w-10 shrink-0">
+                <span className="text-[10px] font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider shrink-0">
                   {t("myLists.sortLabel")}
                 </span>
                 {SORT_OPTIONS.map((opt) => (
@@ -498,7 +498,7 @@ function MyListsPage() {
                 className="flex items-center gap-1.5 flex-wrap"
                 data-testid="visibility-filter"
               >
-                <span className="text-[10px] font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider w-10 shrink-0">
+                <span className="text-[10px] font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider shrink-0">
                   {t("myLists.showLabel")}
                 </span>
                 {VISIBILITY_OPTIONS.map((opt) => (
@@ -514,7 +514,7 @@ function MyListsPage() {
                 className="flex items-center gap-1.5 flex-wrap"
                 data-testid="role-filter"
               >
-                <span className="text-[10px] font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider w-10 shrink-0">
+                <span className="text-[10px] font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider shrink-0">
                   {t("myLists.typeLabel")}
                 </span>
                 {ROLE_OPTIONS.map((opt) => (
