@@ -3,7 +3,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { AppNav } from "@/components/AppNav";
 import { Skeleton } from "@/components/Skeleton";
-import { cardHover, Progress } from "@/components/ui";
+import { ListCard, Progress } from "@/components/ui";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import {
   useAcceptChallenge,
@@ -83,73 +83,79 @@ function ExploreListCard({
       : null;
 
   return (
-    <div
-      className={`rounded-2xl border border-black/[0.08] bg-canvas p-5 dark:border-white/[0.08] dark:bg-canvas-dark ${cardHover}`}
-    >
-      {(list.category || owner) && (
-        <div className="mb-2 flex items-center gap-3">
-          {list.category && (
-            <span
-              data-testid={`explore-card-category-${list.id}`}
-              className="inline-flex items-center gap-1.5 rounded-full border border-black/[0.10] dark:border-white/[0.10] bg-black/[0.03] dark:bg-white/[0.04] px-2 py-0.5 text-[11px] font-medium text-gray-600 dark:text-gray-400"
-            >
-              <CategoryIcon
-                category={list.category as ListCategory}
-                size={13}
-                className="text-gray-500 dark:text-gray-400"
+    <ListCard
+      eyebrow={
+        list.category ? (
+          <span
+            data-testid={`explore-card-category-${list.id}`}
+            className="inline-flex items-center gap-1.5 rounded-full border border-black/[0.10] dark:border-white/[0.10] bg-black/[0.03] dark:bg-white/[0.04] px-2 py-0.5 text-[11px] font-medium text-gray-600 dark:text-gray-400"
+          >
+            <CategoryIcon
+              category={list.category as ListCategory}
+              size={13}
+              className="text-gray-500 dark:text-gray-400"
+            />
+            {t(`categories.${list.category}`)}
+          </span>
+        ) : undefined
+      }
+      headerRight={
+        owner ? (
+          <Link
+            to="/u/$userId"
+            params={{ userId: owner.id }}
+            data-testid={`explore-card-author-${list.id}`}
+            className="flex items-center gap-1.5 text-[11px] text-gray-500 hover:text-ink dark:text-[#6b6b67] dark:hover:text-paper no-underline transition-colors"
+          >
+            {owner.image ? (
+              <img
+                src={owner.image}
+                alt=""
+                className="h-5 w-5 rounded-full object-cover outline outline-1 outline-black/10 dark:outline-white/10"
               />
-              {t(`categories.${list.category}`)}
-            </span>
-          )}
-          {owner && (
-            <Link
-              to="/u/$userId"
-              params={{ userId: owner.id }}
-              data-testid={`explore-card-author-${list.id}`}
-              className="ml-auto flex items-center gap-1.5 text-[11px] text-gray-500 hover:text-ink dark:text-[#6b6b67] dark:hover:text-paper no-underline transition-colors"
-            >
-              {owner.image ? (
-                <img
-                  src={owner.image}
-                  alt=""
-                  className="h-5 w-5 rounded-full object-cover outline outline-1 outline-black/10 dark:outline-white/10"
-                />
-              ) : (
-                <div className="h-5 w-5 rounded-full bg-black/[0.06] dark:bg-white/[0.06] outline outline-1 outline-black/10 dark:outline-white/10" />
-              )}
-              <span className="font-medium">{privateName(owner.name)}</span>
-            </Link>
-          )}
-        </div>
-      )}
-      <Link
-        to="/explore/$listId"
-        params={{ listId: list.slug ?? list.id }}
-        className="block text-[14px] font-semibold text-ink dark:text-paper mb-1.5 leading-snug tracking-[-0.01em] hover:opacity-70 transition-opacity duration-150 no-underline"
-      >
-        {list.name}
-      </Link>
-      {list.description && (
-        <p className="text-[12px] leading-[1.6] mb-2.5 text-gray-500 dark:text-[#6b6b67]">
-          {list.description}
-        </p>
-      )}
-      {list.previewItems.length > 0 && (
-        <p
-          data-testid={`explore-card-preview-${list.id}`}
-          className="mb-2.5 truncate text-[12px] text-gray-400 dark:text-gray-500"
+            ) : (
+              <div className="h-5 w-5 rounded-full bg-black/[0.06] dark:bg-white/[0.06] outline outline-1 outline-black/10 dark:outline-white/10" />
+            )}
+            <span className="font-medium">{privateName(owner.name)}</span>
+          </Link>
+        ) : undefined
+      }
+      title={
+        <Link
+          to="/explore/$listId"
+          params={{ listId: list.slug ?? list.id }}
+          className="text-inherit no-underline transition-opacity duration-150 hover:opacity-70"
         >
-          <span className="text-gray-500 dark:text-[#6b6b67]">
-            {t("explore.previewLabel")}:
-          </span>{" "}
-          {list.previewItems.map(plainItemText).join(" · ")}
-        </p>
-      )}
-      <div
-        data-testid={`explore-card-meta-${list.id}`}
-        className="flex items-center gap-2 text-[11px] tabular-nums text-gray-500 dark:text-[#6b6b67]"
-      >
-        <span>
+          {list.name}
+        </Link>
+      }
+      description={list.description || undefined}
+      body={
+        list.previewItems.length > 0 ? (
+          <p
+            data-testid={`explore-card-preview-${list.id}`}
+            className="truncate text-[12px] text-gray-400 dark:text-gray-500"
+          >
+            <span className="text-gray-500 dark:text-[#6b6b67]">
+              {t("explore.previewLabel")}:
+            </span>{" "}
+            {list.previewItems.map(plainItemText).join(" · ")}
+          </p>
+        ) : undefined
+      }
+      progress={
+        pct !== null ? (
+          <Progress
+            value={pct}
+            data-testid={`explore-card-progress-${list.id}`}
+          />
+        ) : undefined
+      }
+      footerLeft={
+        <div
+          data-testid={`explore-card-meta-${list.id}`}
+          className="text-[11px] tabular-nums text-gray-500 dark:text-[#6b6b67]"
+        >
           {[
             t("explore.metaItems", { count: list.itemCount }),
             list.participantCount > 0
@@ -164,35 +170,31 @@ function ExploreListCard({
           ]
             .filter(Boolean)
             .join(" · ")}
-        </span>
-      </div>
-      {pct !== null && (
-        <Progress
-          value={pct}
-          className="mt-2"
-          data-testid={`explore-card-progress-${list.id}`}
-        />
-      )}
-      <button
-        type="button"
-        onClick={handleAccept}
-        disabled={acceptPending}
-        data-testid={`accept-btn-${list.id}`}
-        className={[
-          "mt-3.5 w-full py-2.5 rounded-lg text-[12px] font-semibold tracking-[0.04em]",
-          "transition disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer active:scale-[0.97]",
-          accepted
-            ? "bg-canvas text-muted border border-black/[0.08] dark:bg-canvas-dark dark:border-white/[0.08]"
-            : "bg-ink text-paper border border-ink hover:bg-black dark:bg-paper dark:text-ink dark:border-paper dark:hover:bg-white",
-        ].join(" ")}
-      >
-        {session?.user
-          ? accepted
-            ? t("explore.challengeAccepted")
-            : t("explore.acceptChallenge")
-          : t("explore.signIn")}
-      </button>
-    </div>
+        </div>
+      }
+      footerRight={
+        <button
+          type="button"
+          onClick={handleAccept}
+          disabled={acceptPending}
+          data-testid={`accept-btn-${list.id}`}
+          className={[
+            "inline-flex shrink-0 items-center gap-1 rounded-lg px-3 py-1.5 text-[12px] font-semibold tracking-[0.02em]",
+            "transition active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer",
+            accepted
+              ? "border border-black/[0.08] bg-canvas text-muted dark:border-white/[0.08] dark:bg-canvas-dark"
+              : "bg-ink text-paper hover:bg-black dark:bg-paper dark:text-ink dark:hover:bg-white",
+          ].join(" ")}
+        >
+          {session?.user
+            ? accepted
+              ? t("explore.challengeAccepted")
+              : t("explore.acceptChallenge")
+            : t("explore.signIn")}
+          {!accepted && <span aria-hidden="true">→</span>}
+        </button>
+      }
+    />
   );
 }
 

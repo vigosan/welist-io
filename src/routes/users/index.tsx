@@ -3,7 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppNav } from "@/components/AppNav";
 import { Skeleton } from "@/components/Skeleton";
-import { cardHover } from "@/components/ui";
+import { cardHover, Progress } from "@/components/ui";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { useToggleFollow, useUserDirectory } from "@/hooks/useList";
 import { useSearchInput } from "@/hooks/useSearchInput";
@@ -79,7 +79,7 @@ function UserRowSkeleton() {
   return (
     <div
       data-testid="user-row-skeleton"
-      className="flex items-center gap-4 rounded-2xl border border-black/[0.08] dark:border-white/[0.08] bg-white dark:bg-white/[0.02] p-4"
+      className="flex items-center gap-4 rounded-2xl border border-black/[0.08] dark:border-white/[0.08] bg-white dark:bg-white/[0.02] p-5"
     >
       <Skeleton variant="circle" className="w-12 h-12 shrink-0" />
       <div className="flex-1 min-w-0 flex flex-col gap-2">
@@ -101,7 +101,7 @@ function UserRow({ user }: { user: DirectoryUser }) {
   return (
     <article
       data-testid={`user-card-${user.id}`}
-      className={`group relative flex items-center gap-4 rounded-2xl border border-black/[0.08] bg-canvas p-4 dark:border-white/[0.08] dark:bg-canvas-dark ${cardHover}`}
+      className={`group relative flex items-center gap-4 rounded-2xl border border-black/[0.08] bg-canvas p-5 dark:border-white/[0.08] dark:bg-canvas-dark ${cardHover}`}
     >
       <Link
         to="/u/$userId"
@@ -116,10 +116,7 @@ function UserRow({ user }: { user: DirectoryUser }) {
           className="pointer-events-none w-12 h-12 rounded-full shrink-0 outline outline-1 outline-black/10 dark:outline-white/10"
         />
       ) : (
-        <div
-          className="pointer-events-none w-12 h-12 rounded-full shrink-0 flex items-center justify-center text-sm font-semibold bg-black/[0.04] dark:bg-white/[0.06] text-ink dark:text-paper border border-black/[0.08] dark:border-white/[0.10]"
-          style={{ fontFamily: "'Space Mono', monospace" }}
-        >
+        <div className="pointer-events-none w-12 h-12 rounded-full shrink-0 flex items-center justify-center font-mono text-sm font-semibold bg-black/[0.04] dark:bg-white/[0.06] text-ink dark:text-paper border border-black/[0.08] dark:border-white/[0.10]">
           {initials(user.name)}
         </div>
       )}
@@ -138,21 +135,10 @@ function UserRow({ user }: { user: DirectoryUser }) {
         )}
         {user.achievementsUnlocked > 0 && (
           <div className="mt-2 flex items-center gap-2">
-            <span
-              className="text-[10px] uppercase tracking-wider text-gray-400 dark:text-[#6b6b67] shrink-0"
-              style={{ fontFamily: "'Space Mono', monospace" }}
-            >
+            <span className="font-mono text-[10px] uppercase tracking-wider text-gray-400 dark:text-[#6b6b67] shrink-0">
               ★ {user.achievementsUnlocked} / {user.achievementsTotal}
             </span>
-            <div
-              className="flex-1 h-[2px] rounded-full bg-black/[0.06] dark:bg-white/[0.08] overflow-hidden"
-              aria-hidden="true"
-            >
-              <div
-                className="h-full bg-ink dark:bg-paper"
-                style={{ width: `${achievementsPct}%` }}
-              />
-            </div>
+            <Progress value={achievementsPct} className="flex-1" />
           </div>
         )}
       </div>
@@ -212,7 +198,7 @@ function UsersDirectoryPage() {
 
         <div className="mt-7">
           {isLoading && (
-            <div className="flex flex-col gap-2.5">
+            <div className="flex flex-col gap-3">
               {["a", "b", "c", "d", "e", "f"].map((k) => (
                 <UserRowSkeleton key={k} />
               ))}
@@ -223,7 +209,7 @@ function UsersDirectoryPage() {
               {search ? t("directory.noUsersSearch") : t("directory.noUsers")}
             </p>
           )}
-          <div className="flex flex-col gap-2.5">
+          <div className="flex flex-col gap-3">
             {userList.map((user) => (
               <UserRow key={user.id} user={user} />
             ))}
@@ -232,7 +218,7 @@ function UsersDirectoryPage() {
 
         <div ref={sentinelRef} className="h-4" />
         {isFetchingNextPage && (
-          <div className="flex flex-col gap-2.5 pt-2.5">
+          <div className="flex flex-col gap-3 pt-2.5">
             {["a", "b", "c"].map((k) => (
               <UserRowSkeleton key={k} />
             ))}
