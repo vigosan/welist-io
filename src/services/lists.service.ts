@@ -98,7 +98,8 @@ export type AppNotification = {
     | "added_as_collaborator"
     | "item_added"
     | "item_done"
-    | "list_completed";
+    | "list_completed"
+    | "item_liked";
   listId: string | null;
   listName: string | null;
   actorId: string | null;

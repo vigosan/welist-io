@@ -508,7 +508,8 @@ type NotificationType =
   | "added_as_collaborator"
   | "item_added"
   | "item_done"
-  | "list_completed";
+  | "list_completed"
+  | "item_liked";
 
 type CreateNotificationInput = {
   recipientId: string;
@@ -565,6 +566,24 @@ function renderPushBody(input: {
   }
   if (input.type === "list_completed") {
     return `${name} ha completado «${list}»`;
+  }
+  if (input.type === "challenge_accepted") {
+    return `${name} ha aceptado tu reto «${list}»`;
+  }
+  if (input.type === "challenge_completed") {
+    return `${name} ha completado tu reto «${list}»`;
+  }
+  if (input.type === "new_follower") {
+    return `${name} ha empezado a seguirte`;
+  }
+  if (input.type === "added_as_collaborator") {
+    return `${name} te ha añadido como colaborador en «${list}»`;
+  }
+  if (input.type === "list_purchased") {
+    return `${name} ha comprado tu lista «${list}»`;
+  }
+  if (input.type === "item_liked") {
+    return `A ${name} le ha gustado un ítem de «${list}»`;
   }
   return null;
 }
@@ -1400,6 +1419,33 @@ app.post("/lists/:listId/items/:itemId/like", async (c) => {
     await db.delete(itemLikes).where(eq(itemLikes.id, existing.id));
   } else {
     await db.insert(itemLikes).values({ userId, itemId });
+    if (list.ownerId && list.ownerId !== userId) {
+      const [owner, actor, listRow] = await Promise.all([
+        db.query.users.findFirst({
+          where: eq(users.id, list.ownerId),
+          columns: { id: true },
+        }),
+        db.query.users.findFirst({
+          where: eq(users.id, userId),
+          columns: { name: true, image: true },
+        }),
+        db.query.lists.findFirst({
+          where: eq(lists.id, list.id),
+          columns: { name: true },
+        }),
+      ]);
+      if (owner) {
+        await createNotification({
+          recipientId: list.ownerId,
+          type: "item_liked",
+          listId: list.id,
+          listName: listRow?.name,
+          actorId: userId,
+          actorName: actor?.name,
+          actorImage: actor?.image,
+        });
+      }
+    }
   }
   const likeCount = await db.$count(itemLikes, eq(itemLikes.itemId, itemId));
   return c.json({ liked: !existing, likeCount });

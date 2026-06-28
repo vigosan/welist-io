@@ -627,6 +627,10 @@ describe("PATCH /api/lists/:listId/items/:itemId/toggle", () => {
 describe("POST /api/lists/:listId/items/:itemId/like", () => {
   const headers = { "x-forwarded-for": "10.0.0.99" };
   beforeEach(() => vi.clearAllMocks());
+  afterEach(() => {
+    mockDb.query.users.findFirst.mockReset();
+    mockDb.$count.mockReset();
+  });
 
   it("returns 401 when unauthenticated", async () => {
     mockDb.query.lists.findFirst.mockResolvedValue({
@@ -713,6 +717,59 @@ describe("POST /api/lists/:listId/items/:itemId/like", () => {
       headers,
     });
     expect(res.status).toBe(404);
+  });
+
+  it("notifies the list owner when someone else likes an item", async () => {
+    mockGetAuthUser.mockResolvedValueOnce({
+      session: { user: { id: "liker" } },
+    });
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "abc",
+      name: "Cine",
+      ownerId: "owner",
+      collaborative: false,
+      public: true,
+    });
+    mockDb.query.items.findFirst.mockResolvedValue({ id: "i1" });
+    mockDb.query.itemLikes.findFirst.mockResolvedValue(null);
+    mockDb.query.users.findFirst.mockResolvedValue({
+      id: "owner",
+      name: "Liker",
+      image: null,
+    });
+    mockDb.insert.mockReturnValue(chainableInsert());
+    mockDb.$count.mockResolvedValue(1);
+
+    const res = await app.request("/api/lists/abc/items/i1/like", {
+      method: "POST",
+      headers,
+    });
+    expect(res.status).toBe(200);
+    expect(mockDb.insert).toHaveBeenCalledWith(notifications);
+  });
+
+  it("does not notify when the owner likes their own item", async () => {
+    mockGetAuthUser.mockResolvedValueOnce({
+      session: { user: { id: "owner" } },
+    });
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "abc",
+      name: "Cine",
+      ownerId: "owner",
+      collaborative: false,
+      public: true,
+    });
+    mockDb.query.items.findFirst.mockResolvedValue({ id: "i1" });
+    mockDb.query.itemLikes.findFirst.mockResolvedValue(null);
+    mockDb.insert.mockReturnValue(chainableInsert());
+    mockDb.$count.mockResolvedValue(1);
+
+    const res = await app.request("/api/lists/abc/items/i1/like", {
+      method: "POST",
+      headers,
+    });
+    expect(res.status).toBe(200);
+    expect(mockDb.insert).not.toHaveBeenCalledWith(notifications);
   });
 });
 

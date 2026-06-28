@@ -504,6 +504,7 @@ const es = {
     itemDoneOne: "{{name}} ha completado un ítem en «{{list}}»",
     itemDoneMany: "{{name}} ha completado {{count}} ítems en «{{list}}»",
     listCompleted: "{{name}} ha completado «{{list}}»",
+    itemLiked: "A {{name}} le ha gustado un ítem de «{{list}}»",
   },
   feed: {
     title: "Actividad",

@@ -253,6 +253,13 @@
       "when": 1782629240662,
       "tag": "0035_add_list_activity_user_index",
       "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "7",
+      "when": 1782641453572,
+      "tag": "0036_add_item_liked_notification",
+      "breakpoints": true
     }
   ]
 }

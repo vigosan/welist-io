@@ -231,6 +231,7 @@ export const notificationTypeEnum = pgEnum("notification_type", [
   "item_added",
   "item_done",
   "list_completed",
+  "item_liked",
 ]);
 
 export const notifications = pgTable(
