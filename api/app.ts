@@ -509,7 +509,8 @@ type NotificationType =
   | "item_added"
   | "item_done"
   | "list_completed"
-  | "item_liked";
+  | "item_liked"
+  | "weekly_recap";
 
 type CreateNotificationInput = {
   recipientId: string;
@@ -584,6 +585,9 @@ function renderPushBody(input: {
   }
   if (input.type === "item_liked") {
     return `A ${name} le ha gustado un ítem de «${list}»`;
+  }
+  if (input.type === "weekly_recap") {
+    return "Tu resumen de la semana en welist";
   }
   return null;
 }
@@ -2535,6 +2539,61 @@ app.get("/cron/streak-at-risk", async (c) => {
     } catch {
       /* skip this user, continue */
     }
+  }
+  return c.json({ sent });
+});
+
+const RECAP_TYPES = [
+  "challenge_accepted",
+  "challenge_completed",
+  "new_follower",
+  "item_liked",
+] as const;
+
+app.get("/cron/weekly-recap", async (c) => {
+  const auth = c.req.header("Authorization") ?? "";
+  const cronSecret = process.env.CRON_SECRET ?? "";
+  if (!cronSecret || auth !== `Bearer ${cronSecret}`)
+    return c.json({ error: "Unauthorized" }, 401);
+
+  const rows = await db
+    .select({
+      userId: notifications.userId,
+      type: notifications.type,
+      count: sql<number>`cast(count(*) as int)`,
+    })
+    .from(notifications)
+    .where(
+      and(
+        gt(notifications.createdAt, sql`now() - interval '7 days'`),
+        inArray(notifications.type, [...RECAP_TYPES])
+      )
+    )
+    .groupBy(notifications.userId, notifications.type);
+
+  const byUser = new Map<string, Record<string, number>>();
+  for (const r of rows) {
+    const entry = byUser.get(r.userId) ?? {};
+    entry[r.type] = r.count;
+    byUser.set(r.userId, entry);
+  }
+
+  let sent = 0;
+  for (const [userId, counts] of byUser) {
+    const total = Object.values(counts).reduce((a, b) => a + b, 0);
+    if (total === 0) continue;
+    await createNotification({
+      recipientId: userId,
+      type: "weekly_recap",
+      actionUrl: "/feed",
+      metadata: {
+        accepted: counts.challenge_accepted ?? 0,
+        completed: counts.challenge_completed ?? 0,
+        followers: counts.new_follower ?? 0,
+        liked: counts.item_liked ?? 0,
+      },
+    });
+    sent += 1;
   }
   return c.json({ sent });
 });

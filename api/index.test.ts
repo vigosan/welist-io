@@ -4622,4 +4622,51 @@ describe("OG share routes", () => {
   });
 });
 
+describe("GET /api/cron/weekly-recap", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    process.env.CRON_SECRET = "cron-test-secret";
+  });
+
+  it("returns 401 without the cron secret", async () => {
+    const res = await app.request("/api/cron/weekly-recap");
+    expect(res.status).toBe(401);
+  });
+
+  it("creates one recap notification per user with weekly activity", async () => {
+    mockDb.select.mockReturnValue({
+      from: vi.fn().mockReturnThis(),
+      where: vi.fn().mockReturnThis(),
+      groupBy: vi.fn().mockResolvedValue([
+        { userId: "u1", type: "challenge_accepted", count: 3 },
+        { userId: "u1", type: "new_follower", count: 1 },
+        { userId: "u2", type: "item_liked", count: 2 },
+      ]),
+    });
+    mockDb.insert.mockReturnValue(chainableInsert());
+    mockDb.query.deviceTokens.findMany.mockResolvedValue([]);
+
+    const res = await app.request("/api/cron/weekly-recap", {
+      headers: { Authorization: "Bearer cron-test-secret" },
+    });
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ sent: 2 });
+    expect(mockDb.insert).toHaveBeenCalledWith(notifications);
+  });
+
+  it("sends nothing when there was no activity", async () => {
+    mockDb.select.mockReturnValue({
+      from: vi.fn().mockReturnThis(),
+      where: vi.fn().mockReturnThis(),
+      groupBy: vi.fn().mockResolvedValue([]),
+    });
+
+    const res = await app.request("/api/cron/weekly-recap", {
+      headers: { Authorization: "Bearer cron-test-secret" },
+    });
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ sent: 0 });
+  });
+});
+
 void _sign;

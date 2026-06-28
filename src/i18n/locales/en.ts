@@ -506,6 +506,8 @@ const en: Translations = {
     itemDoneMany: "{{name}} completed {{count}} items in «{{list}}»",
     listCompleted: "{{name}} completed «{{list}}»",
     itemLiked: "{{name}} liked an item in «{{list}}»",
+    weeklyRecap_one: "Your week on welist: {{count}} new interaction",
+    weeklyRecap_other: "Your week on welist: {{count}} new interactions",
   },
   feed: {
     title: "Activity",

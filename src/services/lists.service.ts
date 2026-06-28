@@ -99,14 +99,22 @@ export type AppNotification = {
     | "item_added"
     | "item_done"
     | "list_completed"
-    | "item_liked";
+    | "item_liked"
+    | "weekly_recap";
   listId: string | null;
   listName: string | null;
   actorId: string | null;
   actorName: string | null;
   actorImage: string | null;
   actionUrl: string | null;
-  metadata: { count?: number; itemIds?: string[] } | null;
+  metadata: {
+    count?: number;
+    itemIds?: string[];
+    accepted?: number;
+    completed?: number;
+    followers?: number;
+    liked?: number;
+  } | null;
   readAt: string | null;
   createdAt: string;
 };

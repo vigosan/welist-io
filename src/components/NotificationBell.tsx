@@ -35,6 +35,14 @@ function NotificationItem({ n }: { n: AppNotification }) {
     label = t("notifications.listCompleted", { name, list });
   } else if (n.type === "item_liked") {
     label = t("notifications.itemLiked", { name, list });
+  } else if (n.type === "weekly_recap") {
+    const m = n.metadata ?? {};
+    const total =
+      (m.accepted ?? 0) +
+      (m.completed ?? 0) +
+      (m.followers ?? 0) +
+      (m.liked ?? 0);
+    label = t("notifications.weeklyRecap", { count: total });
   } else {
     label = t("notifications.listPurchased", { name, list });
   }
