@@ -590,7 +590,7 @@ const es = {
   },
   auth: {
     badge: "Tu cuenta",
-    loginTitle: "Entra en Wilist",
+    loginTitle: "Entra en Welist",
     signupTitle: "Crea tu cuenta",
     loginSubtitle: "Accede para guardar tus listas y sincronizar tu progreso.",
     signupSubtitle: "Empieza gratis. Sin tarjeta, sin complicaciones.",

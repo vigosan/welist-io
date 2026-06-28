@@ -591,7 +591,7 @@ const en: Translations = {
   },
   auth: {
     badge: "Your account",
-    loginTitle: "Sign in to Wilist",
+    loginTitle: "Sign in to Welist",
     signupTitle: "Create your account",
     loginSubtitle: "Sign in to save your lists and sync your progress.",
     signupSubtitle: "Start free. No card, no hassle.",

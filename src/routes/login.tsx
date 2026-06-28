@@ -72,7 +72,7 @@ export function LoginPage() {
           <div className="flex flex-col gap-5">
             <span className="self-start inline-flex items-center gap-2 rounded-full border border-black/[0.08] bg-canvas px-2.5 py-1 text-[12px] text-muted dark:border-white/[0.08] dark:bg-canvas-dark">
               <span className="rounded-full bg-ink px-2 py-px text-[10px] font-semibold uppercase tracking-[0.04em] text-canvas dark:bg-paper dark:text-canvas-dark">
-                Wilist
+                Welist
               </span>
               <span>{t("auth.badge")}</span>
             </span>
