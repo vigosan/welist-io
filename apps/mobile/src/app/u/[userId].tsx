@@ -139,6 +139,24 @@ export default function UserProfileScreen() {
             {p.name ?? t("common.anonymous")}
           </Text>
 
+          <View className="mt-2 w-44">
+            <View className="flex-row items-center justify-center gap-2">
+              <View className="rounded-full bg-gray-900 px-2.5 py-0.5 dark:bg-gray-100">
+                <Text className="text-[11px] font-semibold text-white dark:text-gray-900">
+                  {t("u.level", { level: p.level.level })}
+                </Text>
+              </View>
+            </View>
+            <View className="mt-2 h-1.5 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
+              <View
+                className="h-full rounded-full bg-gray-900 dark:bg-gray-100"
+                style={{
+                  width: `${Math.round(p.level.progress * 100)}%`,
+                }}
+              />
+            </View>
+          </View>
+
           {!isMe && signedIn && status.data && (
             <Pressable
               onPress={onFollow}

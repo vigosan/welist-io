@@ -233,6 +233,7 @@ export const es = {
     deleteAccountFailed: "No se pudo eliminar la cuenta.",
   },
   u: {
+    level: "Nivel {{level}}",
     follow: "Seguir",
     following: "Siguiendo",
     report: "Reportar usuario",

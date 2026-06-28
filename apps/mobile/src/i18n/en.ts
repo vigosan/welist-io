@@ -230,6 +230,7 @@ export const en = {
     deleteAccountFailed: "Could not delete account.",
   },
   u: {
+    level: "Level {{level}}",
     follow: "Follow",
     following: "Following",
     report: "Report user",
