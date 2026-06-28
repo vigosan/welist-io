@@ -17,6 +17,7 @@ function makeItem(id: string, text: string, done = false): ItemWithLikes {
     updatedAt: new Date(),
     likeCount: 0,
     likedByMe: false,
+    commentCount: 0,
   };
 }
 

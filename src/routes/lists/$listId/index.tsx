@@ -18,6 +18,7 @@ import { AppNav } from "@/components/AppNav";
 import { CommandPalette } from "@/components/CommandPalette";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { AddItemForm } from "@/components/items/AddItemForm";
+import { CommentThread } from "@/components/items/CommentThread";
 import { ItemRow } from "@/components/items/ItemRow";
 import { ListSettingsPanel } from "@/components/ListSettingsPanel";
 import { ActiveParticipants } from "@/components/lists/ActiveParticipants";
@@ -78,6 +79,7 @@ function ListDetailPage() {
   const [participantsPanelOpen, setParticipantsPanelOpen] = useState(false);
   const [activePlace, setActivePlace] = useState<string | undefined>(undefined);
   const [viewMode, setViewMode] = useState<"list" | "map">("list");
+  const [openComments, setOpenComments] = useState<Set<string>>(new Set());
   const [highlightedItemId, setHighlightedItemId] = useState<string | null>(
     null
   );
@@ -671,6 +673,15 @@ function ListDetailPage() {
                             ? () => toggleItemLike.mutate(item.id)
                             : undefined
                         }
+                        onComment={() =>
+                          setOpenComments((prev) => {
+                            const next = new Set(prev);
+                            next.has(item.id)
+                              ? next.delete(item.id)
+                              : next.add(item.id);
+                            return next;
+                          })
+                        }
                         highlighted={item.id === highlightedItemId}
                         dragHandlers={
                           isOwner && !item.done
@@ -684,6 +695,13 @@ function ListDetailPage() {
                         }
                         isDragOver={dragOverId === item.id}
                       />
+                      {openComments.has(item.id) && (
+                        <CommentThread
+                          listId={listId}
+                          itemId={item.id}
+                          ownerId={list?.ownerId ?? null}
+                        />
+                      )}
                     </div>
                   ))}
                 </div>

@@ -20,6 +20,7 @@ const baseItem = {
   updatedAt: new Date(),
   likeCount: 0,
   likedByMe: false,
+  commentCount: 0,
 };
 const taggedItem = {
   ...baseItem,
@@ -262,6 +263,59 @@ describe("ItemRow", () => {
       "aria-pressed",
       "true"
     );
+  });
+
+  it("does not render comment button when onComment is not provided", () => {
+    render(
+      <ItemRow
+        item={baseItem}
+        onToggle={vi.fn()}
+        onDelete={vi.fn()}
+        onEdit={vi.fn()}
+      />
+    );
+    expect(screen.queryByTestId("item-comment-i1")).not.toBeInTheDocument();
+  });
+
+  it("calls onComment when the comment button is clicked", async () => {
+    const onComment = vi.fn();
+    render(
+      <ItemRow
+        item={baseItem}
+        onToggle={vi.fn()}
+        onDelete={vi.fn()}
+        onEdit={vi.fn()}
+        onComment={onComment}
+      />
+    );
+    await userEvent.click(screen.getByTestId("item-comment-i1"));
+    expect(onComment).toHaveBeenCalledOnce();
+  });
+
+  it("renders comment count only when greater than zero", () => {
+    const { rerender } = render(
+      <ItemRow
+        item={baseItem}
+        onToggle={vi.fn()}
+        onDelete={vi.fn()}
+        onEdit={vi.fn()}
+        onComment={vi.fn()}
+      />
+    );
+    expect(
+      screen.queryByTestId("item-comment-count-i1")
+    ).not.toBeInTheDocument();
+
+    rerender(
+      <ItemRow
+        item={{ ...baseItem, commentCount: 2 }}
+        onToggle={vi.fn()}
+        onDelete={vi.fn()}
+        onEdit={vi.fn()}
+        onComment={vi.fn()}
+      />
+    );
+    expect(screen.getByTestId("item-comment-count-i1")).toHaveTextContent("2");
   });
 
   it("renders tags alongside markdown without interference", () => {

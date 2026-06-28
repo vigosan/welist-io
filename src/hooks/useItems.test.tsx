@@ -4,9 +4,11 @@ import type React from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { ItemWithLikes } from "./useItems";
 import {
+  useAddComment,
   useAddItem,
   useBulkAddItems,
   useBulkDeleteItems,
+  useDeleteComment,
   useDeleteItem,
   useItems,
   useToggleItem,
@@ -23,6 +25,9 @@ vi.mock("@/services/items.service", () => ({
     delete: vi.fn(),
     bulkAdd: vi.fn(),
     bulkDelete: vi.fn(),
+    listComments: vi.fn(),
+    addComment: vi.fn(),
+    deleteComment: vi.fn(),
   },
 }));
 
@@ -43,6 +48,7 @@ const ITEM_A: ItemWithLikes = {
   updatedAt: new Date(),
   likeCount: 0,
   likedByMe: false,
+  commentCount: 0,
 };
 const ITEM_B: ItemWithLikes = {
   id: "i2",
@@ -57,6 +63,7 @@ const ITEM_B: ItemWithLikes = {
   updatedAt: new Date(),
   likeCount: 0,
   likedByMe: false,
+  commentCount: 0,
 };
 
 function makeWrapper() {
@@ -309,5 +316,51 @@ describe("useBulkDeleteItems", () => {
     expect(invalidate).toHaveBeenCalledWith(
       expect.objectContaining({ queryKey: ["my-lists"] })
     );
+  });
+});
+
+describe("useAddComment", () => {
+  it("increments the item's commentCount in the items cache on success", async () => {
+    const { qc, Wrapper } = makeWrapper();
+    qc.setQueryData(["items", LIST_ID], [ITEM_A, ITEM_B]);
+    vi.mocked(itemsService.addComment).mockResolvedValue({
+      id: "c1",
+      body: "nice",
+      createdAt: new Date().toISOString(),
+      userId: "u2",
+      userName: "Ana",
+      userImage: null,
+    });
+
+    const { result } = renderHook(() => useAddComment(LIST_ID, ITEM_A.id), {
+      wrapper: Wrapper,
+    });
+    await act(async () => {
+      await result.current.mutateAsync("nice");
+    });
+
+    const cached = qc.getQueryData<ItemWithLikes[]>(["items", LIST_ID]);
+    expect(cached?.find((i) => i.id === ITEM_A.id)?.commentCount).toBe(1);
+  });
+});
+
+describe("useDeleteComment", () => {
+  it("decrements the item's commentCount in the items cache on success", async () => {
+    const { qc, Wrapper } = makeWrapper();
+    qc.setQueryData(
+      ["items", LIST_ID],
+      [{ ...ITEM_A, commentCount: 2 }, ITEM_B]
+    );
+    vi.mocked(itemsService.deleteComment).mockResolvedValue(undefined);
+
+    const { result } = renderHook(() => useDeleteComment(LIST_ID, ITEM_A.id), {
+      wrapper: Wrapper,
+    });
+    await act(async () => {
+      await result.current.mutateAsync("c1");
+    });
+
+    const cached = qc.getQueryData<ItemWithLikes[]>(["items", LIST_ID]);
+    expect(cached?.find((i) => i.id === ITEM_A.id)?.commentCount).toBe(1);
   });
 });

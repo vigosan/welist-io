@@ -140,6 +140,26 @@ export const itemLikes = pgTable(
   ]
 );
 
+export const itemComments = pgTable(
+  "item_comments",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    itemId: uuid("item_id")
+      .notNull()
+      .references(() => items.id, { onDelete: "cascade" }),
+    body: text("body").notNull(),
+    createdAt: timestamp("created_at", {
+      withTimezone: true,
+    })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => [index("item_comments_item_idx").on(t.itemId)]
+);
+
 export const listActivityActionEnum = pgEnum("list_activity_action", [
   "item_added",
   "item_edited",
@@ -233,6 +253,7 @@ export const notificationTypeEnum = pgEnum("notification_type", [
   "list_completed",
   "item_liked",
   "weekly_recap",
+  "item_commented",
 ]);
 
 export const notifications = pgTable(
@@ -424,6 +445,7 @@ export type Item = typeof items.$inferSelect;
 export type Participation = typeof participations.$inferSelect;
 export type ItemProgress = typeof itemProgress.$inferSelect;
 export type ItemLike = typeof itemLikes.$inferSelect;
+export type ItemComment = typeof itemComments.$inferSelect;
 export type ListActivity = typeof listActivity.$inferSelect;
 export type StripeAccount = typeof stripeAccounts.$inferSelect;
 export type ListPrice = typeof listPrices.$inferSelect;

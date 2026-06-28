@@ -6,6 +6,7 @@ import { zValidator } from "@hono/zod-validator";
 import type { AnyColumn } from "drizzle-orm";
 import {
   and,
+  asc,
   countDistinct,
   desc,
   eq,
@@ -30,6 +31,7 @@ import {
   deviceTokens,
   events,
   follows,
+  itemComments,
   itemLikes,
   itemProgress,
   items,
@@ -512,7 +514,8 @@ type NotificationType =
   | "item_done"
   | "list_completed"
   | "item_liked"
-  | "weekly_recap";
+  | "weekly_recap"
+  | "item_commented";
 
 type CreateNotificationInput = {
   recipientId: string;
@@ -587,6 +590,9 @@ function renderPushBody(input: {
   }
   if (input.type === "item_liked") {
     return `A ${name} le ha gustado un ítem de «${list}»`;
+  }
+  if (input.type === "item_commented") {
+    return `${name} ha comentado un ítem de «${list}»`;
   }
   if (input.type === "weekly_recap") {
     return "Tu resumen de la semana en welist";
@@ -1057,10 +1063,25 @@ app.get("/lists/:listId/items", async (c) => {
     likeCountByItem.set(row.itemId, (likeCountByItem.get(row.itemId) ?? 0) + 1);
     if (userId && row.userId === userId) likedByMeSet.add(row.itemId);
   }
+  const commentRows =
+    itemIds.length === 0
+      ? []
+      : await db.query.itemComments.findMany({
+          where: inUuids(itemComments.itemId, itemIds),
+          columns: { itemId: true },
+        });
+  const commentCountByItem = new Map<string, number>();
+  for (const row of commentRows) {
+    commentCountByItem.set(
+      row.itemId,
+      (commentCountByItem.get(row.itemId) ?? 0) + 1
+    );
+  }
   const withLikes = rows.map((item) => ({
     ...item,
     likeCount: likeCountByItem.get(item.id) ?? 0,
     likedByMe: likedByMeSet.has(item.id),
+    commentCount: commentCountByItem.get(item.id) ?? 0,
   }));
 
   if (!participation || participation.role !== "challenger")
@@ -1475,6 +1496,111 @@ app.post("/lists/:listId/items/:itemId/like", async (c) => {
   }
   const likeCount = await db.$count(itemLikes, eq(itemLikes.itemId, itemId));
   return c.json({ liked: !existing, likeCount });
+});
+
+app.get("/lists/:listId/items/:itemId/comments", async (c) => {
+  const list = await resolveList(c.req.param("listId"));
+  if (!list) return c.json({ error: "Not found" }, 404);
+  const authUser = getOptionalUser(c);
+  const userId = authUser?.session?.user?.id ?? null;
+  if (!(await canViewList(list, userId)))
+    return c.json({ error: "Not found" }, 404);
+  const itemId = c.req.param("itemId");
+  const item = await db.query.items.findFirst({
+    where: and(eq(items.id, itemId), eq(items.listId, list.id)),
+    columns: { id: true },
+  });
+  if (!item) return c.json({ error: "Not found" }, 404);
+  const rows = await db
+    .select({
+      id: itemComments.id,
+      body: itemComments.body,
+      createdAt: itemComments.createdAt,
+      userId: itemComments.userId,
+      userName: users.name,
+      userImage: users.image,
+    })
+    .from(itemComments)
+    .leftJoin(users, eq(users.id, itemComments.userId))
+    .where(eq(itemComments.itemId, itemId))
+    .orderBy(asc(itemComments.createdAt));
+  return c.json(rows);
+});
+
+app.post(
+  "/lists/:listId/items/:itemId/comments",
+  zValidator("json", z.object({ body: z.string().trim().min(1).max(1000) })),
+  async (c) => {
+    const list = await resolveList(c.req.param("listId"));
+    if (!list) return c.json({ error: "Not found" }, 404);
+    const authUser = getOptionalUser(c);
+    const userId = authUser?.session?.user?.id ?? null;
+    if (!userId) return c.json({ error: "Unauthorized" }, 401);
+    if (!(await canViewList(list, userId)))
+      return c.json({ error: "Not found" }, 404);
+    const itemId = c.req.param("itemId");
+    const item = await db.query.items.findFirst({
+      where: and(eq(items.id, itemId), eq(items.listId, list.id)),
+      columns: { id: true },
+    });
+    if (!item) return c.json({ error: "Not found" }, 404);
+    const { body } = c.req.valid("json");
+    const [created] = await db
+      .insert(itemComments)
+      .values({ userId, itemId, body })
+      .returning();
+    const author = await db.query.users.findFirst({
+      where: eq(users.id, userId),
+      columns: { name: true, image: true },
+    });
+    if (list.ownerId && list.ownerId !== userId) {
+      const listRow = await db.query.lists.findFirst({
+        where: eq(lists.id, list.id),
+        columns: { name: true },
+      });
+      await createNotification({
+        recipientId: list.ownerId,
+        type: "item_commented",
+        listId: list.id,
+        listName: listRow?.name,
+        actorId: userId,
+        actorName: author?.name,
+        actorImage: author?.image,
+      });
+    }
+    notifyListChange(list.id).catch(() => {});
+    return c.json(
+      {
+        id: created.id,
+        body: created.body,
+        createdAt: created.createdAt,
+        userId,
+        userName: author?.name ?? null,
+        userImage: author?.image ?? null,
+      },
+      201
+    );
+  }
+);
+
+app.delete("/lists/:listId/items/:itemId/comments/:commentId", async (c) => {
+  const list = await resolveList(c.req.param("listId"));
+  if (!list) return c.json({ error: "Not found" }, 404);
+  const authUser = getOptionalUser(c);
+  const userId = authUser?.session?.user?.id ?? null;
+  if (!userId) return c.json({ error: "Unauthorized" }, 401);
+  const commentId = c.req.param("commentId");
+  const comment = await db.query.itemComments.findFirst({
+    where: eq(itemComments.id, commentId),
+    columns: { id: true, userId: true },
+  });
+  if (!comment) return c.json({ error: "Not found" }, 404);
+  const isAuthor = comment.userId === userId;
+  const isOwner = list.ownerId === userId;
+  if (!isAuthor && !isOwner) return c.json({ error: "Forbidden" }, 403);
+  await db.delete(itemComments).where(eq(itemComments.id, commentId));
+  notifyListChange(list.id).catch(() => {});
+  return c.body(null, 204);
 });
 
 app.delete("/lists/:listId/items/:itemId", async (c) => {

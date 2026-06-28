@@ -5,11 +5,12 @@ import { t } from "@/i18n/service";
 import { queryKeys } from "@/lib/query-keys";
 import {
   type Coords,
+  type ItemCommentView,
   type ItemWithLikes,
   itemsService,
 } from "@/services/items.service";
 
-export type { Item, ItemWithLikes };
+export type { Item, ItemCommentView, ItemWithLikes };
 
 interface MutationContext {
   previous: ItemWithLikes[] | undefined;
@@ -68,6 +69,64 @@ export function useToggleItemLike(listId: string) {
     },
     onSettled: () =>
       qc.invalidateQueries({ queryKey: queryKeys.items(listId) }),
+  });
+}
+
+function bumpCommentCount(
+  qc: ReturnType<typeof useQueryClient>,
+  listId: string,
+  itemId: string,
+  delta: number
+) {
+  qc.setQueryData<ItemWithLikes[]>(queryKeys.items(listId), (old) =>
+    old?.map((i) =>
+      i.id === itemId
+        ? { ...i, commentCount: Math.max(0, i.commentCount + delta) }
+        : i
+    )
+  );
+}
+
+export function useItemComments(
+  itemId: string,
+  listId: string,
+  enabled: boolean
+) {
+  return useQuery({
+    queryKey: queryKeys.itemComments(itemId),
+    queryFn: () => itemsService.listComments(listId, itemId),
+    enabled,
+  });
+}
+
+export function useAddComment(listId: string, itemId: string) {
+  const qc = useQueryClient();
+  return useMutation<ItemCommentView, Error, string>({
+    mutationFn: (body: string) => itemsService.addComment(listId, itemId, body),
+    onSuccess: (created) => {
+      qc.setQueryData<ItemCommentView[]>(
+        queryKeys.itemComments(itemId),
+        (old) => [...(old ?? []), created]
+      );
+      bumpCommentCount(qc, listId, itemId, 1);
+    },
+    onError: () => toast.error(t("items.errorComment")),
+  });
+}
+
+export function useDeleteComment(listId: string, itemId: string) {
+  const qc = useQueryClient();
+  return useMutation<void, Error, string>({
+    mutationFn: (commentId: string) =>
+      itemsService.deleteComment(listId, itemId, commentId),
+    onSuccess: (_data, commentId) => {
+      qc.setQueryData<ItemCommentView[]>(
+        queryKeys.itemComments(itemId),
+        (old) => old?.filter((c) => c.id !== commentId)
+      );
+      bumpCommentCount(qc, listId, itemId, -1);
+    },
+    onError: () => toast.error(t("items.errorComment")),
   });
 }
 

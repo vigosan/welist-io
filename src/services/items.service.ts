@@ -10,6 +10,16 @@ export interface Coords {
 export type ItemWithLikes = Item & {
   likeCount: number;
   likedByMe: boolean;
+  commentCount: number;
+};
+
+export type ItemCommentView = {
+  id: string;
+  body: string;
+  createdAt: string;
+  userId: string;
+  userName: string | null;
+  userImage: string | null;
 };
 
 export const itemsService = {
@@ -20,6 +30,23 @@ export const itemsService = {
     apiClient<{ liked: boolean; likeCount: number }>(
       `/api/lists/${listId}/items/${itemId}/like`,
       { method: "POST" }
+    ),
+
+  listComments: (listId: string, itemId: string) =>
+    apiClient<ItemCommentView[]>(
+      `/api/lists/${listId}/items/${itemId}/comments`
+    ),
+
+  addComment: (listId: string, itemId: string, body: string) =>
+    apiClient<ItemCommentView>(
+      `/api/lists/${listId}/items/${itemId}/comments`,
+      { method: "POST", body: JSON.stringify({ body }) }
+    ),
+
+  deleteComment: (listId: string, itemId: string, commentId: string) =>
+    apiClient<void>(
+      `/api/lists/${listId}/items/${itemId}/comments/${commentId}`,
+      { method: "DELETE" }
     ),
 
   add: (listId: string, text: string, coords?: Coords) =>

@@ -381,6 +381,13 @@ const en: Translations = {
     errorLike: "Could not register your like",
     like: "Like",
     unlike: "Remove like",
+    errorComment: "Could not save your comment",
+    comments: "Comments",
+    comment: "Comment",
+    commentPlaceholder: "Add a comment…",
+    commentSend: "Send",
+    commentEmpty: "No comments yet.",
+    commentDelete: "Delete comment",
   },
   bulk: {
     header_one: "{{count}} item to add",

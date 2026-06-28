@@ -13,6 +13,7 @@ interface ItemCaps {
   canWrite?: boolean;
   canToggle?: boolean;
   canLike?: boolean;
+  canComment?: boolean;
 }
 
 interface ItemDragHandlers {
@@ -28,6 +29,7 @@ interface Props {
   onDelete: () => void;
   onEdit: (text: string, coords?: Coords | null) => void;
   onLike?: () => void;
+  onComment?: () => void;
   onTagClick?: (tag: string) => void;
   activeTag?: string;
   caps?: ItemCaps;
@@ -43,6 +45,7 @@ export const ItemRow = memo(
     onDelete,
     onEdit,
     onLike,
+    onComment,
     onTagClick,
     activeTag,
     caps,
@@ -50,7 +53,12 @@ export const ItemRow = memo(
     isDragOver,
     highlighted,
   }: Props) {
-    const { canWrite = true, canToggle, canLike = true } = caps ?? {};
+    const {
+      canWrite = true,
+      canToggle,
+      canLike = true,
+      canComment = true,
+    } = caps ?? {};
     const { onDragStart, onDragOver, onDrop, onDragEnd } = dragHandlers ?? {};
     const [editing, setEditing] = useState(false);
     const [text, setText] = useState(item.text);
@@ -368,6 +376,43 @@ export const ItemRow = memo(
               )}
             </button>
           )}
+          {onComment && (
+            <button
+              type="button"
+              onClick={canComment ? onComment : undefined}
+              disabled={!canComment}
+              data-testid={`item-comment-${item.id}`}
+              aria-label={t("items.comments")}
+              className={`cursor-pointer w-9 h-9 sm:w-8 sm:h-8 flex items-center justify-center gap-1 rounded-md transition-colors active:scale-[0.92] ${
+                item.commentCount > 0
+                  ? "text-gray-900 dark:text-gray-100"
+                  : "text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+              } ${canComment ? "" : "cursor-default"}`}
+            >
+              <svg
+                aria-hidden="true"
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={1.75}
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M8 12h.01M12 12h.01M16 12h.01M21 12a9 9 0 01-13.5 7.79L3 21l1.21-4.5A9 9 0 1121 12z"
+                />
+              </svg>
+              {item.commentCount > 0 && (
+                <span
+                  data-testid={`item-comment-count-${item.id}`}
+                  className="text-[11px] font-mono tabular-nums leading-none"
+                >
+                  {item.commentCount}
+                </span>
+              )}
+            </button>
+          )}
           {canWrite && !item.done && !editing && (
             <button
               type="button"
@@ -428,12 +473,15 @@ export const ItemRow = memo(
     prev.item.text === next.item.text &&
     prev.item.likeCount === next.item.likeCount &&
     prev.item.likedByMe === next.item.likedByMe &&
+    prev.item.commentCount === next.item.commentCount &&
     prev.highlighted === next.highlighted &&
     prev.activeTag === next.activeTag &&
     prev.caps?.canWrite === next.caps?.canWrite &&
     prev.caps?.canToggle === next.caps?.canToggle &&
     prev.caps?.canLike === next.caps?.canLike &&
+    prev.caps?.canComment === next.caps?.canComment &&
     prev.isDragOver === next.isDragOver &&
     !!prev.dragHandlers === !!next.dragHandlers &&
-    !!prev.onLike === !!next.onLike
+    !!prev.onLike === !!next.onLike &&
+    !!prev.onComment === !!next.onComment
 );

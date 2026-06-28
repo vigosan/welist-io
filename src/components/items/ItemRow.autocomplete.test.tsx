@@ -31,6 +31,7 @@ const baseItem = {
   updatedAt: new Date(),
   likeCount: 0,
   likedByMe: false,
+  commentCount: 0,
 };
 
 describe("ItemRow edit autocomplete", () => {

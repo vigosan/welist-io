@@ -380,6 +380,13 @@ const es = {
     errorLike: "No se pudo registrar tu like",
     like: "Me gusta",
     unlike: "Quitar me gusta",
+    errorComment: "No se pudo guardar tu comentario",
+    comments: "Comentarios",
+    comment: "Comentar",
+    commentPlaceholder: "Añade un comentario…",
+    commentSend: "Enviar",
+    commentEmpty: "Aún no hay comentarios.",
+    commentDelete: "Eliminar comentario",
   },
   bulk: {
     header_one: "{{count}} elemento para añadir",
