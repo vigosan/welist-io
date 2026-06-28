@@ -7,7 +7,7 @@
     "dev": "concurrently -n api,vite -c blue,green \"tsx watch api/serve.ts\" \"vite\"",
     "dev:frontend": "vite",
     "build": "vite build",
-    "check:types": "tsc -b",
+    "check:types": "tsc -b tsconfig.build.json",
     "check:api-types": "tsc -p tsconfig.api.json",
     "preview": "vite preview",
     "test": "vitest",
