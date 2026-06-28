@@ -30,6 +30,7 @@ import { ListStatsCard } from "@/components/lists/ListStatsCard";
 import { ListViewChip } from "@/components/lists/ListViewChip";
 import { ParticipantsPanel } from "@/components/lists/ParticipantsPanel";
 import { SignInNudge } from "@/components/SignInNudge";
+import { Progress } from "@/components/ui";
 
 const ListMap = lazy(() =>
   import("@/components/maps/ListMap").then((m) => ({ default: m.ListMap }))
@@ -366,13 +367,23 @@ function ListDetailPage() {
                         setEditingName(false);
                       }}
                       data-testid="list-name-edit-input"
-                      className="w-full text-xl font-bold text-gray-900 leading-tight bg-transparent outline-none border-b-2 border-gray-900"
+                      className="w-full font-bold text-gray-900 bg-transparent outline-none border-b-2 border-gray-900"
+                      style={{
+                        fontSize: "clamp(26px, 4.5vw, 38px)",
+                        letterSpacing: "-0.03em",
+                        lineHeight: 1.05,
+                      }}
                     />
                   </form>
                 ) : (
                   <h1
-                    className="text-xl font-bold text-gray-900 dark:text-gray-100 leading-tight cursor-default"
-                    style={{ textWrap: "balance" }}
+                    className="font-bold text-gray-900 dark:text-gray-100 cursor-default"
+                    style={{
+                      fontSize: "clamp(26px, 4.5vw, 38px)",
+                      letterSpacing: "-0.03em",
+                      lineHeight: 1.05,
+                      textWrap: "balance",
+                    }}
                     onDoubleClick={
                       isOwner
                         ? () => {
@@ -514,11 +525,19 @@ function ListDetailPage() {
               )}
 
               {!listLoading && items.length > 0 && (
-                <div className="mt-2 h-0.5 bg-gray-100 dark:bg-gray-700 overflow-hidden rounded-full order-4">
-                  <div
-                    className="h-full bg-gray-900 dark:bg-gray-100 rounded-full transition-all duration-700"
-                    style={{ width: `${progress}%` }}
-                  />
+                <div className="mt-3 order-4">
+                  <div className="mb-1.5 flex items-baseline justify-between font-mono text-[11px] tabular-nums text-muted">
+                    <span>
+                      {t("list.progress", {
+                        done: doneCount,
+                        total: items.length,
+                      })}
+                    </span>
+                    <span className="text-[13px] font-medium text-gray-900 dark:text-gray-100">
+                      {Math.round(progress)}%
+                    </span>
+                  </div>
+                  <Progress value={progress} className="h-1.5" />
                 </div>
               )}
 
@@ -622,9 +641,32 @@ function ListDetailPage() {
                   ))}
                 </div>
               ) : filteredItems.length === 0 ? (
-                <div className="flex flex-col items-center gap-2 py-12 text-center">
-                  <span className="text-2xl select-none" aria-hidden>
-                    {searchQuery ? "🔍" : items.length === 0 ? "✦" : "◎"}
+                <div className="flex flex-col items-center gap-3 py-12 text-center">
+                  <span
+                    className="inline-grid h-12 w-12 place-items-center rounded-2xl border border-gray-200 dark:border-gray-700 text-gray-300 dark:text-gray-600"
+                    aria-hidden
+                  >
+                    <svg
+                      aria-hidden="true"
+                      className="h-5 w-5"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      viewBox="0 0 24 24"
+                    >
+                      {searchQuery ? (
+                        <>
+                          <circle cx="11" cy="11" r="7" />
+                          <path d="m21 21-4.3-4.3" />
+                        </>
+                      ) : items.length === 0 ? (
+                        <path d="M12 5v14M5 12h14" />
+                      ) : (
+                        <path d="M3 4h18M7 9h10M11 14h2" />
+                      )}
+                    </svg>
                   </span>
                   <p
                     className="text-sm text-gray-400"

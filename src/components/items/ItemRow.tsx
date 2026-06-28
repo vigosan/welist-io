@@ -161,12 +161,12 @@ export const ItemRow = memo(
         onDragOver={onDragOver}
         onDrop={onDrop}
         onDragEnd={onDragEnd}
-        className={`flex items-center gap-2 px-2.5 py-2 rounded-xl transition-colors ${
+        className={`group/row flex items-center gap-2 px-3 py-2.5 rounded-xl border transition-[background-color,border-color,opacity] duration-200 ${
           isDragOver
-            ? "bg-gray-200 dark:bg-gray-700"
+            ? "border-ink/20 bg-black/[0.04] dark:border-paper/20 dark:bg-white/[0.05]"
             : item.done
-              ? "bg-gray-100 dark:bg-gray-800"
-              : "bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800"
+              ? "border-transparent bg-transparent opacity-55 hover:opacity-100 hover:bg-black/[0.02] dark:hover:bg-white/[0.03]"
+              : "border-transparent bg-transparent hover:border-black/[0.07] hover:bg-black/[0.02] dark:hover:border-white/[0.08] dark:hover:bg-white/[0.03]"
         } ${highlighted ? "ring-2 ring-gray-900 dark:ring-gray-100" : ""}`}
       >
         {canWrite && (
@@ -419,7 +419,7 @@ export const ItemRow = memo(
               onClick={() => setEditing(true)}
               data-testid={`item-edit-${item.id}`}
               aria-label={t("items.edit", { text: display || item.text })}
-              className="cursor-pointer w-9 h-9 sm:w-8 sm:h-8 flex items-center justify-center text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors active:scale-[0.92] rounded-md"
+              className="cursor-pointer w-9 h-9 sm:w-8 sm:h-8 flex items-center justify-center text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-[color,opacity] active:scale-[0.92] rounded-md sm:opacity-0 sm:transition-opacity sm:group-hover/row:opacity-100 sm:group-focus-within/row:opacity-100"
             >
               <svg
                 aria-hidden="true"
@@ -445,7 +445,7 @@ export const ItemRow = memo(
               aria-label={t("items.delete", {
                 text: display || item.text,
               })}
-              className="cursor-pointer w-9 h-9 sm:w-8 sm:h-8 flex items-center justify-center text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors active:scale-[0.92] rounded-md"
+              className="cursor-pointer w-9 h-9 sm:w-8 sm:h-8 flex items-center justify-center text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-[color,opacity] active:scale-[0.92] rounded-md sm:opacity-0 sm:transition-opacity sm:group-hover/row:opacity-100 sm:group-focus-within/row:opacity-100"
             >
               <svg
                 aria-hidden="true"
