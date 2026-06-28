@@ -8,6 +8,7 @@
     "dev:frontend": "vite",
     "build": "vite build",
     "check:types": "tsc -b",
+    "check:api-types": "tsc -p tsconfig.api.json",
     "preview": "vite preview",
     "test": "vitest",
     "db:generate": "drizzle-kit generate",
