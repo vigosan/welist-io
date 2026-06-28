@@ -36,6 +36,10 @@ export const ActiveParticipants = memo(function ActiveParticipants({
               <img
                 src={p.image}
                 alt={p.name ?? ""}
+                width={24}
+                height={24}
+                loading="lazy"
+                decoding="async"
                 className="w-full h-full object-cover"
               />
             ) : (

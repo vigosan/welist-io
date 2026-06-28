@@ -113,6 +113,10 @@ function UserRow({ user }: { user: DirectoryUser }) {
         <img
           src={user.image}
           alt=""
+          width={48}
+          height={48}
+          loading="lazy"
+          decoding="async"
           className="pointer-events-none w-12 h-12 rounded-full shrink-0 outline outline-1 outline-black/10 dark:outline-white/10"
         />
       ) : (

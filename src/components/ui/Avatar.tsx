@@ -12,6 +12,10 @@ export function Avatar({
       <img
         src={image}
         alt={name ?? ""}
+        width={24}
+        height={24}
+        loading="lazy"
+        decoding="async"
         className="w-6 h-6 rounded-full shrink-0"
       />
     );

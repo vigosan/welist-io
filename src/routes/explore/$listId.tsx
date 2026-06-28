@@ -152,6 +152,9 @@ function ExploreDetailPage() {
             <img
               src={detail.owner.image}
               alt={detail.owner.name ?? ""}
+              width={36}
+              height={36}
+              decoding="async"
               className="w-9 h-9 rounded-full shrink-0 outline outline-1 outline-black/10"
             />
           )}
@@ -193,6 +196,10 @@ function ExploreDetailPage() {
                       key={p.id}
                       src={p.image}
                       alt={p.name ?? ""}
+                      width={24}
+                      height={24}
+                      loading="lazy"
+                      decoding="async"
                       className="w-6 h-6 rounded-full outline outline-2 outline-canvas dark:outline-canvas-dark"
                     />
                   ) : (
@@ -268,6 +275,10 @@ function ExploreDetailPage() {
                     <img
                       src={p.image}
                       alt={p.name ?? ""}
+                      width={24}
+                      height={24}
+                      loading="lazy"
+                      decoding="async"
                       className="w-6 h-6 rounded-full shrink-0 outline outline-1 outline-black/10 dark:outline-white/10"
                     />
                   ) : (
