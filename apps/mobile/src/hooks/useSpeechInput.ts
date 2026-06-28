@@ -1,43 +1,60 @@
-import {
-  addSpeechRecognitionListener,
-  ExpoSpeechRecognitionModule,
-  isRecognitionAvailable,
-} from "expo-speech-recognition";
 import { useCallback, useEffect, useRef, useState } from "react";
+
+// Lazily resolve the native module. A static `import` from
+// "expo-speech-recognition" throws at module-eval time when the native module
+// is not present in the binary (e.g. an older dev client), which would crash
+// any screen that imports this hook. Requiring it inside try/catch keeps the
+// feature optional and degrades to `supported: false`.
+type SpeechModule = {
+  ExpoSpeechRecognitionModule: {
+    start: (opts: Record<string, unknown>) => void;
+    stop: () => void;
+    requestPermissionsAsync: () => Promise<{ granted: boolean }>;
+  };
+  addSpeechRecognitionListener: (
+    event: string,
+    cb: (e: { isFinal?: boolean; results?: { transcript?: string }[] }) => void
+  ) => { remove: () => void };
+  isRecognitionAvailable: () => boolean;
+};
+
+function loadSpeech(): SpeechModule | null {
+  try {
+    // biome-ignore lint/suspicious/noExplicitAny: optional native module
+    const mod = require("expo-speech-recognition") as any;
+    if (!mod?.isRecognitionAvailable?.()) return null;
+    return mod as SpeechModule;
+  } catch {
+    return null;
+  }
+}
 
 function localeTag(lang: string): string {
   return lang === "es" ? "es-ES" : "en-US";
 }
 
-/**
- * Wraps expo-speech-recognition with a small web-parity surface
- * ({ supported, listening, start, stop }). `supported` is false when the
- * native module is unavailable (e.g. dev client not rebuilt), so callers can
- * hide the mic button and degrade gracefully.
- */
 export function useSpeechInput(lang: string, onResult: (text: string) => void) {
   const [listening, setListening] = useState(false);
   const onResultRef = useRef(onResult);
   onResultRef.current = onResult;
+  const moduleRef = useRef<SpeechModule | null | undefined>(undefined);
 
-  const supported = (() => {
-    try {
-      return isRecognitionAvailable();
-    } catch {
-      return false;
-    }
-  })();
+  if (moduleRef.current === undefined) {
+    moduleRef.current = loadSpeech();
+  }
+  const speech = moduleRef.current;
+  const supported = speech !== null;
 
   useEffect(() => {
-    if (!supported) return;
-    const resultSub = addSpeechRecognitionListener("result", (e) => {
+    if (!speech) return;
+    const resultSub = speech.addSpeechRecognitionListener("result", (e) => {
       const transcript = e.results?.[0]?.transcript?.trim();
       if (e.isFinal && transcript) onResultRef.current(transcript);
     });
-    const endSub = addSpeechRecognitionListener("end", () =>
+    const endSub = speech.addSpeechRecognitionListener("end", () =>
       setListening(false)
     );
-    const errorSub = addSpeechRecognitionListener("error", () =>
+    const errorSub = speech.addSpeechRecognitionListener("error", () =>
       setListening(false)
     );
     return () => {
@@ -45,28 +62,29 @@ export function useSpeechInput(lang: string, onResult: (text: string) => void) {
       endSub.remove();
       errorSub.remove();
     };
-  }, [supported]);
+  }, [speech]);
 
   const stop = useCallback(() => {
     try {
-      ExpoSpeechRecognitionModule.stop();
+      speech?.ExpoSpeechRecognitionModule.stop();
     } catch {
       /* noop */
     }
     setListening(false);
-  }, []);
+  }, [speech]);
 
   const start = useCallback(async () => {
-    if (!supported) return;
-    const perm = await ExpoSpeechRecognitionModule.requestPermissionsAsync();
+    if (!speech) return;
+    const perm =
+      await speech.ExpoSpeechRecognitionModule.requestPermissionsAsync();
     if (!perm.granted) return;
     setListening(true);
-    ExpoSpeechRecognitionModule.start({
+    speech.ExpoSpeechRecognitionModule.start({
       lang: localeTag(lang),
       interimResults: false,
       continuous: false,
     });
-  }, [supported, lang]);
+  }, [speech, lang]);
 
   return { supported, listening, start, stop };
 }
