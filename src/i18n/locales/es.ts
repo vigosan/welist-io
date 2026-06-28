@@ -669,6 +669,12 @@ const es = {
         "Recibe un recordatorio quincenal con un ítem aleatorio pendiente de tus listas para que no se te olvide.",
       toggle: "Recibir recordatorios por email",
     },
+    pushNotifications: {
+      title: "Notificaciones del navegador",
+      description:
+        "Recibe un aviso en este navegador cuando alguien acepte tu reto, te siga o le guste un ítem tuyo.",
+      toggle: "Activar notificaciones del navegador",
+    },
     stripe: {
       title: "Pagos con Stripe",
       description:

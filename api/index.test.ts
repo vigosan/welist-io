@@ -12,6 +12,7 @@ const mockDb = {
     listPurchases: { findFirst: vi.fn() },
     notifications: { findFirst: vi.fn(), findMany: vi.fn() },
     deviceTokens: { findMany: vi.fn().mockResolvedValue([]) },
+    webPushSubscriptions: { findMany: vi.fn().mockResolvedValue([]) },
     userSettings: { findFirst: vi.fn() },
   },
   insert: vi.fn(),
@@ -52,6 +53,12 @@ vi.mock("./og", () => ({
   ),
 }));
 
+vi.mock("./web-push", () => ({
+  sendWebPush: vi
+    .fn()
+    .mockResolvedValue({ skipped: false, staleEndpoints: [] }),
+}));
+
 const mockStripeConstructEvent = vi.fn();
 vi.mock("stripe", () => {
   const StripeMock = vi.fn().mockImplementation(() => ({
@@ -66,8 +73,14 @@ vi.mock("stripe", () => {
 const { app } = await import("./app.js");
 const { sendEmail: mockSendEmail } = await import("./email.js");
 const { sendExpoPush: mockSendExpoPush } = await import("./push.js");
-const { achievements, deviceTokens, lists, notifications, participations } =
-  await import("../src/db/schema/lists.schema.js");
+const {
+  achievements,
+  deviceTokens,
+  lists,
+  notifications,
+  participations,
+  webPushSubscriptions,
+} = await import("../src/db/schema/lists.schema.js");
 
 function chainableInsert() {
   const valuesMock = vi.fn().mockImplementation(() => {
@@ -4751,6 +4764,80 @@ describe("GET /api/lists/:listId/duel/:opponentId", () => {
       .mockResolvedValueOnce(undefined);
     const res = await app.request("/api/lists/abc/duel/ghost", { headers });
     expect(res.status).toBe(404);
+  });
+});
+
+describe("web push subscription endpoints", () => {
+  const headers = { "Content-Type": "application/json" };
+  beforeEach(() => vi.clearAllMocks());
+  afterEach(() => {
+    delete process.env.VAPID_PUBLIC_KEY;
+  });
+
+  it("exposes the VAPID public key", async () => {
+    process.env.VAPID_PUBLIC_KEY = "test-public-key";
+    const res = await app.request("/api/web-push/public-key");
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ publicKey: "test-public-key" });
+  });
+
+  it("returns 401 subscribing while unauthenticated", async () => {
+    mockGetAuthUser.mockRejectedValueOnce(new Error("no session"));
+    const res = await app.request("/api/me/web-push", {
+      method: "POST",
+      headers,
+      body: JSON.stringify({
+        endpoint: "https://push.example.com/abc",
+        keys: { p256dh: "key", auth: "auth" },
+      }),
+    });
+    expect(res.status).toBe(401);
+  });
+
+  it("saves a subscription for the authenticated user", async () => {
+    mockGetAuthUser.mockResolvedValueOnce({ session: { user: { id: "u1" } } });
+    const valuesMock = vi.fn().mockReturnValue({
+      onConflictDoUpdate: vi.fn().mockResolvedValue(undefined),
+    });
+    mockDb.insert.mockReturnValue({ values: valuesMock });
+
+    const res = await app.request("/api/me/web-push", {
+      method: "POST",
+      headers,
+      body: JSON.stringify({
+        endpoint: "https://push.example.com/abc",
+        keys: { p256dh: "key", auth: "auth" },
+      }),
+    });
+    expect(res.status).toBe(204);
+    expect(mockDb.insert).toHaveBeenCalledWith(webPushSubscriptions);
+  });
+
+  it("rejects an invalid endpoint", async () => {
+    mockGetAuthUser.mockResolvedValueOnce({ session: { user: { id: "u1" } } });
+    const res = await app.request("/api/me/web-push", {
+      method: "POST",
+      headers,
+      body: JSON.stringify({
+        endpoint: "not-a-url",
+        keys: { p256dh: "key", auth: "auth" },
+      }),
+    });
+    expect(res.status).toBe(400);
+  });
+
+  it("deletes a subscription by endpoint", async () => {
+    mockGetAuthUser.mockResolvedValueOnce({ session: { user: { id: "u1" } } });
+    mockDb.delete.mockReturnValue({
+      where: vi.fn().mockResolvedValue(undefined),
+    });
+    const res = await app.request("/api/me/web-push", {
+      method: "DELETE",
+      headers,
+      body: JSON.stringify({ endpoint: "https://push.example.com/abc" }),
+    });
+    expect(res.status).toBe(204);
+    expect(mockDb.delete).toHaveBeenCalledWith(webPushSubscriptions);
   });
 });
 

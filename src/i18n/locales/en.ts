@@ -670,6 +670,12 @@ const en: Translations = {
         "Get a fortnightly reminder with a random pending item from your lists so you don't forget.",
       toggle: "Get email reminders",
     },
+    pushNotifications: {
+      title: "Browser notifications",
+      description:
+        "Get notified in this browser when someone accepts your challenge, follows you or likes your items.",
+      toggle: "Enable browser notifications",
+    },
     stripe: {
       title: "Stripe payments",
       description:

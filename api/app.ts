@@ -42,6 +42,7 @@ import {
   reports,
   stripeAccounts,
   userSettings,
+  webPushSubscriptions,
 } from "../src/db/schema/lists.schema.js";
 import { ADULT_CATEGORIES, LIST_CATEGORIES } from "../src/lib/categories.js";
 import { plainItemText } from "../src/lib/item-text.js";
@@ -62,6 +63,7 @@ import { hashPassword, verifyPassword } from "./password.js";
 import { sendExpoPush } from "./push.js";
 import { rateLimit } from "./rate-limit.js";
 import { listChangesStream, notifyListChange } from "./realtime.js";
+import { sendWebPush } from "./web-push.js";
 
 type Variables = { authUser: AuthUser | null };
 
@@ -602,19 +604,39 @@ async function dispatchPushIfApplicable(input: {
 }) {
   const body = renderPushBody(input);
   if (!body) return;
-  const tokens = await db.query.deviceTokens.findMany({
-    where: eq(deviceTokens.userId, input.recipientId),
-    columns: { token: true },
-  });
-  if (tokens.length === 0) return;
-  await sendExpoPush(
-    tokens.map((t) => ({
-      to: t.token,
+  const tokens =
+    (await db.query.deviceTokens.findMany({
+      where: eq(deviceTokens.userId, input.recipientId),
+      columns: { token: true },
+    })) ?? [];
+  if (tokens.length > 0) {
+    await sendExpoPush(
+      tokens.map((t) => ({
+        to: t.token,
+        title: input.listName ?? "Welist",
+        body,
+        data: { listId: input.listId ?? null, type: input.type },
+      }))
+    );
+  }
+
+  const subs =
+    (await db.query.webPushSubscriptions.findMany({
+      where: eq(webPushSubscriptions.userId, input.recipientId),
+      columns: { endpoint: true, p256dh: true, auth: true },
+    })) ?? [];
+  if (subs.length > 0) {
+    const { staleEndpoints } = await sendWebPush(subs, {
       title: input.listName ?? "Welist",
       body,
-      data: { listId: input.listId ?? null, type: input.type },
-    }))
-  );
+      url: input.listId ? `/explore/${input.listId}` : "/feed",
+    });
+    if (staleEndpoints.length > 0) {
+      await db
+        .delete(webPushSubscriptions)
+        .where(inArray(webPushSubscriptions.endpoint, staleEndpoints));
+    }
+  }
 }
 
 const COALESCE_WINDOW_MS = 15 * 60 * 1000;
@@ -2000,6 +2022,58 @@ app.delete("/me/device-tokens/:token", async (c) => {
     .where(and(eq(deviceTokens.userId, userId), eq(deviceTokens.token, token)));
   return c.body(null, 204);
 });
+
+app.get("/web-push/public-key", (c) => {
+  return c.json({ publicKey: process.env.VAPID_PUBLIC_KEY ?? null });
+});
+
+app.post(
+  "/me/web-push",
+  zValidator(
+    "json",
+    z.object({
+      endpoint: z.string().url().max(1000),
+      keys: z.object({
+        p256dh: z.string().min(1).max(500),
+        auth: z.string().min(1).max(500),
+      }),
+    })
+  ),
+  async (c) => {
+    const authUser = getOptionalUser(c);
+    const userId = authUser?.session?.user?.id;
+    if (!userId) return c.json({ error: "Unauthorized" }, 401);
+    const { endpoint, keys } = c.req.valid("json");
+    await db
+      .insert(webPushSubscriptions)
+      .values({ userId, endpoint, p256dh: keys.p256dh, auth: keys.auth })
+      .onConflictDoUpdate({
+        target: webPushSubscriptions.endpoint,
+        set: { userId, p256dh: keys.p256dh, auth: keys.auth },
+      });
+    return c.body(null, 204);
+  }
+);
+
+app.delete(
+  "/me/web-push",
+  zValidator("json", z.object({ endpoint: z.string().url().max(1000) })),
+  async (c) => {
+    const authUser = getOptionalUser(c);
+    const userId = authUser?.session?.user?.id;
+    if (!userId) return c.json({ error: "Unauthorized" }, 401);
+    const { endpoint } = c.req.valid("json");
+    await db
+      .delete(webPushSubscriptions)
+      .where(
+        and(
+          eq(webPushSubscriptions.userId, userId),
+          eq(webPushSubscriptions.endpoint, endpoint)
+        )
+      );
+    return c.body(null, 204);
+  }
+);
 
 app.get("/users/me/settings", async (c) => {
   const authUser = getOptionalUser(c);

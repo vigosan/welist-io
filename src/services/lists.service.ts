@@ -161,6 +161,24 @@ export const duelService = {
     apiClient<DuelResult>(`/api/lists/${listId}/duel/${opponentId}`),
 };
 
+export const webPushService = {
+  getPublicKey: () =>
+    apiClient<{ publicKey: string | null }>("/api/web-push/public-key"),
+  subscribe: (sub: {
+    endpoint: string;
+    keys: { p256dh: string; auth: string };
+  }) =>
+    apiClient<void>("/api/me/web-push", {
+      method: "POST",
+      body: JSON.stringify(sub),
+    }),
+  unsubscribe: (endpoint: string) =>
+    apiClient<void>("/api/me/web-push", {
+      method: "DELETE",
+      body: JSON.stringify({ endpoint }),
+    }),
+};
+
 export const feedService = {
   getAll: (cursor?: string) => {
     const qs = cursor ? `?cursor=${encodeURIComponent(cursor)}` : "";

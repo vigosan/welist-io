@@ -17,6 +17,7 @@ import {
   useUserSettings,
 } from "@/hooks/useList";
 import { useStripeAccountStatus } from "@/hooks/useStripeAccount";
+import { useWebPush } from "@/hooks/useWebPush";
 import { queryKeys } from "@/lib/query-keys";
 
 const searchSchema = z.object({
@@ -31,6 +32,7 @@ export const Route = createFileRoute("/settings")({
 function SettingsPage() {
   const { t } = useTranslation();
   const { data: session } = useSession();
+  const webPush = useWebPush();
   const { stripe: stripeParam } = useSearch({
     from: "/settings",
   });
@@ -224,6 +226,45 @@ function SettingsPage() {
             </button>
           </label>
         </section>
+
+        {webPush.supported && (
+          <section className="bg-canvas dark:bg-canvas-dark border border-black/[0.08] dark:border-white/[0.08] rounded-2xl p-5 flex flex-col gap-4">
+            <div>
+              <p className="text-sm font-semibold text-ink dark:text-paper">
+                {t("settings.pushNotifications.title")}
+              </p>
+              <p className="text-xs text-muted mt-0.5 leading-relaxed">
+                {t("settings.pushNotifications.description")}
+              </p>
+            </div>
+            <label className="flex items-center justify-between gap-3 cursor-pointer">
+              <span className="text-sm text-ink dark:text-paper">
+                {t("settings.pushNotifications.toggle")}
+              </span>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={webPush.enabled}
+                data-testid="web-push-toggle"
+                onClick={() =>
+                  webPush.enabled ? webPush.disable() : webPush.enable()
+                }
+                disabled={webPush.loading || !webPush.ready}
+                className={`cursor-pointer relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors duration-150 focus:outline-none disabled:opacity-40 ${
+                  webPush.enabled
+                    ? "bg-ink dark:bg-paper"
+                    : "bg-black/[0.10] dark:bg-white/[0.10]"
+                }`}
+              >
+                <span
+                  className={`inline-block h-3.5 w-3.5 rounded-full bg-white dark:bg-ink shadow transition-transform duration-150 ${
+                    webPush.enabled ? "translate-x-4.5" : "translate-x-0.5"
+                  }`}
+                />
+              </button>
+            </label>
+          </section>
+        )}
 
         <section className="bg-canvas dark:bg-canvas-dark border border-black/[0.08] dark:border-white/[0.08] rounded-2xl p-5 flex flex-col gap-4">
           <div>

@@ -284,6 +284,23 @@ export const deviceTokens = pgTable(
   (t) => [index("device_tokens_user_idx").on(t.userId)]
 );
 
+export const webPushSubscriptions = pgTable(
+  "web_push_subscriptions",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    endpoint: text("endpoint").notNull().unique(),
+    p256dh: text("p256dh").notNull(),
+    auth: text("auth").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => [index("web_push_subscriptions_user_idx").on(t.userId)]
+);
+
 export const achievementTypeEnum = pgEnum("achievement_type", [
   "first_list_created",
   "five_lists_created",
