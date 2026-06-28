@@ -12,6 +12,7 @@ import type {
   ListWithParticipation,
 } from "@/services/lists.service";
 import {
+  duelService,
   feedService,
   listsService,
   statsService,
@@ -288,6 +289,18 @@ export function useExplore(q?: string, sort?: string, category?: string) {
       listsService.explore(q, pageParam, sort, category),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (last) => last.nextCursor ?? undefined,
+  });
+}
+
+export function useDuel(
+  listId: string,
+  opponentId: string | null,
+  enabled: boolean
+) {
+  return useQuery({
+    queryKey: queryKeys.duel(listId, opponentId ?? ""),
+    queryFn: () => duelService.get(listId, opponentId as string),
+    enabled: enabled && !!opponentId,
   });
 }
 

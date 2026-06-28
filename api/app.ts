@@ -2900,6 +2900,80 @@ app.get("/lists/:listId/active-participants", async (c) => {
   return c.json({ participants: participantsList, total });
 });
 
+async function userDoneCountOnList(
+  listId: string,
+  ownerId: string | null,
+  userId: string
+): Promise<number> {
+  const isSharedTracker =
+    ownerId === userId ||
+    (await db.query.participations.findFirst({
+      where: and(
+        eq(participations.sourceListId, listId),
+        eq(participations.userId, userId),
+        eq(participations.role, "collaborator")
+      ),
+      columns: { id: true },
+    })) != null;
+  if (isSharedTracker) {
+    return db.$count(
+      items,
+      and(eq(items.listId, listId), eq(items.done, true))
+    );
+  }
+  const [row] = await db
+    .select({
+      count: sql<number>`cast(count(*) as int)`,
+    })
+    .from(itemProgress)
+    .innerJoin(items, eq(items.id, itemProgress.itemId))
+    .where(
+      and(
+        eq(itemProgress.userId, userId),
+        eq(itemProgress.done, true),
+        eq(items.listId, listId)
+      )
+    );
+  return row?.count ?? 0;
+}
+
+app.get("/lists/:listId/duel/:opponentId", async (c) => {
+  const list = await resolveList(c.req.param("listId"));
+  if (!list) return c.json({ error: "Not found" }, 404);
+  const authUser = getOptionalUser(c);
+  const userId = authUser?.session?.user?.id;
+  if (!userId) return c.json({ error: "Unauthorized" }, 401);
+  if (!(await canViewList(list, userId)))
+    return c.json({ error: "Not found" }, 404);
+  const opponentId = c.req.param("opponentId");
+  if (opponentId === userId)
+    return c.json({ error: "Cannot duel yourself" }, 400);
+
+  const [me, opponent] = await Promise.all([
+    db.query.users.findFirst({
+      where: eq(users.id, userId),
+      columns: { id: true, name: true, image: true },
+    }),
+    db.query.users.findFirst({
+      where: eq(users.id, opponentId),
+      columns: { id: true, name: true, image: true },
+    }),
+  ]);
+  if (!opponent) return c.json({ error: "Not found" }, 404);
+
+  const [totalItems, myDone, opponentDone] = await Promise.all([
+    db.$count(items, eq(items.listId, list.id)),
+    userDoneCountOnList(list.id, list.ownerId, userId),
+    userDoneCountOnList(list.id, list.ownerId, opponentId),
+  ]);
+
+  return c.json({
+    totalItems,
+    me: { ...me, done: myDone },
+    opponent: { ...opponent, done: opponentDone },
+  });
+});
+
 app.get("/lists/:listId/collaborators", async (c) => {
   const authUser = getOptionalUser(c);
   const userId = authUser?.session?.user?.id;

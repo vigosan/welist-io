@@ -508,6 +508,11 @@ const es = {
     weeklyRecap_one: "Tu semana en welist: {{count}} interacción nueva",
     weeklyRecap_other: "Tu semana en welist: {{count}} interacciones nuevas",
   },
+  duel: {
+    title: "Duelo",
+    you: "Tú",
+    loading: "Cargando…",
+  },
   feed: {
     title: "Actividad",
     nav: "Actividad",

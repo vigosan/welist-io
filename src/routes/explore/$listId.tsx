@@ -2,6 +2,7 @@ import { useSession } from "@hono/auth-js/react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppNav } from "@/components/AppNav";
+import { DuelPanel } from "@/components/lists/DuelPanel";
 import { ParticipantsPanel } from "@/components/lists/ParticipantsPanel";
 import { SectionHeading, SectionKicker } from "@/components/ui";
 import {
@@ -228,6 +229,18 @@ function ExploreDetailPage() {
         {showChallengers && challengers.length > 0 && (
           <ParticipantsPanel challengers={challengers} collaborators={[]} />
         )}
+
+        {(() => {
+          const myId = session?.user?.id;
+          if (!myId || !detail) return null;
+          const iAmChallenger = challengers.some((ch) => ch.id === myId);
+          if (!iAmChallenger) return null;
+          const opponents = challengers
+            .filter((ch) => ch.id !== myId)
+            .map((ch) => ({ id: ch.id, name: ch.name, image: ch.image }));
+          if (opponents.length === 0) return null;
+          return <DuelPanel listId={detail.id} opponents={opponents} />;
+        })()}
 
         <div className="rounded-2xl border border-black/[0.08] bg-canvas dark:border-white/[0.08] dark:bg-canvas-dark overflow-hidden">
           <div className="px-4 py-3">

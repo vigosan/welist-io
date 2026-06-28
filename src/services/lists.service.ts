@@ -145,6 +145,22 @@ export type FeedItem = {
   actorImage: string | null;
 };
 
+export type DuelResult = {
+  totalItems: number;
+  me: { id: string; name: string | null; image: string | null; done: number };
+  opponent: {
+    id: string;
+    name: string | null;
+    image: string | null;
+    done: number;
+  };
+};
+
+export const duelService = {
+  get: (listId: string, opponentId: string) =>
+    apiClient<DuelResult>(`/api/lists/${listId}/duel/${opponentId}`),
+};
+
 export const feedService = {
   getAll: (cursor?: string) => {
     const qs = cursor ? `?cursor=${encodeURIComponent(cursor)}` : "";

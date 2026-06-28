@@ -63,11 +63,11 @@ vi.mock("stripe", () => {
   return { default: StripeMock };
 });
 
-const { app } = await import("./app");
-const { sendEmail: mockSendEmail } = await import("./email");
-const { sendExpoPush: mockSendExpoPush } = await import("./push");
+const { app } = await import("./app.js");
+const { sendEmail: mockSendEmail } = await import("./email.js");
+const { sendExpoPush: mockSendExpoPush } = await import("./push.js");
 const { achievements, deviceTokens, lists, notifications, participations } =
-  await import("../src/db/schema/index");
+  await import("../src/db/schema/lists.schema.js");
 
 function chainableInsert() {
   const valuesMock = vi.fn().mockImplementation(() => {
@@ -3381,7 +3381,7 @@ describe("follow endpoints", () => {
   });
 });
 
-import { signUnsubscribeToken } from "./email-token";
+import { signUnsubscribeToken } from "./email-token.js";
 
 describe("unsubscribe endpoint", () => {
   beforeEach(() => {
@@ -3427,7 +3427,7 @@ describe("unsubscribe endpoint", () => {
   });
 });
 
-import { signUnsubscribeToken as _sign } from "./email-token";
+import { signUnsubscribeToken as _sign } from "./email-token.js";
 
 describe("GET /api/cron/random-item-nudge", () => {
   beforeEach(() => {
@@ -4666,6 +4666,91 @@ describe("GET /api/cron/weekly-recap", () => {
     });
     expect(res.status).toBe(200);
     expect(await res.json()).toEqual({ sent: 0 });
+  });
+});
+
+describe("GET /api/lists/:listId/duel/:opponentId", () => {
+  const headers = { "x-forwarded-for": "10.0.0.55" };
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockDb.$count.mockResolvedValue(0);
+  });
+  afterEach(() => {
+    mockDb.query.users.findFirst.mockReset();
+    mockDb.$count.mockReset();
+  });
+
+  it("returns 401 when unauthenticated", async () => {
+    mockGetAuthUser.mockRejectedValueOnce(new Error("no session"));
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "abc",
+      ownerId: "owner",
+      collaborative: false,
+      public: true,
+    });
+    const res = await app.request("/api/lists/abc/duel/u2", { headers });
+    expect(res.status).toBe(401);
+  });
+
+  it("returns 400 when dueling yourself", async () => {
+    mockGetAuthUser.mockResolvedValueOnce({ session: { user: { id: "u1" } } });
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "abc",
+      ownerId: "owner",
+      collaborative: false,
+      public: true,
+    });
+    const res = await app.request("/api/lists/abc/duel/u1", { headers });
+    expect(res.status).toBe(400);
+  });
+
+  it("returns head-to-head progress for two challengers", async () => {
+    mockGetAuthUser.mockResolvedValueOnce({ session: { user: { id: "u1" } } });
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "abc",
+      ownerId: "owner",
+      collaborative: false,
+      public: true,
+    });
+    mockDb.query.users.findFirst
+      .mockResolvedValueOnce({ id: "u1", name: "Me", image: null })
+      .mockResolvedValueOnce({ id: "u2", name: "Rival", image: null });
+    // neither is owner/collaborator -> challenger path
+    mockDb.query.participations.findFirst.mockResolvedValue(null);
+    mockDb.$count.mockResolvedValue(10); // totalItems
+    mockDb.select.mockReturnValue({
+      from: vi.fn().mockReturnThis(),
+      innerJoin: vi.fn().mockReturnThis(),
+      where: vi.fn().mockResolvedValue([{ count: 4 }]),
+    });
+
+    const res = await app.request("/api/lists/abc/duel/u2", { headers });
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as {
+      totalItems: number;
+      me: { id: string; done: number };
+      opponent: { id: string; done: number };
+    };
+    expect(body.totalItems).toBe(10);
+    expect(body.me.id).toBe("u1");
+    expect(body.opponent.id).toBe("u2");
+    expect(body.me.done).toBe(4);
+    expect(body.opponent.done).toBe(4);
+  });
+
+  it("returns 404 when the opponent does not exist", async () => {
+    mockGetAuthUser.mockResolvedValueOnce({ session: { user: { id: "u1" } } });
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "abc",
+      ownerId: "owner",
+      collaborative: false,
+      public: true,
+    });
+    mockDb.query.users.findFirst
+      .mockResolvedValueOnce({ id: "u1", name: "Me", image: null })
+      .mockResolvedValueOnce(undefined);
+    const res = await app.request("/api/lists/abc/duel/ghost", { headers });
+    expect(res.status).toBe(404);
   });
 });
 

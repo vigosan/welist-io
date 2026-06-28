@@ -509,6 +509,11 @@ const en: Translations = {
     weeklyRecap_one: "Your week on welist: {{count}} new interaction",
     weeklyRecap_other: "Your week on welist: {{count}} new interactions",
   },
+  duel: {
+    title: "Duel",
+    you: "You",
+    loading: "Loading…",
+  },
   feed: {
     title: "Activity",
     nav: "Activity",
