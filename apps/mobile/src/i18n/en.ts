@@ -248,6 +248,17 @@ export const en = {
     statsFollowing: "Following",
     followFailed: "Could not update",
   },
+  feed: {
+    title: "Activity",
+    signedOut: "Sign in to see activity from people you follow.",
+    empty: "No activity yet. Follow people to see what they create.",
+    someone: "Someone",
+    itemAdded: "{{name}} added an item to «{{list}}»",
+    itemEdited: "{{name}} edited an item in «{{list}}»",
+    itemDeleted: "{{name}} removed an item from «{{list}}»",
+    challengeAccepted: "{{name}} accepted the challenge «{{list}}»",
+    challengeCompleted: "{{name}} completed «{{list}}»",
+  },
   notifications: {
     title: "Notifications",
     markAllRead: "Mark all read",

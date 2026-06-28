@@ -95,6 +95,24 @@ export type AppNotification = {
   createdAt: string;
 };
 
+export type FeedItem = {
+  id: string;
+  action:
+    | "item_added"
+    | "item_edited"
+    | "item_deleted"
+    | "challenge_accepted"
+    | "challenge_completed";
+  createdAt: string;
+  listId: string;
+  listName: string;
+  listSlug: string | null;
+  newValue: { text?: string } | null;
+  actorId: string;
+  actorName: string | null;
+  actorImage: string | null;
+};
+
 export type DirectoryUser = {
   id: string;
   name: string | null;

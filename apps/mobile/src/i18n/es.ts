@@ -251,6 +251,17 @@ export const es = {
     statsFollowing: "Siguiendo",
     followFailed: "No se pudo actualizar",
   },
+  feed: {
+    title: "Actividad",
+    signedOut: "Entra para ver la actividad de quienes sigues.",
+    empty: "Aún no hay actividad. Sigue a gente para ver lo que crea.",
+    someone: "Alguien",
+    itemAdded: "{{name}} añadió un elemento a «{{list}}»",
+    itemEdited: "{{name}} editó un elemento de «{{list}}»",
+    itemDeleted: "{{name}} eliminó un elemento de «{{list}}»",
+    challengeAccepted: "{{name}} aceptó el reto «{{list}}»",
+    challengeCompleted: "{{name}} ha completado «{{list}}»",
+  },
   notifications: {
     title: "Notificaciones",
     markAllRead: "Marcar todas leídas",

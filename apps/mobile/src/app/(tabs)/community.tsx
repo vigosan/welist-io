@@ -1,6 +1,6 @@
 import * as Haptics from "expo-haptics";
-import { useRouter } from "expo-router";
-import { ChevronRight, ListFilter } from "lucide-react-native";
+import { type Href, useRouter } from "expo-router";
+import { Activity, ChevronRight, ListFilter } from "lucide-react-native";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
@@ -51,27 +51,40 @@ export default function UsersScreen() {
       <ScreenHeader
         title={t("nav.community")}
         right={
-          <Pressable
-            onPress={() => setFiltersOpen((v) => !v)}
-            accessibilityLabel={t("common.search")}
-            hitSlop={8}
-            className={`h-9 w-9 items-center justify-center rounded-full active:bg-black/[0.05] dark:active:bg-white/[0.06] ${
-              filtersOpen || isFiltered ? "bg-gray-900 dark:bg-gray-100" : ""
-            }`}
-          >
-            <ListFilter
-              color={
-                filtersOpen || isFiltered
-                  ? isDark
-                    ? "#0c0c0b"
-                    : "#ffffff"
-                  : isDark
-                    ? "#f0ede8"
-                    : "#0c0c0b"
-              }
-              size={18}
-            />
-          </Pressable>
+          <View className="flex-row items-center gap-1">
+            <Pressable
+              onPress={() => router.push("/feed" as Href)}
+              accessibilityLabel={t("feed.title")}
+              hitSlop={8}
+              className="h-9 w-9 items-center justify-center rounded-full active:bg-black/[0.05] dark:active:bg-white/[0.06]"
+            >
+              <Activity
+                color={isDark ? "#f0ede8" : "#0c0c0b"}
+                size={18}
+              />
+            </Pressable>
+            <Pressable
+              onPress={() => setFiltersOpen((v) => !v)}
+              accessibilityLabel={t("common.search")}
+              hitSlop={8}
+              className={`h-9 w-9 items-center justify-center rounded-full active:bg-black/[0.05] dark:active:bg-white/[0.06] ${
+                filtersOpen || isFiltered ? "bg-gray-900 dark:bg-gray-100" : ""
+              }`}
+            >
+              <ListFilter
+                color={
+                  filtersOpen || isFiltered
+                    ? isDark
+                      ? "#0c0c0b"
+                      : "#ffffff"
+                    : isDark
+                      ? "#f0ede8"
+                      : "#0c0c0b"
+                }
+                size={18}
+              />
+            </Pressable>
+          </View>
         }
       />
 
