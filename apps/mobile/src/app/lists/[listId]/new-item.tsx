@@ -1,4 +1,5 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { Mic } from "lucide-react-native";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
@@ -11,11 +12,10 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Mic } from "lucide-react-native";
 import { PlaceMentionSuggestions } from "@/components/PlaceMentionSuggestions";
 import { useAddItem, useBulkAddItems } from "@/hooks/items";
-import { useSpeechInput } from "@/hooks/useSpeechInput";
 import { useIsDark } from "@/hooks/useIsDark";
+import { useSpeechInput } from "@/hooks/useSpeechInput";
 import { PARTIAL_PLACE_REGEX } from "@/lib/places";
 import type { Coords } from "@/services/items";
 

@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useRef, useState } from "react";
 import {
   addSpeechRecognitionListener,
   ExpoSpeechRecognitionModule,
   isRecognitionAvailable,
 } from "expo-speech-recognition";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 function localeTag(lang: string): string {
   return lang === "es" ? "es-ES" : "en-US";

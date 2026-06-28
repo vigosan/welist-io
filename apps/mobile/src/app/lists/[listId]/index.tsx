@@ -116,9 +116,7 @@ export default function ListDetailScreen() {
       {
         text: t("comments.title"),
         onPress: () =>
-          router.push(
-            `/lists/${listId}/items/${item.id}/comments` as Href
-          ),
+          router.push(`/lists/${listId}/items/${item.id}/comments` as Href),
       },
     ];
     if (hasCoords) {

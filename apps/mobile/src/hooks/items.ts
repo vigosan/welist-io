@@ -32,8 +32,7 @@ export function useItemComments(
 export function useAddComment(listId: string, itemId: string) {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (body: string) =>
-      itemsService.addComment(listId, itemId, body),
+    mutationFn: (body: string) => itemsService.addComment(listId, itemId, body),
     onSuccess: (created) => {
       qc.setQueryData<ItemCommentView[]>(["item-comments", itemId], (old) => [
         ...(old ?? []),

@@ -63,9 +63,7 @@ export const itemsService = {
     }),
 
   listComments: (listId: string, itemId: string) =>
-    apiFetch<ItemCommentView[]>(
-      `/lists/${listId}/items/${itemId}/comments`
-    ),
+    apiFetch<ItemCommentView[]>(`/lists/${listId}/items/${itemId}/comments`),
 
   addComment: (listId: string, itemId: string, body: string) =>
     apiFetch<ItemCommentView>(`/lists/${listId}/items/${itemId}/comments`, {
@@ -74,8 +72,7 @@ export const itemsService = {
     }),
 
   deleteComment: (listId: string, itemId: string, commentId: string) =>
-    apiFetch<void>(
-      `/lists/${listId}/items/${itemId}/comments/${commentId}`,
-      { method: "DELETE" }
-    ),
+    apiFetch<void>(`/lists/${listId}/items/${itemId}/comments/${commentId}`, {
+      method: "DELETE",
+    }),
 };

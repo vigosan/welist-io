@@ -71,10 +71,7 @@ export default function UsersScreen() {
               hitSlop={8}
               className="h-9 w-9 items-center justify-center rounded-full active:bg-black/[0.05] dark:active:bg-white/[0.06]"
             >
-              <Activity
-                color={isDark ? "#f0ede8" : "#0c0c0b"}
-                size={18}
-              />
+              <Activity color={isDark ? "#f0ede8" : "#0c0c0b"} size={18} />
             </Pressable>
             <Pressable
               onPress={() => setFiltersOpen((v) => !v)}

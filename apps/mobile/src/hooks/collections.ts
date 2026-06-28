@@ -39,8 +39,7 @@ export function useCreateCollection() {
       description?: string;
       public?: boolean;
     }) => collectionsService.create(input),
-    onSuccess: () =>
-      qc.invalidateQueries({ queryKey: ["my-collections"] }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["my-collections"] }),
   });
 }
 

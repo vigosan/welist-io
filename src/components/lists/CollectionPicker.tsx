@@ -43,11 +43,13 @@ export function CollectionPicker({
   }
 
   return (
+    // biome-ignore lint/a11y/noStaticElementInteractions: backdrop overlay dismisses on click
     <div
       className="fixed inset-0 z-[60] flex items-end justify-center bg-black/30 sm:items-center"
       onClick={onClose}
       role="presentation"
     >
+      {/* biome-ignore lint/a11y/useKeyWithClickEvents: click only stops propagation, not an action */}
       <div
         className="w-full max-w-sm rounded-t-2xl bg-canvas p-5 dark:bg-canvas-dark sm:rounded-2xl"
         onClick={(e) => e.stopPropagation()}

@@ -90,7 +90,9 @@ export default function ExploreDetailScreen() {
             onPress={() =>
               router.push({
                 pathname: "/explore/[listId]",
-                params: { listId: d.forkedFrom?.slug ?? d.forkedFrom?.id ?? "" },
+                params: {
+                  listId: d.forkedFrom?.slug ?? d.forkedFrom?.id ?? "",
+                },
               })
             }
             className="mt-1 active:opacity-70"
@@ -124,18 +126,17 @@ export default function ExploreDetailScreen() {
           </Text>
         </Pressable>
 
-        {session.status === "signed-in" &&
-          d.ownerId !== session.user.id && (
-            <Pressable
-              onPress={onFork}
-              disabled={fork.isPending}
-              className="mt-3 rounded-xl border border-gray-300 px-6 py-4 active:opacity-80 disabled:opacity-40 dark:border-gray-600"
-            >
-              <Text className="text-center font-medium text-gray-900 dark:text-gray-100">
-                {t("explore.forkList")}
-              </Text>
-            </Pressable>
-          )}
+        {session.status === "signed-in" && d.ownerId !== session.user.id && (
+          <Pressable
+            onPress={onFork}
+            disabled={fork.isPending}
+            className="mt-3 rounded-xl border border-gray-300 px-6 py-4 active:opacity-80 disabled:opacity-40 dark:border-gray-600"
+          >
+            <Text className="text-center font-medium text-gray-900 dark:text-gray-100">
+              {t("explore.forkList")}
+            </Text>
+          </Pressable>
+        )}
 
         <Text className="mt-8 mb-2 text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
           {t("explore.preview")}

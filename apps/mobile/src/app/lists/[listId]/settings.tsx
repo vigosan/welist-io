@@ -17,10 +17,7 @@ import {
   useCollaborators,
   useRemoveCollaborator,
 } from "@/hooks/collaborators";
-import {
-  useAddListToCollection,
-  useMyCollections,
-} from "@/hooks/collections";
+import { useAddListToCollection, useMyCollections } from "@/hooks/collections";
 import {
   useDeleteList,
   useForkList,
@@ -59,13 +56,9 @@ export default function ListSettingsScreen() {
           addToCollection.mutate(
             { collectionId: col.id, listId },
             {
-              onSuccess: () =>
-                Alert.alert(t("collections.added"), col.name),
+              onSuccess: () => Alert.alert(t("collections.added"), col.name),
               onError: (e: unknown) =>
-                Alert.alert(
-                  t("common.error"),
-                  String((e as Error).message)
-                ),
+                Alert.alert(t("common.error"), String((e as Error).message)),
             }
           ),
       })),

@@ -36,15 +36,19 @@ export default function CollectionsScreen() {
     [explore.data]
   );
 
-  const open = (id: string) =>
-    router.push(`/collections/${id}` as Href);
+  const open = (id: string) => router.push(`/collections/${id}` as Href);
 
   const submit = () => {
     const trimmed = name.trim();
     if (!trimmed || create.isPending) return;
     create.mutate(
       { name: trimmed },
-      { onSuccess: (c) => { setName(""); open(c.id); } }
+      {
+        onSuccess: (c) => {
+          setName("");
+          open(c.id);
+        },
+      }
     );
   };
 
