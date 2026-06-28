@@ -519,15 +519,9 @@ function Ticker() {
   const labels = (explore.data?.pages?.[0]?.items ?? [])
     .slice(0, 8)
     .map((l) => l.name);
-  const fallback = [
-    "Pueblos más bonitos de España",
-    "Planes para conocerse mejor en pareja",
-    "Rutas en bici · Asturias",
-    "Discos que cambian la vida",
-    "Películas de Wong Kar-wai",
-    "Bares con barra de mármol · Madrid",
-    "100 libros antes de los 30",
-  ];
+  const fallback = t("home.tickerFallback", {
+    returnObjects: true,
+  }) as unknown as string[];
   const list = labels.length > 0 ? labels : fallback;
   const loop = [...list, ...list];
 
