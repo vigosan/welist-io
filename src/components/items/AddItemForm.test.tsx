@@ -38,4 +38,23 @@ describe("AddItemForm", () => {
     expect(screen.getByText("Roma")).toBeInTheDocument();
     expect(screen.queryByText("París")).not.toBeInTheDocument();
   });
+
+  it("turns a pasted numbered list into a bulk preview with markers stripped", async () => {
+    renderForm();
+    const input = screen.getByTestId("add-item-input");
+    input.focus();
+    await userEvent.paste("1. Alpha\n2. Beta\n3. Gamma");
+    expect(screen.getByTestId("bulk-preview")).toBeInTheDocument();
+    expect(screen.getByText("Alpha")).toBeInTheDocument();
+    expect(screen.getByText("Beta")).toBeInTheDocument();
+    expect(screen.getByText("Gamma")).toBeInTheDocument();
+  });
+
+  it("turns a pasted comma-separated single line into a bulk preview", async () => {
+    renderForm();
+    screen.getByTestId("add-item-input").focus();
+    await userEvent.paste("apples, bananas, cherries");
+    expect(screen.getByTestId("bulk-preview")).toBeInTheDocument();
+    expect(screen.getByText("bananas")).toBeInTheDocument();
+  });
 });

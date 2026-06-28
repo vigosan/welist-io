@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { useGeocodingSearch } from "@/hooks/useGeocodingSearch";
 import { useAddItem, useBulkAddItems } from "@/hooks/useItems";
 import { useTranslation } from "@/i18n/service";
+import { parseBulkText } from "@/lib/bulk-text";
 import { BULK_ITEM_LIMIT } from "@/lib/constants";
 import { getPartialPlace, PARTIAL_PLACE_REGEX } from "@/lib/places";
 import { getPartialTag, tagColor } from "@/lib/tags";
@@ -74,14 +75,10 @@ export function AddItemForm({
   }
 
   function handlePaste(e: React.ClipboardEvent<HTMLInputElement>) {
-    const text = e.clipboardData.getData("text");
-    const lines = text
-      .split("\n")
-      .map((l) => l.trim())
-      .filter(Boolean);
-    if (lines.length < 2) return;
+    const items = parseBulkText(e.clipboardData.getData("text"));
+    if (items.length < 2) return;
     e.preventDefault();
-    setPendingBulk(lines.slice(0, BULK_ITEM_LIMIT));
+    setPendingBulk(items.slice(0, BULK_ITEM_LIMIT));
     setNewItem("");
   }
 
