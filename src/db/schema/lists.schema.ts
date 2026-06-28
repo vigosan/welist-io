@@ -168,7 +168,10 @@ export const listActivity = pgTable(
       .defaultNow()
       .notNull(),
   },
-  (t) => [index("list_activity_list_idx").on(t.listId)]
+  (t) => [
+    index("list_activity_list_idx").on(t.listId),
+    index("list_activity_user_created_idx").on(t.userId, t.createdAt),
+  ]
 );
 
 export const stripeAccounts = pgTable("stripe_accounts", {

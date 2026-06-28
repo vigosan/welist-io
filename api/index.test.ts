@@ -4421,4 +4421,81 @@ describe("POST /api/auth-web/signup", () => {
   });
 });
 
+describe("GET /api/feed", () => {
+  const headers = { "x-forwarded-for": "10.0.0.77" };
+  const feedChain = (rows: unknown[]) => ({
+    from: vi.fn().mockReturnThis(),
+    innerJoin: vi.fn().mockReturnThis(),
+    where: vi.fn().mockReturnThis(),
+    orderBy: vi.fn().mockReturnThis(),
+    limit: vi.fn().mockResolvedValue(rows),
+  });
+
+  beforeEach(() => vi.clearAllMocks());
+
+  it("returns 401 when unauthenticated", async () => {
+    mockGetAuthUser.mockRejectedValueOnce(new Error("no session"));
+    const res = await app.request("/api/feed", { headers });
+    expect(res.status).toBe(401);
+  });
+
+  it("returns { items, nextCursor: null } when results fit within the page", async () => {
+    mockGetAuthUser.mockResolvedValueOnce({ session: { user: { id: "u1" } } });
+    const rows = [
+      {
+        id: "a1",
+        action: "challenge_completed",
+        createdAt: new Date("2024-01-01"),
+        listId: "l1",
+        listName: "Cine",
+        listSlug: "cine",
+        newValue: null,
+        actorId: "u2",
+        actorName: "Ana",
+        actorImage: null,
+      },
+    ];
+    mockDb.select.mockReturnValue(feedChain(rows));
+
+    const res = await app.request("/api/feed", { headers });
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as Record<string, unknown>;
+    expect((body.items as unknown[]).length).toBe(1);
+    expect(body.nextCursor).toBeNull();
+  });
+
+  it("returns nextCursor when results fill the page", async () => {
+    mockGetAuthUser.mockResolvedValueOnce({ session: { user: { id: "u1" } } });
+    const rows = Array.from({ length: 30 }, (_, i) => ({
+      id: `a${i}`,
+      action: "item_added",
+      createdAt: new Date(`2024-01-${String(i + 1).padStart(2, "0")}`),
+      listId: "l1",
+      listName: "Cine",
+      listSlug: "cine",
+      newValue: { text: "x" },
+      actorId: "u2",
+      actorName: "Ana",
+      actorImage: null,
+    }));
+    mockDb.select.mockReturnValue(feedChain(rows));
+
+    const res = await app.request("/api/feed", { headers });
+    const body = (await res.json()) as Record<string, unknown>;
+    expect(body.nextCursor).not.toBeNull();
+  });
+
+  it("accepts a cursor param to paginate", async () => {
+    mockGetAuthUser.mockResolvedValueOnce({ session: { user: { id: "u1" } } });
+    mockDb.select.mockReturnValue(feedChain([]));
+
+    const res = await app.request("/api/feed?cursor=2024-06-01T00:00:00.000Z", {
+      headers,
+    });
+    expect(res.status).toBe(200);
+    const chain = mockDb.select.mock.results[0].value;
+    expect(chain.where).toHaveBeenCalled();
+  });
+});
+
 void _sign;

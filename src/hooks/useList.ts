@@ -12,6 +12,7 @@ import type {
   ListWithParticipation,
 } from "@/services/lists.service";
 import {
+  feedService,
   listsService,
   statsService,
   usersService,
@@ -278,6 +279,16 @@ export function useExplore(q?: string, sort?: string, category?: string) {
       listsService.explore(q, pageParam, sort, category),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (last) => last.nextCursor ?? undefined,
+  });
+}
+
+export function useFeed(enabled: boolean) {
+  return useInfiniteQuery({
+    queryKey: queryKeys.feed(),
+    queryFn: ({ pageParam }) => feedService.getAll(pageParam),
+    initialPageParam: undefined as string | undefined,
+    getNextPageParam: (last) => last.nextCursor ?? undefined,
+    enabled,
   });
 }
 

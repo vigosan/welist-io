@@ -198,6 +198,9 @@ export function AppNav() {
                 testId="nav-my-lists"
               />
             )}
+            {session?.user && (
+              <NavLink to="/feed" label={t("feed.nav")} testId="nav-feed" />
+            )}
             <NavLink
               to="/explore"
               label={t("nav.explore")}
@@ -353,6 +356,16 @@ export function AppNav() {
                   onClick={closeMobile}
                 >
                   {t("nav.myLists")}
+                </Link>
+              )}
+              {session?.user && (
+                <Link
+                  to="/feed"
+                  data-testid="nav-feed-mobile"
+                  className="block px-6 py-3 text-sm font-medium text-ink dark:text-paper hover:bg-black/[0.02] dark:hover:bg-white/[0.03] transition-colors duration-150 no-underline"
+                  onClick={closeMobile}
+                >
+                  {t("feed.nav")}
                 </Link>
               )}
               <Link

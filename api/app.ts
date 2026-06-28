@@ -2935,6 +2935,58 @@ app.get("/lists/:listId/activity", async (c) => {
   return c.json(rows);
 });
 
+const FEED_PAGE_SIZE = 30;
+
+app.get("/feed", async (c) => {
+  const authUser = getOptionalUser(c);
+  const userId = authUser?.session?.user?.id;
+  if (!userId) return c.json({ error: "Unauthorized" }, 401);
+  const cursor = c.req.query("cursor");
+
+  const followees = db
+    .select({ id: follows.followingId })
+    .from(follows)
+    .where(eq(follows.followerId, userId));
+
+  const visible = or(
+    eq(lists.public, true),
+    eq(lists.collaborative, true),
+    eq(lists.ownerId, userId)
+  );
+  const where = and(
+    inArray(listActivity.userId, followees),
+    visible,
+    cursor ? lt(listActivity.createdAt, new Date(cursor)) : undefined
+  );
+
+  const rows = await db
+    .select({
+      id: listActivity.id,
+      action: listActivity.action,
+      createdAt: listActivity.createdAt,
+      listId: lists.id,
+      listName: lists.name,
+      listSlug: lists.slug,
+      newValue: listActivity.newValue,
+      actorId: users.id,
+      actorName: users.name,
+      actorImage: users.image,
+    })
+    .from(listActivity)
+    .innerJoin(lists, eq(lists.id, listActivity.listId))
+    .innerJoin(users, eq(users.id, listActivity.userId))
+    .where(where)
+    .orderBy(desc(listActivity.createdAt))
+    .limit(FEED_PAGE_SIZE);
+
+  const nextCursor =
+    rows.length === FEED_PAGE_SIZE
+      ? rows[rows.length - 1].createdAt.toISOString()
+      : null;
+
+  return c.json({ items: rows, nextCursor });
+});
+
 app.get("/lists/:listId/participation", async (c) => {
   const authUser = getOptionalUser(c);
   const userId = authUser?.session?.user?.id;

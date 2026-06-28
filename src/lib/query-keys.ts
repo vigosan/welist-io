@@ -29,6 +29,7 @@ export const queryKeys = {
   userSettings: () => ["user-settings"] as const,
   followStatus: (userId: string) => ["follow-status", userId] as const,
   notifications: () => ["notifications"] as const,
+  feed: () => ["feed"] as const,
   stats: () => ["stats"] as const,
   streak: () => ["streak"] as const,
 };
