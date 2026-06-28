@@ -741,12 +741,12 @@ function ExploreSection() {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             {lists.map((list, idx) => {
               const pct =
-                list.itemCount && list.itemCount > 0
+                list.participantCount > 0 && list.itemCount > 0
                   ? Math.min(
                       100,
                       Math.round(
-                        ((list.participantCount ?? 0) /
-                          Math.max(1, list.itemCount)) *
+                        (list.progressDoneTotal /
+                          (list.participantCount * list.itemCount)) *
                           100
                       )
                     )
