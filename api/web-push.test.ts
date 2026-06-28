@@ -20,7 +20,7 @@ describe("sendWebPush", () => {
   });
 
   it("skips silently when VAPID keys are not configured", async () => {
-    const { sendWebPush } = await import("./web-push");
+    const { sendWebPush } = await import("./web-push.js");
     const result = await sendWebPush(
       [{ endpoint: "https://e", p256dh: "p", auth: "a" }],
       { title: "T", body: "B" }
@@ -30,7 +30,7 @@ describe("sendWebPush", () => {
   });
 
   it("does nothing for an empty target list", async () => {
-    const { sendWebPush } = await import("./web-push");
+    const { sendWebPush } = await import("./web-push.js");
     const result = await sendWebPush([], { title: "T", body: "B" });
     expect(result.skipped).toBe(false);
     expect(result.staleEndpoints).toEqual([]);
@@ -39,7 +39,7 @@ describe("sendWebPush", () => {
   it("sends to each target when configured", async () => {
     process.env.VAPID_PUBLIC_KEY = "pub";
     process.env.VAPID_PRIVATE_KEY = "priv";
-    const { sendWebPush } = await import("./web-push");
+    const { sendWebPush } = await import("./web-push.js");
     await sendWebPush(
       [
         { endpoint: "https://a", p256dh: "p", auth: "a" },
@@ -54,7 +54,7 @@ describe("sendWebPush", () => {
     process.env.VAPID_PUBLIC_KEY = "pub";
     process.env.VAPID_PRIVATE_KEY = "priv";
     sendNotification.mockRejectedValueOnce({ statusCode: 410 });
-    const { sendWebPush } = await import("./web-push");
+    const { sendWebPush } = await import("./web-push.js");
     const result = await sendWebPush(
       [{ endpoint: "https://gone", p256dh: "p", auth: "a" }],
       { title: "T", body: "B" }
