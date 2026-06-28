@@ -98,6 +98,8 @@ export const en = {
     emptySubtitle: "Try a different category or clear filters.",
     emptyAction: "Clear filters",
     accept: "Accept challenge",
+    forkList: "Make my own copy",
+    forkedFrom: "Forked from {{name}}",
     preview: "Items",
     itemsAndParticipants: "{{items}} items · {{participants}} participants",
   },

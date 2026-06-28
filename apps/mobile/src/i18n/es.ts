@@ -98,6 +98,8 @@ export const es = {
     emptySubtitle: "Prueba con otra categoría o sin filtros.",
     emptyAction: "Limpiar filtros",
     accept: "Aceptar reto",
+    forkList: "Hacer mi propia copia",
+    forkedFrom: "Bifurcada de {{name}}",
     preview: "Ítems",
     itemsAndParticipants: "{{items}} items · {{participants}} participantes",
   },

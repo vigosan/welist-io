@@ -9,14 +9,18 @@ import {
   useExploreDetail,
   useExploreItems,
 } from "@/hooks/explore";
+import { useForkList } from "@/hooks/lists";
+import { useSession } from "@/lib/auth";
 
 export default function ExploreDetailScreen() {
   const { t } = useTranslation();
   const { listId } = useLocalSearchParams<{ listId: string }>();
   const router = useRouter();
+  const { session } = useSession();
   const detail = useExploreDetail(listId);
   const items = useExploreItems(listId);
   const accept = useAcceptChallenge();
+  const fork = useForkList();
 
   const onAccept = () =>
     accept.mutate(listId, {
@@ -24,6 +28,17 @@ export default function ExploreDetailScreen() {
         router.replace({
           pathname: "/lists/[listId]",
           params: { listId },
+        }),
+      onError: (e) =>
+        Alert.alert(t("common.error"), String((e as Error).message)),
+    });
+
+  const onFork = () =>
+    fork.mutate(listId, {
+      onSuccess: (created) =>
+        router.replace({
+          pathname: "/lists/[listId]",
+          params: { listId: created.id },
         }),
       onError: (e) =>
         Alert.alert(t("common.error"), String((e as Error).message)),
@@ -70,6 +85,22 @@ export default function ExploreDetailScreen() {
           {t("common.by")} {d.owner?.name ?? t("common.anonymous")}
         </Text>
 
+        {d.forkedFrom && (
+          <Pressable
+            onPress={() =>
+              router.push({
+                pathname: "/explore/[listId]",
+                params: { listId: d.forkedFrom?.slug ?? d.forkedFrom?.id ?? "" },
+              })
+            }
+            className="mt-1 active:opacity-70"
+          >
+            <Text className="text-xs text-gray-400 dark:text-gray-500">
+              ⑂ {t("explore.forkedFrom", { name: d.forkedFrom.name })}
+            </Text>
+          </Pressable>
+        )}
+
         {d.description && (
           <Text className="mt-3 text-sm text-gray-900 dark:text-gray-100">
             {d.description}
@@ -92,6 +123,19 @@ export default function ExploreDetailScreen() {
             {t("explore.accept")}
           </Text>
         </Pressable>
+
+        {session.status === "signed-in" &&
+          d.ownerId !== session.user.id && (
+            <Pressable
+              onPress={onFork}
+              disabled={fork.isPending}
+              className="mt-3 rounded-xl border border-gray-300 px-6 py-4 active:opacity-80 disabled:opacity-40 dark:border-gray-600"
+            >
+              <Text className="text-center font-medium text-gray-900 dark:text-gray-100">
+                {t("explore.forkList")}
+              </Text>
+            </Pressable>
+          )}
 
         <Text className="mt-8 mb-2 text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
           {t("explore.preview")}

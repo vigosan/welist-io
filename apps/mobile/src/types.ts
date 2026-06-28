@@ -161,6 +161,7 @@ export type ExploreDetail = {
   createdAt: string;
   ownerId: string | null;
   owner: { name: string | null; image: string | null } | null;
+  forkedFrom: { id: string; name: string; slug: string | null } | null;
   itemCount: number;
   participantCount: number;
   challengers: {
