@@ -248,6 +248,12 @@ export const en = {
     statsFollowing: "Following",
     followFailed: "Could not update",
   },
+  comments: {
+    title: "Comments",
+    empty: "No comments yet.",
+    placeholder: "Add a comment…",
+    send: "Send",
+  },
   feed: {
     title: "Activity",
     signedOut: "Sign in to see activity from people you follow.",

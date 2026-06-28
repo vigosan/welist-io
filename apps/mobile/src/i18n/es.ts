@@ -251,6 +251,12 @@ export const es = {
     statsFollowing: "Siguiendo",
     followFailed: "No se pudo actualizar",
   },
+  comments: {
+    title: "Comentarios",
+    empty: "Aún no hay comentarios.",
+    placeholder: "Añade un comentario…",
+    send: "Enviar",
+  },
   feed: {
     title: "Actividad",
     signedOut: "Entra para ver la actividad de quienes sigues.",

@@ -34,6 +34,18 @@ export type Item = {
   placeName: string | null;
   createdAt: string;
   updatedAt: string;
+  likeCount?: number;
+  likedByMe?: boolean;
+  commentCount?: number;
+};
+
+export type ItemCommentView = {
+  id: string;
+  body: string;
+  createdAt: string;
+  userId: string;
+  userName: string | null;
+  userImage: string | null;
 };
 
 export type Page<T> = { items: T[]; nextCursor: string | null };

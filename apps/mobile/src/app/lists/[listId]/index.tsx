@@ -1,6 +1,6 @@
 import * as Clipboard from "expo-clipboard";
 import * as Haptics from "expo-haptics";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { type Href, useLocalSearchParams, useRouter } from "expo-router";
 import { ListFilter, MoreVertical, Plus } from "lucide-react-native";
 import { useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -112,6 +112,13 @@ export default function ListDetailScreen() {
       {
         text: hasCoords ? t("list.changeLocation") : t("list.setLocation"),
         onPress: () => setLocating(item),
+      },
+      {
+        text: t("comments.title"),
+        onPress: () =>
+          router.push(
+            `/lists/${listId}/items/${item.id}/comments` as Href
+          ),
       },
     ];
     if (hasCoords) {
@@ -707,6 +714,11 @@ function SwipeableItemRow({
             >
               {renderInlineMarkdown(displayItemText(item.text))}
             </Text>
+            {!!item.commentCount && item.commentCount > 0 && (
+              <Text className="mt-0.5 text-[11px] text-gray-400 dark:text-gray-500">
+                💬 {item.commentCount}
+              </Text>
+            )}
           </View>
         </Pressable>
 

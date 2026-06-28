@@ -1,6 +1,62 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { type Coords, itemsService } from "@/services/items";
-import type { Item } from "@/types";
+import type { Item, ItemCommentView } from "@/types";
+
+function bumpCommentCount(
+  qc: ReturnType<typeof useQueryClient>,
+  listId: string,
+  itemId: string,
+  delta: number
+) {
+  qc.setQueryData<Item[]>(["items", listId], (old) =>
+    old?.map((i) =>
+      i.id === itemId
+        ? { ...i, commentCount: Math.max(0, (i.commentCount ?? 0) + delta) }
+        : i
+    )
+  );
+}
+
+export function useItemComments(
+  listId: string,
+  itemId: string,
+  enabled: boolean
+) {
+  return useQuery({
+    queryKey: ["item-comments", itemId],
+    queryFn: () => itemsService.listComments(listId, itemId),
+    enabled: enabled && !!itemId,
+  });
+}
+
+export function useAddComment(listId: string, itemId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (body: string) =>
+      itemsService.addComment(listId, itemId, body),
+    onSuccess: (created) => {
+      qc.setQueryData<ItemCommentView[]>(["item-comments", itemId], (old) => [
+        ...(old ?? []),
+        created,
+      ]);
+      bumpCommentCount(qc, listId, itemId, 1);
+    },
+  });
+}
+
+export function useDeleteComment(listId: string, itemId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (commentId: string) =>
+      itemsService.deleteComment(listId, itemId, commentId),
+    onSuccess: (_data, commentId) => {
+      qc.setQueryData<ItemCommentView[]>(["item-comments", itemId], (old) =>
+        old?.filter((c) => c.id !== commentId)
+      );
+      bumpCommentCount(qc, listId, itemId, -1);
+    },
+  });
+}
 
 export function useItems(listId: string) {
   return useQuery({

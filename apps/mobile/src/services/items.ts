@@ -1,5 +1,5 @@
 import { apiFetch } from "@/lib/api";
-import type { Item } from "@/types";
+import type { Item, ItemCommentView } from "@/types";
 
 export type Coords = {
   latitude: string;
@@ -61,4 +61,21 @@ export const itemsService = {
       method: "PATCH",
       body: JSON.stringify({ ids }),
     }),
+
+  listComments: (listId: string, itemId: string) =>
+    apiFetch<ItemCommentView[]>(
+      `/lists/${listId}/items/${itemId}/comments`
+    ),
+
+  addComment: (listId: string, itemId: string, body: string) =>
+    apiFetch<ItemCommentView>(`/lists/${listId}/items/${itemId}/comments`, {
+      method: "POST",
+      body: JSON.stringify({ body }),
+    }),
+
+  deleteComment: (listId: string, itemId: string, commentId: string) =>
+    apiFetch<void>(
+      `/lists/${listId}/items/${itemId}/comments/${commentId}`,
+      { method: "DELETE" }
+    ),
 };
