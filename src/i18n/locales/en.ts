@@ -558,6 +558,7 @@ const en: Translations = {
     delete: "Delete collection",
     addTo: "Add to collection",
     added: "Added",
+    close: "Close",
   },
   profile: {
     level: "Level {{level}}",

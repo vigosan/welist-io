@@ -557,6 +557,7 @@ const es = {
     delete: "Eliminar colección",
     addTo: "Añadir a colección",
     added: "Añadida",
+    close: "Cerrar",
   },
   profile: {
     level: "Nivel {{level}}",
