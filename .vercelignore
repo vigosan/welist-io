@@ -1,3 +1,4 @@
 api/serve.ts
+api/*.test.ts
 apps/
 
