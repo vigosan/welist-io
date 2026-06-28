@@ -1,6 +1,6 @@
 import { useSession } from "@hono/auth-js/react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { memo, useCallback, useMemo, useState } from "react";
 import { AppNav } from "@/components/AppNav";
 import { Skeleton } from "@/components/Skeleton";
 import { ListCard, Progress } from "@/components/ui";
@@ -43,7 +43,7 @@ function ExploreCardSkeleton() {
   );
 }
 
-function ExploreListCard({
+const ExploreListCard = memo(function ExploreListCard({
   list,
   onAccept,
   acceptPending,
@@ -112,6 +112,10 @@ function ExploreListCard({
               <img
                 src={owner.image}
                 alt=""
+                width={20}
+                height={20}
+                loading="lazy"
+                decoding="async"
                 className="h-5 w-5 rounded-full object-cover outline outline-1 outline-black/10 dark:outline-white/10"
               />
             ) : (
@@ -197,7 +201,7 @@ function ExploreListCard({
       }
     />
   );
-}
+});
 
 function chipClass(active: boolean): string {
   return `cursor-pointer px-3 py-1 rounded-full text-xs transition-colors duration-150 whitespace-nowrap shrink-0 border active:scale-[0.97] ${
@@ -236,25 +240,31 @@ function ExplorePage() {
   });
   const { t } = useTranslation();
 
-  const lists = data?.pages.flatMap((p) => p.items) ?? [];
+  const lists = useMemo(
+    () => data?.pages.flatMap((p) => p.items) ?? [],
+    [data]
+  );
 
-  function handleAccept(listId: string) {
-    const list = lists.find((l) => l.id === listId);
-    acceptChallenge.mutate(listId, {
-      onSuccess: (accepted) =>
-        navigate({
-          to: "/lists/$listId",
-          params: { listId: accepted.slug ?? accepted.id },
-        }),
-      onError: (err) => {
-        if (err.message === "Already participating" && list)
+  const handleAccept = useCallback(
+    (listId: string) => {
+      const list = lists.find((l) => l.id === listId);
+      acceptChallenge.mutate(listId, {
+        onSuccess: (accepted) =>
           navigate({
             to: "/lists/$listId",
-            params: { listId: list.slug ?? list.id },
-          });
-      },
-    });
-  }
+            params: { listId: accepted.slug ?? accepted.id },
+          }),
+        onError: (err) => {
+          if (err.message === "Already participating" && list)
+            navigate({
+              to: "/lists/$listId",
+              params: { listId: list.slug ?? list.id },
+            });
+        },
+      });
+    },
+    [lists, acceptChallenge, navigate]
+  );
 
   return (
     <div className="min-h-dvh bg-canvas dark:bg-canvas-dark flex flex-col">
