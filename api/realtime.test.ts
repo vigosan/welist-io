@@ -20,7 +20,7 @@ vi.mock("../src/db/client", () => ({
   db: { execute: mockExecute },
 }));
 
-const { listChangesStream, notifyListChange } = await import("./realtime");
+const { listChangesStream, notifyListChange } = await import("./realtime.js");
 
 function emitNotification(payload: unknown) {
   fakeClient.emit("notification", {

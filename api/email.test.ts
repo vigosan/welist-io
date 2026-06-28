@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { sendEmail } from "./email";
+import { sendEmail } from "./email.js";
 
 const ARGS = {
   to: "user@example.com",

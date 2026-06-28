@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { rateLimit } from "./rate-limit";
+import { rateLimit } from "./rate-limit.js";
 
 function makeApp(limit: number, windowMs: number) {
   const app = new Hono();

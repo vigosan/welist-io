@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { signUnsubscribeToken, verifyUnsubscribeToken } from "./email-token";
+import { signUnsubscribeToken, verifyUnsubscribeToken } from "./email-token.js";
 
 const SECRET = "test-secret-1";
 

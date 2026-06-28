@@ -24,7 +24,7 @@ const mockIssueToken = vi.fn();
 const mockVerifyToken = vi.fn();
 
 vi.mock("./auth-mobile", async (importOriginal) => {
-  const original = await importOriginal<typeof import("./auth-mobile")>();
+  const original = await importOriginal<typeof import("./auth-mobile.js")>();
   return {
     ...original,
     verifyGoogleIdToken: (...args: unknown[]) => mockVerifyGoogle(...args),
@@ -38,7 +38,7 @@ vi.mock("./auth-mobile", async (importOriginal) => {
 
 process.env.AUTH_SECRET = "test-secret";
 
-const { app } = await import("./app");
+const { app } = await import("./app.js");
 
 describe("POST /api/auth-mobile/exchange", () => {
   beforeEach(() => {
