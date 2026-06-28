@@ -2452,7 +2452,7 @@ app.get("/cron/streak-at-risk", async (c) => {
     );
 
   const authSecret = process.env.AUTH_SECRET ?? "";
-  const appUrl = process.env.APP_URL ?? "https://welist.io";
+  const appUrl = process.env.APP_URL ?? "https://www.welist.io";
   const now = new Date();
   let sent = 0;
   for (const u of eligible) {
@@ -2505,7 +2505,7 @@ app.get("/cron/random-item-nudge", async (c) => {
     .where(and(eq(users.emailOptIn, true), isNotNull(users.email)));
 
   const authSecret = process.env.AUTH_SECRET ?? "";
-  const appUrl = process.env.APP_URL ?? "https://welist.io";
+  const appUrl = process.env.APP_URL ?? "https://www.welist.io";
   let sent = 0;
   for (const u of eligible) {
     if (!u.email) continue;
@@ -3518,7 +3518,7 @@ app.get("/og/:listId", async (c) => {
 
 app.get("/share/:listId", async (c) => {
   const param = c.req.param("listId");
-  const appUrl = process.env.APP_URL ?? "https://welist.io";
+  const appUrl = process.env.APP_URL ?? "https://www.welist.io";
   const data = await getOgData(param);
   if (!data) {
     return c.redirect(`${appUrl}/explore`, 302);

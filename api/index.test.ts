@@ -4529,7 +4529,8 @@ describe("OG share routes", () => {
     expect(res.status).toBe(200);
     const html = await res.text();
     expect(html).toContain('property="og:image"');
-    expect(html).toContain("/api/og/pueblos");
+    expect(html).toContain("https://www.welist.io/api/og/pueblos");
+    expect(html).toContain("https://www.welist.io/explore/pueblos");
     expect(html).toContain("Pueblos de España");
     expect(html).toContain('name="twitter:card" content="summary_large_image"');
   });
