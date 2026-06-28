@@ -1,5 +1,20 @@
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { ImageResponse } from "@vercel/og";
 import type { ReactElement } from "react";
+
+const fontDir = join(dirname(fileURLToPath(import.meta.url)), "fonts");
+const fonts = [
+  { name: "Space Grotesk", file: "SpaceGrotesk-Regular.ttf", weight: 400 },
+  { name: "Space Grotesk", file: "SpaceGrotesk-Medium.ttf", weight: 500 },
+  { name: "Space Grotesk", file: "SpaceGrotesk-Bold.ttf", weight: 700 },
+].map((f) => ({
+  name: f.name,
+  data: readFileSync(join(fontDir, f.file)),
+  weight: f.weight as 400 | 500 | 700,
+  style: "normal" as const,
+}));
 
 export type OgData = {
   name: string;
@@ -44,7 +59,7 @@ export function renderOgImage(data: OgData): ImageResponse {
       justifyContent: "space-between",
       backgroundColor: "#fafaf8",
       padding: "72px",
-      fontFamily: "sans-serif",
+      fontFamily: "Space Grotesk",
     },
     [
       el(
@@ -92,5 +107,6 @@ export function renderOgImage(data: OgData): ImageResponse {
   return new ImageResponse(tree as unknown as ReactElement, {
     width: WIDTH,
     height: HEIGHT,
+    fonts,
   });
 }
