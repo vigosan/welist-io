@@ -11,7 +11,9 @@
     "ios": {
       "bundleIdentifier": "io.wilist.app",
       "supportsTablet": true,
-      "associatedDomains": ["applinks:welist.io"],
+      "associatedDomains": [
+        "applinks:welist.io"
+      ],
       "usesAppleSignIn": true,
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
@@ -45,7 +47,10 @@
               "pathPrefix": "/u/"
             }
           ],
-          "category": ["BROWSABLE", "DEFAULT"]
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
         }
       ]
     },
@@ -59,7 +64,10 @@
       [
         "expo-localization",
         {
-          "supportedLocales": ["en", "es"]
+          "supportedLocales": [
+            "en",
+            "es"
+          ]
         }
       ],
       "expo-apple-authentication",
@@ -95,6 +103,14 @@
         "./plugins/with-android-legacy-icon",
         {
           "icon": "./assets/images/icon.png"
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "static"
+          }
         }
       ]
     ],
