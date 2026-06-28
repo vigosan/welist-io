@@ -209,13 +209,20 @@ describe("ExplorePage", () => {
     expect(a).toHaveTextContent("5 elementos");
     expect(a).toHaveTextContent("3 participantes");
     expect(a).toHaveTextContent("1 completado");
-    expect(a).toHaveTextContent("40% medio");
+    // Average progress is now the card's primary mono stat, not a meta token.
+    expect(screen.getByTestId("explore-card-progress-e1")).toBeInTheDocument();
 
     const b = screen.getByTestId("explore-card-meta-e2");
     expect(b).toHaveTextContent("2 elementos");
     expect(b).not.toHaveTextContent("participante");
     expect(b).not.toHaveTextContent("completado");
-    expect(b).not.toHaveTextContent("% medio");
+    // No participants → no progress bar, item count shown as the stat instead.
+    expect(
+      screen.queryByTestId("explore-card-progress-e2")
+    ).not.toBeInTheDocument();
+    expect(screen.getByTestId("explore-card-itemcount-e2")).toHaveTextContent(
+      "2"
+    );
   });
 
   it("shows empty state when there are no lists", async () => {

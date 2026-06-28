@@ -332,6 +332,8 @@ const en: Translations = {
     previewLabel: "Includes",
     avgProgress: "{{pct}}% average progress",
     avgProgressShort: "{{pct}}% avg",
+    statPctLabel: "% done",
+    statItemsLabel: "items",
     metaItems_one: "{{count}} item",
     metaItems_other: "{{count}} items",
     metaParticipants_one: "{{count}} participant",

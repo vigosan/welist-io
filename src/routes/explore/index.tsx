@@ -32,13 +32,19 @@ function ExploreCardSkeleton() {
   return (
     <div
       data-testid="explore-card-skeleton"
-      className="rounded-2xl border border-black/[0.08] dark:border-white/[0.08] bg-white dark:bg-white/[0.02] p-5"
+      className="rounded-2xl border border-black/[0.08] dark:border-white/[0.08] bg-canvas dark:bg-canvas-dark p-6"
     >
-      <Skeleton variant="text" className="mb-3 h-4 w-20" />
-      <Skeleton variant="text" className="mb-2 h-4 w-2/3" />
-      <Skeleton variant="text" className="mb-2.5 h-3 w-full" />
-      <Skeleton variant="text" className="mb-3 h-3 w-5/6" />
-      <Skeleton variant="text" className="h-3 w-40" />
+      <Skeleton variant="text" className="mb-4 h-4 w-24" />
+      <div className="flex items-start gap-4">
+        <div className="flex-1">
+          <Skeleton variant="text" className="mb-2 h-5 w-2/3" />
+          <Skeleton variant="text" className="mb-1.5 h-3 w-full" />
+          <Skeleton variant="text" className="h-3 w-5/6" />
+        </div>
+        <Skeleton variant="text" className="h-9 w-12" />
+      </div>
+      <Skeleton variant="text" className="mt-5 h-1.5 w-full" />
+      <Skeleton variant="text" className="mt-4 h-3 w-40" />
     </div>
   );
 }
@@ -135,6 +141,18 @@ const ExploreListCard = memo(function ExploreListCard({
         </Link>
       }
       description={list.description || undefined}
+      stat={
+        pct !== null ? (
+          pct
+        ) : (
+          <span data-testid={`explore-card-itemcount-${list.id}`}>
+            {list.itemCount}
+          </span>
+        )
+      }
+      statLabel={
+        pct !== null ? t("explore.statPctLabel") : t("explore.statItemsLabel")
+      }
       body={
         list.previewItems.length > 0 ? (
           <p
@@ -152,6 +170,7 @@ const ExploreListCard = memo(function ExploreListCard({
         pct !== null ? (
           <Progress
             value={pct}
+            className="h-1.5"
             data-testid={`explore-card-progress-${list.id}`}
           />
         ) : undefined
@@ -171,7 +190,6 @@ const ExploreListCard = memo(function ExploreListCard({
             list.completedCount > 0
               ? t("explore.metaCompleted", { count: list.completedCount })
               : null,
-            pct !== null ? t("explore.avgProgressShort", { pct }) : null,
           ]
             .filter(Boolean)
             .join(" · ")}
@@ -196,7 +214,14 @@ const ExploreListCard = memo(function ExploreListCard({
               ? t("explore.challengeAccepted")
               : t("explore.acceptChallenge")
             : t("explore.signIn")}
-          {!accepted && <span aria-hidden="true">→</span>}
+          {!accepted && (
+            <span
+              aria-hidden="true"
+              className="transition-transform duration-200 group-hover:translate-x-0.5"
+            >
+              →
+            </span>
+          )}
         </button>
       }
     />
@@ -274,12 +299,23 @@ function ExplorePage() {
         <form
           onSubmit={handleSearch}
           className={[
-            "flex overflow-hidden rounded-lg transition-all duration-200",
+            "flex items-center gap-2 rounded-2xl p-1.5 pl-4 transition-colors duration-200 border",
             focused
-              ? "bg-black/[0.06] dark:bg-white/[0.07] border border-black/[0.20] dark:border-white/[0.18]"
-              : "bg-black/[0.03] dark:bg-white/[0.04] border border-black/[0.08] dark:border-white/[0.08]",
+              ? "bg-canvas dark:bg-canvas-dark border-ink/25 dark:border-paper/25 shadow-[0_10px_30px_-22px_rgba(0,0,0,0.35)]"
+              : "bg-black/[0.03] dark:bg-white/[0.04] border-black/[0.08] dark:border-white/[0.08]",
           ].join(" ")}
         >
+          <svg
+            aria-hidden="true"
+            className="h-4 w-4 shrink-0 text-muted"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            viewBox="0 0 24 24"
+          >
+            <circle cx="11" cy="11" r="7" />
+            <path strokeLinecap="round" d="m21 21-4.3-4.3" />
+          </svg>
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
@@ -288,12 +324,11 @@ function ExplorePage() {
             placeholder={t("explore.searchPlaceholder")}
             aria-label={t("explore.searchAriaLabel")}
             data-testid="explore-search-input"
-            className="flex-1 px-4 py-2.5 text-sm text-ink dark:text-paper placeholder-muted dark:placeholder-[#6b6b67] bg-transparent outline-none"
+            className="flex-1 min-w-0 py-2 text-sm text-ink dark:text-paper placeholder-muted dark:placeholder-[#6b6b67] bg-transparent outline-none"
           />
           <button
             type="submit"
-            className="px-5 py-2.5 text-[12px] font-semibold tracking-[0.04em] bg-ink dark:bg-paper text-canvas dark:text-ink border-none cursor-pointer"
-            style={{ borderRadius: 0 }}
+            className="shrink-0 rounded-xl px-4 py-2 text-[12px] font-semibold tracking-[0.02em] bg-ink dark:bg-paper text-canvas dark:text-ink border-none cursor-pointer transition active:scale-[0.96] hover:bg-black dark:hover:bg-white"
           >
             {t("explore.search")}
           </button>
@@ -457,7 +492,7 @@ function ExplorePage() {
 
         <div className="mt-6">
           {isLoading && (
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-4">
               {["a", "b", "c", "d", "e"].map((k) => (
                 <ExploreCardSkeleton key={k} />
               ))}
@@ -479,7 +514,7 @@ function ExplorePage() {
               )}
             </div>
           )}
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-4">
             {lists.map((list) => (
               <ExploreListCard
                 key={list.id}
@@ -493,7 +528,7 @@ function ExplorePage() {
 
         <div ref={sentinelRef} className="h-4" />
         {isFetchingNextPage && (
-          <div className="flex flex-col gap-3 pt-3">
+          <div className="flex flex-col gap-4 pt-4">
             {["a", "b", "c"].map((k) => (
               <ExploreCardSkeleton key={k} />
             ))}

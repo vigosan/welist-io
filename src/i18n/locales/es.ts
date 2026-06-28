@@ -331,6 +331,8 @@ const es = {
     previewLabel: "Incluye",
     avgProgress: "{{pct}}% completado de media",
     avgProgressShort: "{{pct}}% medio",
+    statPctLabel: "% hecho",
+    statItemsLabel: "ítems",
     metaItems_one: "{{count}} elemento",
     metaItems_other: "{{count}} elementos",
     metaParticipants_one: "{{count}} participante",
