@@ -85,6 +85,13 @@
         }
       ],
       [
+        "expo-speech-recognition",
+        {
+          "microphonePermission": "Allow Welist to use the microphone to dictate list items.",
+          "speechRecognitionPermission": "Allow Welist to recognize speech to dictate list items."
+        }
+      ],
+      [
         "./plugins/with-android-legacy-icon",
         {
           "icon": "./assets/images/icon.png"

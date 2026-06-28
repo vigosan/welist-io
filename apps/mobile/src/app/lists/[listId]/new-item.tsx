@@ -11,19 +11,26 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Mic } from "lucide-react-native";
 import { PlaceMentionSuggestions } from "@/components/PlaceMentionSuggestions";
 import { useAddItem, useBulkAddItems } from "@/hooks/items";
+import { useSpeechInput } from "@/hooks/useSpeechInput";
+import { useIsDark } from "@/hooks/useIsDark";
 import { PARTIAL_PLACE_REGEX } from "@/lib/places";
 import type { Coords } from "@/services/items";
 
 export default function NewItemScreen() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const router = useRouter();
+  const isDark = useIsDark();
   const { listId } = useLocalSearchParams<{ listId: string }>();
   const [text, setText] = useState("");
   const [pendingCoords, setPendingCoords] = useState<Coords | null>(null);
   const add = useAddItem(listId);
   const bulkAdd = useBulkAddItems(listId);
+  const speech = useSpeechInput(i18n.language, (heard) => {
+    setText((prev) => (prev.trim() ? `${prev.trim()} ${heard}` : heard));
+  });
 
   const submit = () => {
     const lines = text
@@ -119,6 +126,38 @@ export default function NewItemScreen() {
               Keyboard.dismiss();
             }}
           />
+        )}
+        {speech.supported && (
+          <Pressable
+            onPress={() => (speech.listening ? speech.stop() : speech.start())}
+            className={`mt-3 flex-row items-center justify-center gap-2 rounded-2xl border px-4 py-3 active:opacity-80 ${
+              speech.listening
+                ? "border-gray-900 bg-gray-900 dark:border-gray-100 dark:bg-gray-100"
+                : "border-gray-300 dark:border-gray-600"
+            }`}
+          >
+            <Mic
+              size={16}
+              color={
+                speech.listening
+                  ? isDark
+                    ? "#0c0c0b"
+                    : "#ffffff"
+                  : isDark
+                    ? "#f0ede8"
+                    : "#0c0c0b"
+              }
+            />
+            <Text
+              className={`text-sm font-medium ${
+                speech.listening
+                  ? "text-white dark:text-gray-900"
+                  : "text-gray-900 dark:text-gray-100"
+              }`}
+            >
+              {speech.listening ? t("list.listening") : t("list.dictate")}
+            </Text>
+          </Pressable>
         )}
         <Text className="mt-3 text-xs text-gray-500 dark:text-gray-400">
           {t("list.newItemHint")}

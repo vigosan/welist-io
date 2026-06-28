@@ -132,6 +132,8 @@ export const es = {
     emptyAction: "Añadir ítem",
     newItemTitle: "Nuevo ítem",
     newItemHint: "Pega varias líneas para añadir varios ítems a la vez.",
+    dictate: "Dictar",
+    listening: "Escuchando…",
     filterAll: "todos",
     filterPending: "pendientes",
     filterDone: "hechos",
