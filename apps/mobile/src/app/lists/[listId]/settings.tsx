@@ -1,4 +1,4 @@
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { type Href, useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
@@ -17,6 +17,10 @@ import {
   useCollaborators,
   useRemoveCollaborator,
 } from "@/hooks/collaborators";
+import {
+  useAddListToCollection,
+  useMyCollections,
+} from "@/hooks/collections";
 import {
   useDeleteList,
   useForkList,
@@ -39,6 +43,35 @@ export default function ListSettingsScreen() {
   const update = useUpdateList(listId);
   const fork = useForkList();
   const remove = useDeleteList();
+  const myCollections = useMyCollections(session.status === "signed-in");
+  const addToCollection = useAddListToCollection();
+
+  const doAddToCollection = () => {
+    const cols = myCollections.data ?? [];
+    if (cols.length === 0) {
+      router.push("/collections" as Href);
+      return;
+    }
+    Alert.alert(t("collections.addTo"), undefined, [
+      ...cols.map((col) => ({
+        text: col.name,
+        onPress: () =>
+          addToCollection.mutate(
+            { collectionId: col.id, listId },
+            {
+              onSuccess: () =>
+                Alert.alert(t("collections.added"), col.name),
+              onError: (e: unknown) =>
+                Alert.alert(
+                  t("common.error"),
+                  String((e as Error).message)
+                ),
+            }
+          ),
+      })),
+      { text: t("common.cancel"), style: "cancel" as const },
+    ]);
+  };
 
   const isOwner =
     session.status === "signed-in" &&
@@ -235,6 +268,17 @@ export default function ListSettingsScreen() {
         {isOwner && <ActivitySection listId={listId} />}
 
         <View className="mt-10 gap-3">
+          {isOwner && (
+            <Pressable
+              onPress={doAddToCollection}
+              disabled={addToCollection.isPending}
+              className="rounded-xl border border-gray-200 px-6 py-3 active:opacity-80 dark:border-gray-700"
+            >
+              <Text className="text-center font-medium text-gray-900 dark:text-gray-100">
+                {t("collections.addTo")}
+              </Text>
+            </Pressable>
+          )}
           <Pressable
             onPress={doFork}
             disabled={fork.isPending}

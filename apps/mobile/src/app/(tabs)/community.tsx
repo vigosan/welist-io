@@ -1,6 +1,11 @@
 import * as Haptics from "expo-haptics";
 import { type Href, useRouter } from "expo-router";
-import { Activity, ChevronRight, ListFilter } from "lucide-react-native";
+import {
+  Activity,
+  ChevronRight,
+  FolderOpen,
+  ListFilter,
+} from "lucide-react-native";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
@@ -52,6 +57,14 @@ export default function UsersScreen() {
         title={t("nav.community")}
         right={
           <View className="flex-row items-center gap-1">
+            <Pressable
+              onPress={() => router.push("/collections" as Href)}
+              accessibilityLabel={t("collections.title")}
+              hitSlop={8}
+              className="h-9 w-9 items-center justify-center rounded-full active:bg-black/[0.05] dark:active:bg-white/[0.06]"
+            >
+              <FolderOpen color={isDark ? "#f0ede8" : "#0c0c0b"} size={18} />
+            </Pressable>
             <Pressable
               onPress={() => router.push("/feed" as Href)}
               accessibilityLabel={t("feed.title")}

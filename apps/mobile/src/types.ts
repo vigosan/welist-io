@@ -215,3 +215,40 @@ export type ExploreDetail = {
     completedAt: string | null;
   }[];
 };
+
+export type CollectionSummary = {
+  id: string;
+  name: string;
+  slug: string | null;
+  description: string | null;
+  ownerId: string;
+  ownerName: string | null;
+  ownerImage: string | null;
+  listCount: number;
+};
+
+export type MyCollection = {
+  id: string;
+  name: string;
+  slug: string | null;
+  description: string | null;
+  public: boolean;
+  listCount: number;
+};
+
+export type CollectionDetail = {
+  id: string;
+  name: string;
+  slug: string | null;
+  description: string | null;
+  public: boolean;
+  ownerId: string;
+  owner: { name: string | null; image: string | null } | null;
+  lists: {
+    id: string;
+    name: string;
+    slug: string | null;
+    description: string | null;
+    itemCount: number;
+  }[];
+};
