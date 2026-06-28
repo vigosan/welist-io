@@ -21,9 +21,14 @@ import { Input } from "@/components/Input";
 import { ProgressDonut } from "@/components/ProgressDonut";
 import { ScreenHeader } from "@/components/ScreenHeader";
 import { MyListSkeleton } from "@/components/Skeleton";
-import { useDeleteList, useMyLists } from "@/hooks/lists";
+import {
+  useCreateListFromTemplate,
+  useDeleteList,
+  useMyLists,
+} from "@/hooks/lists";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { useIsDark } from "@/hooks/useIsDark";
+import { getListTemplates } from "@/lib/list-templates";
 import type { MyListsSort, MyListsVisibility } from "@/services/lists";
 import type { MyListItem } from "@/types";
 
@@ -31,9 +36,29 @@ const SORTS: MyListsSort[] = ["recent", "newest", "oldest", "likes"];
 const VISIBILITIES: MyListsVisibility[] = ["all", "public", "private"];
 
 export default function MyListsScreen() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const router = useRouter();
   const isDark = useIsDark();
+  const createFromTemplate = useCreateListFromTemplate();
+
+  const onUseTemplate = (templateId: string) => {
+    const template = getListTemplates(i18n.language).find(
+      (tpl) => tpl.id === templateId
+    );
+    if (!template || createFromTemplate.isPending) return;
+    createFromTemplate.mutate(
+      { name: template.name, items: template.items },
+      {
+        onSuccess: (list) =>
+          router.push({
+            pathname: "/lists/[listId]",
+            params: { listId: list.id },
+          }),
+        onError: (e) =>
+          Alert.alert(t("common.error"), String((e as Error).message)),
+      }
+    );
+  };
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<MyListsSort>("recent");
   const [visibility, setVisibility] = useState<MyListsVisibility>("all");
@@ -226,14 +251,33 @@ export default function MyListsScreen() {
               title={t("lists.empty")}
               subtitle={t("lists.emptySubtitle")}
               action={
-                <Pressable
-                  onPress={() => router.push("/new-list")}
-                  className="rounded-2xl bg-gray-900 px-5 py-3 active:opacity-80 dark:bg-gray-100"
-                >
-                  <Text className="text-sm font-medium text-white dark:text-gray-900">
-                    {t("lists.emptyAction")}
+                <View className="items-center gap-4">
+                  <Pressable
+                    onPress={() => router.push("/new-list")}
+                    className="rounded-2xl bg-gray-900 px-5 py-3 active:opacity-80 dark:bg-gray-100"
+                  >
+                    <Text className="text-sm font-medium text-white dark:text-gray-900">
+                      {t("lists.emptyAction")}
+                    </Text>
+                  </Pressable>
+                  <Text className="text-xs text-gray-400 dark:text-gray-500">
+                    {t("lists.orTemplate")}
                   </Text>
-                </Pressable>
+                  <View className="flex-row flex-wrap justify-center gap-2">
+                    {getListTemplates(i18n.language).map((tpl) => (
+                      <Pressable
+                        key={tpl.id}
+                        onPress={() => onUseTemplate(tpl.id)}
+                        disabled={createFromTemplate.isPending}
+                        className="rounded-full border border-gray-300 px-3 py-1.5 active:opacity-70 disabled:opacity-40 dark:border-gray-600"
+                      >
+                        <Text className="text-xs text-gray-600 dark:text-gray-300">
+                          {tpl.name}
+                        </Text>
+                      </Pressable>
+                    ))}
+                  </View>
+                </View>
               }
             />
           )

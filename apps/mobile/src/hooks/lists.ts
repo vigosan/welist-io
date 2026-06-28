@@ -64,6 +64,15 @@ export function useCreateList() {
   });
 }
 
+export function useCreateListFromTemplate() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (input: { name: string; items: string[] }) =>
+      listsService.createFromTemplate(input.name, input.items),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["my-lists"] }),
+  });
+}
+
 export function useUpdateList(listId: string) {
   const qc = useQueryClient();
   return useMutation({

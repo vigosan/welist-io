@@ -111,6 +111,7 @@ export const en = {
     empty: "No lists yet",
     emptySubtitle: "Create your first list of challenges, wishes or tasks.",
     emptyAction: "Create list",
+    orTemplate: "or start from a template",
     progress: "{{done}}/{{total}} done",
     participants: "{{count}} participants",
     deleteTitle: "Delete list",
