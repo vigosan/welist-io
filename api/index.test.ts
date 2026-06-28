@@ -46,6 +46,12 @@ vi.mock("./push", () => ({
   sendExpoPush: vi.fn().mockResolvedValue(undefined),
 }));
 
+vi.mock("./og", () => ({
+  renderOgImage: vi.fn(
+    () => new Response("png", { headers: { "Content-Type": "image/png" } })
+  ),
+}));
+
 const mockStripeConstructEvent = vi.fn();
 vi.mock("stripe", () => {
   const StripeMock = vi.fn().mockImplementation(() => ({
@@ -4495,6 +4501,66 @@ describe("GET /api/feed", () => {
     expect(res.status).toBe(200);
     const chain = mockDb.select.mock.results[0].value;
     expect(chain.where).toHaveBeenCalled();
+  });
+});
+
+describe("OG share routes", () => {
+  const ogChain = (rows: unknown[]) => ({
+    from: vi.fn().mockReturnThis(),
+    leftJoin: vi.fn().mockReturnThis(),
+    where: vi.fn().mockResolvedValue(rows),
+  });
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockDb.$count.mockResolvedValue(0);
+  });
+
+  it("GET /api/share/:listId injects per-list meta tags for crawlers", async () => {
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "l1",
+      name: "Pueblos de España",
+      slug: "pueblos",
+      description: "Los más bonitos",
+    });
+    mockDb.select.mockReturnValue(ogChain([{ ownerName: "Ana" }]));
+
+    const res = await app.request("/api/share/pueblos");
+    expect(res.status).toBe(200);
+    const html = await res.text();
+    expect(html).toContain('property="og:image"');
+    expect(html).toContain("/api/og/pueblos");
+    expect(html).toContain("Pueblos de España");
+    expect(html).toContain('name="twitter:card" content="summary_large_image"');
+  });
+
+  it("GET /api/share/:listId redirects to /explore when the list is missing", async () => {
+    mockDb.query.lists.findFirst.mockResolvedValue(undefined);
+
+    const res = await app.request("/api/share/nope");
+    expect(res.status).toBe(302);
+    expect(res.headers.get("location")).toContain("/explore");
+  });
+
+  it("GET /api/og/:listId returns 404 when the list is missing", async () => {
+    mockDb.query.lists.findFirst.mockResolvedValue(undefined);
+
+    const res = await app.request("/api/og/nope");
+    expect(res.status).toBe(404);
+  });
+
+  it("GET /api/og/:listId renders an image for an existing list", async () => {
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "l1",
+      name: "Cine",
+      slug: "cine",
+      description: null,
+    });
+    mockDb.select.mockReturnValue(ogChain([{ ownerName: "Ana" }]));
+
+    const res = await app.request("/api/og/cine");
+    expect(res.status).toBe(200);
+    expect(res.headers.get("content-type")).toContain("image/png");
   });
 });
 

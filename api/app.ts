@@ -57,6 +57,7 @@ import {
 } from "./auth-mobile.js";
 import { sendEmail } from "./email.js";
 import { signUnsubscribeToken, verifyUnsubscribeToken } from "./email-token.js";
+import { renderOgImage } from "./og.js";
 import { hashPassword, verifyPassword } from "./password.js";
 import { sendExpoPush } from "./push.js";
 import { rateLimit } from "./rate-limit.js";
@@ -424,6 +425,33 @@ function inUuids(col: AnyColumn, ids: string[]) {
 
 function listWhere(param: string) {
   return UUID_RE.test(param) ? eq(lists.id, param) : eq(lists.slug, param);
+}
+
+async function getOgData(param: string) {
+  const list = await db.query.lists.findFirst({
+    where: listWhere(param),
+    columns: { id: true, name: true, slug: true, description: true },
+  });
+  if (!list) return null;
+  const [stats] = await db
+    .select({ ownerName: users.name })
+    .from(lists)
+    .leftJoin(users, eq(users.id, lists.ownerId))
+    .where(eq(lists.id, list.id));
+  const itemCount = await db.$count(items, eq(items.listId, list.id));
+  const participantCount = await db.$count(
+    participations,
+    eq(participations.sourceListId, list.id)
+  );
+  return {
+    id: list.id,
+    name: list.name,
+    slug: list.slug,
+    description: list.description,
+    ownerName: stats?.ownerName ?? null,
+    itemCount,
+    participantCount,
+  };
 }
 
 async function resolveList(param: string): Promise<{
@@ -3475,4 +3503,52 @@ app.get("/admin/stats", async (c) => {
     weeklyLists,
     revenue: revenueRow[0]?.total ?? 0,
   });
+});
+
+app.get("/og/:listId", async (c) => {
+  const data = await getOgData(c.req.param("listId"));
+  if (!data) return c.json({ error: "Not found" }, 404);
+  return renderOgImage({
+    name: data.name,
+    ownerName: data.ownerName,
+    itemCount: data.itemCount,
+    participantCount: data.participantCount,
+  });
+});
+
+app.get("/share/:listId", async (c) => {
+  const param = c.req.param("listId");
+  const appUrl = process.env.APP_URL ?? "https://welist.io";
+  const data = await getOgData(param);
+  if (!data) {
+    return c.redirect(`${appUrl}/explore`, 302);
+  }
+  const canonical = `${appUrl}/explore/${data.slug ?? data.id}`;
+  const ogImage = `${appUrl}/api/og/${data.slug ?? data.id}`;
+  const title = `${data.name} · Welist`;
+  const description =
+    data.description ??
+    `${data.itemCount} items${
+      data.ownerName ? ` · by ${data.ownerName}` : ""
+    }. Take the challenge on Welist.`;
+  const html = `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>${escapeHtml(title)}</title>
+<meta name="description" content="${escapeHtml(description)}" />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="${escapeHtml(title)}" />
+<meta property="og:description" content="${escapeHtml(description)}" />
+<meta property="og:url" content="${escapeHtml(canonical)}" />
+<meta property="og:image" content="${escapeHtml(ogImage)}" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="${escapeHtml(title)}" />
+<meta name="twitter:description" content="${escapeHtml(description)}" />
+<meta name="twitter:image" content="${escapeHtml(ogImage)}" />
+<meta http-equiv="refresh" content="0; url=${escapeHtml(canonical)}" />
+</head>
+<body><a href="${escapeHtml(canonical)}">${escapeHtml(data.name)}</a></body>
+</html>`;
+  return c.html(html);
 });
