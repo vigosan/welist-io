@@ -489,3 +489,67 @@ export const listsService = {
     }>(`/api/my-lists${qs ? `?${qs}` : ""}`);
   },
 };
+
+export type CollectionSummary = {
+  id: string;
+  name: string;
+  slug: string | null;
+  description: string | null;
+  ownerId: string;
+  ownerName: string | null;
+  ownerImage: string | null;
+  listCount: number;
+};
+
+export type MyCollection = {
+  id: string;
+  name: string;
+  slug: string | null;
+  description: string | null;
+  public: boolean;
+  listCount: number;
+};
+
+export type CollectionDetail = {
+  id: string;
+  name: string;
+  slug: string | null;
+  description: string | null;
+  public: boolean;
+  ownerId: string;
+  owner: { name: string | null; image: string | null } | null;
+  lists: Array<{
+    id: string;
+    name: string;
+    slug: string | null;
+    description: string | null;
+    itemCount: number;
+  }>;
+};
+
+export const collectionsService = {
+  explore: (cursor?: string) => {
+    const qs = cursor ? `?cursor=${encodeURIComponent(cursor)}` : "";
+    return apiClient<{ items: CollectionSummary[]; nextCursor: string | null }>(
+      `/api/collections${qs}`
+    );
+  },
+  mine: () => apiClient<MyCollection[]>("/api/me/collections"),
+  detail: (id: string) => apiClient<CollectionDetail>(`/api/collections/${id}`),
+  create: (input: { name: string; description?: string; public?: boolean }) =>
+    apiClient<{ id: string; slug: string | null }>("/api/collections", {
+      method: "POST",
+      body: JSON.stringify(input),
+    }),
+  delete: (id: string) =>
+    apiClient<void>(`/api/collections/${id}`, { method: "DELETE" }),
+  addList: (collectionId: string, listId: string) =>
+    apiClient<void>(`/api/collections/${collectionId}/lists`, {
+      method: "POST",
+      body: JSON.stringify({ listId }),
+    }),
+  removeList: (collectionId: string, listId: string) =>
+    apiClient<void>(`/api/collections/${collectionId}/lists/${listId}`, {
+      method: "DELETE",
+    }),
+};
