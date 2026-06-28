@@ -557,6 +557,16 @@ function MyListsPage() {
             >
               {search ? t("myLists.noListsSearch") : t("myLists.noLists")}
             </p>
+            {!search && (
+              <button
+                type="button"
+                onClick={() => setCreating(true)}
+                data-testid="empty-create-first-list"
+                className="mt-2 cursor-pointer rounded-lg bg-ink px-4 py-2 text-sm font-semibold text-canvas transition hover:bg-black active:scale-[0.96] dark:bg-paper dark:text-ink dark:hover:bg-white"
+              >
+                {t("myLists.createFirstList")}
+              </button>
+            )}
           </div>
         )}
         {!isLoading && lists.length > 0 && (
