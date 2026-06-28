@@ -16,7 +16,12 @@ vi.mock("@hono/auth-js/react", () => ({
 }));
 
 import { useSession } from "@hono/auth-js/react";
-import { useDeleteList, useMyLists, useStreak } from "@/hooks/useList";
+import {
+  useCreateListFromTemplate,
+  useDeleteList,
+  useMyLists,
+  useStreak,
+} from "@/hooks/useList";
 
 const LIST_A: List = {
   id: "l1",
@@ -105,13 +110,19 @@ function setupMocks({
   lists = [LIST_A, LIST_B],
   isLoading = false,
   deleteMutate = vi.fn(),
+  templateMutate = vi.fn(),
   streak,
 }: {
   lists?: List[];
   isLoading?: boolean;
   deleteMutate?: ReturnType<typeof vi.fn>;
+  templateMutate?: ReturnType<typeof vi.fn>;
   streak?: { current: number };
 } = {}) {
+  vi.mocked(useCreateListFromTemplate).mockReturnValue({
+    mutate: templateMutate,
+    isPending: false,
+  } as never);
   vi.mocked(useStreak).mockReturnValue({ data: streak } as never);
   vi.mocked(useSession).mockReturnValue({
     data: { user: { id: "u1", name: "User" }, expires: "" },
@@ -153,6 +164,28 @@ describe("MyListsPage", () => {
     await waitFor(() =>
       expect(screen.queryAllByTestId("my-list-card")).toHaveLength(0)
     );
+  });
+
+  it("offers starter templates in the empty state to solve the cold start", async () => {
+    setupMocks({ lists: [] });
+    renderPage();
+    await waitFor(() =>
+      expect(screen.getByTestId("template-chip-movies")).toBeInTheDocument()
+    );
+  });
+
+  it("clicking a template chip creates a list seeded from that template", async () => {
+    const templateMutate = vi.fn();
+    setupMocks({ lists: [], templateMutate });
+    renderPage();
+    await waitFor(() =>
+      expect(screen.getByTestId("template-chip-movies")).toBeInTheDocument()
+    );
+    await userEvent.click(screen.getByTestId("template-chip-movies"));
+    expect(templateMutate).toHaveBeenCalledTimes(1);
+    const [payload] = templateMutate.mock.calls[0];
+    expect(payload.name).toBeTruthy();
+    expect(payload.items.length).toBeGreaterThan(0);
   });
 
   it("clicking delete button shows confirmation", async () => {

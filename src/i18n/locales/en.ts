@@ -262,6 +262,7 @@ const en: Translations = {
     noListsSearch: "No lists found with that name.",
     noLists: "You don't have any lists yet.",
     createFirstList: "Create your first list",
+    orStartFromTemplate: "or start from a template",
     loading: "Loading…",
     filterAll: "All",
     filterPublic: "Public",

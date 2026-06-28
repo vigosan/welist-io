@@ -14,12 +14,14 @@ import { Chip, ListCard, Progress } from "@/components/ui";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import {
   useCreateList,
+  useCreateListFromTemplate,
   useDeleteList,
   useMyLists,
   useStreak,
 } from "@/hooks/useList";
 import { useSearchInput } from "@/hooks/useSearchInput";
-import { useTranslation } from "@/i18n/service";
+import { useLanguage, useTranslation } from "@/i18n/service";
+import { getListTemplates } from "@/lib/list-templates";
 
 export const Route = createFileRoute("/lists/")({
   component: MyListsPage,
@@ -276,9 +278,26 @@ function MyListsPage() {
     fetchNextPage,
   });
   const { t } = useTranslation();
+  const { language } = useLanguage();
+  const navigate = useNavigate();
+  const createFromTemplate = useCreateListFromTemplate();
   const { data: session } = useSession();
   const userId = session?.user?.id;
   const { data: streak } = useStreak();
+
+  function handleUseTemplate(templateId: string) {
+    const template = getListTemplates(language).find(
+      (tpl) => tpl.id === templateId
+    );
+    if (!template || createFromTemplate.isPending) return;
+    createFromTemplate.mutate(
+      { name: template.name, items: template.items },
+      {
+        onSuccess: (list) =>
+          navigate({ to: "/lists/$listId", params: { listId: list.id } }),
+      }
+    );
+  }
 
   const SORT_OPTIONS: { value: SortOption; label: string }[] = [
     { value: "recent", label: t("myLists.sortRecent") },
@@ -566,6 +585,25 @@ function MyListsPage() {
               >
                 {t("myLists.createFirstList")}
               </button>
+            )}
+            {!search && (
+              <>
+                <p className="mt-4 text-xs text-gray-400 dark:text-[#6b6b67]">
+                  {t("myLists.orStartFromTemplate")}
+                </p>
+                <div className="mt-2 flex flex-wrap justify-center gap-1.5">
+                  {getListTemplates(language).map((tpl) => (
+                    <Chip
+                      key={tpl.id}
+                      onClick={() => handleUseTemplate(tpl.id)}
+                      disabled={createFromTemplate.isPending}
+                      data-testid={`template-chip-${tpl.id}`}
+                    >
+                      {tpl.name}
+                    </Chip>
+                  ))}
+                </div>
+              </>
             )}
           </div>
         )}

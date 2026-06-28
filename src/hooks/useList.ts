@@ -120,6 +120,15 @@ export function useCreateList() {
   });
 }
 
+export function useCreateListFromTemplate() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ name, items }: { name: string; items: string[] }) =>
+      listsService.createFromTemplate(name, items),
+    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.myListsAll() }),
+  });
+}
+
 export function useUpdateName(listId: string) {
   const qc = useQueryClient();
   return useMutation({

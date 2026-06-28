@@ -261,6 +261,7 @@ const es = {
     noListsSearch: "No hay listas con ese nombre.",
     noLists: "Aún no tienes listas.",
     createFirstList: "Crea tu primera lista",
+    orStartFromTemplate: "o empieza con una plantilla",
     loading: "Cargando…",
     filterAll: "Todas",
     filterPublic: "Públicas",

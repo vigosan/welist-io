@@ -295,6 +295,20 @@ export const listsService = {
       body: JSON.stringify({ name }),
     }),
 
+  createFromTemplate: async (name: string, items: string[]) => {
+    const list = await apiClient<List>("/api/lists", {
+      method: "POST",
+      body: JSON.stringify({ name }),
+    });
+    if (items.length > 0) {
+      await apiClient(`/api/lists/${list.id}/items/bulk`, {
+        method: "POST",
+        body: JSON.stringify({ texts: items }),
+      });
+    }
+    return list;
+  },
+
   update: (
     listId: string,
     patch: {
