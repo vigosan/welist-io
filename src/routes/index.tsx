@@ -503,6 +503,9 @@ function Hero() {
               <CreateForm />
             </div>
             <MetaRow />
+            <div className="mt-8">
+              <ProofAvatars />
+            </div>
           </div>
           <div className="hidden lg:block">
             <ProductPreview progress={progress} reduced={reduced} />
