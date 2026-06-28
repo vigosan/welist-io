@@ -1,4 +1,4 @@
-import { signIn, useSession } from "@hono/auth-js/react";
+import { useSession } from "@hono/auth-js/react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { AppNav } from "@/components/AppNav";
@@ -54,6 +54,7 @@ function ExploreListCard({
 }) {
   const { data: session } = useSession();
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [optimisticAccepted, setOptimisticAccepted] = useState(false);
   const accepted = list.isParticipating || optimisticAccepted;
 
@@ -62,7 +63,7 @@ function ExploreListCard({
       setOptimisticAccepted(true);
       onAccept(list.id);
     } else {
-      signIn("google");
+      navigate({ to: "/login" });
     }
   }
 
@@ -453,9 +454,20 @@ function ExplorePage() {
             </div>
           )}
           {!isLoading && lists.length === 0 && (
-            <p className="text-[12px] text-gray-500 text-center py-10">
-              {search ? t("explore.noListsSearch") : t("explore.noLists")}
-            </p>
+            <div className="flex flex-col items-center gap-3 py-10 text-center">
+              <p className="text-[12px] text-gray-500">
+                {search ? t("explore.noListsSearch") : t("explore.noLists")}
+              </p>
+              {!search && (
+                <Link
+                  to="/lists"
+                  data-testid="explore-empty-cta"
+                  className="cursor-pointer rounded-lg bg-ink px-4 py-2 text-sm font-semibold text-canvas no-underline transition hover:bg-black active:scale-[0.96] dark:bg-paper dark:text-ink dark:hover:bg-white"
+                >
+                  {t("explore.emptyCta")}
+                </Link>
+              )}
+            </div>
           )}
           <div className="flex flex-col gap-3">
             {lists.map((list) => (

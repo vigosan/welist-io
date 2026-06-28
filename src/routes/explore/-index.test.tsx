@@ -251,14 +251,31 @@ describe("ExplorePage", () => {
     );
   });
 
-  it("accept button calls signIn when not logged in", async () => {
+  it("accept button navigates to login when not logged in", async () => {
     setupMocks({ sessionUser: null });
-    renderPage();
+    const qc = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false },
+        mutations: { retry: false },
+      },
+    });
+    const history = createMemoryHistory({ initialEntries: ["/explore"] });
+    const router = createRouter({
+      routeTree,
+      history,
+      context: { queryClient: qc },
+    });
+    render(
+      <QueryClientProvider client={qc}>
+        <RouterProvider router={router} />
+      </QueryClientProvider>
+    );
     await waitFor(() =>
       expect(screen.getByTestId("accept-btn-e1")).toBeInTheDocument()
     );
     await userEvent.click(screen.getByTestId("accept-btn-e1"));
-    expect(signIn).toHaveBeenCalledWith("google");
+    expect(router.state.location.pathname).toBe("/login");
+    expect(signIn).not.toHaveBeenCalled();
   });
 
   it("requests created_desc sort by default", async () => {

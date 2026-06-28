@@ -1,4 +1,4 @@
-import { signIn, useSession } from "@hono/auth-js/react";
+import { useSession } from "@hono/auth-js/react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppNav } from "@/components/AppNav";
@@ -297,7 +297,7 @@ function ExploreDetailPage() {
             if (session?.user) {
               handleAccept();
             } else {
-              signIn("google");
+              navigate({ to: "/login" });
             }
           }}
           disabled={
