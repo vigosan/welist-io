@@ -8,12 +8,17 @@ export function useListRealtime(listId: string, enabled: boolean) {
   useEffect(() => {
     if (!enabled || !listId) return;
     const es = new EventSource(`/api/lists/${listId}/stream`);
+    let timer: ReturnType<typeof setTimeout> | undefined;
     const onChange = () => {
-      qc.invalidateQueries({ queryKey: queryKeys.items(listId) });
-      qc.invalidateQueries({ queryKey: queryKeys.list(listId) });
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        qc.invalidateQueries({ queryKey: queryKeys.items(listId) });
+        qc.invalidateQueries({ queryKey: queryKeys.list(listId) });
+      }, 250);
     };
     es.addEventListener("list-changed", onChange);
     return () => {
+      clearTimeout(timer);
       es.removeEventListener("list-changed", onChange);
       es.close();
     };

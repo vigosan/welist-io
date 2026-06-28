@@ -74,19 +74,49 @@ describe("useListRealtime", () => {
   });
 
   it("invalidates the items and list queries on list-changed", () => {
-    const { invalidateSpy } = renderWithClient(true);
-    const [es] = FakeEventSource.instances;
+    vi.useFakeTimers();
+    try {
+      const { invalidateSpy } = renderWithClient(true);
+      const [es] = FakeEventSource.instances;
 
-    act(() => {
-      es.dispatch("list-changed", { listId: LIST_ID });
-    });
+      act(() => {
+        es.dispatch("list-changed", { listId: LIST_ID });
+        vi.runAllTimers();
+      });
 
-    expect(invalidateSpy).toHaveBeenCalledWith({
-      queryKey: queryKeys.items(LIST_ID),
-    });
-    expect(invalidateSpy).toHaveBeenCalledWith({
-      queryKey: queryKeys.list(LIST_ID),
-    });
+      expect(invalidateSpy).toHaveBeenCalledWith({
+        queryKey: queryKeys.items(LIST_ID),
+      });
+      expect(invalidateSpy).toHaveBeenCalledWith({
+        queryKey: queryKeys.list(LIST_ID),
+      });
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("coalesces a burst of list-changed events into one invalidation", () => {
+    vi.useFakeTimers();
+    try {
+      const { invalidateSpy } = renderWithClient(true);
+      const [es] = FakeEventSource.instances;
+
+      act(() => {
+        es.dispatch("list-changed", { listId: LIST_ID });
+        es.dispatch("list-changed", { listId: LIST_ID });
+        es.dispatch("list-changed", { listId: LIST_ID });
+        vi.runAllTimers();
+      });
+
+      const itemsCalls = invalidateSpy.mock.calls.filter(
+        ([arg]) =>
+          JSON.stringify(arg) ===
+          JSON.stringify({ queryKey: queryKeys.items(LIST_ID) })
+      );
+      expect(itemsCalls).toHaveLength(1);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it("closes the EventSource on unmount", () => {
