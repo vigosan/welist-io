@@ -2615,6 +2615,58 @@ describe("GET /api/users", () => {
   });
 });
 
+describe("GET /api/users/:userId/profile (level)", () => {
+  beforeEach(() => vi.clearAllMocks());
+  afterEach(() => mockDb.$count.mockReset());
+
+  function selectChain(rows: unknown[]) {
+    return {
+      from: vi.fn().mockReturnThis(),
+      innerJoin: vi.fn().mockReturnThis(),
+      where: vi.fn().mockReturnThis(),
+      orderBy: vi.fn().mockReturnThis(),
+      limit: vi.fn().mockResolvedValue(rows),
+    };
+  }
+
+  it("returns 404 for an unknown user", async () => {
+    mockDb.query.users.findFirst.mockResolvedValue(undefined);
+    const res = await app.request("/api/users/ghost/profile");
+    expect(res.status).toBe(404);
+  });
+
+  it("includes a level object derived from the user's metrics", async () => {
+    mockDb.query.users.findFirst.mockResolvedValue({
+      id: "u1",
+      name: "Ana",
+      image: null,
+    });
+    // publicLists chain, completedChallenges chain, ownedListIds subquery chain
+    mockDb.select
+      .mockReturnValueOnce(selectChain([]))
+      .mockReturnValueOnce(selectChain([]))
+      .mockReturnValue(selectChain([]));
+    mockDb.$count.mockResolvedValue(2);
+
+    const res = await app.request("/api/users/u1/profile");
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as {
+      level: {
+        xp: number;
+        level: number;
+        xpIntoLevel: number;
+        xpForNextLevel: number;
+        progress: number;
+      };
+    };
+    expect(body.level).toBeDefined();
+    expect(body.level.level).toBeGreaterThanOrEqual(1);
+    expect(body.level.xp).toBeGreaterThan(0);
+    expect(body.level.progress).toBeGreaterThanOrEqual(0);
+    expect(body.level.progress).toBeLessThanOrEqual(1);
+  });
+});
+
 describe("GET /api/users/search", () => {
   const headers = { "x-forwarded-for": "10.0.0.42" };
 

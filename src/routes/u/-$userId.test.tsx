@@ -27,6 +27,13 @@ const PROFILE = {
   image: null,
   publicLists: [],
   completedChallenges: [],
+  level: {
+    xp: 137,
+    level: 2,
+    xpIntoLevel: 37,
+    xpForNextLevel: 200,
+    progress: 0.185,
+  },
 };
 
 function renderProfile() {
@@ -144,5 +151,18 @@ describe("UserProfilePage achievements", () => {
       const card = screen.getByTestId("achievement-first_list_created");
       expect(card).toHaveAttribute("data-unlocked", "true");
     });
+  });
+
+  it("shows the level badge and XP bar from the profile", async () => {
+    vi.mocked(useUserAchievements).mockReturnValue({
+      data: [],
+    } as unknown as ReturnType<typeof useUserAchievements>);
+
+    renderProfile();
+
+    await waitFor(() =>
+      expect(screen.getByTestId("profile-level-badge")).toHaveTextContent("2")
+    );
+    expect(screen.getByTestId("profile-xp-bar")).toBeInTheDocument();
   });
 });

@@ -80,10 +80,18 @@ function UserProfilePage() {
               </span>
             </div>
           )}
-          <div>
-            <h1 className="text-xl font-bold tracking-tight text-ink dark:text-paper">
-              {profile.name ? privateName(profile.name) : "Anonymous"}
-            </h1>
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2">
+              <h1 className="text-xl font-bold tracking-tight text-ink dark:text-paper truncate">
+                {profile.name ? privateName(profile.name) : "Anonymous"}
+              </h1>
+              <span
+                data-testid="profile-level-badge"
+                className="shrink-0 rounded-full bg-ink px-2 py-0.5 text-[11px] font-semibold text-canvas dark:bg-paper dark:text-ink"
+              >
+                {t("profile.level", { level: profile.level.level })}
+              </span>
+            </div>
             <p className="text-sm text-gray-500 dark:text-muted">
               {profile.publicLists.length}{" "}
               {t("profile.publicLists").toLowerCase()} ·{" "}
@@ -91,6 +99,21 @@ function UserProfilePage() {
               {t("profile.completedChallenges").toLowerCase()}
             </p>
           </div>
+        </div>
+
+        <div data-testid="profile-xp-bar">
+          <div className="h-1.5 w-full overflow-hidden rounded-full bg-black/[0.06] dark:bg-white/[0.08]">
+            <div
+              className="h-full rounded-full bg-ink dark:bg-paper transition-[width] duration-500"
+              style={{ width: `${Math.round(profile.level.progress * 100)}%` }}
+            />
+          </div>
+          <p className="mt-1 font-mono text-[10.5px] tabular-nums text-gray-400 dark:text-[#6b6b67]">
+            {t("profile.xpProgress", {
+              into: profile.level.xpIntoLevel,
+              total: profile.level.xpForNextLevel,
+            })}
+          </p>
         </div>
 
         <FollowButton userId={userId} />

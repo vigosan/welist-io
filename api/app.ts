@@ -49,6 +49,7 @@ import {
 import { ADULT_CATEGORIES, LIST_CATEGORIES } from "../src/lib/categories.js";
 import { plainItemText } from "../src/lib/item-text.js";
 import { cleanName, slugify } from "../src/lib/slug.js";
+import { levelFromMetrics } from "../src/lib/xp.js";
 import {
   getAppleAudiences,
   getGoogleMobileAudiences,
@@ -2358,12 +2359,19 @@ app.get("/users/:userId/profile", async (c) => {
     .orderBy(desc(participations.completedAt))
     .limit(20);
 
+  const [metrics, achievementsUnlocked] = await Promise.all([
+    computeAchievementMetrics(userId),
+    db.$count(achievements, eq(achievements.userId, userId)),
+  ]);
+  const level = levelFromMetrics({ ...metrics, achievementsUnlocked });
+
   return c.json({
     id: user.id,
     name: user.name,
     image: user.image,
     publicLists,
     completedChallenges,
+    level,
   });
 });
 

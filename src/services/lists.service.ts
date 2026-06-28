@@ -85,6 +85,13 @@ export type UserProfile = {
     slug: string | null;
     completedAt: string | null;
   }>;
+  level: {
+    xp: number;
+    level: number;
+    xpIntoLevel: number;
+    xpForNextLevel: number;
+    progress: number;
+  };
 };
 
 export type AppNotification = {

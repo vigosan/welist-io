@@ -534,6 +534,8 @@ const es = {
     challengeCompleted: "{{name}} ha completado «{{list}}»",
   },
   profile: {
+    level: "Nivel {{level}}",
+    xpProgress: "{{into}} / {{total}} XP para el siguiente nivel",
     publicLists: "Listas públicas",
     completedChallenges: "Retos completados",
     noPublicLists: "No hay listas públicas aún.",

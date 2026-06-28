@@ -535,6 +535,8 @@ const en: Translations = {
     challengeCompleted: "{{name}} completed «{{list}}»",
   },
   profile: {
+    level: "Level {{level}}",
+    xpProgress: "{{into}} / {{total}} XP to next level",
     publicLists: "Public lists",
     completedChallenges: "Completed challenges",
     noPublicLists: "No public lists yet.",
