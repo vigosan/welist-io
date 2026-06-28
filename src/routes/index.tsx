@@ -4,7 +4,6 @@ import { AppFooter } from "@/components/AppFooter";
 import { AppNav } from "@/components/AppNav";
 import { Skeleton } from "@/components/Skeleton";
 import {
-  Chip,
   card,
   Progress,
   SectionHeading,
@@ -707,9 +706,18 @@ function ExploreSection() {
           </div>
           <div className="flex flex-wrap gap-1.5">
             {chips.map((c) => (
-              <Chip key={c.id} active={c.active}>
+              <Link
+                key={c.id}
+                to="/explore"
+                className={[
+                  "cursor-pointer rounded-full border px-3.5 py-1.5 text-[13px] no-underline transition-colors active:scale-[0.97]",
+                  c.active
+                    ? "border-ink bg-ink text-canvas dark:border-paper dark:bg-paper dark:text-canvas-dark"
+                    : "border-black/[0.08] bg-canvas text-muted hover:border-black/20 hover:text-ink dark:border-white/[0.08] dark:bg-canvas-dark dark:hover:border-white/20 dark:hover:text-paper",
+                ].join(" ")}
+              >
                 {c.label}
-              </Chip>
+              </Link>
             ))}
           </div>
         </div>
