@@ -35,6 +35,15 @@ function renderVerb(
       ? t("notifications.item_done_one")
       : t("notifications.item_done_many", { count });
   }
+  if (n.type === "weekly_recap") {
+    const m = n.metadata ?? {};
+    const total =
+      (m.accepted ?? 0) +
+      (m.completed ?? 0) +
+      (m.followers ?? 0) +
+      (m.liked ?? 0);
+    return t("notifications.weekly_recap", { count: total });
+  }
   return t(`notifications.${n.type}` as const);
 }
 

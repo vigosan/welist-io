@@ -111,10 +111,10 @@ export function useUpdateList(listId: string) {
   });
 }
 
-export function useCloneList() {
+export function useForkList() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (listId: string) => listsService.clone(listId),
+    mutationFn: (listId: string) => listsService.fork(listId),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["my-lists"] }),
   });
 }

@@ -67,7 +67,11 @@ export type NotificationType =
   | "added_as_collaborator"
   | "item_added"
   | "item_done"
-  | "list_completed";
+  | "list_completed"
+  | "item_liked"
+  | "item_commented"
+  | "list_forked"
+  | "weekly_recap";
 
 export type AppNotification = {
   id: string;
@@ -79,7 +83,14 @@ export type AppNotification = {
   actorName: string | null;
   actorImage: string | null;
   actionUrl: string | null;
-  metadata: { count?: number; itemIds?: string[] } | null;
+  metadata: {
+    count?: number;
+    itemIds?: string[];
+    accepted?: number;
+    completed?: number;
+    followers?: number;
+    liked?: number;
+  } | null;
   readAt: string | null;
   createdAt: string;
 };

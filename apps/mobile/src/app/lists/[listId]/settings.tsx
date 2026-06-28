@@ -18,8 +18,8 @@ import {
   useRemoveCollaborator,
 } from "@/hooks/collaborators";
 import {
-  useCloneList,
   useDeleteList,
+  useForkList,
   useList,
   useListActivity,
   useUpdateList,
@@ -37,7 +37,7 @@ export default function ListSettingsScreen() {
   const { session } = useSession();
   const list = useList(listId);
   const update = useUpdateList(listId);
-  const clone = useCloneList();
+  const fork = useForkList();
   const remove = useDeleteList();
 
   const isOwner =
@@ -81,8 +81,8 @@ export default function ListSettingsScreen() {
     );
   };
 
-  const doClone = () =>
-    clone.mutate(listId, {
+  const doFork = () =>
+    fork.mutate(listId, {
       onSuccess: (created) => {
         router.replace({
           pathname: "/lists/[listId]",
@@ -90,7 +90,7 @@ export default function ListSettingsScreen() {
         });
       },
       onError: (e) =>
-        Alert.alert(t("settings.couldNotClone"), String((e as Error).message)),
+        Alert.alert(t("settings.couldNotFork"), String((e as Error).message)),
     });
 
   const confirmDelete = () =>
@@ -236,12 +236,12 @@ export default function ListSettingsScreen() {
 
         <View className="mt-10 gap-3">
           <Pressable
-            onPress={doClone}
-            disabled={clone.isPending}
+            onPress={doFork}
+            disabled={fork.isPending}
             className="rounded-xl border border-gray-200 px-6 py-3 active:opacity-80 dark:border-gray-700"
           >
             <Text className="text-center font-medium text-gray-900 dark:text-gray-100">
-              {t("settings.cloneList")}
+              {t("settings.forkList")}
             </Text>
           </Pressable>
 

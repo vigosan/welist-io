@@ -45,8 +45,8 @@ export const listsService = {
       body: JSON.stringify(patch),
     }),
 
-  clone: (listId: string) =>
-    apiFetch<List>(`/lists/${listId}/clone`, { method: "POST" }),
+  fork: (listId: string) =>
+    apiFetch<List>(`/lists/${listId}/fork`, { method: "POST" }),
 
   delete: (listId: string) =>
     apiFetch<void>(`/lists/${listId}`, { method: "DELETE" }),
