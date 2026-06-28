@@ -20,6 +20,7 @@ import {
   useExplore,
   useExploreDetail,
   useExploreItems,
+  useForkList,
 } from "@/hooks/useList";
 
 function renderDetailPage(listId = "list-detail-1") {
@@ -58,6 +59,10 @@ function setupBaseMocks() {
     fetchNextPage: vi.fn(),
   } as never);
   vi.mocked(useAcceptChallenge).mockReturnValue({
+    mutate: vi.fn(),
+    isPending: false,
+  } as never);
+  vi.mocked(useForkList).mockReturnValue({
     mutate: vi.fn(),
     isPending: false,
   } as never);
@@ -136,5 +141,101 @@ describe("ExploreDetailPage", () => {
 
     fireEvent.click(screen.getByTestId("challengers-toggle"));
     expect(screen.queryByText("2 retadores")).not.toBeInTheDocument();
+  });
+
+  it("shows a fork button to a logged-in non-owner and forks on click", async () => {
+    setupBaseMocks();
+    vi.mocked(useSession).mockReturnValue({
+      data: { user: { id: "viewer" }, expires: "" },
+      status: "authenticated",
+      update: vi.fn(),
+    } as never);
+    const forkMutate = vi.fn();
+    vi.mocked(useForkList).mockReturnValue({
+      mutate: forkMutate,
+      isPending: false,
+    } as never);
+    vi.mocked(useExploreDetail).mockReturnValue({
+      data: {
+        id: "list-detail-1",
+        name: "Lista Detalle",
+        slug: null,
+        description: null,
+        ownerId: "owner-1",
+        owner: { name: "Ana", image: null },
+        forkedFrom: null,
+        itemCount: 1,
+        participantCount: 0,
+        challengers: [],
+        completedParticipants: [],
+      },
+      isLoading: false,
+    } as never);
+
+    renderDetailPage();
+
+    await waitFor(() =>
+      expect(screen.getByTestId("fork-list-btn")).toBeInTheDocument()
+    );
+    fireEvent.click(screen.getByTestId("fork-list-btn"));
+    expect(forkMutate).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not show the fork button to the list owner", async () => {
+    setupBaseMocks();
+    vi.mocked(useSession).mockReturnValue({
+      data: { user: { id: "owner-1" }, expires: "" },
+      status: "authenticated",
+      update: vi.fn(),
+    } as never);
+    vi.mocked(useExploreDetail).mockReturnValue({
+      data: {
+        id: "list-detail-1",
+        name: "Lista Detalle",
+        slug: null,
+        description: null,
+        ownerId: "owner-1",
+        owner: { name: "Ana", image: null },
+        forkedFrom: null,
+        itemCount: 1,
+        participantCount: 0,
+        challengers: [],
+        completedParticipants: [],
+      },
+      isLoading: false,
+    } as never);
+
+    renderDetailPage();
+
+    await waitFor(() =>
+      expect(screen.getByText("Lista Detalle")).toBeInTheDocument()
+    );
+    expect(screen.queryByTestId("fork-list-btn")).not.toBeInTheDocument();
+  });
+
+  it("shows forked-from attribution when the list is a fork", async () => {
+    setupBaseMocks();
+    vi.mocked(useExploreDetail).mockReturnValue({
+      data: {
+        id: "list-detail-1",
+        name: "Mi versión",
+        slug: null,
+        description: null,
+        ownerId: "owner-1",
+        owner: { name: "Ana", image: null },
+        forkedFrom: { id: "src", name: "Original", slug: "original" },
+        itemCount: 1,
+        participantCount: 0,
+        challengers: [],
+        completedParticipants: [],
+      },
+      isLoading: false,
+    } as never);
+
+    renderDetailPage();
+
+    await waitFor(() =>
+      expect(screen.getByTestId("forked-from-link")).toBeInTheDocument()
+    );
   });
 });

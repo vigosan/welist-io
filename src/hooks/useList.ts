@@ -314,9 +314,11 @@ export function useFeed(enabled: boolean) {
   });
 }
 
-export function useCloneList() {
+export function useForkList() {
+  const qc = useQueryClient();
   return useMutation({
-    mutationFn: (listId: string) => listsService.clone(listId),
+    mutationFn: (listId: string) => listsService.fork(listId),
+    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.myListsAll() }),
   });
 }
 

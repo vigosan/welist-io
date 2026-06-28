@@ -16,6 +16,7 @@ const LIST: List = {
   public: false,
   collaborative: false,
   ownerId: null,
+  forkedFromId: null,
   completedAt: null,
   createdAt: new Date(),
 };

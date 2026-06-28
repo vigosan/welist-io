@@ -516,7 +516,8 @@ type NotificationType =
   | "list_completed"
   | "item_liked"
   | "weekly_recap"
-  | "item_commented";
+  | "item_commented"
+  | "list_forked";
 
 type CreateNotificationInput = {
   recipientId: string;
@@ -594,6 +595,9 @@ function renderPushBody(input: {
   }
   if (input.type === "item_commented") {
     return `${name} ha comentado un ítem de «${list}»`;
+  }
+  if (input.type === "list_forked") {
+    return `${name} ha creado su versión de «${list}»`;
   }
   if (input.type === "weekly_recap") {
     return "Tu resumen de la semana en welist";
@@ -2873,9 +2877,17 @@ app.get("/explore/:listId", async (c) => {
       public: true,
       createdAt: true,
       ownerId: true,
+      forkedFromId: true,
     },
   });
   if (!list?.public) return c.json({ error: "Not found" }, 404);
+
+  const forkedFrom = list.forkedFromId
+    ? ((await db.query.lists.findFirst({
+        where: eq(lists.id, list.forkedFromId),
+        columns: { id: true, name: true, slug: true },
+      })) ?? null)
+    : null;
 
   const [stats] = await db
     .select({
@@ -2944,6 +2956,7 @@ app.get("/explore/:listId", async (c) => {
     createdAt: list.createdAt,
     ownerId: list.ownerId,
     owner,
+    forkedFrom,
     itemCount: stats?.itemCount ?? 0,
     participantCount: totalParticipants[0]?.count ?? 0,
     challengers,
@@ -2965,32 +2978,91 @@ app.get("/explore/:listId/items", async (c) => {
   return c.json(rows.map(({ done: _done, ...item }) => item));
 });
 
-app.post("/lists/:listId/clone", async (c) => {
+app.post("/lists/:listId/fork", async (c) => {
   const listId = c.req.param("listId");
+  const authUser = getOptionalUser(c);
+  const userId = authUser?.session?.user?.id ?? null;
+  if (!userId) return c.json({ error: "Unauthorized" }, 401);
+
   const source = await db.query.lists.findFirst({
     where: listWhere(listId),
   });
   if (!source) return c.json({ error: "Not found" }, 404);
+  if (!(await canViewList(source, userId)))
+    return c.json({ error: "Not found" }, 404);
 
   const sourceItems = await db.query.items.findMany({
     where: eq(items.listId, source.id),
     orderBy: (t, { asc }) => [asc(t.position), asc(t.createdAt)],
   });
 
-  const [newList] = await db
-    .insert(lists)
-    .values({ name: source.name })
-    .returning();
+  const baseSlug = slugify(source.name);
+  let newList: typeof lists.$inferSelect | undefined;
+  for (let attempt = 0; attempt < 6; attempt++) {
+    const slug =
+      baseSlug.length === 0
+        ? null
+        : attempt === 0
+          ? baseSlug
+          : `${baseSlug}-${attempt + 1}`;
+    try {
+      [newList] = await db
+        .insert(lists)
+        .values({
+          name: source.name,
+          slug,
+          ownerId: userId,
+          forkedFromId: source.id,
+        })
+        .returning();
+      break;
+    } catch (e: unknown) {
+      if (!isUniqueViolation(e) || slug === null) throw e;
+    }
+  }
+  if (!newList) {
+    [newList] = await db
+      .insert(lists)
+      .values({
+        name: source.name,
+        slug: null,
+        ownerId: userId,
+        forkedFromId: source.id,
+      })
+      .returning();
+  }
+  const created = newList;
 
   if (sourceItems.length > 0) {
     await db.insert(items).values(
       sourceItems.map((item, i) => ({
-        listId: newList.id,
+        listId: created.id,
         text: item.text,
         done: false,
         position: i,
+        latitude: item.latitude,
+        longitude: item.longitude,
+        placeName: item.placeName,
       }))
     );
+  }
+
+  await checkAchievements(userId);
+
+  if (source.ownerId && source.ownerId !== userId) {
+    const actor = await db.query.users.findFirst({
+      where: eq(users.id, userId),
+      columns: { name: true, image: true },
+    });
+    await createNotification({
+      recipientId: source.ownerId,
+      type: "list_forked",
+      listId: source.id,
+      listName: source.name,
+      actorId: userId,
+      actorName: actor?.name,
+      actorImage: actor?.image,
+    });
   }
 
   return c.json(newList, 201);

@@ -78,6 +78,7 @@ const {
   achievements,
   deviceTokens,
   itemComments,
+  items,
   lists,
   notifications,
   participations,
@@ -1689,105 +1690,119 @@ describe("GET /api/explore/:listId", () => {
   });
 });
 
-describe("POST /api/lists/:listId/clone", () => {
-  beforeEach(() => vi.clearAllMocks());
+describe("POST /api/lists/:listId/fork", () => {
+  const publicSource = {
+    id: "abc",
+    name: "Original",
+    ownerId: "owner",
+    public: true,
+    collaborative: false,
+  };
 
-  it("clones a list with its items and returns 201", async () => {
-    const source = { id: "abc", name: "Original" };
-    const sourceItems = [
-      {
-        id: "i1",
-        listId: "abc",
-        text: "Tarea 1",
-        done: true,
-        position: 0,
-      },
-      {
-        id: "i2",
-        listId: "abc",
-        text: "Tarea 2",
-        done: false,
-        position: 1,
-      },
-    ];
-    const newList = { id: "xyz", name: "Original" };
-
-    mockDb.query.lists.findFirst.mockResolvedValue(source);
-    mockDb.query.items.findMany.mockResolvedValue(sourceItems);
-    mockDb.insert
-      .mockReturnValueOnce({
-        values: vi.fn().mockReturnValue({
-          returning: vi.fn().mockResolvedValue([newList]),
-        }),
-      })
-      .mockReturnValueOnce({
-        values: vi.fn().mockResolvedValue(undefined),
-      });
-
-    const res = await app.request("/api/lists/abc/clone", {
-      method: "POST",
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockDb.$count.mockResolvedValue(0);
+    // computeAchievementMetrics does db.select(...).from(...).where(...)
+    mockDb.select.mockReturnValue({
+      from: vi.fn().mockReturnThis(),
+      where: vi.fn().mockResolvedValue([]),
     });
+    mockDb.query.users.findFirst.mockResolvedValue({ name: "F", image: null });
+  });
+  afterEach(() => {
+    mockDb.$count.mockReset();
+    mockDb.query.users.findFirst.mockReset();
+  });
+
+  it("forks a list to the current user with provenance and items", async () => {
+    mockGetAuthUser.mockResolvedValueOnce({ session: { user: { id: "u2" } } });
+    mockDb.query.lists.findFirst.mockResolvedValue(publicSource);
+    mockDb.query.items.findMany.mockResolvedValue([
+      { id: "i1", listId: "abc", text: "Tarea 1", done: true, position: 0 },
+    ]);
+    const listValues = vi.fn().mockReturnValue({
+      returning: vi.fn().mockResolvedValue([{ id: "xyz", name: "Original" }]),
+    });
+    mockDb.insert.mockImplementation((table) =>
+      table === lists
+        ? { values: listValues }
+        : { values: vi.fn().mockResolvedValue(undefined) }
+    );
+
+    const res = await app.request("/api/lists/abc/fork", { method: "POST" });
     expect(res.status).toBe(201);
     const body = (await res.json()) as Record<string, unknown>;
     expect(body.id).toBe("xyz");
-    expect(body.name).toBe("Original");
+    expect(listValues).toHaveBeenCalledWith(
+      expect.objectContaining({ ownerId: "u2", forkedFromId: "abc" })
+    );
   });
 
-  it("resets done to false on all cloned items", async () => {
-    const source = { id: "abc", name: "Original" };
-    const sourceItems = [
+  it("requires authentication", async () => {
+    mockGetAuthUser.mockRejectedValueOnce(new Error("no session"));
+    mockDb.query.lists.findFirst.mockResolvedValue(publicSource);
+    const res = await app.request("/api/lists/abc/fork", { method: "POST" });
+    expect(res.status).toBe(401);
+  });
+
+  it("resets done to false on all forked items and copies geo", async () => {
+    mockGetAuthUser.mockResolvedValueOnce({ session: { user: { id: "u2" } } });
+    mockDb.query.lists.findFirst.mockResolvedValue(publicSource);
+    mockDb.query.items.findMany.mockResolvedValue([
       {
         id: "i1",
         listId: "abc",
         text: "Hecha",
         done: true,
         position: 0,
+        latitude: "1.0",
+        longitude: "2.0",
+        placeName: "Roma",
       },
-    ];
-    const newList = { id: "xyz", name: "Original" };
+    ]);
+    const itemsValues = vi.fn().mockResolvedValue(undefined);
+    mockDb.insert.mockImplementation((table) =>
+      table === lists
+        ? {
+            values: vi.fn().mockReturnValue({
+              returning: vi.fn().mockResolvedValue([{ id: "xyz", name: "X" }]),
+            }),
+          }
+        : table === items
+          ? { values: itemsValues }
+          : { values: vi.fn().mockResolvedValue(undefined) }
+    );
 
-    mockDb.query.lists.findFirst.mockResolvedValue(source);
-    mockDb.query.items.findMany.mockResolvedValue(sourceItems);
-    const itemsValuesMock = vi.fn().mockResolvedValue(undefined);
-    mockDb.insert
-      .mockReturnValueOnce({
-        values: vi.fn().mockReturnValue({
-          returning: vi.fn().mockResolvedValue([newList]),
-        }),
-      })
-      .mockReturnValueOnce({ values: itemsValuesMock });
-
-    await app.request("/api/lists/abc/clone", {
-      method: "POST",
-    });
-    expect(itemsValuesMock).toHaveBeenCalledWith(
-      expect.arrayContaining([expect.objectContaining({ done: false })])
+    await app.request("/api/lists/abc/fork", { method: "POST" });
+    expect(itemsValues).toHaveBeenCalledWith(
+      expect.arrayContaining([
+        expect.objectContaining({ done: false, placeName: "Roma" }),
+      ])
     );
   });
 
-  it("clones an empty list without inserting items", async () => {
-    const source = { id: "abc", name: "Vacía" };
-    const newList = { id: "xyz", name: "Vacía" };
-
-    mockDb.query.lists.findFirst.mockResolvedValue(source);
+  it("notifies the source owner that their list was forked", async () => {
+    mockGetAuthUser.mockResolvedValueOnce({ session: { user: { id: "u2" } } });
+    mockDb.query.lists.findFirst.mockResolvedValue(publicSource);
     mockDb.query.items.findMany.mockResolvedValue([]);
-    mockDb.insert.mockReturnValueOnce({
-      values: vi.fn().mockReturnValue({
-        returning: vi.fn().mockResolvedValue([newList]),
-      }),
-    });
+    mockDb.insert.mockImplementation((table) =>
+      table === lists
+        ? {
+            values: vi.fn().mockReturnValue({
+              returning: vi.fn().mockResolvedValue([{ id: "xyz", name: "X" }]),
+            }),
+          }
+        : { values: vi.fn().mockResolvedValue(undefined) }
+    );
 
-    const res = await app.request("/api/lists/abc/clone", {
-      method: "POST",
-    });
-    expect(res.status).toBe(201);
-    expect(mockDb.insert).toHaveBeenCalledTimes(1);
+    await app.request("/api/lists/abc/fork", { method: "POST" });
+    expect(mockDb.insert).toHaveBeenCalledWith(notifications);
   });
 
   it("returns 404 when source list not found", async () => {
+    mockGetAuthUser.mockResolvedValueOnce({ session: { user: { id: "u2" } } });
     mockDb.query.lists.findFirst.mockResolvedValue(null);
-
-    const res = await app.request("/api/lists/nonexistent/clone", {
+    const res = await app.request("/api/lists/nonexistent/fork", {
       method: "POST",
     });
     expect(res.status).toBe(404);

@@ -1,4 +1,5 @@
 import {
+  type AnyPgColumn,
   boolean,
   index,
   integer,
@@ -23,6 +24,10 @@ export const lists = pgTable(
     public: boolean("public").notNull().default(false),
     collaborative: boolean("collaborative").notNull().default(false),
     ownerId: text("owner_id").references(() => users.id),
+    forkedFromId: uuid("forked_from_id").references(
+      (): AnyPgColumn => lists.id,
+      { onDelete: "set null" }
+    ),
     completedAt: timestamp("completed_at", { withTimezone: true }),
     createdAt: timestamp("created_at", {
       withTimezone: true,
@@ -254,6 +259,7 @@ export const notificationTypeEnum = pgEnum("notification_type", [
   "item_liked",
   "weekly_recap",
   "item_commented",
+  "list_forked",
 ]);
 
 export const notifications = pgTable(

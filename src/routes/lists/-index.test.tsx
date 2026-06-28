@@ -32,6 +32,7 @@ const LIST_A: List = {
   public: false,
   collaborative: false,
   ownerId: "u1",
+  forkedFromId: null,
   completedAt: null,
   createdAt: new Date(),
 };
@@ -44,6 +45,7 @@ const LIST_B: List = {
   public: true,
   collaborative: false,
   ownerId: "u1",
+  forkedFromId: null,
   completedAt: null,
   createdAt: new Date(),
 };
@@ -56,6 +58,7 @@ const LIST_PARTICIPATED: List = {
   public: true,
   collaborative: false,
   ownerId: "other-user",
+  forkedFromId: null,
   completedAt: null,
   createdAt: new Date(),
 };

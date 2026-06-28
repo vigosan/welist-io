@@ -48,6 +48,11 @@ export type ExploreDetail = {
     name: string | null;
     image: string | null;
   } | null;
+  forkedFrom: {
+    id: string;
+    name: string;
+    slug: string | null;
+  } | null;
   itemCount: number;
   participantCount: number;
   challengers: Array<{
@@ -107,7 +112,9 @@ export type AppNotification = {
     | "item_done"
     | "list_completed"
     | "item_liked"
-    | "weekly_recap";
+    | "weekly_recap"
+    | "item_commented"
+    | "list_forked";
   listId: string | null;
   listName: string | null;
   actorId: string | null;
@@ -388,8 +395,8 @@ export const listsService = {
     }>(`/api/explore${qs ? `?${qs}` : ""}`);
   },
 
-  clone: (listId: string) =>
-    apiClient<List>(`/api/lists/${listId}/clone`, {
+  fork: (listId: string) =>
+    apiClient<List>(`/api/lists/${listId}/fork`, {
       method: "POST",
     }),
 

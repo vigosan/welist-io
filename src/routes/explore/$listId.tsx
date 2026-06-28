@@ -9,6 +9,7 @@ import {
   useAcceptChallenge,
   useExploreDetail,
   useExploreItems,
+  useForkList,
 } from "@/hooks/useList";
 import { useTrackOnMount } from "@/hooks/useTrackOnMount";
 import { useTranslation } from "@/i18n/service";
@@ -29,10 +30,23 @@ function ExploreDetailPage() {
     !!detail
   );
   const acceptChallenge = useAcceptChallenge();
+  const forkList = useForkList();
   const { data: session } = useSession();
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [showChallengers, setShowChallengers] = useState(false);
+
+  function handleFork() {
+    const id = detail?.id;
+    if (!id || forkList.isPending) return;
+    forkList.mutate(id, {
+      onSuccess: (list) =>
+        navigate({
+          to: "/lists/$listId",
+          params: { listId: list.slug ?? list.id },
+        }),
+    });
+  }
 
   function handleAccept() {
     const id = detail?.id;
@@ -147,6 +161,18 @@ function ExploreDetailPage() {
               <p className="text-sm text-muted leading-relaxed mt-2">
                 {detail.description}
               </p>
+            )}
+            {detail.forkedFrom && (
+              <Link
+                to="/explore/$listId"
+                params={{
+                  listId: detail.forkedFrom.slug ?? detail.forkedFrom.id,
+                }}
+                data-testid="forked-from-link"
+                className="mt-2 inline-block text-xs text-gray-400 hover:text-ink dark:text-[#6b6b67] dark:hover:text-paper no-underline transition-colors"
+              >
+                ⑂ {t("explore.forkedFrom", { name: detail.forkedFrom.name })}
+              </Link>
             )}
           </div>
           {detail.owner?.image && (
@@ -332,6 +358,18 @@ function ExploreDetailPage() {
         >
           {session?.user ? t("explore.acceptChallenge") : t("explore.signIn")}
         </button>
+
+        {session?.user && detail.ownerId !== session.user.id && (
+          <button
+            type="button"
+            onClick={handleFork}
+            disabled={forkList.isPending}
+            data-testid="fork-list-btn"
+            className="cursor-pointer w-full py-3 text-sm font-semibold border border-black/[0.12] dark:border-white/[0.14] text-ink dark:text-paper rounded-lg hover:border-black/30 dark:hover:border-white/30 disabled:opacity-40 disabled:cursor-not-allowed transition duration-150 active:scale-[0.96]"
+          >
+            {t("explore.forkList")}
+          </button>
+        )}
       </main>
     </div>
   );
