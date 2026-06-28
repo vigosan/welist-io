@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import type { Action } from "@/components/CommandPalette";
 import type { List } from "@/db/schema";
 import { useTranslation } from "@/i18n/service";
-import { fireConfetti } from "@/lib/confetti";
 
 interface Options {
   list: List | undefined;
@@ -191,7 +190,7 @@ export function useCommandPalette({
     {
       id: "confetti",
       label: t("command.testConfetti"),
-      onSelect: fireConfetti,
+      onSelect: () => import("@/lib/confetti").then((m) => m.fireConfetti()),
     },
   ];
 
