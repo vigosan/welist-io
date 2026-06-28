@@ -168,6 +168,7 @@ const en: Translations = {
     addItemPlaceholder: "Add item…",
     addItemAriaLabel: "New item text",
     addItem: "Add",
+    dictate: "Dictate item",
     closeSearch: "Close search",
     confirmSlug: "Custom URL",
     cancelSlug: "Cancel URL editing",

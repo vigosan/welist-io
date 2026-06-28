@@ -1,7 +1,8 @@
 import { useMemo, useState } from "react";
 import { useGeocodingSearch } from "@/hooks/useGeocodingSearch";
 import { useAddItem, useBulkAddItems } from "@/hooks/useItems";
-import { useTranslation } from "@/i18n/service";
+import { useSpeechInput } from "@/hooks/useSpeechInput";
+import { useLanguage, useTranslation } from "@/i18n/service";
 import { parseBulkText } from "@/lib/bulk-text";
 import { BULK_ITEM_LIMIT } from "@/lib/constants";
 import { getPartialPlace, PARTIAL_PLACE_REGEX } from "@/lib/places";
@@ -24,6 +25,7 @@ export function AddItemForm({
   addInputRef,
 }: Props) {
   const { t } = useTranslation();
+  const { language } = useLanguage();
   const [newItem, setNewItem] = useState("");
   const [pendingBulk, setPendingBulk] = useState<string[] | null>(null);
   const [pendingCoords, setPendingCoords] = useState<Coords | null>(null);
@@ -31,6 +33,10 @@ export function AddItemForm({
 
   const addItem = useAddItem(listId);
   const bulkAddItems = useBulkAddItems(listId);
+  const speech = useSpeechInput(language, (text) => {
+    setNewItem((prev) => (prev.trim() ? `${prev.trim()} ${text}` : text));
+    addInputRef.current?.focus();
+  });
 
   const partialTag = useMemo(() => getPartialTag(newItem), [newItem]);
   const partialPlace = useMemo(() => getPartialPlace(newItem), [newItem]);
@@ -203,6 +209,37 @@ export function AddItemForm({
               data-testid="add-item-input"
               className="flex-1 pl-3 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-600 bg-transparent outline-none"
             />
+            {speech.supported && (
+              <button
+                type="button"
+                onClick={() =>
+                  speech.listening ? speech.stop() : speech.start()
+                }
+                data-testid="add-item-mic"
+                aria-label={t("list.dictate")}
+                aria-pressed={speech.listening}
+                className={`cursor-pointer shrink-0 w-9 h-9 flex items-center justify-center rounded-xl transition active:scale-[0.92] ${
+                  speech.listening
+                    ? "bg-gray-900 text-white dark:bg-white dark:text-gray-900 animate-pulse"
+                    : "text-gray-400 hover:text-gray-700 dark:text-gray-500 dark:hover:text-gray-300"
+                }`}
+              >
+                <svg
+                  aria-hidden="true"
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={1.75}
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3zM19 10v2a7 7 0 0 1-14 0v-2M12 19v4"
+                  />
+                </svg>
+              </button>
+            )}
             <button
               type="submit"
               disabled={!newItem.trim() || addItem.isPending}

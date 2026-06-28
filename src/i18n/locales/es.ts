@@ -167,6 +167,7 @@ const es = {
     addItemPlaceholder: "Añadir elemento…",
     addItemAriaLabel: "Texto del nuevo elemento",
     addItem: "Añadir",
+    dictate: "Dictar elemento",
     closeSearch: "Cerrar búsqueda",
     confirmSlug: "URL personalizada",
     cancelSlug: "Cancelar edición de URL",

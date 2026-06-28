@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { createRef } from "react";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { AddItemForm } from "./AddItemForm";
 
 vi.mock("@/hooks/useGeocodingSearch", () => ({
@@ -11,6 +11,16 @@ vi.mock("@/hooks/useGeocodingSearch", () => ({
 vi.mock("@/hooks/useItems", () => ({
   useAddItem: () => ({ mutate: vi.fn(), isPending: false }),
   useBulkAddItems: () => ({ mutate: vi.fn(), isPending: false }),
+}));
+
+const speechMock = {
+  supported: true,
+  listening: false,
+  start: vi.fn(),
+  stop: vi.fn(),
+};
+vi.mock("@/hooks/useSpeechInput", () => ({
+  useSpeechInput: () => speechMock,
 }));
 
 function renderForm(allTags: string[] = [], allPlaces: string[] = []) {
@@ -25,6 +35,13 @@ function renderForm(allTags: string[] = [], allPlaces: string[] = []) {
 }
 
 describe("AddItemForm", () => {
+  beforeEach(() => {
+    speechMock.supported = true;
+    speechMock.listening = false;
+    speechMock.start.mockClear();
+    speechMock.stop.mockClear();
+  });
+
   it("suggests existing tags matching the partial tag being typed", async () => {
     renderForm(["personal", "work"]);
     await userEvent.type(screen.getByTestId("add-item-input"), "Tarea #wo");
@@ -56,5 +73,18 @@ describe("AddItemForm", () => {
     await userEvent.paste("apples, bananas, cherries");
     expect(screen.getByTestId("bulk-preview")).toBeInTheDocument();
     expect(screen.getByText("bananas")).toBeInTheDocument();
+  });
+
+  it("shows the mic button and starts dictation when speech is supported", async () => {
+    renderForm();
+    const mic = screen.getByTestId("add-item-mic");
+    await userEvent.click(mic);
+    expect(speechMock.start).toHaveBeenCalledOnce();
+  });
+
+  it("hides the mic button when speech is not supported", () => {
+    speechMock.supported = false;
+    renderForm();
+    expect(screen.queryByTestId("add-item-mic")).not.toBeInTheDocument();
   });
 });
