@@ -4,7 +4,8 @@ import { AppFooter } from "@/components/AppFooter";
 import { AppNav } from "@/components/AppNav";
 import { Skeleton } from "@/components/Skeleton";
 import {
-  card,
+  cardBase,
+  cardLift,
   Progress,
   SectionHeading,
   SectionKicker,
@@ -645,8 +646,10 @@ function HowItWorks() {
               className="flex flex-col gap-4 bg-canvas p-7 transition-colors duration-300 hover:bg-canvas/60 dark:bg-canvas-dark dark:hover:bg-canvas-dark/60"
               data-testid={`step-${i + 1}`}
             >
-              <div className="flex items-center justify-between font-mono text-[11px] uppercase tracking-[0.12em] text-muted">
-                <span>{s.num}</span>
+              <div className="flex items-start justify-between">
+                <span className="font-mono text-[40px] font-medium leading-none tracking-[-0.04em] text-ink/15 dark:text-paper/15">
+                  {s.num}
+                </span>
                 <StepIcon kind={s.icon} />
               </div>
               <h3 className="text-[20px] font-semibold leading-tight tracking-[-0.02em] text-ink dark:text-paper">
@@ -756,34 +759,47 @@ function ExploreSection() {
                   key={list.id}
                   to="/explore/$listId"
                   params={{ listId: list.slug ?? list.id }}
-                  className="block no-underline"
+                  className="group block no-underline"
                 >
-                  <article className={`${card} flex h-full flex-col gap-4 p-5`}>
+                  <article
+                    className={`${cardBase} ${cardLift} flex h-full flex-col gap-4 p-6`}
+                  >
                     <div className="flex items-center justify-between">
                       <span className="font-mono text-[10.5px] uppercase tracking-[0.1em] text-muted">
                         {list.category ?? "·"}
                       </span>
                       <StatusPill>{statuses[idx % statuses.length]}</StatusPill>
                     </div>
-                    <h3 className="text-[18px] font-semibold leading-tight tracking-[-0.02em] text-ink dark:text-paper">
-                      {list.name}
-                    </h3>
+                    <div className="flex items-start gap-3">
+                      <h3 className="flex-1 text-[18px] font-semibold leading-[1.2] tracking-[-0.02em] text-ink dark:text-paper [text-wrap:balance]">
+                        {list.name}
+                      </h3>
+                      <div className="shrink-0 text-right leading-none">
+                        <div className="font-mono text-[30px] font-medium tabular-nums tracking-[-0.04em] text-ink dark:text-paper">
+                          {pct}
+                        </div>
+                        <div className="mt-0.5 font-mono text-[9px] uppercase tracking-[0.14em] text-muted">
+                          {t("explore.statPctLabel")}
+                        </div>
+                      </div>
+                    </div>
                     {list.description && (
-                      <p className="line-clamp-3 flex-1 text-[13.5px] leading-[1.55] text-muted">
+                      <p className="line-clamp-2 flex-1 text-[13.5px] leading-[1.55] text-muted [text-wrap:pretty]">
                         {list.description}
                       </p>
                     )}
-                    <div className="mt-auto flex items-center justify-between border-t border-black/[0.04] pt-3 dark:border-white/[0.04]">
-                      <div className="flex items-center gap-2">
-                        <Progress value={pct} className="w-[80px]" />
-                        <span className="font-mono text-[11px] text-ink dark:text-paper">
-                          {pct}%
-                        </span>
-                      </div>
-                      <span className="font-mono text-[10.5px] uppercase tracking-[0.08em] text-muted">
+                    <div className="mt-auto flex items-center justify-between border-t border-black/[0.06] pt-3.5 dark:border-white/[0.06]">
+                      <Progress value={pct} className="w-[96px] h-1.5" />
+                      <span className="inline-flex items-center gap-1.5 font-mono text-[10.5px] uppercase tracking-[0.08em] text-muted">
                         {t("home.cardParticipants", {
                           count: list.participantCount ?? 0,
                         })}
+                        <span
+                          aria-hidden="true"
+                          className="transition-transform duration-200 group-hover:translate-x-0.5"
+                        >
+                          →
+                        </span>
                       </span>
                     </div>
                   </article>
@@ -925,16 +941,18 @@ function BigCta() {
               {tiles.map((tile) => (
                 <div key={tile.l}>
                   <div
-                    className="font-bold tabular-nums"
+                    className="font-mono font-medium tabular-nums"
                     style={{
-                      fontSize: "clamp(28px, 3.5vw, 42px)",
-                      letterSpacing: "-0.03em",
+                      fontSize: "clamp(30px, 3.8vw, 46px)",
+                      letterSpacing: "-0.04em",
                       lineHeight: 1,
                     }}
                   >
                     {tile.n.toLocaleString("es-ES")}
                   </div>
-                  <div className="mt-2 text-[12.5px] opacity-70">{tile.l}</div>
+                  <div className="mt-2 font-mono text-[10.5px] uppercase tracking-[0.1em] opacity-60">
+                    {tile.l}
+                  </div>
                 </div>
               ))}
             </div>
