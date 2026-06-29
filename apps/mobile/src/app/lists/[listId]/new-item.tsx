@@ -128,36 +128,35 @@ export default function NewItemScreen() {
           />
         )}
         {speech.supported && (
-          <Pressable
-            onPress={() => (speech.listening ? speech.stop() : speech.start())}
-            className={`mt-3 flex-row items-center justify-center gap-2 rounded-2xl border px-4 py-3 active:opacity-80 ${
-              speech.listening
-                ? "border-gray-900 bg-gray-900 dark:border-gray-100 dark:bg-gray-100"
-                : "border-gray-300 dark:border-gray-600"
-            }`}
-          >
-            <Mic
-              size={16}
-              color={
+          <View className="mt-4 items-center">
+            <Pressable
+              onPressIn={() => speech.start()}
+              onPressOut={() => speech.stop()}
+              accessibilityLabel={t("list.dictate")}
+              accessibilityState={{ busy: speech.listening }}
+              className={`h-16 w-16 items-center justify-center rounded-full border active:opacity-80 ${
                 speech.listening
-                  ? isDark
-                    ? "#0c0c0b"
-                    : "#ffffff"
-                  : isDark
-                    ? "#f0ede8"
-                    : "#0c0c0b"
-              }
-            />
-            <Text
-              className={`text-sm font-medium ${
-                speech.listening
-                  ? "text-white dark:text-gray-900"
-                  : "text-gray-900 dark:text-gray-100"
+                  ? "border-gray-900 bg-gray-900 dark:border-gray-100 dark:bg-gray-100"
+                  : "border-gray-300 dark:border-gray-600"
               }`}
             >
-              {speech.listening ? t("list.listening") : t("list.dictate")}
+              <Mic
+                size={24}
+                color={
+                  speech.listening
+                    ? isDark
+                      ? "#0c0c0b"
+                      : "#ffffff"
+                    : isDark
+                      ? "#f0ede8"
+                      : "#0c0c0b"
+                }
+              />
+            </Pressable>
+            <Text className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+              {speech.listening ? t("list.listening") : t("list.holdToDictate")}
             </Text>
-          </Pressable>
+          </View>
         )}
         <Text className="mt-3 text-xs text-gray-500 dark:text-gray-400">
           {t("list.newItemHint")}

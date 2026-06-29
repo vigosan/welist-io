@@ -133,6 +133,7 @@ export const en = {
     newItemTitle: "New item",
     newItemHint: "Paste multiple lines to add several items at once.",
     dictate: "Dictate",
+    holdToDictate: "Hold to dictate",
     listening: "Listening…",
     completed: "Completed",
     filterAll: "all",

@@ -133,6 +133,7 @@ export const es = {
     newItemTitle: "Nuevo ítem",
     newItemHint: "Pega varias líneas para añadir varios ítems a la vez.",
     dictate: "Dictar",
+    holdToDictate: "Mantén para dictar",
     listening: "Escuchando…",
     filterAll: "todos",
     filterPending: "pendientes",

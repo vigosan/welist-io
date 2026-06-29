@@ -64,7 +64,10 @@ export function useSpeechInput(lang: string, onResult: (text: string) => void) {
     };
   }, [speech]);
 
+  const wantListeningRef = useRef(false);
+
   const stop = useCallback(() => {
+    wantListeningRef.current = false;
     try {
       speech?.ExpoSpeechRecognitionModule.stop();
     } catch {
@@ -75,10 +78,15 @@ export function useSpeechInput(lang: string, onResult: (text: string) => void) {
 
   const start = useCallback(async () => {
     if (!speech) return;
+    wantListeningRef.current = true;
+    setListening(true);
     const perm =
       await speech.ExpoSpeechRecognitionModule.requestPermissionsAsync();
-    if (!perm.granted) return;
-    setListening(true);
+    // If the user released (push-to-talk) before the permission resolved, abort.
+    if (!perm.granted || !wantListeningRef.current) {
+      setListening(false);
+      return;
+    }
     speech.ExpoSpeechRecognitionModule.start({
       lang: localeTag(lang),
       interimResults: false,
