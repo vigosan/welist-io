@@ -167,7 +167,7 @@ const ExploreListCard = memo(function ExploreListCard({
         ) : undefined
       }
       progress={
-        pct !== null ? (
+        pct !== null && pct > 0 ? (
           <Progress
             value={pct}
             className="h-1.5"
