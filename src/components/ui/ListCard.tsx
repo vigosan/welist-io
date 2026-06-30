@@ -49,7 +49,7 @@ export function ListCard({
             {title}
           </h3>
           {description && (
-            <p className="text-[13px] leading-[1.6] text-gray-500 dark:text-[#6b6b67] [text-wrap:pretty]">
+            <p className="text-[13px] leading-[1.6] text-gray-500 dark:text-muted-dark [text-wrap:pretty]">
               {description}
             </p>
           )}

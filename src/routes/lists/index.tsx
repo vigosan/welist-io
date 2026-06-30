@@ -331,11 +331,7 @@ function MyListsPage() {
         {streak && streak.current > 0 && (
           <div
             data-testid="streak-badge"
-            className="mb-5 inline-flex items-center gap-1.5 rounded-full border border-black/[0.08] dark:border-white/[0.08] px-3 py-1 text-[11px] tabular-nums"
-            style={{
-              color: "#a0a09c",
-              fontFamily: "'Space Mono', monospace",
-            }}
+            className="mb-5 inline-flex items-center gap-1.5 rounded-full border border-black/[0.08] dark:border-white/[0.08] px-3 py-1 font-mono text-[11px] tabular-nums text-muted"
           >
             {t("myLists.streak", { count: streak.current })}
           </div>
@@ -591,7 +587,7 @@ function MyListsPage() {
             )}
             {!search && (
               <>
-                <p className="mt-4 text-xs text-gray-400 dark:text-[#6b6b67]">
+                <p className="mt-4 text-xs text-gray-400 dark:text-muted-dark">
                   {t("myLists.orStartFromTemplate")}
                 </p>
                 <div className="mt-2 flex flex-wrap justify-center gap-1.5">

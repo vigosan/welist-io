@@ -169,7 +169,7 @@ function ExploreDetailPage() {
                   listId: detail.forkedFrom.slug ?? detail.forkedFrom.id,
                 }}
                 data-testid="forked-from-link"
-                className="mt-2 inline-block text-xs text-gray-400 hover:text-ink dark:text-[#6b6b67] dark:hover:text-paper no-underline transition-colors"
+                className="mt-2 inline-block text-xs text-gray-400 hover:text-ink dark:text-muted-dark dark:hover:text-paper no-underline transition-colors"
               >
                 ⑂ {t("explore.forkedFrom", { name: detail.forkedFrom.name })}
               </Link>

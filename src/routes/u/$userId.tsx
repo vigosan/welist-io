@@ -108,7 +108,7 @@ function UserProfilePage() {
               style={{ width: `${Math.round(profile.level.progress * 100)}%` }}
             />
           </div>
-          <p className="mt-1 font-mono text-[10.5px] tabular-nums text-gray-400 dark:text-[#6b6b67]">
+          <p className="mt-1 font-mono text-[10.5px] tabular-nums text-gray-400 dark:text-muted-dark">
             {t("profile.xpProgress", {
               into: profile.level.xpIntoLevel,
               total: profile.level.xpForNextLevel,
@@ -165,7 +165,7 @@ function UserProfilePage() {
                         </span>
                         <span
                           data-testid={`achievement-progress-${a.type}`}
-                          className="text-[11px] tabular-nums text-gray-400 dark:text-[#6b6b67] shrink-0"
+                          className="text-[11px] tabular-nums text-gray-400 dark:text-muted-dark shrink-0"
                         >
                           {a.progress} / {a.target}
                         </span>
@@ -178,7 +178,7 @@ function UserProfilePage() {
                           className={`h-full ${
                             unlocked
                               ? "bg-gray-900 dark:bg-paper"
-                              : "bg-gray-400 dark:bg-[#6b6b67]"
+                              : "bg-gray-400 dark:bg-muted-dark"
                           }`}
                           style={{ width: `${pct}%` }}
                         />
@@ -222,7 +222,7 @@ function UserProfilePage() {
                     </div>
                     <svg
                       aria-hidden="true"
-                      className="text-gray-300 dark:text-[#6b6b67] group-hover:text-gray-500 dark:group-hover:text-muted w-4 h-4 shrink-0 mt-0.5 transition-colors duration-150"
+                      className="text-gray-300 dark:text-muted-dark group-hover:text-gray-500 dark:group-hover:text-muted w-4 h-4 shrink-0 mt-0.5 transition-colors duration-150"
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="currentColor"

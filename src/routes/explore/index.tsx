@@ -112,7 +112,7 @@ const ExploreListCard = memo(function ExploreListCard({
             to="/u/$userId"
             params={{ userId: owner.id }}
             data-testid={`explore-card-author-${list.id}`}
-            className="flex items-center gap-1.5 text-[11px] text-gray-500 hover:text-ink dark:text-[#6b6b67] dark:hover:text-paper no-underline transition-colors"
+            className="flex items-center gap-1.5 text-[11px] text-gray-500 hover:text-ink dark:text-muted-dark dark:hover:text-paper no-underline transition-colors"
           >
             {owner.image ? (
               <img
@@ -159,7 +159,7 @@ const ExploreListCard = memo(function ExploreListCard({
             data-testid={`explore-card-preview-${list.id}`}
             className="truncate text-[12px] text-gray-400 dark:text-gray-500"
           >
-            <span className="text-gray-500 dark:text-[#6b6b67]">
+            <span className="text-gray-500 dark:text-muted-dark">
               {t("explore.previewLabel")}:
             </span>{" "}
             {list.previewItems.map(plainItemText).join(" · ")}
@@ -178,7 +178,7 @@ const ExploreListCard = memo(function ExploreListCard({
       footerLeft={
         <div
           data-testid={`explore-card-meta-${list.id}`}
-          className="text-[11px] tabular-nums text-gray-500 dark:text-[#6b6b67]"
+          className="text-[11px] tabular-nums text-gray-500 dark:text-muted-dark"
         >
           {[
             t("explore.metaItems", { count: list.itemCount }),
@@ -324,7 +324,7 @@ function ExplorePage() {
             placeholder={t("explore.searchPlaceholder")}
             aria-label={t("explore.searchAriaLabel")}
             data-testid="explore-search-input"
-            className="flex-1 min-w-0 py-2 text-sm text-ink dark:text-paper placeholder-muted dark:placeholder-[#6b6b67] bg-transparent outline-none"
+            className="flex-1 min-w-0 py-2 text-sm text-ink dark:text-paper placeholder-muted dark:placeholder-muted-dark bg-transparent outline-none"
           />
           <button
             type="submit"

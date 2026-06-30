@@ -36,7 +36,7 @@ function PrivacyPage() {
           {t("privacy.updated")}
         </p>
 
-        <div className="mt-8 flex flex-col gap-6 text-sm text-gray-700 dark:text-[#d4d2cd] leading-relaxed">
+        <div className="mt-8 flex flex-col gap-6 text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
           <Section title={t("privacy.s1.title")}>
             <p>
               <Trans i18nKey="privacy.s1.p1" components={md} />

@@ -133,13 +133,13 @@ function UserRow({ user }: { user: DirectoryUser }) {
             {summary.join(" · ")}
           </p>
         ) : (
-          <p className="text-[12px] text-gray-400 dark:text-[#6b6b67] italic">
+          <p className="text-[12px] text-gray-400 dark:text-muted-dark italic">
             {t("directory.noActivity")}
           </p>
         )}
         {user.achievementsUnlocked > 0 && (
           <div className="mt-2 flex items-center gap-2">
-            <span className="font-mono text-[10px] uppercase tracking-wider text-gray-400 dark:text-[#6b6b67] shrink-0">
+            <span className="font-mono text-[10px] uppercase tracking-wider text-gray-400 dark:text-muted-dark shrink-0">
               ★ {user.achievementsUnlocked} / {user.achievementsTotal}
             </span>
             <Progress value={achievementsPct} className="flex-1" />
@@ -189,7 +189,7 @@ function UsersDirectoryPage() {
             placeholder={t("directory.searchPlaceholder")}
             aria-label={t("directory.searchAriaLabel")}
             data-testid="directory-search-input"
-            className="flex-1 px-4 py-2.5 text-sm text-ink dark:text-paper placeholder-muted dark:placeholder-[#6b6b67] bg-transparent outline-none"
+            className="flex-1 px-4 py-2.5 text-sm text-ink dark:text-paper placeholder-muted dark:placeholder-muted-dark bg-transparent outline-none"
           />
           <button
             type="submit"
