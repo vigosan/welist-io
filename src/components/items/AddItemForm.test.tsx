@@ -75,6 +75,22 @@ describe("AddItemForm", () => {
     expect(screen.getByText("bananas")).toBeInTheDocument();
   });
 
+  it("opens the slash menu when '/' is typed and inserts bold markdown on click", async () => {
+    renderForm();
+    const input = screen.getByTestId<HTMLInputElement>("add-item-input");
+    await userEvent.type(input, "/");
+    expect(screen.getByTestId("slash-menu")).toBeInTheDocument();
+    await userEvent.click(screen.getByTestId("slash-action-bold"));
+    expect(input.value).toBe("**texto**");
+    expect(screen.queryByTestId("slash-menu")).not.toBeInTheDocument();
+  });
+
+  it("does not open the slash menu for a slash inside a word", async () => {
+    renderForm();
+    await userEvent.type(screen.getByTestId("add-item-input"), "Xàbia/Jávea");
+    expect(screen.queryByTestId("slash-menu")).not.toBeInTheDocument();
+  });
+
   it("shows the mic button and starts dictation when speech is supported", async () => {
     renderForm();
     const mic = screen.getByTestId("add-item-mic");

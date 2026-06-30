@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { useGeocodingSearch } from "@/hooks/useGeocodingSearch";
 import { useAddItem, useBulkAddItems } from "@/hooks/useItems";
+import { useSlashMenu } from "@/hooks/useSlashMenu";
 import { useSpeechInput } from "@/hooks/useSpeechInput";
 import { useLanguage, useTranslation } from "@/i18n/service";
 import { parseBulkText } from "@/lib/bulk-text";
@@ -10,6 +11,7 @@ import { getPartialTag, tagColor } from "@/lib/tags";
 import type { Coords } from "@/services/items.service";
 import { BulkPastePreview } from "./BulkPastePreview";
 import { GeocodingDropdown } from "./GeocodingDropdown";
+import { SlashMenu } from "./SlashMenu";
 
 interface Props {
   listId: string;
@@ -37,6 +39,7 @@ export function AddItemForm({
     setNewItem((prev) => (prev.trim() ? `${prev.trim()} ${text}` : text));
     addInputRef.current?.focus();
   });
+  const slash = useSlashMenu(setNewItem);
 
   const partialTag = useMemo(() => getPartialTag(newItem), [newItem]);
   const partialPlace = useMemo(() => getPartialPlace(newItem), [newItem]);
@@ -180,6 +183,16 @@ export function AddItemForm({
                 }}
               />
             )}
+          {slash.open && (
+            <SlashMenu
+              activeIndex={slash.activeIndex}
+              onSelect={(action) => {
+                if (addInputRef.current)
+                  slash.select(action, addInputRef.current);
+              }}
+              className="absolute bottom-full left-0 right-0 mb-2 z-10"
+            />
+          )}
           <form
             onSubmit={handleAdd}
             className="flex gap-2 p-1.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl"
@@ -190,11 +203,13 @@ export function AddItemForm({
               onChange={(e) => {
                 const val = e.target.value;
                 setNewItem(val);
+                slash.sync(e.target);
                 const hasAt = PARTIAL_PLACE_REGEX.test(val);
                 setPlaceDropdownOpen(hasAt);
                 if (!hasAt) setPendingCoords(null);
               }}
               onKeyDown={(e) => {
+                if (slash.onKeyDown(e, e.currentTarget)) return;
                 if (e.key === "Escape" && placeDropdownOpen) {
                   e.preventDefault();
                   setNewItem((v) =>
