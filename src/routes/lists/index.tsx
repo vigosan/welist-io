@@ -375,17 +375,6 @@ function MyListsPage() {
           {(() => {
             const hasNonDefault =
               sort !== "recent" || visibility !== "all" || role !== "all";
-            const activeSortLabel = SORT_OPTIONS.find(
-              (o) => o.value === sort
-            )?.label;
-            const activeVisibilityLabel =
-              visibility !== "all"
-                ? VISIBILITY_OPTIONS.find((o) => o.value === visibility)?.label
-                : undefined;
-            const activeRoleLabel =
-              role !== "all"
-                ? ROLE_OPTIONS.find((o) => o.value === role)?.label
-                : undefined;
             return (
               <div className="mt-3 flex items-center gap-2 flex-wrap">
                 <button
@@ -436,56 +425,6 @@ function MyListsPage() {
                   </svg>
                 </button>
 
-                {/* Active filter summary (collapsed) */}
-                {!filtersOpen && hasNonDefault && (
-                  <div className="flex items-center gap-1.5">
-                    {sort !== "recent" && (
-                      <button
-                        type="button"
-                        onClick={() => setSort("recent")}
-                        className="cursor-pointer inline-flex items-center gap-1 rounded-full border border-black/[0.10] dark:border-white/[0.10] px-2 py-0.5 text-xs text-gray-500 hover:border-black/[0.25] hover:text-gray-700 transition"
-                      >
-                        {activeSortLabel}
-                        <span
-                          aria-hidden
-                          className="text-gray-300 dark:text-gray-600 leading-none"
-                        >
-                          ×
-                        </span>
-                      </button>
-                    )}
-                    {visibility !== "all" && (
-                      <button
-                        type="button"
-                        onClick={() => setVisibility("all")}
-                        className="cursor-pointer inline-flex items-center gap-1 rounded-full border border-black/[0.10] dark:border-white/[0.10] px-2 py-0.5 text-xs text-gray-500 hover:border-black/[0.25] hover:text-gray-700 transition"
-                      >
-                        {activeVisibilityLabel}
-                        <span
-                          aria-hidden
-                          className="text-gray-300 dark:text-gray-600 leading-none"
-                        >
-                          ×
-                        </span>
-                      </button>
-                    )}
-                    {role !== "all" && (
-                      <button
-                        type="button"
-                        onClick={() => setRole("all")}
-                        className="cursor-pointer inline-flex items-center gap-1 rounded-full border border-black/[0.10] dark:border-white/[0.10] px-2 py-0.5 text-xs text-gray-500 hover:border-black/[0.25] hover:text-gray-700 transition"
-                      >
-                        {activeRoleLabel}
-                        <span
-                          aria-hidden
-                          className="text-gray-300 dark:text-gray-600 leading-none"
-                        >
-                          ×
-                        </span>
-                      </button>
-                    )}
-                  </div>
-                )}
               </div>
             );
           })()}
