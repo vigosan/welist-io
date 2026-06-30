@@ -46,7 +46,7 @@ export function ParticipantsPanel({ challengers, collaborators }: Props) {
                   {!c.completedAt && c.totalItems > 0 && (
                     <div className="h-1 w-full bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
                       <div
-                        className="h-full bg-gray-900 dark:bg-gray-100 rounded-full transition-all"
+                        className="h-full bg-gray-900 dark:bg-gray-100 rounded-full transition-[width] duration-300"
                         style={{
                           width: `${Math.round((c.doneCount / c.totalItems) * 100)}%`,
                         }}

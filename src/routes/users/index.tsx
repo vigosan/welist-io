@@ -175,7 +175,7 @@ function UsersDirectoryPage() {
         <form
           onSubmit={handleSearch}
           className={[
-            "flex overflow-hidden rounded-lg transition-all duration-200",
+            "flex overflow-hidden rounded-lg transition-[border-color,background-color] duration-200",
             focused
               ? "bg-black/[0.06] dark:bg-white/[0.07] border border-black/[0.20] dark:border-white/[0.18]"
               : "bg-black/[0.03] dark:bg-white/[0.04] border border-black/[0.08] dark:border-white/[0.08]",

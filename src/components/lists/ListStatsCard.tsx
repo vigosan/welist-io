@@ -74,7 +74,7 @@ export function ListStatsCard({ challengers, itemCount }: Props) {
           </span>
           <div className="h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
             <div
-              className="h-full bg-gray-900 dark:bg-gray-100 rounded-full transition-all duration-300"
+              className="h-full bg-gray-900 dark:bg-gray-100 rounded-full transition-[width] duration-300"
               style={{ width: `${avgProgress}%` }}
             />
           </div>

@@ -100,7 +100,7 @@ export function LoginPage() {
             type="button"
             data-testid="auth-google-btn"
             onClick={() => signIn("google", { callbackUrl: "/lists" })}
-            className="cursor-pointer w-full flex items-center justify-center gap-2 rounded-xl border border-black/[0.08] bg-canvas px-4 py-2.5 text-[13px] font-medium text-ink transition-all duration-150 hover:border-ink/30 active:scale-[0.98] dark:border-white/[0.08] dark:bg-canvas-dark dark:text-paper dark:hover:border-paper/30"
+            className="cursor-pointer w-full flex items-center justify-center gap-2 rounded-xl border border-black/[0.08] bg-canvas px-4 py-2.5 text-[13px] font-medium text-ink transition-[border-color,transform] duration-150 hover:border-ink/30 active:scale-[0.98] dark:border-white/[0.08] dark:bg-canvas-dark dark:text-paper dark:hover:border-paper/30"
           >
             {t("auth.google")}
           </button>

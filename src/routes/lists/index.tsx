@@ -343,7 +343,7 @@ function MyListsPage() {
             <div className="flex gap-2">
               <form
                 onSubmit={handleSearch}
-                className="flex-1 flex overflow-hidden rounded-lg transition-all duration-200 border border-black/[0.08] dark:border-white/[0.08] bg-black/[0.03] dark:bg-white/[0.03] focus-within:border-black/[0.20] dark:focus-within:border-white/[0.20] focus-within:bg-black/[0.06] dark:focus-within:bg-white/[0.06]"
+                className="flex-1 flex overflow-hidden rounded-lg transition-[border-color,background-color] duration-200 border border-black/[0.08] dark:border-white/[0.08] bg-black/[0.03] dark:bg-white/[0.03] focus-within:border-black/[0.20] dark:focus-within:border-white/[0.20] focus-within:bg-black/[0.06] dark:focus-within:bg-white/[0.06]"
               >
                 <input
                   value={q}

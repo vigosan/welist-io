@@ -270,7 +270,7 @@ export function AppNav() {
               <Link
                 to="/login"
                 data-testid="sign-in-btn"
-                className="cursor-pointer text-[12px] font-medium px-3.5 py-[5px] rounded-md border border-black/20 dark:border-white/[0.18] text-ink dark:text-paper bg-transparent hover:bg-ink dark:hover:bg-paper hover:text-canvas dark:hover:text-ink hover:border-transparent transition-all duration-150"
+                className="cursor-pointer text-[12px] font-medium px-3.5 py-[5px] rounded-md border border-black/20 dark:border-white/[0.18] text-ink dark:text-paper bg-transparent hover:bg-ink dark:hover:bg-paper hover:text-canvas dark:hover:text-ink hover:border-transparent transition-[background-color,border-color,color] duration-150"
               >
                 {t("user.signIn")}
               </Link>
