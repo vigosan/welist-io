@@ -2,12 +2,14 @@ import { memo, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useGeocodingSearch } from "@/hooks/useGeocodingSearch";
 import type { ItemWithLikes } from "@/hooks/useItems";
+import { useSlashMenu } from "@/hooks/useSlashMenu";
 import { useTranslation } from "@/i18n/service";
 import { renderInlineMarkdown } from "@/lib/inline-markdown";
 import { parseItemText } from "@/lib/item-text";
 import { PARTIAL_PLACE_REGEX } from "@/lib/places";
 import type { Coords } from "@/services/items.service";
 import { GeocodingDropdown } from "./GeocodingDropdown";
+import { SlashMenu } from "./SlashMenu";
 
 interface ItemCaps {
   canWrite?: boolean;
@@ -66,6 +68,7 @@ export const ItemRow = memo(
       Coords | null | undefined
     >(undefined);
     const [geoOpen, setGeoOpen] = useState(false);
+    const slash = useSlashMenu(setText);
     const cancelled = useRef(false);
     const inputRef = useRef<HTMLInputElement | null>(null);
     const [dropdownRect, setDropdownRect] = useState<{
@@ -113,12 +116,15 @@ export const ItemRow = memo(
       setPendingCoords(undefined);
     }
 
-    function handleTextChange(val: string) {
+    function handleTextChange(el: HTMLInputElement) {
+      const val = el.value;
       setText(val);
+      slash.sync(el);
       setGeoOpen(PARTIAL_PLACE_REGEX.test(val));
     }
 
-    function handleKeyDown(e: React.KeyboardEvent) {
+    function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+      if (slash.onKeyDown(e, e.currentTarget)) return;
       if (e.key === "Escape") {
         e.preventDefault();
         if (geoOpen) {
@@ -267,12 +273,22 @@ export const ItemRow = memo(
                   />,
                   document.body
                 )}
+              {slash.open && (
+                <SlashMenu
+                  activeIndex={slash.activeIndex}
+                  onSelect={(action) => {
+                    if (inputRef.current)
+                      slash.select(action, inputRef.current);
+                  }}
+                  className="absolute bottom-full left-0 right-0 mb-1 z-50"
+                />
+              )}
               <form onSubmit={handleSubmit}>
                 <input
                   ref={inputRef}
                   autoFocus
                   value={text}
-                  onChange={(e) => handleTextChange(e.target.value)}
+                  onChange={(e) => handleTextChange(e.target)}
                   onKeyDown={handleKeyDown}
                   onBlur={() => {
                     if (!cancelled.current) handleSubmit();
