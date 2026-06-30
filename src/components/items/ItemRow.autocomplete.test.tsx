@@ -34,6 +34,59 @@ const baseItem = {
   commentCount: 0,
 };
 
+const itemWithPlace = {
+  ...baseItem,
+  text: "Cena @Roma",
+  latitude: "41.9",
+  longitude: "12.5",
+  placeName: "Roma",
+};
+
+describe("ItemRow edit coords", () => {
+  it("attaches coordinates when a place is added while editing", async () => {
+    const user = userEvent.setup();
+    const onEdit = vi.fn();
+    render(
+      <ItemRow
+        item={baseItem}
+        onToggle={vi.fn()}
+        onDelete={vi.fn()}
+        onEdit={onEdit}
+      />
+    );
+    await user.dblClick(screen.getByTestId("item-text-i1"));
+    const input = screen.getByTestId<HTMLInputElement>("item-edit-input-i1");
+    await user.click(input);
+    await user.type(input, " @Mad");
+    await user.click(screen.getByText("Madrid"));
+    await user.keyboard("{Enter}");
+    expect(onEdit).toHaveBeenCalledWith(
+      "Comprar leche @Madrid",
+      expect.objectContaining({ placeName: "Madrid" })
+    );
+  });
+
+  it("keeps the existing place when editing other text", async () => {
+    const user = userEvent.setup();
+    const onEdit = vi.fn();
+    render(
+      <ItemRow
+        item={itemWithPlace}
+        onToggle={vi.fn()}
+        onDelete={vi.fn()}
+        onEdit={onEdit}
+      />
+    );
+    await user.dblClick(screen.getByTestId("item-text-i1"));
+    const input = screen.getByTestId<HTMLInputElement>("item-edit-input-i1");
+    await user.click(input);
+    await user.type(input, " hoy");
+    await user.keyboard("{Enter}");
+    // Text changed but @Roma kept → coords must NOT be wiped (undefined = keep)
+    expect(onEdit).toHaveBeenCalledWith("Cena @Roma hoy", undefined);
+  });
+});
+
 describe("ItemRow edit autocomplete", () => {
   it("shows geocoding dropdown when typing @<3+chars> in edit mode", async () => {
     const user = userEvent.setup();
