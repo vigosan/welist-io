@@ -3,20 +3,8 @@ import { useEffect, useRef, useState } from "react";
 import { AppFooter } from "@/components/AppFooter";
 import { AppNav } from "@/components/AppNav";
 import { Skeleton } from "@/components/Skeleton";
-import {
-  cardBase,
-  cardLift,
-  Progress,
-  SectionHeading,
-  SectionKicker,
-  StatusPill,
-} from "@/components/ui";
-import {
-  useCreateList,
-  useExplore,
-  useStats,
-  useUserDirectory,
-} from "@/hooks/useList";
+import { Progress, SectionHeading, SectionKicker } from "@/components/ui";
+import { useCreateList, useStats, useUserDirectory } from "@/hooks/useList";
 import { useTranslation } from "@/i18n/service";
 import {
   doneCountFromProgress,
@@ -517,45 +505,6 @@ function Hero() {
   );
 }
 
-function Ticker() {
-  const { t } = useTranslation();
-  const explore = useExplore();
-  const labels = (explore.data?.pages?.[0]?.items ?? [])
-    .slice(0, 8)
-    .map((l) => l.name);
-  const fallback = t("home.tickerFallback", {
-    returnObjects: true,
-  }) as unknown as string[];
-  const list = labels.length > 0 ? labels : fallback;
-  const loop = [...list, ...list];
-
-  return (
-    <section className="border-y border-black/[0.06] bg-black/[0.015] py-6 overflow-hidden dark:border-white/[0.06] dark:bg-white/[0.015]">
-      <p className="mb-3 text-center font-mono text-[10.5px] uppercase tracking-[0.16em] text-muted">
-        {t("home.tickerLabel")}
-      </p>
-      <div
-        className="flex w-max gap-12 whitespace-nowrap"
-        style={{ animation: "marquee 50s linear infinite" }}
-      >
-        {loop.map((label, i) => (
-          <span
-            // biome-ignore lint/suspicious/noArrayIndexKey: marquee loop, stable order
-            key={`${label}-${i}`}
-            className="flex items-center gap-12 text-[15px] font-medium tracking-[-0.01em] text-ink dark:text-paper"
-          >
-            {label}
-            <span
-              aria-hidden="true"
-              className="inline-block h-1 w-1 rounded-full bg-muted/40"
-            />
-          </span>
-        ))}
-      </div>
-    </section>
-  );
-}
-
 function StepIcon({ kind }: { kind: "plus" | "share" | "bolt" }) {
   return (
     <span className="inline-grid h-9 w-9 place-items-center rounded-[10px] border border-black/[0.08] bg-canvas text-ink dark:border-white/[0.08] dark:bg-canvas-dark dark:text-paper">
@@ -595,28 +544,24 @@ function HowItWorks() {
     num: string;
     title: string;
     desc: string;
-    tag: string;
     icon: "plus" | "share" | "bolt";
   }[] = [
     {
       num: "01",
       title: t("home.step1Title"),
       desc: t("home.step1Desc"),
-      tag: t("home.step1Tag"),
       icon: "plus",
     },
     {
       num: "02",
       title: t("home.step2Title"),
       desc: t("home.step2Desc"),
-      tag: t("home.step2Tag"),
       icon: "share",
     },
     {
       num: "03",
       title: t("home.step3Title"),
       desc: t("home.step3Desc"),
-      tag: t("home.step3Tag"),
       icon: "bolt",
     },
   ];
@@ -658,164 +603,8 @@ function HowItWorks() {
               <p className="flex-1 text-[14px] leading-[1.55] text-muted">
                 {s.desc}
               </p>
-              <span className="inline-flex items-center gap-2 font-mono text-[10.5px] uppercase tracking-[0.08em] text-muted">
-                <span
-                  aria-hidden="true"
-                  className="inline-block h-1.5 w-1.5 rounded-full bg-ink dark:bg-paper"
-                />
-                {s.tag}
-              </span>
             </div>
           ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function ExploreSection() {
-  const ref = useFadeIn();
-  const { t } = useTranslation();
-  const explore = useExplore();
-  const lists = explore.data?.pages?.[0]?.items?.slice(0, 3) ?? [];
-  const loading = explore.isLoading;
-
-  const chips = [
-    { id: "all", label: t("home.chipAll"), active: true },
-    { id: "travel", label: t("home.chipTravel") },
-    { id: "culture", label: t("home.chipCulture") },
-    { id: "couple", label: t("home.chipCouple") },
-    { id: "cooking", label: t("home.chipCooking") },
-  ];
-
-  const statuses = [
-    t("home.cardStatusActive"),
-    t("home.cardStatusNew"),
-    t("home.cardStatusOngoing"),
-  ];
-
-  return (
-    <section className="px-4 py-16 sm:px-12 sm:py-20">
-      <div ref={ref} className="mx-auto max-w-[1240px]">
-        <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <SectionKicker>{t("nav.explore")}</SectionKicker>
-            <div className="mt-3.5 max-w-[18ch]">
-              <SectionHeading>{t("home.exploreHeadline")}</SectionHeading>
-            </div>
-          </div>
-          <div className="flex flex-wrap gap-1.5">
-            {chips.map((c) => (
-              <Link
-                key={c.id}
-                to="/explore"
-                className={[
-                  "cursor-pointer rounded-full border px-3.5 py-1.5 text-[13px] no-underline transition-colors active:scale-[0.97]",
-                  c.active
-                    ? "border-ink bg-ink text-canvas dark:border-paper dark:bg-paper dark:text-canvas-dark"
-                    : "border-black/[0.08] bg-canvas text-muted hover:border-black/20 hover:text-ink dark:border-white/[0.08] dark:bg-canvas-dark dark:hover:border-white/20 dark:hover:text-paper",
-                ].join(" ")}
-              >
-                {c.label}
-              </Link>
-            ))}
-          </div>
-        </div>
-
-        {loading ? (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            {["a", "b", "c"].map((k) => (
-              <div
-                key={k}
-                data-testid="proof-cards-skeleton"
-                className="h-full rounded-2xl border border-black/[0.08] bg-canvas p-6 dark:border-white/[0.08] dark:bg-canvas-dark"
-              >
-                <Skeleton variant="text" className="mb-2 h-4 w-2/3" />
-                <Skeleton variant="text" className="mb-2 h-3 w-full" />
-                <Skeleton variant="text" className="mb-4 h-3 w-5/6" />
-                <div className="mt-auto flex gap-4">
-                  <Skeleton variant="text" className="h-3 w-16" />
-                  <Skeleton variant="text" className="h-3 w-16" />
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            {lists.map((list, idx) => {
-              const pct =
-                list.participantCount > 0 && list.itemCount > 0
-                  ? Math.min(
-                      100,
-                      Math.round(
-                        (list.progressDoneTotal /
-                          (list.participantCount * list.itemCount)) *
-                          100
-                      )
-                    )
-                  : 0;
-              return (
-                <Link
-                  key={list.id}
-                  to="/explore/$listId"
-                  params={{ listId: list.slug ?? list.id }}
-                  className="group block no-underline"
-                >
-                  <article
-                    className={`${cardBase} ${cardLift} flex h-full flex-col gap-4 p-6`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="font-mono text-[10.5px] uppercase tracking-[0.1em] text-muted">
-                        {list.category ?? "·"}
-                      </span>
-                      <StatusPill>{statuses[idx % statuses.length]}</StatusPill>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <h3 className="flex-1 text-[18px] font-semibold leading-[1.2] tracking-[-0.02em] text-ink dark:text-paper [text-wrap:balance]">
-                        {list.name}
-                      </h3>
-                      <div className="shrink-0 text-right leading-none">
-                        <div className="font-mono text-[30px] font-medium tabular-nums tracking-[-0.04em] text-ink dark:text-paper">
-                          {pct}
-                        </div>
-                        <div className="mt-0.5 font-mono text-[9px] uppercase tracking-[0.14em] text-muted">
-                          {t("explore.statPctLabel")}
-                        </div>
-                      </div>
-                    </div>
-                    {list.description && (
-                      <p className="line-clamp-2 flex-1 text-[13.5px] leading-[1.55] text-muted [text-wrap:pretty]">
-                        {list.description}
-                      </p>
-                    )}
-                    <div className="mt-auto flex items-center justify-between border-t border-black/[0.06] pt-3.5 dark:border-white/[0.06]">
-                      <Progress value={pct} className="w-[96px] h-1.5" />
-                      <span className="inline-flex items-center gap-1.5 font-mono text-[10.5px] uppercase tracking-[0.08em] text-muted">
-                        {t("home.cardParticipants", {
-                          count: list.participantCount ?? 0,
-                        })}
-                        <span
-                          aria-hidden="true"
-                          className="transition-transform duration-200 group-hover:translate-x-0.5"
-                        >
-                          →
-                        </span>
-                      </span>
-                    </div>
-                  </article>
-                </Link>
-              );
-            })}
-          </div>
-        )}
-
-        <div className="mt-8">
-          <Link
-            to="/explore"
-            className="font-mono text-[11px] uppercase tracking-[0.14em] text-muted no-underline transition-colors hover:text-ink dark:hover:text-paper"
-          >
-            {t("home.proofViewAll")}
-          </Link>
         </div>
       </div>
     </section>
@@ -887,8 +676,6 @@ function BigCta() {
   const tiles = [
     { n: stats?.lists ?? 0, l: t("home.statsLists") },
     { n: stats?.users ?? 0, l: t("home.statsUsers") },
-    { n: stats?.challenges ?? 0, l: t("home.statsChallenges") },
-    { n: stats?.itemsCompleted ?? 0, l: t("home.statsItems") },
   ];
 
   return (
@@ -974,9 +761,7 @@ function HomePage() {
 
       <main className="flex-1 flex flex-col">
         <Hero />
-        <Ticker />
         <HowItWorks />
-        <ExploreSection />
         <BigCta />
       </main>
 
