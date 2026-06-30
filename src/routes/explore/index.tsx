@@ -384,7 +384,6 @@ function ExplorePage() {
                   />
                 </svg>
               </button>
-
             </div>
           );
         })()}

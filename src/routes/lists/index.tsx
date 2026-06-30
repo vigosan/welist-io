@@ -424,7 +424,6 @@ function MyListsPage() {
                     />
                   </svg>
                 </button>
-
               </div>
             );
           })()}
