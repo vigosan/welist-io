@@ -468,9 +468,9 @@ function SettingsPage() {
           )}
         </section>
 
-        <section className="bg-canvas dark:bg-canvas-dark border border-red-200 dark:border-red-900 rounded-2xl p-5 flex flex-col gap-4">
+        <section className="bg-canvas dark:bg-canvas-dark border border-black/[0.08] dark:border-white/[0.08] rounded-2xl p-5 flex flex-col gap-4">
           <div>
-            <p className="text-sm font-semibold text-red-700 dark:text-red-400">
+            <p className="text-sm font-semibold text-ink dark:text-paper">
               {t("settings.dangerZone.title")}
             </p>
             <p className="text-xs text-muted mt-0.5 leading-relaxed">

@@ -117,7 +117,7 @@ function CollectionDetailPage() {
               })
             }
             data-testid="delete-collection-btn"
-            className="mt-8 cursor-pointer text-xs text-gray-400 hover:text-red-500"
+            className="mt-8 cursor-pointer text-xs text-gray-400 hover:text-ink dark:hover:text-paper transition-colors duration-150"
           >
             {t("collections.delete")}
           </button>
