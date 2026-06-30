@@ -66,6 +66,36 @@ describe("ItemRow edit coords", () => {
     );
   });
 
+  it("Enter selects the geocoding result instead of saving when the dropdown is open", async () => {
+    const user = userEvent.setup();
+    const onEdit = vi.fn();
+    render(
+      <ItemRow
+        item={itemWithPlace}
+        onToggle={vi.fn()}
+        onDelete={vi.fn()}
+        onEdit={onEdit}
+      />
+    );
+    await user.dblClick(screen.getByTestId("item-text-i1"));
+    const input = screen.getByTestId<HTMLInputElement>("item-edit-input-i1");
+    await user.click(input);
+    await user.keyboard("{End}");
+    // remove "Roma", type a new place → dropdown opens with "Madrid"
+    await user.keyboard("{Backspace}{Backspace}{Backspace}{Backspace}");
+    await user.type(input, "Madrid");
+    expect(await screen.findByText("Madrid")).toBeInTheDocument();
+    // First Enter picks the geo result (does not save yet)
+    await user.keyboard("{Enter}");
+    expect(onEdit).not.toHaveBeenCalled();
+    // Second Enter saves with the freshly selected coords
+    await user.keyboard("{Enter}");
+    expect(onEdit).toHaveBeenCalledWith(
+      expect.stringContaining("@Madrid"),
+      expect.objectContaining({ placeName: "Madrid" })
+    );
+  });
+
   it("keeps the existing place when editing other text", async () => {
     const user = userEvent.setup();
     const onEdit = vi.fn();

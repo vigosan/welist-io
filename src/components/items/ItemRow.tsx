@@ -123,8 +123,29 @@ export const ItemRow = memo(
       setGeoOpen(PARTIAL_PLACE_REGEX.test(val));
     }
 
+    function selectPlace(result: {
+      latitude: string;
+      longitude: string;
+      name: string;
+    }) {
+      setText((prev) =>
+        prev.replace(PARTIAL_PLACE_REGEX, `@${result.name} `)
+      );
+      setPendingCoords({
+        latitude: result.latitude,
+        longitude: result.longitude,
+        placeName: result.name,
+      });
+      setGeoOpen(false);
+    }
+
     function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
       if (slash.onKeyDown(e, e.currentTarget)) return;
+      if (e.key === "Enter" && showGeoDropdown && geocodingResults.length > 0) {
+        e.preventDefault();
+        selectPlace(geocodingResults[0]);
+        return;
+      }
       if (e.key === "Escape") {
         e.preventDefault();
         if (geoOpen) {
@@ -260,17 +281,7 @@ export const ItemRow = memo(
                       width: dropdownRect.width,
                       transform: "translateY(-100%)",
                     }}
-                    onSelect={(result) => {
-                      setText((prev) =>
-                        prev.replace(PARTIAL_PLACE_REGEX, `@${result.name} `)
-                      );
-                      setPendingCoords({
-                        latitude: result.latitude,
-                        longitude: result.longitude,
-                        placeName: result.name,
-                      });
-                      setGeoOpen(false);
-                    }}
+                    onSelect={selectPlace}
                   />,
                   document.body
                 )}
