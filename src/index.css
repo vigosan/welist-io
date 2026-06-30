@@ -86,13 +86,15 @@
 }
 
 /* Unlayered on purpose: must win over Tailwind's layered `outline-none`
-   utilities so keyboard focus is always visible. */
-:focus-visible {
+   utilities so keyboard focus is always visible. Text fields are excluded —
+   their wrapping container shows focus via `focus-within`, so the heavy
+   outline on the field itself would be redundant and visually noisy. */
+:focus-visible:not(input):not(textarea):not([contenteditable="true"]) {
   outline: 2px solid var(--color-ink);
   outline-offset: 2px;
 }
 
-html.dark :focus-visible {
+html.dark :focus-visible:not(input):not(textarea):not([contenteditable="true"]) {
   outline-color: var(--color-paper);
 }
 
