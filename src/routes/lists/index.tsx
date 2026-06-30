@@ -42,7 +42,7 @@ function MyListRow({
   if (confirming) {
     return (
       <div
-        className="flex items-center gap-2 rounded-2xl border border-black/[0.08] dark:border-white/[0.08] bg-white dark:bg-white/[0.02] p-4"
+        className="flex items-center gap-2 rounded-2xl border border-black/[0.08] dark:border-white/[0.08] bg-canvas dark:bg-canvas-dark p-4"
         data-testid="my-list-card"
       >
         <span className="flex-1 text-sm text-gray-500 truncate">
@@ -554,7 +554,7 @@ function MyListsPage() {
             {Array.from({ length: 6 }, (_, i) => i).map((i) => (
               <div
                 key={`skeleton-${i}`}
-                className="rounded-2xl border border-black/[0.08] dark:border-white/[0.08] bg-white dark:bg-white/[0.02] p-5 animate-pulse"
+                className="rounded-2xl border border-black/[0.08] dark:border-white/[0.08] bg-canvas dark:bg-canvas-dark p-5 animate-pulse"
                 style={{ animationDelay: `${i * 60}ms` }}
               >
                 <div className="h-3.5 w-2/3 rounded bg-black/[0.06] dark:bg-white/[0.06] mb-2.5" />
@@ -620,7 +620,7 @@ function MyListsPage() {
             {["a", "b", "c"].map((k) => (
               <div
                 key={`next-skeleton-${k}`}
-                className="rounded-2xl border border-black/[0.08] dark:border-white/[0.08] bg-white dark:bg-white/[0.02] p-5 animate-pulse"
+                className="rounded-2xl border border-black/[0.08] dark:border-white/[0.08] bg-canvas dark:bg-canvas-dark p-5 animate-pulse"
               >
                 <div className="h-3.5 w-2/3 rounded bg-black/[0.06] dark:bg-white/[0.06] mb-2.5" />
                 <div className="h-px w-full rounded bg-black/[0.06] dark:bg-white/[0.06] mb-2.5" />

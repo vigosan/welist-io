@@ -51,7 +51,7 @@ export function UserMenu() {
         </button>
 
         {open && (
-          <div className="absolute right-0 top-full mt-1 min-w-40 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl z-50 py-1">
+          <div className="absolute right-0 top-full mt-1 min-w-40 bg-canvas dark:bg-canvas-dark border border-gray-100 dark:border-gray-800 rounded-xl shadow-lg z-50 py-1">
             <Link
               to="/lists"
               onClick={() => setOpen(false)}

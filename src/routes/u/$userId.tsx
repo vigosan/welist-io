@@ -206,7 +206,7 @@ function UserProfilePage() {
                   key={list.id}
                   to="/explore/$listId"
                   params={{ listId: list.slug ?? list.id }}
-                  className="group bg-white dark:bg-white/[0.02] rounded-2xl border border-black/[0.08] dark:border-white/[0.08] p-4 flex flex-col gap-2 hover:border-black/[0.18] dark:hover:border-white/[0.18] transition-[border-color] duration-150 no-underline"
+                  className="group bg-canvas dark:bg-canvas-dark rounded-2xl border border-black/[0.08] dark:border-white/[0.08] p-4 flex flex-col gap-2 hover:border-black/[0.18] dark:hover:border-white/[0.18] transition-[border-color] duration-150 no-underline"
                   data-testid={`profile-list-${list.id}`}
                 >
                   <div className="flex items-start justify-between gap-3">
@@ -269,7 +269,7 @@ function UserProfilePage() {
                   key={challenge.id}
                   to="/explore/$listId"
                   params={{ listId: challenge.slug ?? challenge.id }}
-                  className="bg-white dark:bg-white/[0.02] rounded-2xl border border-black/[0.08] dark:border-white/[0.08] px-4 py-3 flex items-center justify-between gap-3 hover:border-black/[0.18] dark:hover:border-white/[0.18] transition-[border-color] duration-150 no-underline"
+                  className="bg-canvas dark:bg-canvas-dark rounded-2xl border border-black/[0.08] dark:border-white/[0.08] px-4 py-3 flex items-center justify-between gap-3 hover:border-black/[0.18] dark:hover:border-white/[0.18] transition-[border-color] duration-150 no-underline"
                   data-testid={`profile-challenge-${challenge.id}`}
                 >
                   <div className="flex items-center gap-2.5 min-w-0">

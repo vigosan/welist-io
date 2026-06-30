@@ -166,7 +166,7 @@ export function NotificationBell({ userId }: Props) {
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-1 w-72 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl z-50 overflow-hidden">
+        <div className="absolute right-0 top-full mt-1 w-72 bg-canvas dark:bg-canvas-dark border border-gray-100 dark:border-gray-800 rounded-xl shadow-lg z-50 overflow-hidden">
           <div className="px-4 py-2.5 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
             <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
               {t("notifications.title")}

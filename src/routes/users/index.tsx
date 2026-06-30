@@ -79,7 +79,7 @@ function UserRowSkeleton() {
   return (
     <div
       data-testid="user-row-skeleton"
-      className="flex items-center gap-4 rounded-2xl border border-black/[0.08] dark:border-white/[0.08] bg-white dark:bg-white/[0.02] p-5"
+      className="flex items-center gap-4 rounded-2xl border border-black/[0.08] dark:border-white/[0.08] bg-canvas dark:bg-canvas-dark p-5"
     >
       <Skeleton variant="circle" className="w-12 h-12 shrink-0" />
       <div className="flex-1 min-w-0 flex flex-col gap-2">

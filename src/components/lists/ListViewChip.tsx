@@ -72,7 +72,7 @@ export function ListViewChip({ viewMode, onChange }: Props) {
       {open && (
         <div
           role="menu"
-          className="absolute left-0 top-full mt-1.5 z-50 w-max bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded-xl shadow-lg overflow-hidden"
+          className="absolute left-0 top-full mt-1.5 z-50 w-max bg-canvas dark:bg-canvas-dark border border-gray-100 dark:border-gray-800 rounded-xl shadow-lg overflow-hidden"
         >
           <ViewOption
             testId="view-option-list"

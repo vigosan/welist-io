@@ -300,7 +300,7 @@ export function ListDropdownMenu({
   ];
 
   return (
-    <div className="absolute right-0 top-full mt-1.5 z-50 w-max bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded-xl shadow-lg overflow-hidden">
+    <div className="absolute right-0 top-full mt-1.5 z-50 w-max bg-canvas dark:bg-canvas-dark border border-gray-100 dark:border-gray-800 rounded-xl shadow-lg overflow-hidden">
       <span aria-live="polite" className="sr-only">
         {copied ? t("list.linkCopied") : ""}
       </span>
