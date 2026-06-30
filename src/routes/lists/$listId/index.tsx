@@ -291,7 +291,7 @@ function ListDetailPage() {
           </div>
         )}
         <div className="flex-1 flex flex-col sm:items-center sm:p-6">
-          <div className="flex-1 flex flex-col w-full sm:max-w-3xl bg-white dark:bg-gray-900 sm:rounded-3xl sm:border sm:border-gray-100 dark:sm:border-gray-800 [overflow:clip] sm:max-h-[calc(100dvh-3.25rem-3rem)]">
+          <div className="flex-1 flex flex-col w-full sm:max-w-3xl bg-canvas dark:bg-canvas-dark sm:rounded-3xl sm:border sm:border-gray-100 dark:sm:border-gray-800 [overflow:clip] sm:max-h-[calc(100dvh-3.25rem-3rem)]">
             <div className="px-5 pt-5 pb-4 shrink-0 flex flex-col">
               <div
                 className="flex items-center justify-between order-1"
@@ -303,7 +303,61 @@ function ListDetailPage() {
                 >
                   {t("list.back")}
                 </Link>
-                <div className="relative flex items-center shrink-0">
+                <div className="relative flex items-center gap-1.5 shrink-0">
+                  {!searchActive && (
+                    <button
+                      type="button"
+                      onClick={openSearch}
+                      data-testid="search-btn-inline"
+                      aria-label={t("list.searchTitle")}
+                      className="cursor-pointer h-7 w-7 flex items-center justify-center rounded-md border border-gray-200 text-gray-400 hover:border-gray-400 hover:text-gray-700 transition active:scale-[0.96]"
+                    >
+                      <svg
+                        aria-hidden="true"
+                        className="w-3.5 h-3.5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                        />
+                      </svg>
+                    </button>
+                  )}
+                  {hasGeoItems && (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setViewMode((v) => (v === "list" ? "map" : "list"))
+                      }
+                      data-testid="map-toggle-btn-inline"
+                      aria-label={
+                        viewMode === "list"
+                          ? t("list.mapView")
+                          : t("list.listView")
+                      }
+                      className={`cursor-pointer h-7 w-7 flex items-center justify-center rounded-md border transition active:scale-[0.96] ${viewMode === "map" ? "border-gray-900 bg-gray-900 text-white" : "border-gray-200 text-gray-400 hover:border-gray-400 hover:text-gray-700"}`}
+                    >
+                      <svg
+                        aria-hidden="true"
+                        className="w-3.5 h-3.5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
+                        />
+                      </svg>
+                    </button>
+                  )}
                   <button
                     type="button"
                     onClick={() => setMenuOpen((v) => !v)}
@@ -325,16 +379,9 @@ function ListDetailPage() {
 
                   {menuOpen && (
                     <ListDropdownMenu
-                      searchActive={searchActive}
-                      hasGeoItems={hasGeoItems}
-                      viewMode={viewMode}
                       hasPendingItems={filteredItems.some((i) => !i.done)}
                       copied={copied}
                       isOwner={isOwner}
-                      onOpenSearch={openSearch}
-                      onToggleViewMode={() =>
-                        setViewMode((v) => (v === "list" ? "map" : "list"))
-                      }
                       onPickRandom={pickRandomItem}
                       onOpenPalette={() => setPaletteOpen(true)}
                       onShare={handleShare}
