@@ -193,8 +193,7 @@ function UsersDirectoryPage() {
           />
           <button
             type="submit"
-            className="px-5 py-2.5 text-[12px] font-semibold tracking-[0.04em] bg-ink dark:bg-paper text-canvas dark:text-ink border-none cursor-pointer"
-            style={{ borderRadius: 0 }}
+            className="px-5 py-2.5 text-[12px] font-semibold tracking-[0.04em] bg-ink dark:bg-paper text-canvas dark:text-ink rounded-none border-none cursor-pointer"
           >
             {t("directory.search")}
           </button>
