@@ -292,6 +292,7 @@ function ListDetailPage() {
         )}
         <div className="flex-1 flex flex-col sm:items-center sm:p-6">
           <div className="flex-1 flex flex-col w-full sm:max-w-3xl bg-canvas dark:bg-canvas-dark sm:rounded-3xl sm:border sm:border-gray-100 dark:sm:border-gray-800 [overflow:clip] sm:max-h-[calc(100dvh-3.25rem-3rem)]">
+            <div className="flex-1 min-h-0 overflow-y-auto flex flex-col">
             <div className="px-5 pt-5 pb-4 shrink-0 flex flex-col">
               <div
                 className="flex items-center justify-between order-1"
@@ -669,7 +670,7 @@ function ListDetailPage() {
             )}
 
             <div
-              className={`flex-1 overflow-y-auto px-3 py-1 ${viewMode === "map" ? "hidden" : ""}`}
+              className={`flex-1 px-3 py-1 ${viewMode === "map" ? "hidden" : ""}`}
             >
               {itemsLoading ? (
                 <div className="space-y-1">
@@ -798,6 +799,7 @@ function ListDetailPage() {
                   ))}
                 </div>
               )}
+            </div>
             </div>
 
             {canWrite && (
