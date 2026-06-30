@@ -293,513 +293,516 @@ function ListDetailPage() {
         <div className="flex-1 flex flex-col sm:items-center sm:p-6">
           <div className="flex-1 flex flex-col w-full sm:max-w-3xl bg-canvas dark:bg-canvas-dark sm:rounded-3xl sm:border sm:border-gray-100 dark:sm:border-gray-800 [overflow:clip] sm:max-h-[calc(100dvh-3.25rem-3rem)]">
             <div className="flex-1 min-h-0 overflow-y-auto flex flex-col">
-            <div className="px-5 pt-5 pb-4 shrink-0 flex flex-col">
-              <div
-                className="flex items-center justify-between order-1"
-                ref={menuRef}
-              >
-                <Link
-                  to="/lists"
-                  className="cursor-pointer text-sm text-gray-500 dark:text-muted hover:text-ink dark:hover:text-paper transition-colors duration-150 w-fit"
+              <div className="px-5 pt-5 pb-4 shrink-0 flex flex-col">
+                <div
+                  className="flex items-center justify-between order-1"
+                  ref={menuRef}
                 >
-                  {t("list.back")}
-                </Link>
-                <div className="relative flex items-center gap-1.5 shrink-0">
-                  {!searchActive && (
-                    <button
-                      type="button"
-                      onClick={openSearch}
-                      data-testid="search-btn-inline"
-                      aria-label={t("list.searchTitle")}
-                      className="cursor-pointer h-7 w-7 flex items-center justify-center rounded-md border border-gray-200 text-gray-400 hover:border-gray-400 hover:text-gray-700 transition active:scale-[0.96]"
-                    >
-                      <svg
-                        aria-hidden="true"
-                        className="w-3.5 h-3.5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                        />
-                      </svg>
-                    </button>
-                  )}
-                  {hasGeoItems && (
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setViewMode((v) => (v === "list" ? "map" : "list"))
-                      }
-                      data-testid="map-toggle-btn-inline"
-                      aria-label={
-                        viewMode === "list"
-                          ? t("list.mapView")
-                          : t("list.listView")
-                      }
-                      className={`cursor-pointer h-7 w-7 flex items-center justify-center rounded-md border transition active:scale-[0.96] ${viewMode === "map" ? "border-gray-900 bg-gray-900 text-white" : "border-gray-200 text-gray-400 hover:border-gray-400 hover:text-gray-700"}`}
-                    >
-                      <svg
-                        aria-hidden="true"
-                        className="w-3.5 h-3.5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
-                        />
-                      </svg>
-                    </button>
-                  )}
-                  <button
-                    type="button"
-                    onClick={() => setMenuOpen((v) => !v)}
-                    data-testid="list-menu-btn"
-                    aria-label={t("list.menuAriaLabel")}
-                    className={`cursor-pointer h-7 w-7 flex items-center justify-center rounded-md border transition active:scale-[0.96] ${menuOpen ? "border-gray-900 bg-gray-900 text-white" : "border-gray-200 text-gray-400 hover:border-gray-400 hover:text-gray-700"}`}
+                  <Link
+                    to="/lists"
+                    className="cursor-pointer text-sm text-gray-500 dark:text-muted hover:text-ink dark:hover:text-paper transition-colors duration-150 w-fit"
                   >
-                    <svg
-                      aria-hidden="true"
-                      className="w-3.5 h-3.5"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
+                    {t("list.back")}
+                  </Link>
+                  <div className="relative flex items-center gap-1.5 shrink-0">
+                    {!searchActive && (
+                      <button
+                        type="button"
+                        onClick={openSearch}
+                        data-testid="search-btn-inline"
+                        aria-label={t("list.searchTitle")}
+                        className="cursor-pointer h-7 w-7 flex items-center justify-center rounded-md border border-gray-200 text-gray-400 hover:border-gray-400 hover:text-gray-700 transition active:scale-[0.96]"
+                      >
+                        <svg
+                          aria-hidden="true"
+                          className="w-3.5 h-3.5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                          />
+                        </svg>
+                      </button>
+                    )}
+                    {hasGeoItems && (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setViewMode((v) => (v === "list" ? "map" : "list"))
+                        }
+                        data-testid="map-toggle-btn-inline"
+                        aria-label={
+                          viewMode === "list"
+                            ? t("list.mapView")
+                            : t("list.listView")
+                        }
+                        className={`cursor-pointer h-7 w-7 flex items-center justify-center rounded-md border transition active:scale-[0.96] ${viewMode === "map" ? "border-gray-900 bg-gray-900 text-white" : "border-gray-200 text-gray-400 hover:border-gray-400 hover:text-gray-700"}`}
+                      >
+                        <svg
+                          aria-hidden="true"
+                          className="w-3.5 h-3.5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
+                          />
+                        </svg>
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => setMenuOpen((v) => !v)}
+                      data-testid="list-menu-btn"
+                      aria-label={t("list.menuAriaLabel")}
+                      className={`cursor-pointer h-7 w-7 flex items-center justify-center rounded-md border transition active:scale-[0.96] ${menuOpen ? "border-gray-900 bg-gray-900 text-white" : "border-gray-200 text-gray-400 hover:border-gray-400 hover:text-gray-700"}`}
                     >
-                      <circle cx="4" cy="10" r="1.5" />
-                      <circle cx="10" cy="10" r="1.5" />
-                      <circle cx="16" cy="10" r="1.5" />
-                    </svg>
-                  </button>
+                      <svg
+                        aria-hidden="true"
+                        className="w-3.5 h-3.5"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <circle cx="4" cy="10" r="1.5" />
+                        <circle cx="10" cy="10" r="1.5" />
+                        <circle cx="16" cy="10" r="1.5" />
+                      </svg>
+                    </button>
 
-                  {menuOpen && (
-                    <ListDropdownMenu
-                      hasPendingItems={filteredItems.some((i) => !i.done)}
-                      copied={copied}
-                      isOwner={isOwner}
-                      onPickRandom={pickRandomItem}
-                      onOpenPalette={() => setPaletteOpen(true)}
-                      onShare={handleShare}
-                      onExport={handleExport}
-                      onAddToCollection={() => setCollectionPickerOpen(true)}
-                      onToggleSettings={() => setSettingsOpen((v) => !v)}
-                      onDelete={() => setConfirmDelete(true)}
-                      onClose={() => setMenuOpen(false)}
-                    />
-                  )}
+                    {menuOpen && (
+                      <ListDropdownMenu
+                        hasPendingItems={filteredItems.some((i) => !i.done)}
+                        copied={copied}
+                        isOwner={isOwner}
+                        onPickRandom={pickRandomItem}
+                        onOpenPalette={() => setPaletteOpen(true)}
+                        onShare={handleShare}
+                        onExport={handleExport}
+                        onAddToCollection={() => setCollectionPickerOpen(true)}
+                        onToggleSettings={() => setSettingsOpen((v) => !v)}
+                        onDelete={() => setConfirmDelete(true)}
+                        onClose={() => setMenuOpen(false)}
+                      />
+                    )}
+                  </div>
                 </div>
-              </div>
-              <div className="mt-4 order-2">
-                {listLoading ? (
-                  <div className="h-7 w-3/4 rounded-lg bg-gray-200 animate-pulse" />
-                ) : editingName ? (
-                  <form
-                    onSubmit={(e) => {
-                      e.preventDefault();
-                      const trimmed = nameValue.trim();
-                      if (trimmed && trimmed !== list?.name)
-                        updateName.mutate(trimmed);
-                      setEditingName(false);
-                    }}
-                  >
-                    <input
-                      autoFocus
-                      value={nameValue}
-                      onChange={(e) => setNameValue(e.target.value)}
-                      onBlur={(e) => {
-                        const t = e.target.value.trim();
-                        if (t && t !== list?.name) updateName.mutate(t);
+                <div className="mt-4 order-2">
+                  {listLoading ? (
+                    <div className="h-7 w-3/4 rounded-lg bg-gray-200 animate-pulse" />
+                  ) : editingName ? (
+                    <form
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        const trimmed = nameValue.trim();
+                        if (trimmed && trimmed !== list?.name)
+                          updateName.mutate(trimmed);
                         setEditingName(false);
                       }}
-                      data-testid="list-name-edit-input"
-                      className="w-full font-bold text-gray-900 bg-transparent outline-none border-b-2 border-gray-900"
+                    >
+                      <input
+                        autoFocus
+                        value={nameValue}
+                        onChange={(e) => setNameValue(e.target.value)}
+                        onBlur={(e) => {
+                          const t = e.target.value.trim();
+                          if (t && t !== list?.name) updateName.mutate(t);
+                          setEditingName(false);
+                        }}
+                        data-testid="list-name-edit-input"
+                        className="w-full font-bold text-gray-900 bg-transparent outline-none border-b-2 border-gray-900"
+                        style={{
+                          fontSize: "clamp(26px, 4.5vw, 38px)",
+                          letterSpacing: "-0.03em",
+                          lineHeight: 1.05,
+                        }}
+                      />
+                    </form>
+                  ) : (
+                    <h1
+                      className="font-bold text-gray-900 dark:text-gray-100 cursor-default"
                       style={{
                         fontSize: "clamp(26px, 4.5vw, 38px)",
                         letterSpacing: "-0.03em",
                         lineHeight: 1.05,
+                        textWrap: "balance",
                       }}
-                    />
-                  </form>
-                ) : (
-                  <h1
-                    className="font-bold text-gray-900 dark:text-gray-100 cursor-default"
-                    style={{
-                      fontSize: "clamp(26px, 4.5vw, 38px)",
-                      letterSpacing: "-0.03em",
-                      lineHeight: 1.05,
-                      textWrap: "balance",
-                    }}
-                    onDoubleClick={
-                      isOwner
-                        ? () => {
-                            setNameValue(list?.name ?? "");
-                            setEditingName(true);
-                          }
-                        : undefined
-                    }
-                  >
-                    {list?.name ?? "…"}
-                  </h1>
-                )}
-              </div>
+                      onDoubleClick={
+                        isOwner
+                          ? () => {
+                              setNameValue(list?.name ?? "");
+                              setEditingName(true);
+                            }
+                          : undefined
+                      }
+                    >
+                      {list?.name ?? "…"}
+                    </h1>
+                  )}
+                </div>
 
-              {!listLoading && (isOwner || !!list?.description) && (
-                <div className="mt-3 order-5">
-                  {isOwner ? (
-                    editingDescription ? (
-                      <textarea
-                        autoFocus
-                        aria-label={t("list.addDescriptionPlaceholder")}
-                        value={descriptionValue}
-                        onChange={(e) => setDescriptionValue(e.target.value)}
-                        onBlur={() => {
-                          const trimmed = descriptionValue.trim();
-                          updateDescription.mutate(trimmed || null);
-                          setEditingDescription(false);
-                        }}
-                        onKeyDown={(e) => {
-                          if (e.key === "Escape") {
-                            setEditingDescription(false);
-                          }
-                          if (e.key === "Enter" && !e.shiftKey) {
-                            e.preventDefault();
+                {!listLoading && (isOwner || !!list?.description) && (
+                  <div className="mt-3 order-5">
+                    {isOwner ? (
+                      editingDescription ? (
+                        <textarea
+                          autoFocus
+                          aria-label={t("list.addDescriptionPlaceholder")}
+                          value={descriptionValue}
+                          onChange={(e) => setDescriptionValue(e.target.value)}
+                          onBlur={() => {
                             const trimmed = descriptionValue.trim();
                             updateDescription.mutate(trimmed || null);
                             setEditingDescription(false);
-                          }
-                        }}
-                        placeholder={t("list.addDescriptionPlaceholder")}
-                        maxLength={500}
-                        rows={2}
-                        data-testid="description-textarea"
-                        className="w-full text-sm text-gray-600 leading-relaxed bg-transparent outline-none resize-none border-b border-gray-200 focus:border-gray-400 transition placeholder-gray-300"
-                      />
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.key === "Escape") {
+                              setEditingDescription(false);
+                            }
+                            if (e.key === "Enter" && !e.shiftKey) {
+                              e.preventDefault();
+                              const trimmed = descriptionValue.trim();
+                              updateDescription.mutate(trimmed || null);
+                              setEditingDescription(false);
+                            }
+                          }}
+                          placeholder={t("list.addDescriptionPlaceholder")}
+                          maxLength={500}
+                          rows={2}
+                          data-testid="description-textarea"
+                          className="w-full text-sm text-gray-600 leading-relaxed bg-transparent outline-none resize-none border-b border-gray-200 focus:border-gray-400 transition placeholder-gray-300"
+                        />
+                      ) : (
+                        <div>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setDescriptionValue(list?.description ?? "");
+                              setEditingDescription(true);
+                            }}
+                            data-testid="description-btn"
+                            className="cursor-pointer w-full text-left text-sm leading-relaxed transition"
+                          >
+                            {list?.description ? (
+                              <span className="text-gray-500">
+                                {list.description}
+                              </span>
+                            ) : (
+                              <span className="text-gray-300 hover:text-gray-400">
+                                {t("list.addDescriptionPlaceholder")}
+                              </span>
+                            )}
+                          </button>
+                        </div>
+                      )
                     ) : (
                       <div>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setDescriptionValue(list?.description ?? "");
-                            setEditingDescription(true);
-                          }}
-                          data-testid="description-btn"
-                          className="cursor-pointer w-full text-left text-sm leading-relaxed transition"
-                        >
-                          {list?.description ? (
-                            <span className="text-gray-500">
-                              {list.description}
-                            </span>
-                          ) : (
-                            <span className="text-gray-300 hover:text-gray-400">
-                              {t("list.addDescriptionPlaceholder")}
-                            </span>
-                          )}
-                        </button>
-                      </div>
-                    )
-                  ) : (
-                    <div>
-                      <span className="text-sm text-gray-500 leading-relaxed">
-                        {list?.description}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {!listLoading &&
-                ((activeParticipantsData && activeParticipantsData.total > 0) ||
-                  isParticipant) && (
-                  <div className="flex items-center gap-2 mt-2 order-3 min-w-0 flex-1">
-                    {activeParticipantsData &&
-                      activeParticipantsData.total > 0 && (
-                        <ActiveParticipants
-                          participants={activeParticipantsData.participants}
-                          total={activeParticipantsData.total}
-                          onClick={
-                            isOwner &&
-                            (challengers.length > 0 || collaborators.length > 0)
-                              ? () => setParticipantsPanelOpen((open) => !open)
-                              : undefined
-                          }
-                        />
-                      )}
-
-                    {isParticipant && (
-                      <>
-                        {activeParticipantsData &&
-                          activeParticipantsData.total > 0 && (
-                            <span className="text-gray-200 text-xs shrink-0">
-                              ·
-                            </span>
-                          )}
-                        <span className="text-xs text-gray-400 shrink-0">
-                          {list?.participationCompletedAt
-                            ? t("list.challengeCompleted")
-                            : t("list.challengeInProgress")}
+                        <span className="text-sm text-gray-500 leading-relaxed">
+                          {list?.description}
                         </span>
-                      </>
+                      </div>
                     )}
                   </div>
                 )}
 
-              {!listLoading && isOwner && participantsPanelOpen && (
-                <ParticipantsPanel
-                  challengers={challengers}
-                  collaborators={collaborators}
-                />
-              )}
+                {!listLoading &&
+                  ((activeParticipantsData &&
+                    activeParticipantsData.total > 0) ||
+                    isParticipant) && (
+                    <div className="flex items-center gap-2 mt-2 order-3 min-w-0 flex-1">
+                      {activeParticipantsData &&
+                        activeParticipantsData.total > 0 && (
+                          <ActiveParticipants
+                            participants={activeParticipantsData.participants}
+                            total={activeParticipantsData.total}
+                            onClick={
+                              isOwner &&
+                              (challengers.length > 0 ||
+                                collaborators.length > 0)
+                                ? () =>
+                                    setParticipantsPanelOpen((open) => !open)
+                                : undefined
+                            }
+                          />
+                        )}
 
-              {!listLoading && isOwner && settingsOpen && (
-                <div className="mt-3 flex flex-col gap-2 order-7">
-                  <ListSettingsPanel
-                    listId={list?.id ?? listId}
-                    onClose={() => setSettingsOpen(false)}
-                    onSlugUpdated={(updated) =>
-                      navigate({
-                        to: "/lists/$listId",
-                        params: { listId: updated.slug ?? updated.id },
-                      })
+                      {isParticipant && (
+                        <>
+                          {activeParticipantsData &&
+                            activeParticipantsData.total > 0 && (
+                              <span className="text-gray-200 text-xs shrink-0">
+                                ·
+                              </span>
+                            )}
+                          <span className="text-xs text-gray-400 shrink-0">
+                            {list?.participationCompletedAt
+                              ? t("list.challengeCompleted")
+                              : t("list.challengeInProgress")}
+                          </span>
+                        </>
+                      )}
+                    </div>
+                  )}
+
+                {!listLoading && isOwner && participantsPanelOpen && (
+                  <ParticipantsPanel
+                    challengers={challengers}
+                    collaborators={collaborators}
+                  />
+                )}
+
+                {!listLoading && isOwner && settingsOpen && (
+                  <div className="mt-3 flex flex-col gap-2 order-7">
+                    <ListSettingsPanel
+                      listId={list?.id ?? listId}
+                      onClose={() => setSettingsOpen(false)}
+                      onSlugUpdated={(updated) =>
+                        navigate({
+                          to: "/lists/$listId",
+                          params: { listId: updated.slug ?? updated.id },
+                        })
+                      }
+                    />
+                    <ListStatsCard
+                      challengers={challengers}
+                      itemCount={items.length}
+                    />
+                  </div>
+                )}
+
+                {!listLoading && items.length > 0 && (
+                  <div className="mt-3 order-4">
+                    <div className="mb-1.5 flex items-baseline justify-between font-mono text-[11px] tabular-nums text-muted">
+                      <span>
+                        {t("list.progress", {
+                          done: doneCount,
+                          total: items.length,
+                        })}
+                      </span>
+                      <span className="text-[13px] font-medium text-gray-900 dark:text-gray-100">
+                        {Math.round(progress)}%
+                      </span>
+                    </div>
+                    <Progress value={progress} className="h-1.5" />
+                  </div>
+                )}
+
+                {!itemsLoading && (items.length > 0 || isOwner) && (
+                  <ListFilterBar
+                    statusFilter={statusFilter}
+                    activeTag={activeTag}
+                    activePlace={activePlace}
+                    allTags={allTags}
+                    allPlaces={allPlaces}
+                    onStatusFilter={setStatusFilter}
+                    onTagFilter={setActiveTag}
+                    onPlaceFilter={setActivePlace}
+                    trailingSlot={
+                      <>
+                        {isOwner && (
+                          <ListSettingsChip
+                            active={settingsOpen}
+                            onToggle={() => setSettingsOpen((v) => !v)}
+                          />
+                        )}
+                        <ListViewChip
+                          viewMode={viewMode}
+                          onChange={setViewMode}
+                        />
+                      </>
                     }
                   />
-                  <ListStatsCard
-                    challengers={challengers}
-                    itemCount={items.length}
-                  />
-                </div>
-              )}
+                )}
+              </div>
 
-              {!listLoading && items.length > 0 && (
-                <div className="mt-3 order-4">
-                  <div className="mb-1.5 flex items-baseline justify-between font-mono text-[11px] tabular-nums text-muted">
-                    <span>
-                      {t("list.progress", {
-                        done: doneCount,
-                        total: items.length,
-                      })}
-                    </span>
-                    <span className="text-[13px] font-medium text-gray-900 dark:text-gray-100">
-                      {Math.round(progress)}%
-                    </span>
-                  </div>
-                  <Progress value={progress} className="h-1.5" />
-                </div>
-              )}
-
-              {!itemsLoading && (items.length > 0 || isOwner) && (
-                <ListFilterBar
-                  statusFilter={statusFilter}
-                  activeTag={activeTag}
-                  activePlace={activePlace}
-                  allTags={allTags}
-                  allPlaces={allPlaces}
-                  onStatusFilter={setStatusFilter}
-                  onTagFilter={setActiveTag}
-                  onPlaceFilter={setActivePlace}
-                  trailingSlot={
-                    <>
-                      {isOwner && (
-                        <ListSettingsChip
-                          active={settingsOpen}
-                          onToggle={() => setSettingsOpen((v) => !v)}
-                        />
-                      )}
-                      <ListViewChip
-                        viewMode={viewMode}
-                        onChange={setViewMode}
-                      />
-                    </>
-                  }
+              {searchActive && (
+                <ListSearchBar
+                  value={searchQuery}
+                  onChange={setSearchQuery}
+                  onClose={closeSearch}
+                  resultCount={filteredItems.length}
+                  inputRef={searchInputRef}
                 />
               )}
-            </div>
 
-            {searchActive && (
-              <ListSearchBar
-                value={searchQuery}
-                onChange={setSearchQuery}
-                onClose={closeSearch}
-                resultCount={filteredItems.length}
-                inputRef={searchInputRef}
-              />
-            )}
-
-            {viewMode === "map" && hasGeoItems && (
-              <div className="relative" style={{ height: "400px" }}>
-                <Suspense
-                  fallback={
-                    <div className="h-full bg-gray-100 dark:bg-gray-800 animate-pulse rounded-xl" />
-                  }
-                >
-                  <ListMap items={items} activeItems={filteredItems} />
-                </Suspense>
-              </div>
-            )}
-            {viewMode === "map" && !hasGeoItems && (
-              <div
-                data-testid="map-empty-state"
-                className="mx-3 my-4 flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 px-6 py-10 text-center"
-              >
-                <svg
-                  aria-hidden="true"
-                  className="w-8 h-8 text-gray-300 dark:text-gray-600"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
-                  />
-                </svg>
-                <div className="text-sm font-medium text-gray-700 dark:text-gray-200">
-                  {t("list.mapEmptyTitle")}
-                </div>
-                <p className="max-w-sm text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
-                  {t("list.mapEmptyHint")}
-                </p>
-              </div>
-            )}
-
-            <div
-              className={`flex-1 px-3 py-1 ${viewMode === "map" ? "hidden" : ""}`}
-            >
-              {itemsLoading ? (
-                <div className="space-y-1">
-                  {Array.from({ length: 4 }, (_, i) => i).map((i) => (
-                    <div
-                      key={`skeleton-${i}`}
-                      className="flex items-center gap-3 px-3 py-3 rounded-lg bg-gray-50 dark:bg-gray-800/50"
-                    >
-                      <div className="shrink-0 w-10 h-10 flex items-center justify-center">
-                        <div className="w-5 h-5 rounded-full bg-gray-200 animate-pulse" />
-                      </div>
-                      <div
-                        className="flex-1 h-4 rounded-md bg-gray-200 animate-pulse"
-                        style={{
-                          width: `${55 + ((i * 13) % 35)}%`,
-                        }}
-                      />
-                    </div>
-                  ))}
-                </div>
-              ) : filteredItems.length === 0 ? (
-                <div className="flex flex-col items-center gap-3 py-12 text-center">
-                  <span
-                    className="inline-grid h-12 w-12 place-items-center rounded-2xl border border-gray-200 dark:border-gray-700 text-gray-300 dark:text-gray-600"
-                    aria-hidden
+              {viewMode === "map" && hasGeoItems && (
+                <div className="relative" style={{ height: "400px" }}>
+                  <Suspense
+                    fallback={
+                      <div className="h-full bg-gray-100 dark:bg-gray-800 animate-pulse rounded-xl" />
+                    }
                   >
-                    <svg
-                      aria-hidden="true"
-                      className="h-5 w-5"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      viewBox="0 0 24 24"
-                    >
-                      {searchQuery ? (
-                        <>
-                          <circle cx="11" cy="11" r="7" />
-                          <path d="m21 21-4.3-4.3" />
-                        </>
-                      ) : items.length === 0 ? (
-                        <path d="M12 5v14M5 12h14" />
-                      ) : (
-                        <path d="M3 4h18M7 9h10M11 14h2" />
-                      )}
-                    </svg>
-                  </span>
-                  <p
-                    className="text-sm text-gray-400"
-                    style={{ textWrap: "balance" }}
-                  >
-                    {searchQuery
-                      ? t("list.noResults", { query: searchQuery })
-                      : items.length === 0
-                        ? t("list.addFirst")
-                        : t("list.noItemsFilter")}
-                  </p>
-                </div>
-              ) : (
-                <div className="space-y-1">
-                  {filteredItems.map((item, idx) => (
-                    <div
-                      key={item.id}
-                      style={{
-                        animationName: "fadeInUp",
-                        animationDuration: "240ms",
-                        animationTimingFunction: "cubic-bezier(0.2, 0, 0, 1)",
-                        animationFillMode: "both",
-                        animationDelay: `${Math.min(idx * 40, 400)}ms`,
-                      }}
-                    >
-                      <ItemRow
-                        item={item}
-                        onToggle={() => toggleItem.mutate(item.id)}
-                        onDelete={() => deleteItem.mutate(item.id)}
-                        onEdit={(text, coords) =>
-                          updateItem.mutate({
-                            id: item.id,
-                            text,
-                            coords,
-                          })
-                        }
-                        onTagClick={handleTagClick}
-                        activeTag={activeTag}
-                        caps={{
-                          canWrite,
-                          canToggle,
-                          canLike: !!session?.user?.id,
-                        }}
-                        onLike={
-                          session?.user?.id
-                            ? () => toggleItemLike.mutate(item.id)
-                            : undefined
-                        }
-                        onComment={() =>
-                          setOpenComments((prev) => {
-                            const next = new Set(prev);
-                            next.has(item.id)
-                              ? next.delete(item.id)
-                              : next.add(item.id);
-                            return next;
-                          })
-                        }
-                        highlighted={item.id === highlightedItemId}
-                        dragHandlers={
-                          isOwner && !item.done
-                            ? {
-                                onDragStart: handleDragStart(item.id),
-                                onDragOver: handleDragOver(item.id),
-                                onDrop: handleDrop(item.id),
-                                onDragEnd: handleDragEnd,
-                              }
-                            : undefined
-                        }
-                        isDragOver={dragOverId === item.id}
-                      />
-                      {openComments.has(item.id) && (
-                        <CommentThread
-                          listId={listId}
-                          itemId={item.id}
-                          ownerId={list?.ownerId ?? null}
-                        />
-                      )}
-                    </div>
-                  ))}
+                    <ListMap items={items} activeItems={filteredItems} />
+                  </Suspense>
                 </div>
               )}
-            </div>
+              {viewMode === "map" && !hasGeoItems && (
+                <div
+                  data-testid="map-empty-state"
+                  className="mx-3 my-4 flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 px-6 py-10 text-center"
+                >
+                  <svg
+                    aria-hidden="true"
+                    className="w-8 h-8 text-gray-300 dark:text-gray-600"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
+                    />
+                  </svg>
+                  <div className="text-sm font-medium text-gray-700 dark:text-gray-200">
+                    {t("list.mapEmptyTitle")}
+                  </div>
+                  <p className="max-w-sm text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+                    {t("list.mapEmptyHint")}
+                  </p>
+                </div>
+              )}
+
+              <div
+                className={`flex-1 px-3 py-1 ${viewMode === "map" ? "hidden" : ""}`}
+              >
+                {itemsLoading ? (
+                  <div className="space-y-1">
+                    {Array.from({ length: 4 }, (_, i) => i).map((i) => (
+                      <div
+                        key={`skeleton-${i}`}
+                        className="flex items-center gap-3 px-3 py-3 rounded-lg bg-gray-50 dark:bg-gray-800/50"
+                      >
+                        <div className="shrink-0 w-10 h-10 flex items-center justify-center">
+                          <div className="w-5 h-5 rounded-full bg-gray-200 animate-pulse" />
+                        </div>
+                        <div
+                          className="flex-1 h-4 rounded-md bg-gray-200 animate-pulse"
+                          style={{
+                            width: `${55 + ((i * 13) % 35)}%`,
+                          }}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                ) : filteredItems.length === 0 ? (
+                  <div className="flex flex-col items-center gap-3 py-12 text-center">
+                    <span
+                      className="inline-grid h-12 w-12 place-items-center rounded-2xl border border-gray-200 dark:border-gray-700 text-gray-300 dark:text-gray-600"
+                      aria-hidden
+                    >
+                      <svg
+                        aria-hidden="true"
+                        className="h-5 w-5"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        viewBox="0 0 24 24"
+                      >
+                        {searchQuery ? (
+                          <>
+                            <circle cx="11" cy="11" r="7" />
+                            <path d="m21 21-4.3-4.3" />
+                          </>
+                        ) : items.length === 0 ? (
+                          <path d="M12 5v14M5 12h14" />
+                        ) : (
+                          <path d="M3 4h18M7 9h10M11 14h2" />
+                        )}
+                      </svg>
+                    </span>
+                    <p
+                      className="text-sm text-gray-400"
+                      style={{ textWrap: "balance" }}
+                    >
+                      {searchQuery
+                        ? t("list.noResults", { query: searchQuery })
+                        : items.length === 0
+                          ? t("list.addFirst")
+                          : t("list.noItemsFilter")}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-1">
+                    {filteredItems.map((item, idx) => (
+                      <div
+                        key={item.id}
+                        style={{
+                          animationName: "fadeInUp",
+                          animationDuration: "240ms",
+                          animationTimingFunction: "cubic-bezier(0.2, 0, 0, 1)",
+                          animationFillMode: "both",
+                          animationDelay: `${Math.min(idx * 40, 400)}ms`,
+                        }}
+                      >
+                        <ItemRow
+                          item={item}
+                          onToggle={() => toggleItem.mutate(item.id)}
+                          onDelete={() => deleteItem.mutate(item.id)}
+                          onEdit={(text, coords) =>
+                            updateItem.mutate({
+                              id: item.id,
+                              text,
+                              coords,
+                            })
+                          }
+                          onTagClick={handleTagClick}
+                          activeTag={activeTag}
+                          caps={{
+                            canWrite,
+                            canToggle,
+                            canLike: !!session?.user?.id,
+                          }}
+                          onLike={
+                            session?.user?.id
+                              ? () => toggleItemLike.mutate(item.id)
+                              : undefined
+                          }
+                          onComment={() =>
+                            setOpenComments((prev) => {
+                              const next = new Set(prev);
+                              next.has(item.id)
+                                ? next.delete(item.id)
+                                : next.add(item.id);
+                              return next;
+                            })
+                          }
+                          highlighted={item.id === highlightedItemId}
+                          dragHandlers={
+                            isOwner && !item.done
+                              ? {
+                                  onDragStart: handleDragStart(item.id),
+                                  onDragOver: handleDragOver(item.id),
+                                  onDrop: handleDrop(item.id),
+                                  onDragEnd: handleDragEnd,
+                                }
+                              : undefined
+                          }
+                          isDragOver={dragOverId === item.id}
+                        />
+                        {openComments.has(item.id) && (
+                          <CommentThread
+                            listId={listId}
+                            itemId={item.id}
+                            ownerId={list?.ownerId ?? null}
+                          />
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
 
             {canWrite && (

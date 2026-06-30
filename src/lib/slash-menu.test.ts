@@ -37,7 +37,9 @@ describe("getSlashQuery", () => {
 });
 
 describe("applySlashAction", () => {
-  const base = (extra: Partial<Parameters<typeof applySlashAction>[0]> = {}) => ({
+  const base = (
+    extra: Partial<Parameters<typeof applySlashAction>[0]> = {}
+  ) => ({
     value: "/",
     start: 0,
     caret: 1,
@@ -45,21 +47,33 @@ describe("applySlashAction", () => {
   });
 
   it("bold replaces the slash query with **placeholder** and selects the placeholder", () => {
-    const r = applySlashAction({ ...base(), action: "bold", placeholder: "texto" });
+    const r = applySlashAction({
+      ...base(),
+      action: "bold",
+      placeholder: "texto",
+    });
     expect(r.value).toBe("**texto**");
     expect(r.selectionStart).toBe(2);
     expect(r.selectionEnd).toBe(7);
   });
 
   it("italic wraps in single asterisks", () => {
-    const r = applySlashAction({ ...base(), action: "italic", placeholder: "texto" });
+    const r = applySlashAction({
+      ...base(),
+      action: "italic",
+      placeholder: "texto",
+    });
     expect(r.value).toBe("*texto*");
     expect(r.selectionStart).toBe(1);
     expect(r.selectionEnd).toBe(6);
   });
 
   it("code wraps in backticks", () => {
-    const r = applySlashAction({ ...base(), action: "code", placeholder: "texto" });
+    const r = applySlashAction({
+      ...base(),
+      action: "code",
+      placeholder: "texto",
+    });
     expect(r.value).toBe("`texto`");
     expect(r.selectionStart).toBe(1);
     expect(r.selectionEnd).toBe(6);
@@ -78,14 +92,22 @@ describe("applySlashAction", () => {
   });
 
   it("place inserts an @ trigger and puts the caret after it", () => {
-    const r = applySlashAction({ ...base(), action: "place", placeholder: "texto" });
+    const r = applySlashAction({
+      ...base(),
+      action: "place",
+      placeholder: "texto",
+    });
     expect(r.value).toBe("@");
     expect(r.selectionStart).toBe(1);
     expect(r.selectionEnd).toBe(1);
   });
 
   it("tag inserts a # trigger and puts the caret after it", () => {
-    const r = applySlashAction({ ...base(), action: "tag", placeholder: "texto" });
+    const r = applySlashAction({
+      ...base(),
+      action: "tag",
+      placeholder: "texto",
+    });
     expect(r.value).toBe("#");
     expect(r.selectionStart).toBe(1);
     expect(r.selectionEnd).toBe(1);

@@ -128,9 +128,7 @@ export const ItemRow = memo(
       longitude: string;
       name: string;
     }) {
-      setText((prev) =>
-        prev.replace(PARTIAL_PLACE_REGEX, `@${result.name} `)
-      );
+      setText((prev) => prev.replace(PARTIAL_PLACE_REGEX, `@${result.name} `));
       setPendingCoords({
         latitude: result.latitude,
         longitude: result.longitude,
