@@ -212,6 +212,9 @@ function CreateListInline({ onClose }: { onClose: () => void }) {
         placeholder={t("myLists.newListPlaceholder")}
         aria-label={t("myLists.newListAriaLabel")}
         data-testid="new-list-name-input"
+        autoComplete="off"
+        data-1p-ignore
+        data-lpignore="true"
         className="flex-1 px-4 py-2.5 text-sm text-ink dark:text-paper placeholder-muted bg-transparent outline-none min-w-0"
         onKeyDown={(e) => e.key === "Escape" && onClose()}
       />

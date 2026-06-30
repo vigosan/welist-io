@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { cardLift } from "./cardClass";
+import { cardHover } from "./cardClass";
 
 type Props = {
   eyebrow?: ReactNode;
@@ -35,7 +35,7 @@ export function ListCard({
   return (
     <div
       data-testid={testId}
-      className={`group relative rounded-2xl border border-black/[0.08] bg-canvas p-6 dark:border-white/[0.08] dark:bg-canvas-dark ${cardLift} ${className}`}
+      className={`group relative rounded-2xl border border-black/[0.08] bg-canvas p-6 dark:border-white/[0.08] dark:bg-canvas-dark ${cardHover} ${className}`}
     >
       {(eyebrow || headerRight) && (
         <div className="mb-3 flex items-center gap-3">
