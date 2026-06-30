@@ -337,11 +337,6 @@ function ExplorePage() {
         {(() => {
           const hasNonDefault =
             sort !== "created_desc" || category !== undefined;
-          const activeSortLabel =
-            sort === "trending" ? t("explore.sortTrending") : null;
-          const activeCategoryLabel = category
-            ? t(`categories.${category}`)
-            : null;
           return (
             <div className="mt-3 flex items-center gap-2 flex-wrap">
               <button
@@ -390,40 +385,6 @@ function ExplorePage() {
                 </svg>
               </button>
 
-              {!filtersOpen && hasNonDefault && (
-                <div className="flex items-center gap-1.5">
-                  {sort !== "created_desc" && (
-                    <button
-                      type="button"
-                      onClick={() => setSort("created_desc")}
-                      className="cursor-pointer inline-flex items-center gap-1 rounded-full border border-black/[0.10] dark:border-white/[0.10] px-2 py-0.5 text-xs text-gray-500 hover:border-black/[0.25] hover:text-gray-700 transition"
-                    >
-                      {activeSortLabel}
-                      <span
-                        aria-hidden
-                        className="text-gray-300 dark:text-gray-600 leading-none"
-                      >
-                        ×
-                      </span>
-                    </button>
-                  )}
-                  {category && (
-                    <button
-                      type="button"
-                      onClick={() => setCategory(undefined)}
-                      className="cursor-pointer inline-flex items-center gap-1 rounded-full border border-black/[0.10] dark:border-white/[0.10] px-2 py-0.5 text-xs text-gray-500 hover:border-black/[0.25] hover:text-gray-700 transition"
-                    >
-                      {activeCategoryLabel}
-                      <span
-                        aria-hidden
-                        className="text-gray-300 dark:text-gray-600 leading-none"
-                      >
-                        ×
-                      </span>
-                    </button>
-                  )}
-                </div>
-              )}
             </div>
           );
         })()}
