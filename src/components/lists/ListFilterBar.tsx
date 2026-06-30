@@ -43,6 +43,14 @@ export function ListFilterBar({
 }: Props) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
+  const [showAllTags, setShowAllTags] = useState(false);
+  const [showAllPlaces, setShowAllPlaces] = useState(false);
+
+  const CHIP_LIMIT = 8;
+  const visibleTags = showAllTags ? allTags : allTags.slice(0, CHIP_LIMIT);
+  const visiblePlaces = showAllPlaces
+    ? allPlaces
+    : allPlaces.slice(0, CHIP_LIMIT);
 
   const hasFilters = statusFilter !== "all" || !!activeTag || !!activePlace;
   const hasOptions = allTags.length > 0 || allPlaces.length > 0;
@@ -206,7 +214,7 @@ export function ListFilterBar({
                   {t("list.tagsLabel")}
                 </span>
                 <div className="flex flex-wrap gap-1.5">
-                  {allTags.map((tag) => (
+                  {visibleTags.map((tag) => (
                     <button
                       type="button"
                       key={tag}
@@ -223,6 +231,16 @@ export function ListFilterBar({
                       #{tag}
                     </button>
                   ))}
+                  {!showAllTags && allTags.length > CHIP_LIMIT && (
+                    <button
+                      type="button"
+                      data-testid="tags-show-all"
+                      onClick={() => setShowAllTags(true)}
+                      className="cursor-pointer shrink-0 inline-flex items-center rounded-full border border-gray-200 dark:border-gray-700 px-2.5 py-0.5 text-xs font-medium text-gray-500 dark:text-gray-400 hover:border-gray-400 hover:text-gray-700 transition"
+                    >
+                      +{allTags.length - CHIP_LIMIT}
+                    </button>
+                  )}
                 </div>
               </div>
             )}
@@ -234,7 +252,7 @@ export function ListFilterBar({
                   {t("list.placesLabel")}
                 </span>
                 <div className="flex flex-wrap gap-1.5">
-                  {allPlaces.map((place) => (
+                  {visiblePlaces.map((place) => (
                     <button
                       type="button"
                       key={place}
@@ -252,6 +270,16 @@ export function ListFilterBar({
                       {place}
                     </button>
                   ))}
+                  {!showAllPlaces && allPlaces.length > CHIP_LIMIT && (
+                    <button
+                      type="button"
+                      data-testid="places-show-all"
+                      onClick={() => setShowAllPlaces(true)}
+                      className="cursor-pointer shrink-0 inline-flex items-center rounded-full border border-gray-200 dark:border-gray-700 px-2.5 py-0.5 text-xs font-medium text-gray-500 dark:text-gray-400 hover:border-gray-400 hover:text-gray-700 transition"
+                    >
+                      +{allPlaces.length - CHIP_LIMIT}
+                    </button>
+                  )}
                 </div>
               </div>
             )}
