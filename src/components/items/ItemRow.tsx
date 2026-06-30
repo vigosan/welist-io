@@ -138,9 +138,10 @@ export const ItemRow = memo(
 
     const showGeoDropdown =
       geoOpen && partialPlace !== null && partialPlace.length >= 3;
+    const needsAnchorRect = showGeoDropdown || slash.open;
 
     useEffect(() => {
-      if (!showGeoDropdown) {
+      if (!needsAnchorRect) {
         setDropdownRect(null);
         return;
       }
@@ -156,7 +157,7 @@ export const ItemRow = memo(
         window.removeEventListener("scroll", update, true);
         window.removeEventListener("resize", update);
       };
-    }, [showGeoDropdown]);
+    }, [needsAnchorRect]);
 
     return (
       // biome-ignore lint/a11y/noStaticElementInteractions: drag container
@@ -273,16 +274,26 @@ export const ItemRow = memo(
                   />,
                   document.body
                 )}
-              {slash.open && (
-                <SlashMenu
-                  activeIndex={slash.activeIndex}
-                  onSelect={(action) => {
-                    if (inputRef.current)
-                      slash.select(action, inputRef.current);
-                  }}
-                  className="absolute bottom-full left-0 right-0 mb-1 z-50"
-                />
-              )}
+              {slash.open &&
+                dropdownRect &&
+                createPortal(
+                  <SlashMenu
+                    activeIndex={slash.activeIndex}
+                    onSelect={(action) => {
+                      if (inputRef.current)
+                        slash.select(action, inputRef.current);
+                    }}
+                    className="z-50"
+                    style={{
+                      position: "fixed",
+                      left: dropdownRect.left,
+                      top: dropdownRect.top - 4,
+                      width: dropdownRect.width,
+                      transform: "translateY(-100%)",
+                    }}
+                  />,
+                  document.body
+                )}
               <form onSubmit={handleSubmit}>
                 <input
                   ref={inputRef}
