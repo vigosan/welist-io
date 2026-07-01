@@ -1,4 +1,5 @@
 import { Avatar } from "@/components/ui";
+import { useRemoveCollaborator } from "@/hooks/useList";
 import { useTranslation } from "@/i18n/service";
 import { privateName } from "@/lib/private-name";
 
@@ -18,12 +19,20 @@ type Collaborator = {
 };
 
 interface Props {
+  listId: string;
+  isOwner: boolean;
   challengers: Challenger[];
   collaborators: Collaborator[];
 }
 
-export function ParticipantsPanel({ challengers, collaborators }: Props) {
+export function ParticipantsPanel({
+  listId,
+  isOwner,
+  challengers,
+  collaborators,
+}: Props) {
   const { t } = useTranslation();
+  const removeCollaborator = useRemoveCollaborator(listId);
   if (challengers.length === 0 && collaborators.length === 0) return null;
 
   return (
@@ -77,6 +86,31 @@ export function ParticipantsPanel({ challengers, collaborators }: Props) {
                 <span className="text-xs text-gray-700 flex-1 truncate">
                   {privateName(c.name)}
                 </span>
+                {isOwner && (
+                  <button
+                    type="button"
+                    onClick={() => removeCollaborator.mutate(c.id)}
+                    disabled={removeCollaborator.isPending}
+                    aria-label={t("list.collaboratorsRemove")}
+                    data-testid={`participant-remove-collaborator-${c.id}`}
+                    className="cursor-pointer h-6 w-6 flex items-center justify-center rounded-md text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition disabled:opacity-50 shrink-0"
+                  >
+                    <svg
+                      aria-hidden="true"
+                      className="w-3.5 h-3.5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                  </button>
+                )}
               </li>
             ))}
           </ul>

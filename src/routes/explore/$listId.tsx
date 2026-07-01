@@ -253,7 +253,12 @@ function ExploreDetailPage() {
         </div>
 
         {showChallengers && challengers.length > 0 && (
-          <ParticipantsPanel challengers={challengers} collaborators={[]} />
+          <ParticipantsPanel
+            listId={listId}
+            isOwner={false}
+            challengers={challengers}
+            collaborators={[]}
+          />
         )}
 
         {(() => {

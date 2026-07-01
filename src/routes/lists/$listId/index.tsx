@@ -554,6 +554,8 @@ function ListDetailPage() {
 
                 {!listLoading && isOwner && participantsPanelOpen && (
                   <ParticipantsPanel
+                    listId={list?.id ?? listId}
+                    isOwner={isOwner}
                     challengers={challengers}
                     collaborators={collaborators}
                   />
