@@ -26,8 +26,6 @@ import { z } from "zod";
 import { db } from "../src/db/client.js";
 import { accounts, sessions, users } from "../src/db/schema/auth.schema.js";
 import {
-  type AchievementType,
-  achievements,
   collectionLists,
   collections,
   deviceTokens,
@@ -49,7 +47,6 @@ import {
 import { ADULT_CATEGORIES, LIST_CATEGORIES } from "../src/lib/categories.js";
 import { plainItemText } from "../src/lib/item-text.js";
 import { cleanName, slugify } from "../src/lib/slug.js";
-import { levelFromMetrics } from "../src/lib/xp.js";
 import {
   getAppleAudiences,
   getGoogleMobileAudiences,
@@ -487,24 +484,6 @@ async function getParticipation(sourceListId: string, userId: string) {
   });
 }
 
-function computeDayStreak(days: string[], now: Date): number {
-  if (days.length === 0) return 0;
-  const DAY_MS = 86_400_000;
-  const toNum = (s: string) =>
-    Math.floor(Date.parse(`${s}T00:00:00Z`) / DAY_MS);
-  const todayNum = Math.floor(
-    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()) / DAY_MS
-  );
-  const nums = [...new Set(days.map(toNum))].sort((a, b) => b - a);
-  if (nums[0] < todayNum - 1) return 0;
-  let streak = 1;
-  for (let i = 1; i < nums.length; i++) {
-    if (nums[i - 1] - nums[i] === 1) streak += 1;
-    else break;
-  }
-  return streak;
-}
-
 type NotificationType =
   | "challenge_accepted"
   | "challenge_completed"
@@ -789,7 +768,6 @@ app.post(
         .values({ name, slug: null, ownerId })
         .returning();
     }
-    await checkAchievements(ownerId);
     return c.json(list, 201);
   }
 );
@@ -995,7 +973,6 @@ app.patch(
         .returning();
       if (!updated) return c.json({ error: "Not found" }, 404);
       if (body.public === true && !list.public) {
-        await checkAchievements(list.ownerId);
       }
       notifyListChange(list.id).catch(() => {});
       return c.json(updated);
@@ -1085,7 +1062,6 @@ app.post(
     if (list.public && list.collaborative && userId) {
       await logActivity(list.id, userId, "item_added", item.id, null, { text });
     }
-    await checkAchievements(list.ownerId);
     notifyListChange(list.id).catch(() => {});
     return c.json(item, 201);
   }
@@ -1238,7 +1214,6 @@ app.patch("/lists/:listId/items/:itemId/toggle", async (c) => {
           )
         );
       await logActivity(list.id, userId, "challenge_completed");
-      await checkAchievements(userId);
       if (list.ownerId) {
         const [actor, listMeta] = await Promise.all([
           db.query.users.findFirst({
@@ -1688,11 +1663,10 @@ app.get("/users", async (c) => {
     challengerCounts,
     completedCounts,
     collaboratorCounts,
-    achievementCounts,
     followerCounts,
   ] =
     userIds.length === 0
-      ? [[], [], [], [], [], []]
+      ? [[], [], [], [], []]
       : await Promise.all([
           db
             .select({ ownerId: lists.ownerId, count: countDistinct(lists.id) })
@@ -1741,14 +1715,6 @@ app.get("/users", async (c) => {
             .groupBy(participations.userId),
           db
             .select({
-              userId: achievements.userId,
-              count: countDistinct(achievements.id),
-            })
-            .from(achievements)
-            .where(inArray(achievements.userId, userIds))
-            .groupBy(achievements.userId),
-          db
-            .select({
               followingId: follows.followingId,
               count: countDistinct(follows.id),
             })
@@ -1766,9 +1732,6 @@ app.get("/users", async (c) => {
   );
   const collaboratorCountMap = new Map(
     collaboratorCounts.map((r) => [r.userId, r.count])
-  );
-  const achievementCountMap = new Map(
-    achievementCounts.map((r) => [r.userId, r.count])
   );
   const followerCountMap = new Map(
     followerCounts.map((r) => [r.followingId, r.count])
@@ -1798,8 +1761,6 @@ app.get("/users", async (c) => {
       challengerCount: challengerCountMap.get(u.id) ?? 0,
       completedChallengesCount: completedCountMap.get(u.id) ?? 0,
       collaboratorCount: collaboratorCountMap.get(u.id) ?? 0,
-      achievementsUnlocked: achievementCountMap.get(u.id) ?? 0,
-      achievementsTotal: ACHIEVEMENT_CATALOG.length,
       followerCount: followerCountMap.get(u.id) ?? 0,
       isFollowing: followingSet.has(u.id),
     })),
@@ -2074,25 +2035,6 @@ app.delete("/me", async (c) => {
   return c.json({ ok: true });
 });
 
-app.get("/me/streak", async (c) => {
-  const authUser = getOptionalUser(c);
-  const userId = authUser?.session?.user?.id;
-  if (!userId) return c.json({ error: "Unauthorized" }, 401);
-  const dayExpr = sql<string>`to_char(${itemProgress.updatedAt}, 'YYYY-MM-DD')`;
-  const rows = await db
-    .select({ day: dayExpr })
-    .from(itemProgress)
-    .where(and(eq(itemProgress.userId, userId), eq(itemProgress.done, true)))
-    .groupBy(dayExpr)
-    .orderBy(desc(dayExpr));
-  return c.json({
-    current: computeDayStreak(
-      rows.map((r) => r.day),
-      new Date()
-    ),
-  });
-});
-
 app.get("/users/:userId/profile", async (c) => {
   const userId = c.req.param("userId");
 
@@ -2138,144 +2080,13 @@ app.get("/users/:userId/profile", async (c) => {
     .orderBy(desc(participations.completedAt))
     .limit(20);
 
-  const [metrics, achievementsUnlocked] = await Promise.all([
-    computeAchievementMetrics(userId),
-    db.$count(achievements, eq(achievements.userId, userId)),
-  ]);
-  const level = levelFromMetrics({ ...metrics, achievementsUnlocked });
-
   return c.json({
     id: user.id,
     name: user.name,
     image: user.image,
     publicLists,
     completedChallenges,
-    level,
   });
-});
-
-async function checkAchievements(userId: string | null | undefined) {
-  if (!userId) return;
-  const metrics = await computeAchievementMetrics(userId);
-  const toUnlock = ACHIEVEMENT_CATALOG.filter(
-    (entry) => metrics[entry.metric] >= entry.target
-  ).map((entry) => ({ userId, type: entry.type }));
-  if (toUnlock.length === 0) return;
-  await db
-    .insert(achievements)
-    .values(toUnlock)
-    .onConflictDoNothing({
-      target: [achievements.userId, achievements.type],
-    });
-}
-
-type AchievementMetric =
-  | "listsOwned"
-  | "itemsInOwned"
-  | "publicListsOwned"
-  | "participations"
-  | "participationsCompleted"
-  | "followers"
-  | "sales";
-
-const ACHIEVEMENT_CATALOG: {
-  type: AchievementType;
-  target: number;
-  metric: AchievementMetric;
-}[] = [
-  { type: "first_list_created", target: 1, metric: "listsOwned" },
-  { type: "five_lists_created", target: 5, metric: "listsOwned" },
-  { type: "first_item_added", target: 1, metric: "itemsInOwned" },
-  { type: "hundred_items_created", target: 100, metric: "itemsInOwned" },
-  { type: "first_public_list", target: 1, metric: "publicListsOwned" },
-  { type: "first_list_accepted", target: 1, metric: "participations" },
-  { type: "ten_lists_accepted", target: 10, metric: "participations" },
-  {
-    type: "first_list_completed",
-    target: 1,
-    metric: "participationsCompleted",
-  },
-  {
-    type: "five_lists_completed",
-    target: 5,
-    metric: "participationsCompleted",
-  },
-  {
-    type: "ten_lists_completed",
-    target: 10,
-    metric: "participationsCompleted",
-  },
-  { type: "first_follower", target: 1, metric: "followers" },
-  { type: "ten_followers", target: 10, metric: "followers" },
-  { type: "first_sale", target: 1, metric: "sales" },
-];
-
-async function computeAchievementMetrics(
-  userId: string
-): Promise<Record<AchievementMetric, number>> {
-  const ownedListIds = db
-    .select({ id: lists.id })
-    .from(lists)
-    .where(eq(lists.ownerId, userId));
-  const [
-    listsOwned,
-    itemsInOwned,
-    publicListsOwned,
-    participationsCount,
-    participationsCompleted,
-    followers,
-    sales,
-  ] = await Promise.all([
-    db.$count(lists, eq(lists.ownerId, userId)),
-    db.$count(items, inArray(items.listId, ownedListIds)),
-    db.$count(lists, and(eq(lists.ownerId, userId), eq(lists.public, true))),
-    db.$count(participations, eq(participations.userId, userId)),
-    db.$count(
-      participations,
-      and(
-        eq(participations.userId, userId),
-        isNotNull(participations.completedAt)
-      )
-    ),
-    db.$count(follows, eq(follows.followingId, userId)),
-    db.$count(listPurchases, inArray(listPurchases.listId, ownedListIds)),
-  ]);
-  return {
-    listsOwned,
-    itemsInOwned,
-    publicListsOwned,
-    participations: participationsCount,
-    participationsCompleted,
-    followers,
-    sales,
-  };
-}
-
-app.get("/users/:userId/achievements", async (c) => {
-  const userId = c.req.param("userId");
-  const [metrics, unlockedRows] = await Promise.all([
-    computeAchievementMetrics(userId),
-    db
-      .select({
-        type: achievements.type,
-        unlockedAt: achievements.unlockedAt,
-      })
-      .from(achievements)
-      .where(eq(achievements.userId, userId)),
-  ]);
-  const unlockedMap = new Map(
-    unlockedRows.map((r) => [r.type, r.unlockedAt as Date | string])
-  );
-  const result = ACHIEVEMENT_CATALOG.map((entry) => {
-    const raw = metrics[entry.metric];
-    return {
-      type: entry.type,
-      target: entry.target,
-      progress: Math.min(raw, entry.target),
-      unlockedAt: unlockedMap.get(entry.type) ?? null,
-    };
-  });
-  return c.json({ achievements: result });
 });
 
 app.post("/users/:userId/follow", async (c) => {
@@ -2317,7 +2128,6 @@ app.post("/users/:userId/follow", async (c) => {
       actionUrl: `/u/${followerId}`,
     });
   }
-  await checkAchievements(followingId);
   return c.json({ following: true });
 });
 
@@ -2428,107 +2238,6 @@ function buildNudgeEmail(args: {
 </body></html>`;
   return { subject, html, text };
 }
-
-function buildStreakAtRiskEmail(args: {
-  streak: number;
-  homeLink: string;
-  unsubscribeUrl: string;
-}): { subject: string; html: string; text: string } {
-  const subject = `welist · Tu racha de ${args.streak} días está en riesgo`;
-  const text = [
-    "Hola,",
-    "",
-    `Llevas ${args.streak} días seguidos completando ítems.`,
-    "Marca uno hoy para no perder la racha.",
-    "",
-    `Abrir welist: ${args.homeLink}`,
-    "",
-    `Darte de baja: ${args.unsubscribeUrl}`,
-  ].join("\n");
-  const html = `<!doctype html><html lang="es"><body style="margin:0;padding:0;background:#fbfbfd;color:#1d1d1f;font-family:system-ui,-apple-system,sans-serif">
-<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#fbfbfd">
-  <tr><td align="center" style="padding:40px 16px">
-    <table role="presentation" width="480" cellspacing="0" cellpadding="0" style="max-width:480px;background:#fff;border:1px solid #ebe9e4;border-radius:16px">
-      <tr><td style="padding:32px">
-        <p style="margin:0 0 4px;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#86868b">welist</p>
-        <h1 style="margin:0 0 16px;font-size:18px;font-weight:600;letter-spacing:-0.01em">Tu racha está en riesgo</h1>
-        <p style="margin:0 0 8px;font-size:32px;font-weight:700;letter-spacing:-0.02em;color:#1d1d1f">${args.streak} días</p>
-        <p style="margin:0 0 24px;font-size:14px;line-height:1.5;color:#5a5a55">Marca un ítem hoy para no perderla.</p>
-        <a href="${args.homeLink}" style="display:inline-block;background:#1d1d1f;color:#fbfbfd;padding:10px 16px;border-radius:10px;text-decoration:none;font-size:13px;font-weight:600">Abrir welist →</a>
-      </td></tr>
-      <tr><td style="padding:0 32px 24px;border-top:1px solid #ebe9e4">
-        <p style="margin:16px 0 0;font-size:11px;color:#86868b">¿Demasiados emails? <a href="${args.unsubscribeUrl}" style="color:#86868b;text-decoration:underline">Darte de baja</a>.</p>
-      </td></tr>
-    </table>
-  </td></tr>
-</table>
-</body></html>`;
-  return { subject, html, text };
-}
-
-app.get("/cron/streak-at-risk", async (c) => {
-  const auth = c.req.header("Authorization") ?? "";
-  const cronSecret = process.env.CRON_SECRET ?? "";
-  if (!cronSecret || auth !== `Bearer ${cronSecret}`)
-    return c.json({ error: "Unauthorized" }, 401);
-
-  const eligible = await db
-    .select({ id: users.id, email: users.email, name: users.name })
-    .from(users)
-    .innerJoin(itemProgress, eq(itemProgress.userId, users.id))
-    .where(
-      and(
-        eq(users.emailOptIn, true),
-        isNotNull(users.email),
-        eq(itemProgress.done, true)
-      )
-    )
-    .groupBy(users.id, users.email, users.name)
-    .having(
-      sql`to_char(max(${itemProgress.updatedAt}) at time zone 'UTC', 'YYYY-MM-DD') = to_char((now() at time zone 'UTC') - interval '1 day', 'YYYY-MM-DD')`
-    );
-
-  const authSecret = process.env.AUTH_SECRET ?? "";
-  const appUrl = process.env.APP_URL ?? "https://www.welist.io";
-  const now = new Date();
-  let sent = 0;
-  for (const u of eligible) {
-    if (!u.email) continue;
-    const dayExpr = sql<string>`to_char(${itemProgress.updatedAt}, 'YYYY-MM-DD')`;
-    const dayRows = await db
-      .select({ day: dayExpr })
-      .from(itemProgress)
-      .where(and(eq(itemProgress.userId, u.id), eq(itemProgress.done, true)))
-      .groupBy(dayExpr)
-      .orderBy(desc(dayExpr));
-    const streak = computeDayStreak(
-      dayRows.map((r) => r.day),
-      now
-    );
-    if (streak < 2) continue;
-    const token = await signUnsubscribeToken(u.id, authSecret);
-    const unsubscribeUrl = `${appUrl}/api/unsubscribe?token=${encodeURIComponent(token)}`;
-    const homeLink = `${appUrl}/`;
-    const email = buildStreakAtRiskEmail({
-      streak,
-      homeLink,
-      unsubscribeUrl,
-    });
-    try {
-      await sendEmail({
-        to: u.email,
-        subject: email.subject,
-        html: email.html,
-        text: email.text,
-        listUnsubscribeUrl: unsubscribeUrl,
-      });
-      sent += 1;
-    } catch {
-      /* skip this user, continue */
-    }
-  }
-  return c.json({ sent });
-});
 
 const RECAP_TYPES = [
   "challenge_accepted",
@@ -2819,9 +2528,6 @@ app.post("/lists/:listId/fork", async (c) => {
       }))
     );
   }
-
-  await checkAchievements(userId);
-
   if (source.ownerId && source.ownerId !== userId) {
     const actor = await db.query.users.findFirst({
       where: eq(users.id, userId),
@@ -2891,9 +2597,6 @@ app.post("/lists/:listId/accept", async (c) => {
     role: "challenger",
   });
   await logActivity(source.id, userId, "challenge_accepted");
-
-  await checkAchievements(userId);
-
   if (source.ownerId) {
     const actor = await db.query.users.findFirst({
       where: eq(users.id, userId),
@@ -3794,7 +3497,6 @@ app.post("/stripe/webhook", async (c) => {
           actionUrl: `/lists/${listId}`,
         });
       }
-      await checkAchievements(soldList?.ownerId);
     }
   }
 

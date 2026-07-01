@@ -284,40 +284,6 @@ export const webPushSubscriptions = pgTable(
   (t) => [index("web_push_subscriptions_user_idx").on(t.userId)]
 );
 
-export const achievementTypeEnum = pgEnum("achievement_type", [
-  "first_list_created",
-  "five_lists_created",
-  "first_item_added",
-  "hundred_items_created",
-  "first_list_accepted",
-  "ten_lists_accepted",
-  "first_list_completed",
-  "five_lists_completed",
-  "ten_lists_completed",
-  "first_public_list",
-  "first_follower",
-  "ten_followers",
-  "first_sale",
-]);
-
-export const achievements = pgTable(
-  "achievements",
-  {
-    id: uuid("id").defaultRandom().primaryKey(),
-    userId: text("user_id")
-      .notNull()
-      .references(() => users.id, { onDelete: "cascade" }),
-    type: achievementTypeEnum("type").notNull(),
-    unlockedAt: timestamp("unlocked_at", { withTimezone: true })
-      .defaultNow()
-      .notNull(),
-  },
-  (t) => [
-    unique("achievements_user_type_uidx").on(t.userId, t.type),
-    index("achievements_user_idx").on(t.userId),
-  ]
-);
-
 export const events = pgTable(
   "events",
   {
@@ -458,5 +424,3 @@ export type Notification = typeof notifications.$inferSelect;
 export type DeviceToken = typeof deviceTokens.$inferSelect;
 export type DevicePlatform = DeviceToken["platform"];
 export type Event = typeof events.$inferSelect;
-export type Achievement = typeof achievements.$inferSelect;
-export type AchievementType = Achievement["type"];

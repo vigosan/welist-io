@@ -10,7 +10,6 @@ import {
   useTogglePublic,
   useUpdateDescription,
   useUpdateName,
-  useUserAchievements,
 } from "./useList";
 
 vi.mock("@/services/lists.service", () => ({
@@ -21,9 +20,6 @@ vi.mock("@/services/lists.service", () => ({
     fork: vi.fn(),
     explore: vi.fn(),
     accept: vi.fn(),
-  },
-  usersService: {
-    getAchievements: vi.fn(),
   },
 }));
 
@@ -40,7 +36,7 @@ vi.mock("@tanstack/react-router", async (importOriginal) => {
   };
 });
 
-import { listsService, usersService } from "@/services/lists.service";
+import { listsService } from "@/services/lists.service";
 
 const LIST: ListWithParticipation = {
   id: "list-1",
@@ -215,31 +211,6 @@ describe("useTogglePublic", () => {
     await waitFor(() => expect(result.current.isError).toBe(true));
     const cached = qc.getQueryData<List>(["list", LIST.id]);
     expect(cached?.public).toBe(false);
-  });
-});
-
-describe("useUserAchievements", () => {
-  it("returns the achievements array for a user", async () => {
-    const payload = [
-      {
-        type: "ten_lists_accepted" as const,
-        target: 10,
-        progress: 10,
-        unlockedAt: "2026-05-20T00:00:00Z",
-      },
-    ];
-    vi.mocked(usersService.getAchievements).mockResolvedValue({
-      achievements: payload,
-    });
-    const { Wrapper } = makeWrapper();
-
-    const { result } = renderHook(() => useUserAchievements("u1"), {
-      wrapper: Wrapper,
-    });
-    await waitFor(() => expect(result.current.isSuccess).toBe(true));
-
-    expect(usersService.getAchievements).toHaveBeenCalledWith("u1");
-    expect(result.current.data).toEqual(payload);
   });
 });
 

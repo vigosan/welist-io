@@ -17,7 +17,7 @@ vi.mock("@hono/auth-js/react", () => ({
 }));
 
 import { signIn, useSession } from "@hono/auth-js/react";
-import { useMyLists, useSignup, useStreak } from "@/hooks/useList";
+import { useMyLists, useSignup } from "@/hooks/useList";
 
 function renderLogin() {
   const qc = new QueryClient({
@@ -59,7 +59,6 @@ beforeEach(() => {
     hasNextPage: false,
     fetchNextPage: vi.fn(),
   } as never);
-  vi.mocked(useStreak).mockReturnValue({ data: undefined } as never);
   vi.mocked(signIn).mockResolvedValue({ error: null, ok: true } as never);
   mutateAsync.mockResolvedValue({ ok: true });
 });

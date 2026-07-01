@@ -21,7 +21,6 @@ export const queryKeys = {
     ["list-active-participants", listId] as const,
   stripeAccountStatus: () => ["stripe-account-status"] as const,
   userProfile: (userId: string) => ["user-profile", userId] as const,
-  userAchievements: (userId: string) => ["user-achievements", userId] as const,
   userDirectory: (q?: string) => ["user-directory", q ?? ""] as const,
   userDirectoryAll: () => ["user-directory"] as const,
   userSearch: (q: string) => ["user-search", q] as const,
@@ -36,5 +35,4 @@ export const queryKeys = {
   duel: (listId: string, opponentId: string) =>
     ["duel", listId, opponentId] as const,
   stats: () => ["stats"] as const,
-  streak: () => ["streak"] as const,
 };

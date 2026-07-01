@@ -75,7 +75,6 @@ const { app } = await import("./app.js");
 const { sendEmail: mockSendEmail } = await import("./email.js");
 const { sendExpoPush: mockSendExpoPush } = await import("./push.js");
 const {
-  achievements,
   collectionLists,
   collections,
   deviceTokens,
@@ -2280,7 +2279,7 @@ describe("GET /api/users", () => {
     expect(Array.isArray(body.users)).toBe(true);
   });
 
-  it("includes achievementsUnlocked, achievementsTotal and followerCount per user", async () => {
+  it("includes followerCount per user", async () => {
     const usersChain = {
       from: vi.fn().mockReturnThis(),
       where: vi.fn().mockReturnThis(),
@@ -2294,11 +2293,6 @@ describe("GET /api/users", () => {
       where: vi.fn().mockReturnThis(),
       groupBy: vi.fn().mockResolvedValue([]),
     };
-    const achievementsChain = {
-      from: vi.fn().mockReturnThis(),
-      where: vi.fn().mockReturnThis(),
-      groupBy: vi.fn().mockResolvedValue([{ userId: "u1", count: 4 }]),
-    };
     const followersChain = {
       from: vi.fn().mockReturnThis(),
       where: vi.fn().mockReturnThis(),
@@ -2310,20 +2304,15 @@ describe("GET /api/users", () => {
       .mockReturnValueOnce(emptyChain) // challengerCounts
       .mockReturnValueOnce(emptyChain) // completedCounts
       .mockReturnValueOnce(emptyChain) // collaboratorCounts
-      .mockReturnValueOnce(achievementsChain)
       .mockReturnValueOnce(followersChain);
 
     const res = await app.request("/api/users");
     const body = (await res.json()) as {
       users: {
         id: string;
-        achievementsUnlocked: number;
-        achievementsTotal: number;
         followerCount: number;
       }[];
     };
-    expect(body.users[0].achievementsUnlocked).toBe(4);
-    expect(body.users[0].achievementsTotal).toBeGreaterThan(0);
     expect(body.users[0].followerCount).toBe(7);
   });
 
@@ -2402,7 +2391,6 @@ describe("GET /api/users", () => {
       .mockReturnValueOnce(emptyChain) // challengerCounts
       .mockReturnValueOnce(emptyChain) // completedCounts
       .mockReturnValueOnce(emptyChain) // collaboratorCounts
-      .mockReturnValueOnce(emptyChain) // achievementCounts
       .mockReturnValueOnce(emptyChain) // followerCounts
       .mockReturnValueOnce(followsChain); // viewer follows
 
@@ -2415,58 +2403,6 @@ describe("GET /api/users", () => {
     );
     expect(map.u1).toBe(true);
     expect(map.u2).toBe(false);
-  });
-});
-
-describe("GET /api/users/:userId/profile (level)", () => {
-  beforeEach(() => vi.clearAllMocks());
-  afterEach(() => mockDb.$count.mockReset());
-
-  function selectChain(rows: unknown[]) {
-    return {
-      from: vi.fn().mockReturnThis(),
-      innerJoin: vi.fn().mockReturnThis(),
-      where: vi.fn().mockReturnThis(),
-      orderBy: vi.fn().mockReturnThis(),
-      limit: vi.fn().mockResolvedValue(rows),
-    };
-  }
-
-  it("returns 404 for an unknown user", async () => {
-    mockDb.query.users.findFirst.mockResolvedValue(undefined);
-    const res = await app.request("/api/users/ghost/profile");
-    expect(res.status).toBe(404);
-  });
-
-  it("includes a level object derived from the user's metrics", async () => {
-    mockDb.query.users.findFirst.mockResolvedValue({
-      id: "u1",
-      name: "Ana",
-      image: null,
-    });
-    // publicLists chain, completedChallenges chain, ownedListIds subquery chain
-    mockDb.select
-      .mockReturnValueOnce(selectChain([]))
-      .mockReturnValueOnce(selectChain([]))
-      .mockReturnValue(selectChain([]));
-    mockDb.$count.mockResolvedValue(2);
-
-    const res = await app.request("/api/users/u1/profile");
-    expect(res.status).toBe(200);
-    const body = (await res.json()) as {
-      level: {
-        xp: number;
-        level: number;
-        xpIntoLevel: number;
-        xpForNextLevel: number;
-        progress: number;
-      };
-    };
-    expect(body.level).toBeDefined();
-    expect(body.level.level).toBeGreaterThanOrEqual(1);
-    expect(body.level.xp).toBeGreaterThan(0);
-    expect(body.level.progress).toBeGreaterThanOrEqual(0);
-    expect(body.level.progress).toBeLessThanOrEqual(1);
   });
 });
 
@@ -3062,70 +2998,6 @@ describe("PATCH /api/users/me/settings", () => {
   });
 });
 
-describe("GET /api/me/streak", () => {
-  const chainMock = (rows: unknown[]) => ({
-    from: vi.fn().mockReturnThis(),
-    where: vi.fn().mockReturnThis(),
-    groupBy: vi.fn().mockReturnThis(),
-    orderBy: vi.fn().mockResolvedValue(rows),
-  });
-
-  beforeEach(() => {
-    vi.clearAllMocks();
-    vi.useFakeTimers();
-    vi.setSystemTime(new Date("2026-05-19T12:00:00Z"));
-  });
-
-  afterEach(() => vi.useRealTimers());
-
-  it("returns 401 when there is no session", async () => {
-    mockGetAuthUser.mockRejectedValue(new Error("no session"));
-    const res = await app.request("/api/me/streak");
-    expect(res.status).toBe(401);
-  });
-
-  it("counts consecutive days ending today", async () => {
-    mockGetAuthUser.mockResolvedValue({ session: { user: { id: "u1" } } });
-    mockDb.select.mockReturnValue(
-      chainMock([
-        { day: "2026-05-19" },
-        { day: "2026-05-18" },
-        { day: "2026-05-17" },
-      ])
-    );
-
-    const res = await app.request("/api/me/streak");
-    expect(res.status).toBe(200);
-    expect(await res.json()).toEqual({ current: 3 });
-  });
-
-  it("keeps the streak alive when the latest activity was yesterday", async () => {
-    mockGetAuthUser.mockResolvedValue({ session: { user: { id: "u1" } } });
-    mockDb.select.mockReturnValue(
-      chainMock([{ day: "2026-05-18" }, { day: "2026-05-17" }])
-    );
-
-    const res = await app.request("/api/me/streak");
-    expect(await res.json()).toEqual({ current: 2 });
-  });
-
-  it("returns 0 when the latest activity is older than yesterday", async () => {
-    mockGetAuthUser.mockResolvedValue({ session: { user: { id: "u1" } } });
-    mockDb.select.mockReturnValue(chainMock([{ day: "2026-05-15" }]));
-
-    const res = await app.request("/api/me/streak");
-    expect(await res.json()).toEqual({ current: 0 });
-  });
-
-  it("returns 0 when there is no progress", async () => {
-    mockGetAuthUser.mockResolvedValue({ session: { user: { id: "u1" } } });
-    mockDb.select.mockReturnValue(chainMock([]));
-
-    const res = await app.request("/api/me/streak");
-    expect(await res.json()).toEqual({ current: 0 });
-  });
-});
-
 describe("follow endpoints", () => {
   beforeEach(() => vi.clearAllMocks());
 
@@ -3419,223 +3291,6 @@ describe("GET /api/cron/random-item-nudge", () => {
     expect(res.status).toBe(200);
     expect(await res.json()).toEqual({ sent: 0 });
     expect(mockSendEmail).not.toHaveBeenCalled();
-  });
-});
-
-describe("achievement triggers", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    mockGetAuthUser.mockResolvedValue({ session: { user: { id: "u1" } } });
-    mockDb.insert.mockReturnValue(chainableInsert());
-    mockDb.update.mockReturnValue({
-      set: vi.fn().mockReturnValue({
-        where: vi.fn().mockResolvedValue(undefined),
-      }),
-    });
-  });
-
-  it("does not insert achievements when no thresholds are met", async () => {
-    mockDb.$count.mockResolvedValue(0);
-    mockDb.query.lists.findFirst.mockResolvedValue({
-      id: "src",
-      public: true,
-      ownerId: null,
-      name: "L",
-    });
-    mockDb.query.participations.findFirst.mockResolvedValue(null);
-
-    await app.request("/api/lists/src/accept", { method: "POST" });
-
-    expect(mockDb.insert).not.toHaveBeenCalledWith(achievements);
-  });
-
-  it("inserts achievements after accepting a challenge", async () => {
-    mockDb.$count.mockResolvedValue(100);
-    mockDb.query.lists.findFirst.mockResolvedValue({
-      id: "src",
-      public: true,
-      ownerId: null,
-      name: "L",
-    });
-    mockDb.query.participations.findFirst.mockResolvedValue(null);
-
-    await app.request("/api/lists/src/accept", { method: "POST" });
-
-    expect(mockDb.insert).toHaveBeenCalledWith(achievements);
-  });
-
-  it("inserts achievements after creating a list", async () => {
-    mockDb.$count.mockResolvedValue(100);
-    mockDb.insert.mockReturnValueOnce({
-      values: vi.fn().mockReturnValue({
-        returning: vi.fn().mockResolvedValue([{ id: "L1", ownerId: "u1" }]),
-      }),
-    });
-
-    await app.request("/api/lists", {
-      method: "POST",
-      body: JSON.stringify({ name: "X" }),
-      headers: { "Content-Type": "application/json" },
-    });
-
-    expect(mockDb.insert).toHaveBeenCalledWith(achievements);
-  });
-
-  it("inserts achievements after adding an item", async () => {
-    mockDb.$count.mockResolvedValue(100);
-    mockDb.query.lists.findFirst.mockResolvedValue({
-      id: "abc",
-      ownerId: "u1",
-      collaborative: false,
-      public: false,
-    });
-    mockDb.select.mockReturnValue({
-      from: vi.fn().mockReturnThis(),
-      where: vi.fn().mockResolvedValue([{ pos: 0 }]),
-    });
-    mockDb.insert.mockReturnValueOnce({
-      values: vi.fn().mockReturnValue({
-        returning: vi.fn().mockResolvedValue([{ id: "i1" }]),
-      }),
-    });
-
-    await app.request("/api/lists/abc/items", {
-      method: "POST",
-      body: JSON.stringify({ text: "hola" }),
-      headers: { "Content-Type": "application/json" },
-    });
-
-    expect(mockDb.insert).toHaveBeenCalledWith(achievements);
-  });
-
-  it("inserts achievements after following a user (for the followed user)", async () => {
-    mockDb.$count.mockResolvedValue(100);
-    mockDb.query.users.findFirst.mockResolvedValue({ id: "u2" });
-
-    await app.request("/api/users/u2/follow", { method: "POST" });
-
-    expect(mockDb.insert).toHaveBeenCalledWith(achievements);
-  });
-
-  it("inserts achievements after making a list public", async () => {
-    mockDb.$count.mockResolvedValue(100);
-    mockDb.query.lists.findFirst.mockResolvedValue({
-      id: "abc",
-      ownerId: "u1",
-      public: false,
-    });
-    mockDb.update.mockReturnValue({
-      set: vi.fn().mockReturnValue({
-        where: vi.fn().mockReturnValue({
-          returning: vi.fn().mockResolvedValue([{ id: "abc", public: true }]),
-        }),
-      }),
-    });
-
-    await app.request("/api/lists/abc", {
-      method: "PATCH",
-      body: JSON.stringify({ public: true }),
-      headers: { "Content-Type": "application/json" },
-    });
-
-    expect(mockDb.insert).toHaveBeenCalledWith(achievements);
-  });
-
-  it("inserts achievements when a challenger toggles the last item done", async () => {
-    mockDb.$count.mockResolvedValue(100);
-    const item = { id: "i1", listId: "abc", text: "Tarea", done: false };
-    mockDb.query.lists.findFirst.mockResolvedValue({
-      id: "abc",
-      ownerId: "owner",
-      collaborative: false,
-      public: true,
-    });
-    mockDb.query.items.findFirst.mockResolvedValue(item);
-    mockDb.query.participations.findFirst.mockResolvedValue({
-      id: "p1",
-      completedAt: null,
-      role: "challenger",
-    });
-    mockDb.query.itemProgress.findFirst.mockResolvedValue(null);
-    mockDb.query.items.findMany.mockResolvedValue([item]);
-    mockDb.query.itemProgress.findMany.mockResolvedValue([{ done: true }]);
-    mockDb.query.users.findFirst.mockResolvedValue({
-      name: "Alice",
-      image: null,
-    });
-
-    await app.request("/api/lists/abc/items/i1/toggle", { method: "PATCH" });
-
-    expect(mockDb.insert).toHaveBeenCalledWith(achievements);
-  });
-});
-
-describe("GET /api/users/:userId/achievements", () => {
-  beforeEach(() => vi.clearAllMocks());
-
-  it("returns the full catalog with progress and unlocked state for each badge", async () => {
-    mockDb.$count.mockResolvedValue(0);
-    mockDb.select.mockReturnValue({
-      from: vi.fn().mockReturnThis(),
-      where: vi.fn().mockResolvedValue([]),
-    });
-
-    const res = await app.request("/api/users/u1/achievements");
-    expect(res.status).toBe(200);
-    const body = (await res.json()) as {
-      achievements: {
-        type: string;
-        target: number;
-        progress: number;
-        unlockedAt: string | null;
-      }[];
-    };
-    expect(body.achievements.length).toBeGreaterThanOrEqual(13);
-    const types = body.achievements.map((a) => a.type);
-    expect(types).toContain("first_list_created");
-    expect(types).toContain("ten_lists_accepted");
-    expect(types).toContain("first_sale");
-    for (const a of body.achievements) {
-      expect(a.target).toBeGreaterThan(0);
-      expect(a.progress).toBe(0);
-      expect(a.unlockedAt).toBeNull();
-    }
-  });
-
-  it("marks an achievement as unlocked when it has a row in the achievements table", async () => {
-    mockDb.$count.mockResolvedValue(0);
-    const date = new Date().toISOString();
-    mockDb.select.mockReturnValue({
-      from: vi.fn().mockReturnThis(),
-      where: vi
-        .fn()
-        .mockResolvedValue([{ type: "first_list_created", unlockedAt: date }]),
-    });
-
-    const res = await app.request("/api/users/u1/achievements");
-    const body = (await res.json()) as {
-      achievements: { type: string; unlockedAt: string | null }[];
-    };
-    const unlocked = body.achievements.find(
-      (a) => a.type === "first_list_created"
-    );
-    expect(unlocked?.unlockedAt).toBe(date);
-  });
-
-  it("caps progress at target", async () => {
-    mockDb.$count.mockResolvedValue(50);
-    mockDb.select.mockReturnValue({
-      from: vi.fn().mockReturnThis(),
-      where: vi.fn().mockResolvedValue([]),
-    });
-
-    const res = await app.request("/api/users/u1/achievements");
-    const body = (await res.json()) as {
-      achievements: { type: string; target: number; progress: number }[];
-    };
-    for (const a of body.achievements) {
-      expect(a.progress).toBeLessThanOrEqual(a.target);
-    }
   });
 });
 
@@ -4212,121 +3867,6 @@ describe("POST /api/lists/:listId/checkout on anonymized owner's list", () => {
       headers: { "x-forwarded-for": "10.9.2.1" },
     });
     expect(res.status).toBe(410);
-  });
-});
-
-describe("GET /api/cron/streak-at-risk", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    vi.mocked(mockSendEmail).mockResolvedValue({
-      skipped: false,
-      id: "test-msg",
-    });
-    process.env.CRON_SECRET = "cron-test-secret";
-    process.env.AUTH_SECRET = "auth-test-secret";
-  });
-
-  function utcDay(offsetDays: number): string {
-    const d = new Date();
-    d.setUTCDate(d.getUTCDate() + offsetDays);
-    return d.toISOString().slice(0, 10);
-  }
-
-  it("returns 401 without an Authorization header", async () => {
-    const res = await app.request("/api/cron/streak-at-risk");
-    expect(res.status).toBe(401);
-  });
-
-  it("returns 401 with a wrong secret", async () => {
-    const res = await app.request("/api/cron/streak-at-risk", {
-      headers: { Authorization: "Bearer wrong-secret" },
-    });
-    expect(res.status).toBe(401);
-  });
-
-  it("sends one email per eligible user with streak >= 2", async () => {
-    mockDb.select
-      .mockReturnValueOnce({
-        from: vi.fn().mockReturnThis(),
-        innerJoin: vi.fn().mockReturnThis(),
-        where: vi.fn().mockReturnThis(),
-        groupBy: vi.fn().mockReturnThis(),
-        having: vi
-          .fn()
-          .mockResolvedValue([
-            { id: "u1", email: "u1@example.com", name: "Alice" },
-          ]),
-      })
-      .mockReturnValueOnce({
-        from: vi.fn().mockReturnThis(),
-        where: vi.fn().mockReturnThis(),
-        groupBy: vi.fn().mockReturnThis(),
-        orderBy: vi
-          .fn()
-          .mockResolvedValue([
-            { day: utcDay(-1) },
-            { day: utcDay(-2) },
-            { day: utcDay(-3) },
-          ]),
-      });
-
-    const res = await app.request("/api/cron/streak-at-risk", {
-      headers: { Authorization: "Bearer cron-test-secret" },
-    });
-    expect(res.status).toBe(200);
-    expect(await res.json()).toEqual({ sent: 1 });
-    expect(mockSendEmail).toHaveBeenCalledTimes(1);
-    const args = vi.mocked(mockSendEmail).mock.calls[0][0];
-    expect(args.to).toBe("u1@example.com");
-    expect(args.subject).toMatch(/racha/i);
-    expect(args.subject).toContain("3");
-    expect(args.text).toContain("3");
-    expect(args.listUnsubscribeUrl).toContain("/api/unsubscribe?token=");
-  });
-
-  it("skips users whose streak is only 1 day", async () => {
-    mockDb.select
-      .mockReturnValueOnce({
-        from: vi.fn().mockReturnThis(),
-        innerJoin: vi.fn().mockReturnThis(),
-        where: vi.fn().mockReturnThis(),
-        groupBy: vi.fn().mockReturnThis(),
-        having: vi
-          .fn()
-          .mockResolvedValue([
-            { id: "u1", email: "u1@example.com", name: "Alice" },
-          ]),
-      })
-      .mockReturnValueOnce({
-        from: vi.fn().mockReturnThis(),
-        where: vi.fn().mockReturnThis(),
-        groupBy: vi.fn().mockReturnThis(),
-        orderBy: vi.fn().mockResolvedValue([{ day: utcDay(-1) }]),
-      });
-
-    const res = await app.request("/api/cron/streak-at-risk", {
-      headers: { Authorization: "Bearer cron-test-secret" },
-    });
-    expect(res.status).toBe(200);
-    expect(await res.json()).toEqual({ sent: 0 });
-    expect(mockSendEmail).not.toHaveBeenCalled();
-  });
-
-  it("returns sent: 0 when no users are eligible", async () => {
-    mockDb.select.mockReturnValueOnce({
-      from: vi.fn().mockReturnThis(),
-      innerJoin: vi.fn().mockReturnThis(),
-      where: vi.fn().mockReturnThis(),
-      groupBy: vi.fn().mockReturnThis(),
-      having: vi.fn().mockResolvedValue([]),
-    });
-
-    const res = await app.request("/api/cron/streak-at-risk", {
-      headers: { Authorization: "Bearer cron-test-secret" },
-    });
-    expect(res.status).toBe(200);
-    expect(await res.json()).toEqual({ sent: 0 });
-    expect(mockSendEmail).not.toHaveBeenCalled();
   });
 });
 

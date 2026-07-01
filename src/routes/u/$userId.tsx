@@ -1,10 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppNav } from "@/components/AppNav";
 import { FollowButton } from "@/components/FollowButton";
-import { useUserAchievements, useUserProfile } from "@/hooks/useList";
+import { useUserProfile } from "@/hooks/useList";
 import { useTranslation } from "@/i18n/service";
 import { privateName } from "@/lib/private-name";
-import type { UserAchievement } from "@/services/lists.service";
 
 export const Route = createFileRoute("/u/$userId")({
   component: UserProfilePage,
@@ -13,7 +12,6 @@ export const Route = createFileRoute("/u/$userId")({
 function UserProfilePage() {
   const { userId } = Route.useParams();
   const { data: profile, isLoading } = useUserProfile(userId);
-  const { data: achievements = [] } = useUserAchievements(userId);
   const { t } = useTranslation();
 
   if (isLoading) {
@@ -81,17 +79,9 @@ function UserProfilePage() {
             </div>
           )}
           <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2">
-              <h1 className="text-xl font-bold tracking-tight text-ink dark:text-paper truncate">
-                {profile.name ? privateName(profile.name) : "Anonymous"}
-              </h1>
-              <span
-                data-testid="profile-level-badge"
-                className="shrink-0 rounded-full bg-ink px-2 py-0.5 text-[11px] font-semibold text-canvas dark:bg-paper dark:text-ink"
-              >
-                {t("profile.level", { level: profile.level.level })}
-              </span>
-            </div>
+            <h1 className="text-xl font-bold tracking-tight text-ink dark:text-paper truncate">
+              {profile.name ? privateName(profile.name) : "Anonymous"}
+            </h1>
             <p className="text-sm text-gray-500 dark:text-muted">
               {profile.publicLists.length}{" "}
               {t("profile.publicLists").toLowerCase()} ·{" "}
@@ -101,96 +91,7 @@ function UserProfilePage() {
           </div>
         </div>
 
-        <div data-testid="profile-xp-bar">
-          <div className="h-1.5 w-full overflow-hidden rounded-full bg-black/[0.06] dark:bg-white/[0.08]">
-            <div
-              className="h-full rounded-full bg-ink dark:bg-paper transition-[width] duration-500"
-              style={{ width: `${Math.round(profile.level.progress * 100)}%` }}
-            />
-          </div>
-          <p className="mt-1 font-mono text-[10.5px] tabular-nums text-gray-400 dark:text-muted-dark">
-            {t("profile.xpProgress", {
-              into: profile.level.xpIntoLevel,
-              total: profile.level.xpForNextLevel,
-            })}
-          </p>
-        </div>
-
         <FollowButton userId={userId} />
-
-        <section className="flex flex-col gap-3">
-          <h2 className="text-[11px] font-semibold text-gray-500 dark:text-muted uppercase tracking-wider">
-            {t("profile.achievements")}
-          </h2>
-          {achievements.length === 0 ? (
-            <p className="text-sm text-gray-500 dark:text-muted">
-              {t("profile.noAchievements")}
-            </p>
-          ) : (
-            <ul
-              data-testid="achievements-list"
-              className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1.5"
-            >
-              {achievements.map((a: UserAchievement) => {
-                const unlocked = a.unlockedAt !== null;
-                const pct = Math.round((a.progress / a.target) * 100);
-                return (
-                  <li
-                    key={a.type}
-                    data-testid={`achievement-${a.type}`}
-                    data-unlocked={unlocked ? "true" : "false"}
-                    title={t(`achievements.${a.type}.description`)}
-                    className="flex items-center gap-3 py-1"
-                  >
-                    <span
-                      aria-hidden="true"
-                      className={`text-sm shrink-0 ${
-                        unlocked
-                          ? "text-ink dark:text-paper"
-                          : "text-gray-300 dark:text-[#52524e]"
-                      }`}
-                    >
-                      ★
-                    </span>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-baseline justify-between gap-2">
-                        <span
-                          className={`text-sm truncate ${
-                            unlocked
-                              ? "text-ink dark:text-paper font-medium"
-                              : "text-gray-500 dark:text-muted"
-                          }`}
-                        >
-                          {t(`achievements.${a.type}.title`)}
-                        </span>
-                        <span
-                          data-testid={`achievement-progress-${a.type}`}
-                          className="text-[11px] tabular-nums text-gray-400 dark:text-muted-dark shrink-0"
-                        >
-                          {a.progress} / {a.target}
-                        </span>
-                      </div>
-                      <div
-                        className="mt-1 h-[2px] rounded-full bg-black/[0.06] dark:bg-white/[0.08] overflow-hidden"
-                        aria-hidden="true"
-                      >
-                        <div
-                          className={`h-full ${
-                            unlocked
-                              ? "bg-gray-900 dark:bg-paper"
-                              : "bg-gray-400 dark:bg-muted-dark"
-                          }`}
-                          style={{ width: `${pct}%` }}
-                        />
-                      </div>
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
-          )}
-        </section>
-
         <section className="flex flex-col gap-3">
           <h2 className="text-[11px] font-semibold text-gray-500 dark:text-muted uppercase tracking-wider">
             {t("profile.publicLists")}

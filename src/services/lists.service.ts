@@ -90,13 +90,6 @@ export type UserProfile = {
     slug: string | null;
     completedAt: string | null;
   }>;
-  level: {
-    xp: number;
-    level: number;
-    xpIntoLevel: number;
-    xpForNextLevel: number;
-    progress: number;
-  };
 };
 
 export type AppNotification = {
@@ -210,8 +203,6 @@ export type DirectoryUser = {
   challengerCount: number;
   completedChallengesCount: number;
   collaboratorCount: number;
-  achievementsUnlocked: number;
-  achievementsTotal: number;
   followerCount: number;
   isFollowing: boolean;
 };
@@ -223,28 +214,6 @@ export type AppStats = {
   itemsCompleted: number;
 };
 
-export type AchievementType =
-  | "first_list_created"
-  | "five_lists_created"
-  | "first_item_added"
-  | "hundred_items_created"
-  | "first_public_list"
-  | "first_list_accepted"
-  | "ten_lists_accepted"
-  | "first_list_completed"
-  | "five_lists_completed"
-  | "ten_lists_completed"
-  | "first_follower"
-  | "ten_followers"
-  | "first_sale";
-
-export type UserAchievement = {
-  type: AchievementType;
-  target: number;
-  progress: number;
-  unlockedAt: string | null;
-};
-
 export const statsService = {
   get: () => apiClient<AppStats>("/api/stats"),
 };
@@ -252,11 +221,6 @@ export const statsService = {
 export const usersService = {
   getProfile: (userId: string) =>
     apiClient<UserProfile>(`/api/users/${userId}/profile`),
-
-  getAchievements: (userId: string) =>
-    apiClient<{ achievements: UserAchievement[] }>(
-      `/api/users/${userId}/achievements`
-    ),
 
   directory: (q?: string, cursor?: string) => {
     const params = new URLSearchParams();
@@ -274,8 +238,6 @@ export const usersService = {
       emailOptIn: boolean;
       hasPassword: boolean;
     }>("/api/users/me"),
-
-  getStreak: () => apiClient<{ current: number }>("/api/me/streak"),
 
   followStatus: (userId: string) =>
     apiClient<{

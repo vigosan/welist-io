@@ -3,7 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppNav } from "@/components/AppNav";
 import { Skeleton } from "@/components/Skeleton";
-import { cardHover, Progress } from "@/components/ui";
+import { cardHover } from "@/components/ui";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { useToggleFollow, useUserDirectory } from "@/hooks/useList";
 import { useSearchInput } from "@/hooks/useSearchInput";
@@ -94,9 +94,6 @@ function UserRowSkeleton() {
 function UserRow({ user }: { user: DirectoryUser }) {
   const { t } = useTranslation();
   const summary = buildSummary(user, t);
-  const achievementsPct = Math.round(
-    (user.achievementsUnlocked / Math.max(user.achievementsTotal, 1)) * 100
-  );
 
   return (
     <article
@@ -136,14 +133,6 @@ function UserRow({ user }: { user: DirectoryUser }) {
           <p className="text-[12px] text-gray-400 dark:text-muted-dark italic">
             {t("directory.noActivity")}
           </p>
-        )}
-        {user.achievementsUnlocked > 0 && (
-          <div className="mt-2 flex items-center gap-2">
-            <span className="font-mono text-[10px] uppercase tracking-wider text-gray-400 dark:text-muted-dark shrink-0">
-              ★ {user.achievementsUnlocked} / {user.achievementsTotal}
-            </span>
-            <Progress value={achievementsPct} className="flex-1" />
-          </div>
         )}
       </div>
       <div className="relative">

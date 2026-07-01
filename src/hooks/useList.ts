@@ -477,15 +477,6 @@ export function useUserProfile(userId: string) {
   });
 }
 
-export function useUserAchievements(userId: string) {
-  return useQuery({
-    queryKey: queryKeys.userAchievements(userId),
-    queryFn: async () =>
-      (await usersService.getAchievements(userId)).achievements,
-    staleTime: 60_000,
-  });
-}
-
 export function useUserDirectory(q?: string) {
   return useInfiniteQuery({
     queryKey: queryKeys.userDirectory(q),
@@ -575,14 +566,6 @@ export function useStats() {
     queryKey: queryKeys.stats(),
     queryFn: () => statsService.get(),
     staleTime: 5 * 60_000,
-  });
-}
-
-export function useStreak() {
-  return useQuery({
-    queryKey: queryKeys.streak(),
-    queryFn: () => usersService.getStreak(),
-    staleTime: 60_000,
   });
 }
 

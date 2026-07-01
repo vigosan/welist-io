@@ -17,7 +17,6 @@ import {
   useCreateListFromTemplate,
   useDeleteList,
   useMyLists,
-  useStreak,
 } from "@/hooks/useList";
 import { useSearchInput } from "@/hooks/useSearchInput";
 import { useLanguage, useTranslation } from "@/i18n/service";
@@ -285,7 +284,6 @@ function MyListsPage() {
   const createFromTemplate = useCreateListFromTemplate();
   const { data: session } = useSession();
   const userId = session?.user?.id;
-  const { data: streak } = useStreak();
 
   function handleUseTemplate(templateId: string) {
     const template = getListTemplates(language).find(
@@ -327,14 +325,6 @@ function MyListsPage() {
       <AppNav />
 
       <main className="flex-1 w-full max-w-[760px] mx-auto px-4 sm:px-12 py-10">
-        {streak && streak.current > 0 && (
-          <div
-            data-testid="streak-badge"
-            className="mb-5 inline-flex items-center gap-1.5 rounded-full border border-black/[0.08] dark:border-white/[0.08] px-3 py-1 font-mono text-[11px] tabular-nums text-muted"
-          >
-            {t("myLists.streak", { count: streak.current })}
-          </div>
-        )}
         <div className="mb-7">
           {creating ? (
             <CreateListInline onClose={() => setCreating(false)} />
