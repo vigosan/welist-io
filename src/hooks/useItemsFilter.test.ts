@@ -1,9 +1,9 @@
 import { act, renderHook } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import type { ItemWithLikes } from "@/hooks/useItems";
+import type { ItemView } from "@/hooks/useItems";
 import { useItemsFilter } from "./useItemsFilter";
 
-function makeItem(id: string, text: string, done = false): ItemWithLikes {
+function makeItem(id: string, text: string, done = false): ItemView {
   return {
     id,
     listId: "l1",
@@ -15,9 +15,6 @@ function makeItem(id: string, text: string, done = false): ItemWithLikes {
     placeName: null,
     createdAt: new Date(),
     updatedAt: new Date(),
-    likeCount: 0,
-    likedByMe: false,
-    commentCount: 0,
   };
 }
 
@@ -114,14 +111,9 @@ describe("useItemsFilter", () => {
 
   it("preserves server order when items finish loading", () => {
     const { result, rerender } = renderHook(
-      ({
-        items,
-        itemsLoading,
-      }: {
-        items: ItemWithLikes[];
-        itemsLoading: boolean;
-      }) => useItemsFilter({ ...BASE_OPTS, items, itemsLoading }),
-      { initialProps: { items: [] as ItemWithLikes[], itemsLoading: true } }
+      ({ items, itemsLoading }: { items: ItemView[]; itemsLoading: boolean }) =>
+        useItemsFilter({ ...BASE_OPTS, items, itemsLoading }),
+      { initialProps: { items: [] as ItemView[], itemsLoading: true } }
     );
     rerender({ items: [DONE, PENDING, PLAIN], itemsLoading: false });
     expect(result.current.stableItems.map((i) => i.id)).toEqual([
@@ -133,7 +125,7 @@ describe("useItemsFilter", () => {
 
   it("keeps an item in place after it is toggled done", () => {
     const { result, rerender } = renderHook(
-      ({ items }: { items: ItemWithLikes[] }) =>
+      ({ items }: { items: ItemView[] }) =>
         useItemsFilter({ ...BASE_OPTS, items }),
       { initialProps: { items: [DONE, PENDING, PLAIN] } }
     );
@@ -152,7 +144,7 @@ describe("useItemsFilter", () => {
 
   it("appends items added after the order is established", () => {
     const { result, rerender } = renderHook(
-      ({ items }: { items: ItemWithLikes[] }) =>
+      ({ items }: { items: ItemView[] }) =>
         useItemsFilter({ ...BASE_OPTS, items }),
       { initialProps: { items: [PENDING, DONE] } }
     );

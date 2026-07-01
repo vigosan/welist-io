@@ -6,8 +6,6 @@ const mockDb = {
     items: { findMany: vi.fn(), findFirst: vi.fn() },
     participations: { findFirst: vi.fn(), findMany: vi.fn() },
     itemProgress: { findFirst: vi.fn(), findMany: vi.fn() },
-    itemLikes: { findFirst: vi.fn(), findMany: vi.fn() },
-    itemComments: { findFirst: vi.fn(), findMany: vi.fn() },
     collections: { findFirst: vi.fn(), findMany: vi.fn() },
     collectionLists: { findFirst: vi.fn(), findMany: vi.fn() },
     users: { findFirst: vi.fn() },
@@ -81,7 +79,6 @@ const {
   collectionLists,
   collections,
   deviceTokens,
-  itemComments,
   items,
   lists,
   notifications,
@@ -302,7 +299,6 @@ describe("GET /api/lists/:listId", () => {
 describe("GET /api/lists/:listId/items", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockDb.query.itemComments.findMany.mockResolvedValue([]);
   });
 
   it("returns items ordered by position", async () => {
@@ -329,8 +325,6 @@ describe("GET /api/lists/:listId/items", () => {
       public: true,
     });
     mockDb.query.items.findMany.mockResolvedValue(rows);
-    mockDb.query.itemLikes.findMany.mockResolvedValue([]);
-
     const res = await app.request("/api/lists/abc/items");
     expect(res.status).toBe(200);
     const body = (await res.json()) as Array<Record<string, unknown>>;
@@ -644,213 +638,6 @@ describe("PATCH /api/lists/:listId/items/:itemId/toggle", () => {
       method: "PATCH",
     });
     expect(res.status).toBe(404);
-  });
-});
-
-describe("POST /api/lists/:listId/items/:itemId/like", () => {
-  const headers = { "x-forwarded-for": "10.0.0.99" };
-  beforeEach(() => vi.clearAllMocks());
-  afterEach(() => {
-    mockDb.query.users.findFirst.mockReset();
-    mockDb.$count.mockReset();
-  });
-
-  it("returns 401 when unauthenticated", async () => {
-    mockDb.query.lists.findFirst.mockResolvedValue({
-      id: "abc",
-      ownerId: null,
-      collaborative: false,
-      public: true,
-    });
-    const res = await app.request("/api/lists/abc/items/i1/like", {
-      method: "POST",
-      headers,
-    });
-    expect(res.status).toBe(401);
-  });
-
-  it("creates a like when none exists and returns liked=true with count", async () => {
-    mockGetAuthUser.mockResolvedValueOnce({
-      session: { user: { id: "u1" } },
-    });
-    mockDb.query.lists.findFirst.mockResolvedValue({
-      id: "abc",
-      ownerId: null,
-      collaborative: false,
-      public: true,
-    });
-    mockDb.query.items.findFirst.mockResolvedValue({ id: "i1" });
-    mockDb.query.itemLikes.findFirst.mockResolvedValue(null);
-    mockDb.insert.mockReturnValue(chainableInsert());
-    mockDb.$count.mockResolvedValue(1);
-
-    const res = await app.request("/api/lists/abc/items/i1/like", {
-      method: "POST",
-      headers,
-    });
-    expect(res.status).toBe(200);
-    const body = (await res.json()) as Record<string, unknown>;
-    expect(body.liked).toBe(true);
-    expect(body.likeCount).toBe(1);
-    expect(mockDb.insert).toHaveBeenCalled();
-  });
-
-  it("removes the like when it exists and returns liked=false", async () => {
-    mockGetAuthUser.mockResolvedValueOnce({
-      session: { user: { id: "u1" } },
-    });
-    mockDb.query.lists.findFirst.mockResolvedValue({
-      id: "abc",
-      ownerId: null,
-      collaborative: false,
-      public: true,
-    });
-    mockDb.query.items.findFirst.mockResolvedValue({ id: "i1" });
-    mockDb.query.itemLikes.findFirst.mockResolvedValue({ id: "like-1" });
-    mockDb.delete.mockReturnValue({
-      where: vi.fn().mockResolvedValue(undefined),
-    });
-    mockDb.$count.mockResolvedValue(0);
-
-    const res = await app.request("/api/lists/abc/items/i1/like", {
-      method: "POST",
-      headers,
-    });
-    expect(res.status).toBe(200);
-    const body = (await res.json()) as Record<string, unknown>;
-    expect(body.liked).toBe(false);
-    expect(body.likeCount).toBe(0);
-    expect(mockDb.delete).toHaveBeenCalled();
-  });
-
-  it("returns 404 when the item does not exist", async () => {
-    mockGetAuthUser.mockResolvedValueOnce({
-      session: { user: { id: "u1" } },
-    });
-    mockDb.query.lists.findFirst.mockResolvedValue({
-      id: "abc",
-      ownerId: null,
-      collaborative: false,
-      public: true,
-    });
-    mockDb.query.items.findFirst.mockResolvedValue(null);
-
-    const res = await app.request("/api/lists/abc/items/missing/like", {
-      method: "POST",
-      headers,
-    });
-    expect(res.status).toBe(404);
-  });
-
-  it("notifies the list owner when someone else likes an item", async () => {
-    mockGetAuthUser.mockResolvedValueOnce({
-      session: { user: { id: "liker" } },
-    });
-    mockDb.query.lists.findFirst.mockResolvedValue({
-      id: "abc",
-      name: "Cine",
-      ownerId: "owner",
-      collaborative: false,
-      public: true,
-    });
-    mockDb.query.items.findFirst.mockResolvedValue({ id: "i1" });
-    mockDb.query.itemLikes.findFirst.mockResolvedValue(null);
-    mockDb.query.users.findFirst.mockResolvedValue({
-      id: "owner",
-      name: "Liker",
-      image: null,
-    });
-    mockDb.insert.mockReturnValue(chainableInsert());
-    mockDb.$count.mockResolvedValue(1);
-
-    const res = await app.request("/api/lists/abc/items/i1/like", {
-      method: "POST",
-      headers,
-    });
-    expect(res.status).toBe(200);
-    expect(mockDb.insert).toHaveBeenCalledWith(notifications);
-  });
-
-  it("does not notify when the owner likes their own item", async () => {
-    mockGetAuthUser.mockResolvedValueOnce({
-      session: { user: { id: "owner" } },
-    });
-    mockDb.query.lists.findFirst.mockResolvedValue({
-      id: "abc",
-      name: "Cine",
-      ownerId: "owner",
-      collaborative: false,
-      public: true,
-    });
-    mockDb.query.items.findFirst.mockResolvedValue({ id: "i1" });
-    mockDb.query.itemLikes.findFirst.mockResolvedValue(null);
-    mockDb.insert.mockReturnValue(chainableInsert());
-    mockDb.$count.mockResolvedValue(1);
-
-    const res = await app.request("/api/lists/abc/items/i1/like", {
-      method: "POST",
-      headers,
-    });
-    expect(res.status).toBe(200);
-    expect(mockDb.insert).not.toHaveBeenCalledWith(notifications);
-  });
-});
-
-describe("GET /api/lists/:listId/items (likes overlay)", () => {
-  const headers = { "x-forwarded-for": "10.0.0.100" };
-  beforeEach(() => {
-    vi.clearAllMocks();
-    mockDb.query.itemComments.findMany.mockResolvedValue([]);
-  });
-
-  it("aggregates likeCount and flags likedByMe for the current user", async () => {
-    mockGetAuthUser.mockResolvedValueOnce({
-      session: { user: { id: "u1" } },
-    });
-    mockDb.query.lists.findFirst.mockResolvedValue({
-      id: "abc",
-      ownerId: "owner",
-      collaborative: false,
-      public: true,
-    });
-    mockDb.query.items.findMany.mockResolvedValue([
-      { id: "i1", listId: "abc", text: "A", done: false, position: 0 },
-      { id: "i2", listId: "abc", text: "B", done: false, position: 1 },
-    ]);
-    mockDb.query.itemLikes.findMany.mockResolvedValue([
-      { itemId: "i1", userId: "u1" },
-      { itemId: "i1", userId: "u2" },
-      { itemId: "i2", userId: "u2" },
-    ]);
-
-    const res = await app.request("/api/lists/abc/items", { headers });
-    expect(res.status).toBe(200);
-    const body = (await res.json()) as Array<Record<string, unknown>>;
-    expect(body[0]).toMatchObject({ id: "i1", likeCount: 2, likedByMe: true });
-    expect(body[1]).toMatchObject({ id: "i2", likeCount: 1, likedByMe: false });
-  });
-
-  it("aggregates commentCount per item", async () => {
-    mockDb.query.lists.findFirst.mockResolvedValue({
-      id: "abc",
-      ownerId: "owner",
-      collaborative: false,
-      public: true,
-    });
-    mockDb.query.items.findMany.mockResolvedValue([
-      { id: "i1", listId: "abc", text: "A", done: false, position: 0 },
-      { id: "i2", listId: "abc", text: "B", done: false, position: 1 },
-    ]);
-    mockDb.query.itemLikes.findMany.mockResolvedValue([]);
-    mockDb.query.itemComments.findMany.mockResolvedValue([
-      { itemId: "i1" },
-      { itemId: "i1" },
-    ]);
-
-    const res = await app.request("/api/lists/abc/items", { headers });
-    const body = (await res.json()) as Array<Record<string, unknown>>;
-    expect(body[0]).toMatchObject({ id: "i1", commentCount: 2 });
-    expect(body[1]).toMatchObject({ id: "i2", commentCount: 0 });
   });
 });
 
@@ -2278,7 +2065,6 @@ describe("PATCH toggle list_completed fan-out", () => {
 describe("GET /api/lists/:listId/items (participant item_progress)", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockDb.query.itemComments.findMany.mockResolvedValue([]);
   });
 
   it("returns items with items.done when not a participant", async () => {
@@ -2298,8 +2084,6 @@ describe("GET /api/lists/:listId/items (participant item_progress)", () => {
       public: true,
     });
     mockDb.query.items.findMany.mockResolvedValue(rows);
-    mockDb.query.itemLikes.findMany.mockResolvedValue([]);
-
     const res = await app.request("/api/lists/abc/items");
     expect(res.status).toBe(200);
     const body = (await res.json()) as Array<Record<string, unknown>>;
@@ -4758,7 +4542,7 @@ describe("GET /api/cron/weekly-recap", () => {
       groupBy: vi.fn().mockResolvedValue([
         { userId: "u1", type: "challenge_accepted", count: 3 },
         { userId: "u1", type: "new_follower", count: 1 },
-        { userId: "u2", type: "item_liked", count: 2 },
+        { userId: "u2", type: "challenge_completed", count: 2 },
       ]),
     });
     mockDb.insert.mockReturnValue(chainableInsert());
@@ -4943,164 +4727,6 @@ describe("web push subscription endpoints", () => {
     });
     expect(res.status).toBe(204);
     expect(mockDb.delete).toHaveBeenCalledWith(webPushSubscriptions);
-  });
-});
-
-describe("item comments", () => {
-  const headers = { "Content-Type": "application/json" };
-  beforeEach(() => {
-    vi.clearAllMocks();
-    mockDb.$count.mockResolvedValue(0);
-  });
-  afterEach(() => {
-    mockDb.query.users.findFirst.mockReset();
-    mockDb.$count.mockReset();
-  });
-
-  const publicList = {
-    id: "abc",
-    name: "Cine",
-    ownerId: "owner",
-    collaborative: false,
-    public: true,
-  };
-
-  it("lists comments for an item", async () => {
-    mockDb.query.lists.findFirst.mockResolvedValue(publicList);
-    mockDb.query.items.findFirst.mockResolvedValue({ id: "i1" });
-    mockDb.select.mockReturnValue({
-      from: vi.fn().mockReturnThis(),
-      leftJoin: vi.fn().mockReturnThis(),
-      where: vi.fn().mockReturnThis(),
-      orderBy: vi.fn().mockResolvedValue([
-        {
-          id: "c1",
-          body: "great pick",
-          createdAt: new Date("2024-01-01"),
-          userId: "u2",
-          userName: "Ana",
-          userImage: null,
-        },
-      ]),
-    });
-
-    const res = await app.request("/api/lists/abc/items/i1/comments");
-    expect(res.status).toBe(200);
-    const body = (await res.json()) as unknown[];
-    expect(body).toHaveLength(1);
-  });
-
-  it("returns 401 when posting a comment unauthenticated", async () => {
-    mockGetAuthUser.mockRejectedValueOnce(new Error("no session"));
-    mockDb.query.lists.findFirst.mockResolvedValue(publicList);
-    const res = await app.request("/api/lists/abc/items/i1/comments", {
-      method: "POST",
-      headers,
-      body: JSON.stringify({ body: "hi" }),
-    });
-    expect(res.status).toBe(401);
-  });
-
-  it("rejects an empty comment body", async () => {
-    mockGetAuthUser.mockResolvedValueOnce({ session: { user: { id: "u2" } } });
-    mockDb.query.lists.findFirst.mockResolvedValue(publicList);
-    const res = await app.request("/api/lists/abc/items/i1/comments", {
-      method: "POST",
-      headers,
-      body: JSON.stringify({ body: "   " }),
-    });
-    expect(res.status).toBe(400);
-  });
-
-  it("creates a comment and notifies the list owner", async () => {
-    mockGetAuthUser.mockResolvedValueOnce({ session: { user: { id: "u2" } } });
-    mockDb.query.lists.findFirst
-      .mockResolvedValueOnce(publicList)
-      .mockResolvedValueOnce({ name: "Cine" });
-    mockDb.query.items.findFirst.mockResolvedValue({ id: "i1" });
-    mockDb.query.users.findFirst.mockResolvedValue({
-      name: "Ana",
-      image: null,
-    });
-    mockDb.insert.mockReturnValue({
-      values: vi.fn().mockReturnValue({
-        returning: vi
-          .fn()
-          .mockResolvedValue([
-            { id: "c1", body: "great", createdAt: new Date("2024-01-01") },
-          ]),
-      }),
-    });
-
-    const res = await app.request("/api/lists/abc/items/i1/comments", {
-      method: "POST",
-      headers,
-      body: JSON.stringify({ body: "great" }),
-    });
-    expect(res.status).toBe(201);
-    const body = (await res.json()) as { id: string; body: string };
-    expect(body.id).toBe("c1");
-    expect(mockDb.insert).toHaveBeenCalledWith(itemComments);
-    expect(mockDb.insert).toHaveBeenCalledWith(notifications);
-  });
-
-  it("does not notify when the owner comments on their own item", async () => {
-    mockGetAuthUser.mockResolvedValueOnce({
-      session: { user: { id: "owner" } },
-    });
-    mockDb.query.lists.findFirst.mockResolvedValue(publicList);
-    mockDb.query.items.findFirst.mockResolvedValue({ id: "i1" });
-    mockDb.query.users.findFirst.mockResolvedValue({
-      name: "Owner",
-      image: null,
-    });
-    mockDb.insert.mockReturnValue({
-      values: vi.fn().mockReturnValue({
-        returning: vi
-          .fn()
-          .mockResolvedValue([
-            { id: "c1", body: "mine", createdAt: new Date("2024-01-01") },
-          ]),
-      }),
-    });
-
-    const res = await app.request("/api/lists/abc/items/i1/comments", {
-      method: "POST",
-      headers,
-      body: JSON.stringify({ body: "mine" }),
-    });
-    expect(res.status).toBe(201);
-    expect(mockDb.insert).not.toHaveBeenCalledWith(notifications);
-  });
-
-  it("lets the author delete their own comment", async () => {
-    mockGetAuthUser.mockResolvedValueOnce({ session: { user: { id: "u2" } } });
-    mockDb.query.lists.findFirst.mockResolvedValue(publicList);
-    mockDb.query.itemComments.findFirst.mockResolvedValue({
-      id: "c1",
-      userId: "u2",
-    });
-    mockDb.delete.mockReturnValue({
-      where: vi.fn().mockResolvedValue(undefined),
-    });
-    const res = await app.request("/api/lists/abc/items/i1/comments/c1", {
-      method: "DELETE",
-    });
-    expect(res.status).toBe(204);
-    expect(mockDb.delete).toHaveBeenCalledWith(itemComments);
-  });
-
-  it("forbids deleting someone else's comment when not the owner", async () => {
-    mockGetAuthUser.mockResolvedValueOnce({ session: { user: { id: "u3" } } });
-    mockDb.query.lists.findFirst.mockResolvedValue(publicList);
-    mockDb.query.itemComments.findFirst.mockResolvedValue({
-      id: "c1",
-      userId: "u2",
-    });
-    const res = await app.request("/api/lists/abc/items/i1/comments/c1", {
-      method: "DELETE",
-    });
-    expect(res.status).toBe(403);
   });
 });
 

@@ -1,11 +1,11 @@
 import { useMemo, useState } from "react";
-import type { ItemWithLikes } from "@/hooks/useItems";
+import type { ItemView } from "@/hooks/useItems";
 import { parseItemText } from "@/lib/item-text";
 import { parsePlaces } from "@/lib/places";
 import { parseTags } from "@/lib/tags";
 
 interface Options {
-  items: ItemWithLikes[];
+  items: ItemView[];
   itemsLoading: boolean;
   statusFilter: "all" | "pending" | "done" | undefined;
   activeTag: string | undefined;

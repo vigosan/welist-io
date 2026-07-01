@@ -18,9 +18,6 @@ const baseItem = {
   placeName: null,
   createdAt: new Date(),
   updatedAt: new Date(),
-  likeCount: 0,
-  likedByMe: false,
-  commentCount: 0,
 };
 const taggedItem = {
   ...baseItem,
@@ -196,126 +193,6 @@ describe("ItemRow", () => {
     const anchor = screen.getByTestId("item-text-i1").querySelector("a");
     expect(anchor).toHaveAttribute("href", "https://docs.com");
     expect(anchor).toHaveTextContent("docs");
-  });
-
-  it("does not render like button when onLike is not provided", () => {
-    render(
-      <ItemRow
-        item={baseItem}
-        onToggle={vi.fn()}
-        onDelete={vi.fn()}
-        onEdit={vi.fn()}
-      />
-    );
-    expect(screen.queryByTestId("item-like-i1")).not.toBeInTheDocument();
-  });
-
-  it("calls onLike when the thumbs-up button is clicked", async () => {
-    const onLike = vi.fn();
-    render(
-      <ItemRow
-        item={baseItem}
-        onToggle={vi.fn()}
-        onDelete={vi.fn()}
-        onEdit={vi.fn()}
-        onLike={onLike}
-      />
-    );
-    await userEvent.click(screen.getByTestId("item-like-i1"));
-    expect(onLike).toHaveBeenCalledOnce();
-  });
-
-  it("renders the like count only when greater than zero", () => {
-    const { rerender } = render(
-      <ItemRow
-        item={baseItem}
-        onToggle={vi.fn()}
-        onDelete={vi.fn()}
-        onEdit={vi.fn()}
-        onLike={vi.fn()}
-      />
-    );
-    expect(screen.queryByTestId("item-like-count-i1")).not.toBeInTheDocument();
-
-    rerender(
-      <ItemRow
-        item={{ ...baseItem, likeCount: 3, likedByMe: true }}
-        onToggle={vi.fn()}
-        onDelete={vi.fn()}
-        onEdit={vi.fn()}
-        onLike={vi.fn()}
-      />
-    );
-    expect(screen.getByTestId("item-like-count-i1")).toHaveTextContent("3");
-  });
-
-  it("reflects likedByMe with aria-pressed=true", () => {
-    render(
-      <ItemRow
-        item={{ ...baseItem, likedByMe: true, likeCount: 1 }}
-        onToggle={vi.fn()}
-        onDelete={vi.fn()}
-        onEdit={vi.fn()}
-        onLike={vi.fn()}
-      />
-    );
-    expect(screen.getByTestId("item-like-i1")).toHaveAttribute(
-      "aria-pressed",
-      "true"
-    );
-  });
-
-  it("does not render comment button when onComment is not provided", () => {
-    render(
-      <ItemRow
-        item={baseItem}
-        onToggle={vi.fn()}
-        onDelete={vi.fn()}
-        onEdit={vi.fn()}
-      />
-    );
-    expect(screen.queryByTestId("item-comment-i1")).not.toBeInTheDocument();
-  });
-
-  it("calls onComment when the comment button is clicked", async () => {
-    const onComment = vi.fn();
-    render(
-      <ItemRow
-        item={baseItem}
-        onToggle={vi.fn()}
-        onDelete={vi.fn()}
-        onEdit={vi.fn()}
-        onComment={onComment}
-      />
-    );
-    await userEvent.click(screen.getByTestId("item-comment-i1"));
-    expect(onComment).toHaveBeenCalledOnce();
-  });
-
-  it("renders comment count only when greater than zero", () => {
-    const { rerender } = render(
-      <ItemRow
-        item={baseItem}
-        onToggle={vi.fn()}
-        onDelete={vi.fn()}
-        onEdit={vi.fn()}
-        onComment={vi.fn()}
-      />
-    );
-    expect(
-      screen.queryByTestId("item-comment-count-i1")
-    ).not.toBeInTheDocument();
-
-    rerender(
-      <ItemRow
-        item={{ ...baseItem, commentCount: 2 }}
-        onToggle={vi.fn()}
-        onDelete={vi.fn()}
-        onEdit={vi.fn()}
-        onComment={vi.fn()}
-      />
-    );
-    expect(screen.getByTestId("item-comment-count-i1")).toHaveTextContent("2");
   });
 
   it("renders tags alongside markdown without interference", () => {

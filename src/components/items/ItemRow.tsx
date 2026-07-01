@@ -1,7 +1,7 @@
 import { memo, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useGeocodingSearch } from "@/hooks/useGeocodingSearch";
-import type { ItemWithLikes } from "@/hooks/useItems";
+import type { ItemView } from "@/hooks/useItems";
 import { useSlashMenu } from "@/hooks/useSlashMenu";
 import { useTranslation } from "@/i18n/service";
 import { renderInlineMarkdown } from "@/lib/inline-markdown";
@@ -14,8 +14,6 @@ import { SlashMenu } from "./SlashMenu";
 interface ItemCaps {
   canWrite?: boolean;
   canToggle?: boolean;
-  canLike?: boolean;
-  canComment?: boolean;
 }
 
 interface ItemDragHandlers {
@@ -26,12 +24,10 @@ interface ItemDragHandlers {
 }
 
 interface Props {
-  item: ItemWithLikes;
+  item: ItemView;
   onToggle: () => void;
   onDelete: () => void;
   onEdit: (text: string, coords?: Coords | null) => void;
-  onLike?: () => void;
-  onComment?: () => void;
   onTagClick?: (tag: string) => void;
   activeTag?: string;
   caps?: ItemCaps;
@@ -46,8 +42,6 @@ export const ItemRow = memo(
     onToggle,
     onDelete,
     onEdit,
-    onLike,
-    onComment,
     onTagClick,
     activeTag,
     caps,
@@ -55,12 +49,7 @@ export const ItemRow = memo(
     isDragOver,
     highlighted,
   }: Props) {
-    const {
-      canWrite = true,
-      canToggle,
-      canLike = true,
-      canComment = true,
-    } = caps ?? {};
+    const { canWrite = true, canToggle } = caps ?? {};
     const { onDragStart, onDragOver, onDrop, onDragEnd } = dragHandlers ?? {};
     const [editing, setEditing] = useState(false);
     const [text, setText] = useState(item.text);
@@ -374,81 +363,6 @@ export const ItemRow = memo(
         </div>
 
         <div className="flex items-center shrink-0">
-          {onLike && (
-            <button
-              type="button"
-              onClick={canLike ? onLike : undefined}
-              disabled={!canLike}
-              data-testid={`item-like-${item.id}`}
-              aria-label={item.likedByMe ? t("items.unlike") : t("items.like")}
-              aria-pressed={item.likedByMe}
-              className={`cursor-pointer w-9 h-9 sm:w-8 sm:h-8 flex items-center justify-center gap-1 rounded-md transition-colors active:scale-[0.92] ${
-                item.likedByMe
-                  ? "text-gray-900 dark:text-gray-100"
-                  : "text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
-              } ${canLike ? "" : "cursor-default"}`}
-            >
-              <svg
-                aria-hidden="true"
-                className="w-4 h-4"
-                fill={item.likedByMe ? "currentColor" : "none"}
-                stroke="currentColor"
-                strokeWidth={1.75}
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M6.633 10.5c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 012.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 00.322-1.672V3a.75.75 0 01.75-.75A2.25 2.25 0 0116.5 4.5c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 01-2.649 7.521c-.388.482-.987.729-1.605.729H13.48c-.483 0-.964-.078-1.423-.23l-3.114-1.04a4.501 4.501 0 00-1.423-.23H5.904M14.25 9h2.25M5.904 18.75c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 01-.521-3.507c0-1.553.295-3.036.831-4.398C3.387 10.203 4.167 9.75 5 9.75h1.053c.472 0 .745.556.5.96a8.958 8.958 0 00-1.302 4.665c0 1.194.232 2.333.654 3.375z"
-                />
-              </svg>
-              {item.likeCount > 0 && (
-                <span
-                  data-testid={`item-like-count-${item.id}`}
-                  className="text-[11px] font-mono tabular-nums leading-none"
-                >
-                  {item.likeCount}
-                </span>
-              )}
-            </button>
-          )}
-          {onComment && (
-            <button
-              type="button"
-              onClick={canComment ? onComment : undefined}
-              disabled={!canComment}
-              data-testid={`item-comment-${item.id}`}
-              aria-label={t("items.comments")}
-              className={`cursor-pointer w-9 h-9 sm:w-8 sm:h-8 flex items-center justify-center gap-1 rounded-md transition-colors active:scale-[0.92] ${
-                item.commentCount > 0
-                  ? "text-gray-900 dark:text-gray-100"
-                  : "text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
-              } ${canComment ? "" : "cursor-default"}`}
-            >
-              <svg
-                aria-hidden="true"
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={1.75}
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M8 12h.01M12 12h.01M16 12h.01M21 12a9 9 0 01-13.5 7.79L3 21l1.21-4.5A9 9 0 1121 12z"
-                />
-              </svg>
-              {item.commentCount > 0 && (
-                <span
-                  data-testid={`item-comment-count-${item.id}`}
-                  className="text-[11px] font-mono tabular-nums leading-none"
-                >
-                  {item.commentCount}
-                </span>
-              )}
-            </button>
-          )}
           {canWrite && !item.done && !editing && (
             <button
               type="button"
@@ -507,17 +421,10 @@ export const ItemRow = memo(
     prev.item.id === next.item.id &&
     prev.item.done === next.item.done &&
     prev.item.text === next.item.text &&
-    prev.item.likeCount === next.item.likeCount &&
-    prev.item.likedByMe === next.item.likedByMe &&
-    prev.item.commentCount === next.item.commentCount &&
     prev.highlighted === next.highlighted &&
     prev.activeTag === next.activeTag &&
     prev.caps?.canWrite === next.caps?.canWrite &&
     prev.caps?.canToggle === next.caps?.canToggle &&
-    prev.caps?.canLike === next.caps?.canLike &&
-    prev.caps?.canComment === next.caps?.canComment &&
     prev.isDragOver === next.isDragOver &&
-    !!prev.dragHandlers === !!next.dragHandlers &&
-    !!prev.onLike === !!next.onLike &&
-    !!prev.onComment === !!next.onComment
+    !!prev.dragHandlers === !!next.dragHandlers
 );

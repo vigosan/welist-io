@@ -33,10 +33,6 @@ function NotificationItem({ n }: { n: AppNotification }) {
         : t("notifications.itemDoneMany", { name, list, count });
   } else if (n.type === "list_completed") {
     label = t("notifications.listCompleted", { name, list });
-  } else if (n.type === "item_liked") {
-    label = t("notifications.itemLiked", { name, list });
-  } else if (n.type === "item_commented") {
-    label = t("notifications.itemCommented", { name, list });
   } else if (n.type === "list_forked") {
     label = t("notifications.listForked", { name, list });
   } else if (n.type === "weekly_recap") {

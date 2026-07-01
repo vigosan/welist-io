@@ -7,47 +7,10 @@ export interface Coords {
   placeName: string;
 }
 
-export type ItemWithLikes = Item & {
-  likeCount: number;
-  likedByMe: boolean;
-  commentCount: number;
-};
-
-export type ItemCommentView = {
-  id: string;
-  body: string;
-  createdAt: string;
-  userId: string;
-  userName: string | null;
-  userImage: string | null;
-};
+export type ItemView = Item;
 
 export const itemsService = {
-  list: (listId: string) =>
-    apiClient<ItemWithLikes[]>(`/api/lists/${listId}/items`),
-
-  toggleLike: (listId: string, itemId: string) =>
-    apiClient<{ liked: boolean; likeCount: number }>(
-      `/api/lists/${listId}/items/${itemId}/like`,
-      { method: "POST" }
-    ),
-
-  listComments: (listId: string, itemId: string) =>
-    apiClient<ItemCommentView[]>(
-      `/api/lists/${listId}/items/${itemId}/comments`
-    ),
-
-  addComment: (listId: string, itemId: string, body: string) =>
-    apiClient<ItemCommentView>(
-      `/api/lists/${listId}/items/${itemId}/comments`,
-      { method: "POST", body: JSON.stringify({ body }) }
-    ),
-
-  deleteComment: (listId: string, itemId: string, commentId: string) =>
-    apiClient<void>(
-      `/api/lists/${listId}/items/${itemId}/comments/${commentId}`,
-      { method: "DELETE" }
-    ),
+  list: (listId: string) => apiClient<ItemView[]>(`/api/lists/${listId}/items`),
 
   add: (listId: string, text: string, coords?: Coords) =>
     apiClient<Item>(`/api/lists/${listId}/items`, {

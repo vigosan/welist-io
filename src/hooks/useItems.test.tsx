@@ -2,13 +2,11 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act, renderHook, waitFor } from "@testing-library/react";
 import type React from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { ItemWithLikes } from "./useItems";
+import type { ItemView } from "./useItems";
 import {
-  useAddComment,
   useAddItem,
   useBulkAddItems,
   useBulkDeleteItems,
-  useDeleteComment,
   useDeleteItem,
   useItems,
   useToggleItem,
@@ -20,14 +18,10 @@ vi.mock("@/services/items.service", () => ({
     list: vi.fn(),
     add: vi.fn(),
     toggle: vi.fn(),
-    toggleLike: vi.fn(),
     update: vi.fn(),
     delete: vi.fn(),
     bulkAdd: vi.fn(),
     bulkDelete: vi.fn(),
-    listComments: vi.fn(),
-    addComment: vi.fn(),
-    deleteComment: vi.fn(),
   },
 }));
 
@@ -35,7 +29,7 @@ import { itemsService } from "@/services/items.service";
 
 const LIST_ID = "list-1";
 
-const ITEM_A: ItemWithLikes = {
+const ITEM_A: ItemView = {
   id: "i1",
   listId: LIST_ID,
   text: "Tarea A",
@@ -46,11 +40,8 @@ const ITEM_A: ItemWithLikes = {
   placeName: null,
   createdAt: new Date(),
   updatedAt: new Date(),
-  likeCount: 0,
-  likedByMe: false,
-  commentCount: 0,
 };
-const ITEM_B: ItemWithLikes = {
+const ITEM_B: ItemView = {
   id: "i2",
   listId: LIST_ID,
   text: "Tarea B",
@@ -61,9 +52,6 @@ const ITEM_B: ItemWithLikes = {
   placeName: null,
   createdAt: new Date(),
   updatedAt: new Date(),
-  likeCount: 0,
-  likedByMe: false,
-  commentCount: 0,
 };
 
 function makeWrapper() {
@@ -112,7 +100,7 @@ describe("useToggleItem", () => {
       result.current.mutate(ITEM_A.id);
     });
 
-    const cached = qc.getQueryData<ItemWithLikes[]>(["items", LIST_ID]);
+    const cached = qc.getQueryData<ItemView[]>(["items", LIST_ID]);
     expect(cached?.find((i) => i.id === ITEM_A.id)?.done).toBe(true);
   });
 
@@ -131,7 +119,7 @@ describe("useToggleItem", () => {
     });
 
     await waitFor(() => expect(result.current.isError).toBe(true));
-    const cached = qc.getQueryData<ItemWithLikes[]>(["items", LIST_ID]);
+    const cached = qc.getQueryData<ItemView[]>(["items", LIST_ID]);
     expect(cached?.find((i) => i.id === ITEM_A.id)?.done).toBe(false);
   });
 
@@ -167,7 +155,7 @@ describe("useDeleteItem", () => {
       result.current.mutate(ITEM_A.id);
     });
 
-    const cached = qc.getQueryData<ItemWithLikes[]>(["items", LIST_ID]);
+    const cached = qc.getQueryData<ItemView[]>(["items", LIST_ID]);
     expect(cached?.map((i) => i.id)).not.toContain(ITEM_A.id);
   });
 
@@ -184,7 +172,7 @@ describe("useDeleteItem", () => {
     });
 
     await waitFor(() => expect(result.current.isError).toBe(true));
-    const cached = qc.getQueryData<ItemWithLikes[]>(["items", LIST_ID]);
+    const cached = qc.getQueryData<ItemView[]>(["items", LIST_ID]);
     expect(cached?.map((i) => i.id)).toContain(ITEM_A.id);
   });
 
@@ -226,7 +214,7 @@ describe("useUpdateItem", () => {
       });
     });
 
-    const cached = qc.getQueryData<ItemWithLikes[]>(["items", LIST_ID]);
+    const cached = qc.getQueryData<ItemView[]>(["items", LIST_ID]);
     expect(cached?.find((i) => i.id === ITEM_A.id)?.text).toBe("Nuevo texto");
   });
 
@@ -246,7 +234,7 @@ describe("useUpdateItem", () => {
     });
 
     await waitFor(() => expect(result.current.isError).toBe(true));
-    const cached = qc.getQueryData<ItemWithLikes[]>(["items", LIST_ID]);
+    const cached = qc.getQueryData<ItemView[]>(["items", LIST_ID]);
     expect(cached?.find((i) => i.id === ITEM_A.id)?.text).toBe("Tarea A");
   });
 });
@@ -316,51 +304,5 @@ describe("useBulkDeleteItems", () => {
     expect(invalidate).toHaveBeenCalledWith(
       expect.objectContaining({ queryKey: ["my-lists"] })
     );
-  });
-});
-
-describe("useAddComment", () => {
-  it("increments the item's commentCount in the items cache on success", async () => {
-    const { qc, Wrapper } = makeWrapper();
-    qc.setQueryData(["items", LIST_ID], [ITEM_A, ITEM_B]);
-    vi.mocked(itemsService.addComment).mockResolvedValue({
-      id: "c1",
-      body: "nice",
-      createdAt: new Date().toISOString(),
-      userId: "u2",
-      userName: "Ana",
-      userImage: null,
-    });
-
-    const { result } = renderHook(() => useAddComment(LIST_ID, ITEM_A.id), {
-      wrapper: Wrapper,
-    });
-    await act(async () => {
-      await result.current.mutateAsync("nice");
-    });
-
-    const cached = qc.getQueryData<ItemWithLikes[]>(["items", LIST_ID]);
-    expect(cached?.find((i) => i.id === ITEM_A.id)?.commentCount).toBe(1);
-  });
-});
-
-describe("useDeleteComment", () => {
-  it("decrements the item's commentCount in the items cache on success", async () => {
-    const { qc, Wrapper } = makeWrapper();
-    qc.setQueryData(
-      ["items", LIST_ID],
-      [{ ...ITEM_A, commentCount: 2 }, ITEM_B]
-    );
-    vi.mocked(itemsService.deleteComment).mockResolvedValue(undefined);
-
-    const { result } = renderHook(() => useDeleteComment(LIST_ID, ITEM_A.id), {
-      wrapper: Wrapper,
-    });
-    await act(async () => {
-      await result.current.mutateAsync("c1");
-    });
-
-    const cached = qc.getQueryData<ItemWithLikes[]>(["items", LIST_ID]);
-    expect(cached?.find((i) => i.id === ITEM_A.id)?.commentCount).toBe(1);
   });
 });

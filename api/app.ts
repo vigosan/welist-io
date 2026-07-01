@@ -33,8 +33,6 @@ import {
   deviceTokens,
   events,
   follows,
-  itemComments,
-  itemLikes,
   itemProgress,
   items,
   listActivity,
@@ -516,9 +514,7 @@ type NotificationType =
   | "item_added"
   | "item_done"
   | "list_completed"
-  | "item_liked"
   | "weekly_recap"
-  | "item_commented"
   | "list_forked";
 
 type CreateNotificationInput = {
@@ -591,12 +587,6 @@ function renderPushBody(input: {
   }
   if (input.type === "list_purchased") {
     return `${name} ha comprado tu lista «${list}»`;
-  }
-  if (input.type === "item_liked") {
-    return `A ${name} le ha gustado un ítem de «${list}»`;
-  }
-  if (input.type === "item_commented") {
-    return `${name} ha comentado un ítem de «${list}»`;
   }
   if (input.type === "list_forked") {
     return `${name} ha creado su versión de «${list}»`;
@@ -862,30 +852,6 @@ app.get("/my-lists", async (c) => {
     end as int
   )`;
   const participantCountExpr = sql<number>`cast((select count(*) from ${participations} where ${participations.sourceListId} = ${lists.id}) as int)`;
-  const likeCountExpr = sql<number>`cast((select count(*) from ${itemLikes} il join ${items} i on i.id = il.item_id where i.list_id = ${lists.id}) as int)`;
-
-  if (sort === "likes") {
-    const rows = await db
-      .select({
-        id: lists.id,
-        name: lists.name,
-        slug: lists.slug,
-        description: lists.description,
-        public: lists.public,
-        collaborative: lists.collaborative,
-        ownerId: lists.ownerId,
-        createdAt: lists.createdAt,
-        itemCount: itemCountExpr,
-        doneCount: doneCountExpr,
-        participantCount: participantCountExpr,
-        likeCount: likeCountExpr,
-      })
-      .from(lists)
-      .where(baseWhere)
-      .orderBy(desc(likeCountExpr), desc(lists.createdAt))
-      .limit(MY_LISTS_PAGE_SIZE);
-    return c.json({ items: rows, nextCursor: null });
-  }
 
   if (sort === "recent") {
     const activityExpr = sql<Date>`coalesce(max(${items.updatedAt}), ${lists.createdAt})`;
@@ -1057,42 +1023,9 @@ app.get("/lists/:listId/items", async (c) => {
   });
 
   const itemIds = rows.map((r) => r.id);
-  const likeRows =
-    itemIds.length === 0
-      ? []
-      : await db.query.itemLikes.findMany({
-          where: inUuids(itemLikes.itemId, itemIds),
-          columns: { itemId: true, userId: true },
-        });
-  const likeCountByItem = new Map<string, number>();
-  const likedByMeSet = new Set<string>();
-  for (const row of likeRows) {
-    likeCountByItem.set(row.itemId, (likeCountByItem.get(row.itemId) ?? 0) + 1);
-    if (userId && row.userId === userId) likedByMeSet.add(row.itemId);
-  }
-  const commentRows =
-    itemIds.length === 0
-      ? []
-      : await db.query.itemComments.findMany({
-          where: inUuids(itemComments.itemId, itemIds),
-          columns: { itemId: true },
-        });
-  const commentCountByItem = new Map<string, number>();
-  for (const row of commentRows) {
-    commentCountByItem.set(
-      row.itemId,
-      (commentCountByItem.get(row.itemId) ?? 0) + 1
-    );
-  }
-  const withLikes = rows.map((item) => ({
-    ...item,
-    likeCount: likeCountByItem.get(item.id) ?? 0,
-    likedByMe: likedByMeSet.has(item.id),
-    commentCount: commentCountByItem.get(item.id) ?? 0,
-  }));
 
   if (!participation || participation.role !== "challenger")
-    return c.json(withLikes);
+    return c.json(rows);
 
   const progressRows =
     itemIds.length === 0
@@ -1107,7 +1040,7 @@ app.get("/lists/:listId/items", async (c) => {
         });
   const progressMap = new Map(progressRows.map((p) => [p.itemId, p.done]));
   return c.json(
-    withLikes.map((item) => ({
+    rows.map((item) => ({
       ...item,
       done: progressMap.get(item.id) ?? false,
     }))
@@ -1448,166 +1381,6 @@ app.get("/lists/:listId/stream", async (c) => {
   if (!(await canViewList(list, userId)))
     return c.json({ error: "Not found" }, 404);
   return listChangesStream(list.id);
-});
-
-app.post("/lists/:listId/items/:itemId/like", async (c) => {
-  const list = await resolveList(c.req.param("listId"));
-  if (!list) return c.json({ error: "Not found" }, 404);
-  const authUser = getOptionalUser(c);
-  const userId = authUser?.session?.user?.id ?? null;
-  if (!userId) return c.json({ error: "Unauthorized" }, 401);
-  if (!(await canViewList(list, userId)))
-    return c.json({ error: "Not found" }, 404);
-  const itemId = c.req.param("itemId");
-  const item = await db.query.items.findFirst({
-    where: and(eq(items.id, itemId), eq(items.listId, list.id)),
-    columns: { id: true },
-  });
-  if (!item) return c.json({ error: "Not found" }, 404);
-
-  const existing = await db.query.itemLikes.findFirst({
-    where: and(eq(itemLikes.userId, userId), eq(itemLikes.itemId, itemId)),
-    columns: { id: true },
-  });
-  if (existing) {
-    await db.delete(itemLikes).where(eq(itemLikes.id, existing.id));
-  } else {
-    await db.insert(itemLikes).values({ userId, itemId });
-    if (list.ownerId && list.ownerId !== userId) {
-      const [owner, actor, listRow] = await Promise.all([
-        db.query.users.findFirst({
-          where: eq(users.id, list.ownerId),
-          columns: { id: true },
-        }),
-        db.query.users.findFirst({
-          where: eq(users.id, userId),
-          columns: { name: true, image: true },
-        }),
-        db.query.lists.findFirst({
-          where: eq(lists.id, list.id),
-          columns: { name: true },
-        }),
-      ]);
-      if (owner) {
-        await createNotification({
-          recipientId: list.ownerId,
-          type: "item_liked",
-          listId: list.id,
-          listName: listRow?.name,
-          actorId: userId,
-          actorName: actor?.name,
-          actorImage: actor?.image,
-        });
-      }
-    }
-  }
-  const likeCount = await db.$count(itemLikes, eq(itemLikes.itemId, itemId));
-  return c.json({ liked: !existing, likeCount });
-});
-
-app.get("/lists/:listId/items/:itemId/comments", async (c) => {
-  const list = await resolveList(c.req.param("listId"));
-  if (!list) return c.json({ error: "Not found" }, 404);
-  const authUser = getOptionalUser(c);
-  const userId = authUser?.session?.user?.id ?? null;
-  if (!(await canViewList(list, userId)))
-    return c.json({ error: "Not found" }, 404);
-  const itemId = c.req.param("itemId");
-  const item = await db.query.items.findFirst({
-    where: and(eq(items.id, itemId), eq(items.listId, list.id)),
-    columns: { id: true },
-  });
-  if (!item) return c.json({ error: "Not found" }, 404);
-  const rows = await db
-    .select({
-      id: itemComments.id,
-      body: itemComments.body,
-      createdAt: itemComments.createdAt,
-      userId: itemComments.userId,
-      userName: users.name,
-      userImage: users.image,
-    })
-    .from(itemComments)
-    .leftJoin(users, eq(users.id, itemComments.userId))
-    .where(eq(itemComments.itemId, itemId))
-    .orderBy(asc(itemComments.createdAt));
-  return c.json(rows);
-});
-
-app.post(
-  "/lists/:listId/items/:itemId/comments",
-  zValidator("json", z.object({ body: z.string().trim().min(1).max(1000) })),
-  async (c) => {
-    const list = await resolveList(c.req.param("listId"));
-    if (!list) return c.json({ error: "Not found" }, 404);
-    const authUser = getOptionalUser(c);
-    const userId = authUser?.session?.user?.id ?? null;
-    if (!userId) return c.json({ error: "Unauthorized" }, 401);
-    if (!(await canViewList(list, userId)))
-      return c.json({ error: "Not found" }, 404);
-    const itemId = c.req.param("itemId");
-    const item = await db.query.items.findFirst({
-      where: and(eq(items.id, itemId), eq(items.listId, list.id)),
-      columns: { id: true },
-    });
-    if (!item) return c.json({ error: "Not found" }, 404);
-    const { body } = c.req.valid("json");
-    const [created] = await db
-      .insert(itemComments)
-      .values({ userId, itemId, body })
-      .returning();
-    const author = await db.query.users.findFirst({
-      where: eq(users.id, userId),
-      columns: { name: true, image: true },
-    });
-    if (list.ownerId && list.ownerId !== userId) {
-      const listRow = await db.query.lists.findFirst({
-        where: eq(lists.id, list.id),
-        columns: { name: true },
-      });
-      await createNotification({
-        recipientId: list.ownerId,
-        type: "item_commented",
-        listId: list.id,
-        listName: listRow?.name,
-        actorId: userId,
-        actorName: author?.name,
-        actorImage: author?.image,
-      });
-    }
-    notifyListChange(list.id).catch(() => {});
-    return c.json(
-      {
-        id: created.id,
-        body: created.body,
-        createdAt: created.createdAt,
-        userId,
-        userName: author?.name ?? null,
-        userImage: author?.image ?? null,
-      },
-      201
-    );
-  }
-);
-
-app.delete("/lists/:listId/items/:itemId/comments/:commentId", async (c) => {
-  const list = await resolveList(c.req.param("listId"));
-  if (!list) return c.json({ error: "Not found" }, 404);
-  const authUser = getOptionalUser(c);
-  const userId = authUser?.session?.user?.id ?? null;
-  if (!userId) return c.json({ error: "Unauthorized" }, 401);
-  const commentId = c.req.param("commentId");
-  const comment = await db.query.itemComments.findFirst({
-    where: eq(itemComments.id, commentId),
-    columns: { id: true, userId: true },
-  });
-  if (!comment) return c.json({ error: "Not found" }, 404);
-  const isAuthor = comment.userId === userId;
-  const isOwner = list.ownerId === userId;
-  if (!isAuthor && !isOwner) return c.json({ error: "Forbidden" }, 403);
-  await db.delete(itemComments).where(eq(itemComments.id, commentId));
-  notifyListChange(list.id).catch(() => {});
-  return c.body(null, 204);
 });
 
 app.delete("/lists/:listId/items/:itemId", async (c) => {
@@ -2761,7 +2534,6 @@ const RECAP_TYPES = [
   "challenge_accepted",
   "challenge_completed",
   "new_follower",
-  "item_liked",
 ] as const;
 
 app.get("/cron/weekly-recap", async (c) => {
@@ -2804,7 +2576,6 @@ app.get("/cron/weekly-recap", async (c) => {
         accepted: counts.challenge_accepted ?? 0,
         completed: counts.challenge_completed ?? 0,
         followers: counts.new_follower ?? 0,
-        liked: counts.item_liked ?? 0,
       },
     });
     sent += 1;

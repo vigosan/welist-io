@@ -29,7 +29,7 @@ vi.mock("@hono/auth-js/react", () => ({
 }));
 
 import { useSession } from "@hono/auth-js/react";
-import type { ItemWithLikes } from "@/hooks/useItems";
+import type { ItemView } from "@/hooks/useItems";
 import {
   useAddItem,
   useBulkAddItems,
@@ -79,7 +79,7 @@ const LIST: ListWithParticipation = {
   participationCompletedAt: null,
 };
 
-function makeItem(id: string, text: string, done = false): ItemWithLikes {
+function makeItem(id: string, text: string, done = false): ItemView {
   return {
     id,
     listId: "test-list",
@@ -91,13 +91,10 @@ function makeItem(id: string, text: string, done = false): ItemWithLikes {
     placeName: null,
     createdAt: new Date(),
     updatedAt: new Date(),
-    likeCount: 0,
-    likedByMe: false,
-    commentCount: 0,
   };
 }
 
-const ITEMS: ItemWithLikes[] = [
+const ITEMS: ItemView[] = [
   makeItem("i1", "Tarea A"),
   makeItem("i2", "Tarea B", true),
 ];
@@ -149,9 +146,9 @@ function setupMocks({
   bulkIsPending = false,
   sessionUser = null as SessionUser | null,
 }: {
-  items?: ItemWithLikes[];
+  items?: ItemView[];
   list?: ListWithParticipation;
-  filteredItems?: ItemWithLikes[];
+  filteredItems?: ItemView[];
   addMutate?: ReturnType<typeof vi.fn>;
   toggleMutate?: ReturnType<typeof vi.fn>;
   deleteMutate?: ReturnType<typeof vi.fn>;

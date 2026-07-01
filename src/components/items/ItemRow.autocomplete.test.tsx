@@ -29,9 +29,6 @@ const baseItem = {
   placeName: null,
   createdAt: new Date(),
   updatedAt: new Date(),
-  likeCount: 0,
-  likedByMe: false,
-  commentCount: 0,
 };
 
 const itemWithPlace = {
