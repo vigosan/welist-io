@@ -53,6 +53,34 @@ describe("ItemRow", () => {
     expect(onToggle).toHaveBeenCalledOnce();
   });
 
+  it("calls onToggle when the item text is clicked", async () => {
+    const onToggle = vi.fn();
+    render(
+      <ItemRow
+        item={baseItem}
+        onToggle={onToggle}
+        onDelete={vi.fn()}
+        onEdit={vi.fn()}
+      />
+    );
+    await userEvent.click(screen.getByTestId("item-text-i1"));
+    expect(onToggle).toHaveBeenCalledOnce();
+  });
+
+  it("does not toggle when a link inside the item text is clicked", async () => {
+    const onToggle = vi.fn();
+    render(
+      <ItemRow
+        item={{ ...baseItem, text: "See [site](https://example.com)" }}
+        onToggle={onToggle}
+        onDelete={vi.fn()}
+        onEdit={vi.fn()}
+      />
+    );
+    await userEvent.click(screen.getByRole("link", { name: "site" }));
+    expect(onToggle).not.toHaveBeenCalled();
+  });
+
   it("marks the text as done when item is done", () => {
     render(
       <ItemRow
@@ -135,13 +163,13 @@ describe("ItemRow", () => {
         onEdit={onEdit}
       />
     );
-    await userEvent.dblClick(screen.getByTestId("item-text-i1"));
+    await userEvent.click(screen.getByTestId("item-edit-i1"));
     await userEvent.keyboard("{Escape}");
     expect(onEdit).not.toHaveBeenCalled();
     expect(screen.getByTestId("item-text-i1")).toBeInTheDocument();
   });
 
-  it("enters edit mode on double click and calls onEdit on blur", async () => {
+  it("enters edit mode from the edit button and calls onEdit on blur", async () => {
     const onEdit = vi.fn();
     render(
       <ItemRow
@@ -151,7 +179,7 @@ describe("ItemRow", () => {
         onEdit={onEdit}
       />
     );
-    await userEvent.dblClick(screen.getByTestId("item-text-i1"));
+    await userEvent.click(screen.getByTestId("item-edit-i1"));
     const input = screen.getByTestId("item-edit-input-i1");
     await userEvent.clear(input);
     await userEvent.type(input, "Comprar pan");
@@ -231,7 +259,7 @@ describe("ItemRow", () => {
         onEdit={onEdit}
       />
     );
-    await userEvent.dblClick(screen.getByTestId("item-text-i1"));
+    await userEvent.click(screen.getByTestId("item-edit-i1"));
     const input = screen.getByTestId("item-edit-input-i1");
     await userEvent.type(input, " #Sevilla");
     await userEvent.tab();
@@ -255,7 +283,7 @@ describe("ItemRow", () => {
         onEdit={onEdit}
       />
     );
-    await userEvent.dblClick(screen.getByTestId("item-text-i1"));
+    await userEvent.click(screen.getByTestId("item-edit-i1"));
     const input = screen.getByTestId("item-edit-input-i1");
     await userEvent.clear(input);
     await userEvent.type(input, "Comprar pan");

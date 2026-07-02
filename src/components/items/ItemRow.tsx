@@ -316,14 +316,13 @@ export const ItemRow = memo(
               <span
                 data-testid={`item-text-${item.id}`}
                 data-done={item.done ? "true" : "false"}
-                onDoubleClick={
-                  canWrite && !item.done ? () => setEditing(true) : undefined
-                }
                 onClick={(e) => {
-                  if ((e.target as HTMLElement).tagName === "A")
-                    e.stopPropagation();
+                  if ((e.target as HTMLElement).tagName === "A") return;
+                  if (effectiveCanToggle) onToggle();
                 }}
-                className={`text-sm font-medium cursor-default select-none leading-snug sm:truncate line-through ${
+                className={`text-sm font-medium select-none leading-snug sm:truncate line-through ${
+                  effectiveCanToggle ? "cursor-pointer" : "cursor-default"
+                } ${
                   item.done
                     ? "text-gray-400 dark:text-gray-600"
                     : "text-gray-800 dark:text-gray-200"

@@ -51,7 +51,7 @@ describe("ItemRow edit coords", () => {
         onEdit={onEdit}
       />
     );
-    await user.dblClick(screen.getByTestId("item-text-i1"));
+    await user.click(screen.getByTestId("item-edit-i1"));
     const input = screen.getByTestId<HTMLInputElement>("item-edit-input-i1");
     await user.click(input);
     await user.type(input, " @Mad");
@@ -74,7 +74,7 @@ describe("ItemRow edit coords", () => {
         onEdit={onEdit}
       />
     );
-    await user.dblClick(screen.getByTestId("item-text-i1"));
+    await user.click(screen.getByTestId("item-edit-i1"));
     const input = screen.getByTestId<HTMLInputElement>("item-edit-input-i1");
     await user.click(input);
     await user.keyboard("{End}");
@@ -104,7 +104,7 @@ describe("ItemRow edit coords", () => {
         onEdit={onEdit}
       />
     );
-    await user.dblClick(screen.getByTestId("item-text-i1"));
+    await user.click(screen.getByTestId("item-edit-i1"));
     const input = screen.getByTestId<HTMLInputElement>("item-edit-input-i1");
     await user.click(input);
     await user.type(input, " hoy");
@@ -125,7 +125,7 @@ describe("ItemRow edit autocomplete", () => {
         onEdit={vi.fn()}
       />
     );
-    await user.dblClick(screen.getByTestId("item-text-i1"));
+    await user.click(screen.getByTestId("item-edit-i1"));
     const input = screen.getByTestId("item-edit-input-i1");
     await user.click(input);
     await user.type(input, " @Mad");
@@ -142,7 +142,7 @@ describe("ItemRow edit autocomplete", () => {
         onEdit={vi.fn()}
       />
     );
-    await user.dblClick(screen.getByTestId("item-text-i1"));
+    await user.click(screen.getByTestId("item-edit-i1"));
     const input = screen.getByTestId<HTMLInputElement>("item-edit-input-i1");
     await user.click(input);
     await user.type(input, " /");
