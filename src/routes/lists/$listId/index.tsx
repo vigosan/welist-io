@@ -72,6 +72,7 @@ function ListDetailPage() {
   const { status: statusFilter, tag: activeTag } = Route.useSearch();
   const [searchQuery, setSearchQuery] = useState("");
   const [searchActive, setSearchActive] = useState(false);
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [participantsPanelOpen, setParticipantsPanelOpen] = useState(false);
   const [activePlace, setActivePlace] = useState<string | undefined>(undefined);
@@ -266,6 +267,12 @@ function ListDetailPage() {
   const hasGeoItems = items.some(
     (i) => i.latitude !== null && i.longitude !== null
   );
+  const hasFilterableContent =
+    allTags.length > 0 ||
+    allPlaces.length > 0 ||
+    statusFilter !== "all" ||
+    !!activeTag ||
+    !!activePlace;
   const prevProgress = useRef(0);
   useEffect(() => {
     if (progress === 100 && prevProgress.current < 100 && items.length > 0)
@@ -317,6 +324,30 @@ function ListDetailPage() {
                             strokeLinejoin="round"
                             strokeWidth={2}
                             d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                          />
+                        </svg>
+                      </button>
+                    )}
+                    {hasFilterableContent && (
+                      <button
+                        type="button"
+                        onClick={() => setFiltersOpen((v) => !v)}
+                        data-testid="filter-toggle-btn-inline"
+                        aria-label={t("list.filters")}
+                        className={`cursor-pointer h-7 w-7 flex items-center justify-center rounded-md border transition active:scale-[0.96] ${filtersOpen ? "border-gray-900 bg-gray-900 text-white" : "border-gray-200 text-gray-400 hover:border-gray-400 hover:text-gray-700"}`}
+                      >
+                        <svg
+                          aria-hidden="true"
+                          className="w-3.5 h-3.5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M3 4h18M7 9h10M11 14h2"
                           />
                         </svg>
                       </button>
@@ -590,6 +621,7 @@ function ListDetailPage() {
 
                 {!itemsLoading && (items.length > 0 || isOwner) && (
                   <ListFilterBar
+                    open={filtersOpen}
                     statusFilter={statusFilter}
                     activeTag={activeTag}
                     activePlace={activePlace}
