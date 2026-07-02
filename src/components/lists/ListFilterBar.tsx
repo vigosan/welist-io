@@ -3,6 +3,7 @@ import { useTranslation } from "@/i18n/service";
 import { tagColor } from "@/lib/tags";
 
 interface Props {
+  open: boolean;
   statusFilter: "all" | "pending" | "done";
   activeTag: string | undefined;
   activePlace: string | undefined;
@@ -29,6 +30,7 @@ const PIN_SVG = (
 );
 
 export function ListFilterBar({
+  open,
   statusFilter,
   activeTag,
   activePlace,
@@ -39,7 +41,6 @@ export function ListFilterBar({
   onPlaceFilter,
 }: Props) {
   const { t } = useTranslation();
-  const [open, setOpen] = useState(false);
   const [showAllTags, setShowAllTags] = useState(false);
   const [showAllPlaces, setShowAllPlaces] = useState(false);
 
@@ -50,123 +51,71 @@ export function ListFilterBar({
     : allPlaces.slice(0, CHIP_LIMIT);
 
   const hasFilters = statusFilter !== "all" || !!activeTag || !!activePlace;
-  const hasOptions = allTags.length > 0 || allPlaces.length > 0;
 
-  if (!hasOptions && statusFilter === "all") return null;
+  if (!open && !hasFilters) return null;
 
   return (
     <div className="mt-3 order-7">
-      {/* Toggle row */}
-      <div className="flex items-center gap-2 flex-wrap">
-        <button
-          type="button"
-          data-testid="filter-toggle"
-          onClick={() => setOpen((v) => !v)}
-          className={`cursor-pointer inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-medium transition ${
-            hasFilters
-              ? "border-gray-900 bg-gray-900 text-white dark:border-gray-100 dark:bg-gray-100 dark:text-gray-900"
-              : "border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-700 dark:hover:text-gray-200"
-          }`}
-        >
-          <svg
-            aria-hidden="true"
-            className="w-2.5 h-2.5 shrink-0"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M3 4h18M7 9h10M11 14h2"
-            />
-          </svg>
-          {t("list.filters")}
-          {hasFilters && (
-            <span className="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-white/20 dark:bg-black/20 text-[10px] font-bold leading-none">
-              {(statusFilter !== "all" ? 1 : 0) +
-                (activeTag ? 1 : 0) +
-                (activePlace ? 1 : 0)}
-            </span>
+      {/* Active filter summary pills (collapsed state) */}
+      {!open && hasFilters && (
+        <div className="flex items-center gap-1.5 flex-wrap">
+          {statusFilter !== "all" && (
+            <button
+              type="button"
+              data-testid={`status-filter-${statusFilter}`}
+              onClick={() => onStatusFilter("all")}
+              className="cursor-pointer inline-flex items-center gap-1 rounded-full border border-gray-200 dark:border-gray-700 px-2 py-0.5 text-xs text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 hover:border-gray-400 hover:text-gray-700 transition"
+            >
+              {statusFilter === "pending"
+                ? t("list.filterPending")
+                : t("list.filterDone")}
+              <span
+                aria-hidden
+                className="text-gray-300 dark:text-gray-600 leading-none"
+              >
+                ×
+              </span>
+            </button>
           )}
-          <svg
-            aria-hidden="true"
-            className={`w-2.5 h-2.5 shrink-0 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M19 9l-7 7-7-7"
-            />
-          </svg>
-        </button>
-
-        {/* Active filter summary pills (collapsed state) */}
-        {!open && hasFilters && (
-          <div className="flex items-center gap-1.5 flex-wrap">
-            {statusFilter !== "all" && (
-              <button
-                type="button"
-                data-testid={`status-filter-${statusFilter}`}
-                onClick={() => onStatusFilter("all")}
-                className="cursor-pointer inline-flex items-center gap-1 rounded-full border border-gray-200 dark:border-gray-700 px-2 py-0.5 text-xs text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 hover:border-gray-400 hover:text-gray-700 transition"
+          {activeTag && (
+            <button
+              type="button"
+              data-testid={`tag-filter-${activeTag}`}
+              onClick={() => onTagFilter(null)}
+              className="cursor-pointer inline-flex items-center gap-1 rounded-full border border-gray-200 dark:border-gray-700 px-2 py-0.5 text-xs text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 hover:border-gray-400 hover:text-gray-700 transition"
+            >
+              #{activeTag}
+              <span
+                aria-hidden
+                className="text-gray-300 dark:text-gray-600 leading-none"
               >
-                {statusFilter === "pending"
-                  ? t("list.filterPending")
-                  : t("list.filterDone")}
-                <span
-                  aria-hidden
-                  className="text-gray-300 dark:text-gray-600 leading-none"
-                >
-                  ×
-                </span>
-              </button>
-            )}
-            {activeTag && (
-              <button
-                type="button"
-                data-testid={`tag-filter-${activeTag}`}
-                onClick={() => onTagFilter(null)}
-                className="cursor-pointer inline-flex items-center gap-1 rounded-full border border-gray-200 dark:border-gray-700 px-2 py-0.5 text-xs text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 hover:border-gray-400 hover:text-gray-700 transition"
+                ×
+              </span>
+            </button>
+          )}
+          {activePlace && (
+            <button
+              type="button"
+              data-testid={`place-filter-${activePlace}`}
+              onClick={() => onPlaceFilter(undefined)}
+              className="cursor-pointer inline-flex items-center gap-1 rounded-full border border-gray-200 dark:border-gray-700 px-2 py-0.5 text-xs text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 hover:border-gray-400 hover:text-gray-700 transition"
+            >
+              {PIN_SVG}
+              {activePlace}
+              <span
+                aria-hidden
+                className="text-gray-300 dark:text-gray-600 leading-none"
               >
-                #{activeTag}
-                <span
-                  aria-hidden
-                  className="text-gray-300 dark:text-gray-600 leading-none"
-                >
-                  ×
-                </span>
-              </button>
-            )}
-            {activePlace && (
-              <button
-                type="button"
-                data-testid={`place-filter-${activePlace}`}
-                onClick={() => onPlaceFilter(undefined)}
-                className="cursor-pointer inline-flex items-center gap-1 rounded-full border border-gray-200 dark:border-gray-700 px-2 py-0.5 text-xs text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 hover:border-gray-400 hover:text-gray-700 transition"
-              >
-                {PIN_SVG}
-                {activePlace}
-                <span
-                  aria-hidden
-                  className="text-gray-300 dark:text-gray-600 leading-none"
-                >
-                  ×
-                </span>
-              </button>
-            )}
-          </div>
-        )}
-      </div>
+                ×
+              </span>
+            </button>
+          )}
+        </div>
+      )}
 
       {/* Expanded panel */}
       {open && (
-        <div className="mt-2 -mx-5 relative">
+        <div className="-mx-5 relative">
           <div
             className="pointer-events-none absolute left-0 top-0 bottom-0 w-5 z-10 bg-gradient-to-r from-canvas dark:from-canvas-dark to-transparent"
             aria-hidden

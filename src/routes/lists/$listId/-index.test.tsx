@@ -145,6 +145,7 @@ function setupMocks({
   categoryMutate = vi.fn(),
   bulkIsPending = false,
   sessionUser = null as SessionUser | null,
+  allTags = [] as string[],
 }: {
   items?: ItemView[];
   list?: ListWithParticipation;
@@ -158,6 +159,7 @@ function setupMocks({
   categoryMutate?: ReturnType<typeof vi.fn>;
   bulkIsPending?: boolean;
   sessionUser?: SessionUser | null;
+  allTags?: string[];
 } = {}) {
   vi.mocked(useSession).mockReturnValue({
     data: sessionUser ? { user: sessionUser, expires: "" } : null,
@@ -222,7 +224,7 @@ function setupMocks({
 
   vi.mocked(useItemsFilter).mockReturnValue({
     stableItems: items,
-    allTags: [],
+    allTags,
     allPlaces: [],
     filteredItems,
     resetOrder: vi.fn(),
@@ -572,6 +574,33 @@ describe("ListDetailPage", () => {
         expect(screen.getByTestId("list-settings-panel")).toBeInTheDocument()
       );
       expect(screen.getByTestId("item-delete-i1")).toBeInTheDocument();
+    });
+
+    it("opens the filter panel from the header filter button", async () => {
+      setupMocks({ allTags: ["comida"] });
+      renderPage();
+      await waitFor(() =>
+        expect(
+          screen.getByTestId("filter-toggle-btn-inline")
+        ).toBeInTheDocument()
+      );
+      expect(screen.queryByTestId("filter-toggle")).not.toBeInTheDocument();
+      await userEvent.click(screen.getByTestId("filter-toggle-btn-inline"));
+      await waitFor(() =>
+        expect(screen.getByTestId("status-filter-pending")).toBeInTheDocument()
+      );
+      expect(screen.getByTestId("tag-filter-comida")).toBeInTheDocument();
+    });
+
+    it("hides the filter button when there is nothing to filter by", async () => {
+      setupMocks();
+      renderPage();
+      await waitFor(() =>
+        expect(screen.getByText("Mi lista")).toBeInTheDocument()
+      );
+      expect(
+        screen.queryByTestId("filter-toggle-btn-inline")
+      ).not.toBeInTheDocument();
     });
 
     it("keeps settings and view actions out of the filter chip row", async () => {
