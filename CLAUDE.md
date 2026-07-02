@@ -29,12 +29,12 @@ DB credentials are read from 1Password via `op read`. Items: `Private → Apunta
 
 ### Request flow
 ```
-Browser → Vite (:5173) → proxy /api/* → Hono (:3001 dev / Vercel Edge prod)
+Browser → Vite (:5173) → proxy /api/* → Hono (:3001 dev / Vercel Functions prod)
                                              ↓
                                     Drizzle ORM → Neon (PostgreSQL)
 ```
 
-**API** (`api/app.ts`) — plain Hono app, no auth. `api/index.ts` wraps it for Vercel Edge (`export const config = { runtime: "edge" }`). `api/serve.ts` is the local dev server (excluded from Vercel via `.vercelignore`). ESM imports in `api/` require explicit `.js` extensions.
+**API** (`api/app.ts`) — plain Hono app, no auth. `api/index.ts` wraps it for Vercel Functions by re-exporting `app.fetch` (Node.js runtime — no `runtime: "edge"` config). `api/serve.ts` is the local dev server (excluded from Vercel via `.vercelignore`). ESM imports in `api/` require explicit `.js` extensions.
 
 **Frontend** — service/hook/view layered architecture:
 - `src/services/` — raw `apiClient` calls, return typed data
