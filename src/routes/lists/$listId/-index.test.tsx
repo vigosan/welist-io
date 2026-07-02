@@ -574,33 +574,19 @@ describe("ListDetailPage", () => {
       expect(screen.getByTestId("item-delete-i1")).toBeInTheDocument();
     });
 
-    it("opens the settings panel from the inline chip without using the dropdown", async () => {
+    it("keeps settings and view actions out of the filter chip row", async () => {
       setupMocks({
         list: { ...LIST, ownerId: "owner-id" },
         sessionUser: { id: "owner-id" },
       });
       renderPage();
       await waitFor(() =>
-        expect(screen.getByTestId("settings-chip-toggle")).toBeInTheDocument()
-      );
-      await userEvent.click(screen.getByTestId("settings-chip-toggle"));
-      await waitFor(() =>
-        expect(screen.getByTestId("list-settings-panel")).toBeInTheDocument()
-      );
-    });
-
-    it("hides the settings chip for non-owners", async () => {
-      setupMocks({
-        list: { ...LIST, ownerId: "other-user" },
-        sessionUser: { id: "me" },
-      });
-      renderPage();
-      await waitFor(() =>
-        expect(screen.getByText("Mi lista")).toBeInTheDocument()
+        expect(screen.getByTestId("add-item-input")).toBeInTheDocument()
       );
       expect(
         screen.queryByTestId("settings-chip-toggle")
       ).not.toBeInTheDocument();
+      expect(screen.queryByTestId("view-chip-toggle")).not.toBeInTheDocument();
     });
   });
 });

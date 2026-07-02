@@ -24,9 +24,7 @@ import { ActiveParticipants } from "@/components/lists/ActiveParticipants";
 import { ListDropdownMenu } from "@/components/lists/ListDropdownMenu";
 import { ListFilterBar } from "@/components/lists/ListFilterBar";
 import { ListSearchBar } from "@/components/lists/ListSearchBar";
-import { ListSettingsChip } from "@/components/lists/ListSettingsChip";
 import { ListStatsCard } from "@/components/lists/ListStatsCard";
-import { ListViewChip } from "@/components/lists/ListViewChip";
 import { ParticipantsPanel } from "@/components/lists/ParticipantsPanel";
 import { SignInNudge } from "@/components/SignInNudge";
 import { Progress } from "@/components/ui";
@@ -600,20 +598,6 @@ function ListDetailPage() {
                     onStatusFilter={setStatusFilter}
                     onTagFilter={setActiveTag}
                     onPlaceFilter={setActivePlace}
-                    trailingSlot={
-                      <>
-                        {isOwner && (
-                          <ListSettingsChip
-                            active={settingsOpen}
-                            onToggle={() => setSettingsOpen((v) => !v)}
-                          />
-                        )}
-                        <ListViewChip
-                          viewMode={viewMode}
-                          onChange={setViewMode}
-                        />
-                      </>
-                    }
                   />
                 )}
               </div>

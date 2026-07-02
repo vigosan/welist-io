@@ -188,7 +188,6 @@ const es = {
     challengeCompleted: "¡Reto completado!",
     canContribute: "Puedes añadir elementos",
     settings: "Ajustes de la lista",
-    settingsChip: "Ajustes",
     deleteMenuItem: "Borrar lista",
     visibility: "Visibilidad",
     access: "Acceso",
@@ -203,7 +202,6 @@ const es = {
     accessCollaborative: "Colaborativa",
     mapView: "Mapa",
     listView: "Lista",
-    viewChip: "Vista",
     mapEmptyTitle: "Aún no hay lugares geolocalizados",
     mapEmptyHint:
       "Escribe @ seguido del nombre de un lugar al añadir o editar un elemento para situarlo en el mapa.",
