@@ -21,7 +21,6 @@ import { AddItemForm } from "@/components/items/AddItemForm";
 import { ItemRow } from "@/components/items/ItemRow";
 import { ListSettingsPanel } from "@/components/ListSettingsPanel";
 import { ActiveParticipants } from "@/components/lists/ActiveParticipants";
-import { CollectionPicker } from "@/components/lists/CollectionPicker";
 import { ListDropdownMenu } from "@/components/lists/ListDropdownMenu";
 import { ListFilterBar } from "@/components/lists/ListFilterBar";
 import { ListSearchBar } from "@/components/lists/ListSearchBar";
@@ -84,7 +83,6 @@ function ListDetailPage() {
   );
   const [menuOpen, setMenuOpen] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
-  const [collectionPickerOpen, setCollectionPickerOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const addInputRef = useRef<HTMLInputElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -383,7 +381,6 @@ function ListDetailPage() {
                         onOpenPalette={() => setPaletteOpen(true)}
                         onShare={handleShare}
                         onExport={handleExport}
-                        onAddToCollection={() => setCollectionPickerOpen(true)}
                         onToggleSettings={() => setSettingsOpen((v) => !v)}
                         onDelete={() => setConfirmDelete(true)}
                         onClose={() => setMenuOpen(false)}
@@ -812,12 +809,6 @@ function ListDetailPage() {
         }}
         onCancel={() => setConfirmDelete(false)}
       />
-      {collectionPickerOpen && (
-        <CollectionPicker
-          listId={list?.id ?? listId}
-          onClose={() => setCollectionPickerOpen(false)}
-        />
-      )}
     </>
   );
 }

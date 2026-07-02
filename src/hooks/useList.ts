@@ -12,7 +12,6 @@ import type {
   ListWithParticipation,
 } from "@/services/lists.service";
 import {
-  collectionsService,
   duelService,
   feedService,
   listsService,
@@ -312,80 +311,6 @@ export function useFeed(enabled: boolean) {
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (last) => last.nextCursor ?? undefined,
     enabled,
-  });
-}
-
-export function useCollections() {
-  return useInfiniteQuery({
-    queryKey: queryKeys.collections(),
-    queryFn: ({ pageParam }) => collectionsService.explore(pageParam),
-    initialPageParam: undefined as string | undefined,
-    getNextPageParam: (last) => last.nextCursor ?? undefined,
-  });
-}
-
-export function useMyCollections(enabled: boolean) {
-  return useQuery({
-    queryKey: queryKeys.myCollections(),
-    queryFn: () => collectionsService.mine(),
-    enabled,
-  });
-}
-
-export function useCollectionDetail(id: string) {
-  return useQuery({
-    queryKey: queryKeys.collectionDetail(id),
-    queryFn: () => collectionsService.detail(id),
-  });
-}
-
-export function useCreateCollection() {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: (input: {
-      name: string;
-      description?: string;
-      public?: boolean;
-    }) => collectionsService.create(input),
-    onSuccess: () =>
-      qc.invalidateQueries({ queryKey: queryKeys.myCollections() }),
-  });
-}
-
-export function useDeleteCollection() {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: (id: string) => collectionsService.delete(id),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: queryKeys.myCollections() });
-      qc.invalidateQueries({ queryKey: queryKeys.collections() });
-    },
-  });
-}
-
-export function useAddListToCollection() {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: (input: { collectionId: string; listId: string }) =>
-      collectionsService.addList(input.collectionId, input.listId),
-    onSuccess: (_data, { collectionId }) => {
-      qc.invalidateQueries({
-        queryKey: queryKeys.collectionDetail(collectionId),
-      });
-      qc.invalidateQueries({ queryKey: queryKeys.myCollections() });
-    },
-  });
-}
-
-export function useRemoveListFromCollection() {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: (input: { collectionId: string; listId: string }) =>
-      collectionsService.removeList(input.collectionId, input.listId),
-    onSuccess: (_data, { collectionId }) =>
-      qc.invalidateQueries({
-        queryKey: queryKeys.collectionDetail(collectionId),
-      }),
   });
 }
 

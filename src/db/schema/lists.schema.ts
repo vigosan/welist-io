@@ -364,52 +364,8 @@ export const userSettings = pgTable("user_settings", {
     .notNull(),
 });
 
-export const collections = pgTable(
-  "collections",
-  {
-    id: uuid("id").defaultRandom().primaryKey(),
-    ownerId: text("owner_id")
-      .notNull()
-      .references(() => users.id, { onDelete: "cascade" }),
-    name: text("name").notNull(),
-    slug: text("slug").unique(),
-    description: text("description"),
-    public: boolean("public").notNull().default(true),
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .defaultNow()
-      .notNull(),
-  },
-  (t) => [index("collections_owner_idx").on(t.ownerId)]
-);
-
-export const collectionLists = pgTable(
-  "collection_lists",
-  {
-    id: uuid("id").defaultRandom().primaryKey(),
-    collectionId: uuid("collection_id")
-      .notNull()
-      .references(() => collections.id, { onDelete: "cascade" }),
-    listId: uuid("list_id")
-      .notNull()
-      .references(() => lists.id, { onDelete: "cascade" }),
-    position: integer("position").notNull().default(0),
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .defaultNow()
-      .notNull(),
-  },
-  (t) => [
-    unique("collection_lists_collection_list_uidx").on(
-      t.collectionId,
-      t.listId
-    ),
-    index("collection_lists_collection_idx").on(t.collectionId),
-  ]
-);
-
 export type Report = typeof reports.$inferSelect;
 export type UserSettings = typeof userSettings.$inferSelect;
-export type Collection = typeof collections.$inferSelect;
-export type CollectionList = typeof collectionLists.$inferSelect;
 
 export type List = typeof lists.$inferSelect;
 export type Follow = typeof follows.$inferSelect;

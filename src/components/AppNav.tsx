@@ -211,11 +211,6 @@ export function AppNav() {
               label={t("directory.nav")}
               testId="nav-users"
             />
-            <NavLink
-              to="/collections"
-              label={t("collections.nav")}
-              testId="nav-collections"
-            />
             <NavLink to="/help" label={t("help.nav")} testId="nav-help" />
 
             <div className="w-px h-3.5 bg-black/[0.08] dark:bg-white/[0.08]" />
@@ -388,14 +383,6 @@ export function AppNav() {
                 onClick={closeMobile}
               >
                 {t("directory.nav")}
-              </Link>
-              <Link
-                to="/collections"
-                data-testid="nav-collections-mobile"
-                className="block px-6 py-3 text-sm font-medium text-ink dark:text-paper hover:bg-black/[0.02] dark:hover:bg-white/[0.03] transition-colors duration-150 no-underline"
-                onClick={closeMobile}
-              >
-                {t("collections.nav")}
               </Link>
             </div>
 

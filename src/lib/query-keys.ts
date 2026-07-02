@@ -29,9 +29,6 @@ export const queryKeys = {
   followStatus: (userId: string) => ["follow-status", userId] as const,
   notifications: () => ["notifications"] as const,
   feed: () => ["feed"] as const,
-  collections: () => ["collections"] as const,
-  myCollections: () => ["my-collections"] as const,
-  collectionDetail: (id: string) => ["collection-detail", id] as const,
   duel: (listId: string, opponentId: string) =>
     ["duel", listId, opponentId] as const,
   stats: () => ["stats"] as const,

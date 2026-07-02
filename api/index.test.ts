@@ -6,8 +6,6 @@ const mockDb = {
     items: { findMany: vi.fn(), findFirst: vi.fn() },
     participations: { findFirst: vi.fn(), findMany: vi.fn() },
     itemProgress: { findFirst: vi.fn(), findMany: vi.fn() },
-    collections: { findFirst: vi.fn(), findMany: vi.fn() },
-    collectionLists: { findFirst: vi.fn(), findMany: vi.fn() },
     users: { findFirst: vi.fn() },
     stripeAccounts: { findFirst: vi.fn() },
     listPurchases: { findFirst: vi.fn() },
@@ -75,8 +73,6 @@ const { app } = await import("./app.js");
 const { sendEmail: mockSendEmail } = await import("./email.js");
 const { sendExpoPush: mockSendExpoPush } = await import("./push.js");
 const {
-  collectionLists,
-  collections,
   deviceTokens,
   items,
   lists,
@@ -4267,146 +4263,6 @@ describe("web push subscription endpoints", () => {
     });
     expect(res.status).toBe(204);
     expect(mockDb.delete).toHaveBeenCalledWith(webPushSubscriptions);
-  });
-});
-
-describe("collections", () => {
-  const headers = { "Content-Type": "application/json" };
-  beforeEach(() => vi.clearAllMocks());
-  afterEach(() => mockDb.query.collections.findFirst.mockReset());
-
-  it("creates a collection for the authenticated user", async () => {
-    mockGetAuthUser.mockResolvedValueOnce({ session: { user: { id: "u1" } } });
-    const values = vi.fn().mockReturnValue({
-      returning: vi.fn().mockResolvedValue([{ id: "c1", name: "Trips" }]),
-    });
-    mockDb.insert.mockReturnValue({ values });
-
-    const res = await app.request("/api/collections", {
-      method: "POST",
-      headers,
-      body: JSON.stringify({ name: "Trips" }),
-    });
-    expect(res.status).toBe(201);
-    expect(mockDb.insert).toHaveBeenCalledWith(collections);
-    expect(values).toHaveBeenCalledWith(
-      expect.objectContaining({ ownerId: "u1", name: "Trips" })
-    );
-  });
-
-  it("requires auth to create a collection", async () => {
-    mockGetAuthUser.mockRejectedValueOnce(new Error("no session"));
-    const res = await app.request("/api/collections", {
-      method: "POST",
-      headers,
-      body: JSON.stringify({ name: "Trips" }),
-    });
-    expect(res.status).toBe(401);
-  });
-
-  it("returns a public collection with its lists", async () => {
-    mockDb.query.collections.findFirst.mockResolvedValue({
-      id: "c1",
-      name: "Trips",
-      slug: "trips",
-      description: null,
-      public: true,
-      ownerId: "u1",
-    });
-    mockDb.query.users.findFirst.mockResolvedValue({
-      id: "u1",
-      name: "Ana",
-      image: null,
-    });
-    mockDb.select.mockReturnValue({
-      from: vi.fn().mockReturnThis(),
-      innerJoin: vi.fn().mockReturnThis(),
-      where: vi.fn().mockReturnThis(),
-      orderBy: vi.fn().mockResolvedValue([
-        {
-          id: "l1",
-          name: "Japan",
-          slug: null,
-          description: null,
-          itemCount: 3,
-        },
-      ]),
-    });
-
-    const res = await app.request("/api/collections/trips");
-    expect(res.status).toBe(200);
-    const body = (await res.json()) as { lists: unknown[] };
-    expect(body.lists).toHaveLength(1);
-  });
-
-  it("hides a private collection from non-owners", async () => {
-    mockDb.query.collections.findFirst.mockResolvedValue({
-      id: "c1",
-      name: "Secret",
-      slug: null,
-      description: null,
-      public: false,
-      ownerId: "owner",
-    });
-    const res = await app.request("/api/collections/c1");
-    expect(res.status).toBe(404);
-  });
-
-  it("lets the owner add a list to a collection", async () => {
-    mockGetAuthUser.mockResolvedValueOnce({ session: { user: { id: "u1" } } });
-    mockDb.query.collections.findFirst.mockResolvedValue({
-      id: "c1",
-      ownerId: "u1",
-    });
-    mockDb.select.mockReturnValue({
-      from: vi.fn().mockReturnThis(),
-      where: vi.fn().mockResolvedValue([{ pos: 2 }]),
-    });
-    mockDb.insert.mockReturnValue({
-      values: vi.fn().mockReturnValue({
-        onConflictDoNothing: vi.fn().mockResolvedValue(undefined),
-      }),
-    });
-
-    const res = await app.request("/api/collections/c1/lists", {
-      method: "POST",
-      headers,
-      body: JSON.stringify({
-        listId: "11111111-1111-1111-1111-111111111111",
-      }),
-    });
-    expect(res.status).toBe(204);
-    expect(mockDb.insert).toHaveBeenCalledWith(collectionLists);
-  });
-
-  it("forbids a non-owner from adding a list", async () => {
-    mockGetAuthUser.mockResolvedValueOnce({ session: { user: { id: "u2" } } });
-    mockDb.query.collections.findFirst.mockResolvedValue({
-      id: "c1",
-      ownerId: "u1",
-    });
-    const res = await app.request("/api/collections/c1/lists", {
-      method: "POST",
-      headers,
-      body: JSON.stringify({
-        listId: "11111111-1111-1111-1111-111111111111",
-      }),
-    });
-    expect(res.status).toBe(403);
-  });
-
-  it("lets the owner delete a collection", async () => {
-    mockGetAuthUser.mockResolvedValueOnce({ session: { user: { id: "u1" } } });
-    mockDb.query.collections.findFirst.mockResolvedValue({
-      id: "c1",
-      ownerId: "u1",
-    });
-    mockDb.delete.mockReturnValue({
-      where: vi.fn().mockResolvedValue(undefined),
-    });
-    const res = await app.request("/api/collections/c1", { method: "DELETE" });
-    expect(res.status).toBe(204);
-    expect(mockDb.delete).toHaveBeenCalledWith(collections);
   });
 });
 
