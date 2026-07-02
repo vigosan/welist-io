@@ -1,4 +1,3 @@
-import type { ReactNode } from "react";
 import { useState } from "react";
 import { useTranslation } from "@/i18n/service";
 import { tagColor } from "@/lib/tags";
@@ -12,7 +11,6 @@ interface Props {
   onStatusFilter: (s: "all" | "pending" | "done") => void;
   onTagFilter: (tag: string | null) => void;
   onPlaceFilter: (place: string | undefined) => void;
-  trailingSlot?: ReactNode;
 }
 
 const PIN_SVG = (
@@ -39,7 +37,6 @@ export function ListFilterBar({
   onStatusFilter,
   onTagFilter,
   onPlaceFilter,
-  trailingSlot,
 }: Props) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
@@ -54,66 +51,63 @@ export function ListFilterBar({
 
   const hasFilters = statusFilter !== "all" || !!activeTag || !!activePlace;
   const hasOptions = allTags.length > 0 || allPlaces.length > 0;
-  const hideFilterChip = !hasOptions && statusFilter === "all";
 
-  if (hideFilterChip && !trailingSlot) return null;
+  if (!hasOptions && statusFilter === "all") return null;
 
   return (
     <div className="mt-3 order-7">
       {/* Toggle row */}
       <div className="flex items-center gap-2 flex-wrap">
-        {!hideFilterChip && (
-          <button
-            type="button"
-            data-testid="filter-toggle"
-            onClick={() => setOpen((v) => !v)}
-            className={`cursor-pointer inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-medium transition ${
-              hasFilters
-                ? "border-gray-900 bg-gray-900 text-white dark:border-gray-100 dark:bg-gray-100 dark:text-gray-900"
-                : "border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-700 dark:hover:text-gray-200"
-            }`}
+        <button
+          type="button"
+          data-testid="filter-toggle"
+          onClick={() => setOpen((v) => !v)}
+          className={`cursor-pointer inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-medium transition ${
+            hasFilters
+              ? "border-gray-900 bg-gray-900 text-white dark:border-gray-100 dark:bg-gray-100 dark:text-gray-900"
+              : "border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-700 dark:hover:text-gray-200"
+          }`}
+        >
+          <svg
+            aria-hidden="true"
+            className="w-2.5 h-2.5 shrink-0"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            viewBox="0 0 24 24"
           >
-            <svg
-              aria-hidden="true"
-              className="w-2.5 h-2.5 shrink-0"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M3 4h18M7 9h10M11 14h2"
-              />
-            </svg>
-            {t("list.filters")}
-            {hasFilters && (
-              <span className="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-white/20 dark:bg-black/20 text-[10px] font-bold leading-none">
-                {(statusFilter !== "all" ? 1 : 0) +
-                  (activeTag ? 1 : 0) +
-                  (activePlace ? 1 : 0)}
-              </span>
-            )}
-            <svg
-              aria-hidden="true"
-              className={`w-2.5 h-2.5 shrink-0 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M19 9l-7 7-7-7"
-              />
-            </svg>
-          </button>
-        )}
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M3 4h18M7 9h10M11 14h2"
+            />
+          </svg>
+          {t("list.filters")}
+          {hasFilters && (
+            <span className="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-white/20 dark:bg-black/20 text-[10px] font-bold leading-none">
+              {(statusFilter !== "all" ? 1 : 0) +
+                (activeTag ? 1 : 0) +
+                (activePlace ? 1 : 0)}
+            </span>
+          )}
+          <svg
+            aria-hidden="true"
+            className={`w-2.5 h-2.5 shrink-0 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M19 9l-7 7-7-7"
+            />
+          </svg>
+        </button>
 
         {/* Active filter summary pills (collapsed state) */}
-        {!hideFilterChip && !open && hasFilters && (
+        {!open && hasFilters && (
           <div className="flex items-center gap-1.5 flex-wrap">
             {statusFilter !== "all" && (
               <button
@@ -168,11 +162,10 @@ export function ListFilterBar({
             )}
           </div>
         )}
-        {trailingSlot}
       </div>
 
       {/* Expanded panel */}
-      {!hideFilterChip && open && (
+      {open && (
         <div className="mt-2 -mx-5 relative">
           <div
             className="pointer-events-none absolute left-0 top-0 bottom-0 w-5 z-10 bg-gradient-to-r from-canvas dark:from-canvas-dark to-transparent"

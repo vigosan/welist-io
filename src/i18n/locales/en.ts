@@ -189,7 +189,6 @@ const en: Translations = {
     challengeCompleted: "Challenge completed!",
     canContribute: "You can add items",
     settings: "List settings",
-    settingsChip: "Settings",
     deleteMenuItem: "Delete list",
     visibility: "Visibility",
     access: "Access",
@@ -204,7 +203,6 @@ const en: Translations = {
     accessCollaborative: "Collaborative",
     mapView: "Map",
     listView: "List",
-    viewChip: "View",
     mapEmptyTitle: "No geolocated places yet",
     mapEmptyHint:
       "Type @ followed by a place name when adding or editing an item to pin it on the map.",
