@@ -741,6 +741,35 @@ describe("PATCH /api/lists/:listId/items/:itemId/toggle", () => {
     );
     expect(res.status).toBe(200);
   });
+
+  it("lets anyone view a public collaborative list but not edit it", async () => {
+    mockGetAuthUser.mockRejectedValue(new Error("no session"));
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "33333333-3333-3333-3333-333333333333",
+      ownerId: "owner-1",
+      collaborative: true,
+      public: true,
+      name: "open",
+      slug: "open",
+    });
+    mockDb.query.items.findFirst.mockResolvedValue({
+      id: "44444444-4444-4444-4444-444444444444",
+      done: false,
+    });
+    mockDb.query.participations.findFirst.mockResolvedValue(undefined);
+
+    const view = await app.request(
+      "/api/lists/33333333-3333-3333-3333-333333333333"
+    );
+    expect(view.status).toBe(200);
+
+    const edit = await app.request(
+      "/api/lists/33333333-3333-3333-3333-333333333333/items/44444444-4444-4444-4444-444444444444/toggle",
+      { method: "PATCH" }
+    );
+    expect(edit.status).toBe(403);
+    mockGetAuthUser.mockRejectedValue(new Error("no session"));
+  });
 });
 
 describe("DELETE /api/lists/:listId/items/:itemId", () => {
@@ -932,6 +961,9 @@ describe("Collaborative lists", () => {
   beforeEach(() => vi.clearAllMocks());
 
   it("non-owner can add item to collaborative list (200)", async () => {
+    mockGetAuthUser.mockResolvedValue({
+      session: { user: { id: "collab-user" } },
+    });
     const item = {
       id: "i1",
       listId: "abc",
@@ -943,6 +975,10 @@ describe("Collaborative lists", () => {
       id: "abc",
       ownerId: "owner-id",
       collaborative: true,
+    });
+    mockDb.query.participations.findFirst.mockResolvedValue({
+      id: "p1",
+      role: "collaborator",
     });
     mockDb.select.mockReturnValue({
       from: vi.fn().mockReturnValue({
@@ -962,6 +998,7 @@ describe("Collaborative lists", () => {
     });
 
     expect(res.status).toBe(201);
+    mockGetAuthUser.mockRejectedValue(new Error("no session"));
   });
 
   it("non-owner gets 403 on non-collaborative list", async () => {
