@@ -278,16 +278,40 @@ describe("GET /api/lists/:listId", () => {
     expect(res.status).toBe(404);
   });
 
-  it("returns 200 for private collaborative list when unauthenticated", async () => {
-    mockDb.query.lists.findFirst.mockResolvedValue({
-      id: "abc",
-      ownerId: "u1",
-      public: false,
-      collaborative: true,
+  it("hides a private collaborative list from a logged-in non-collaborator", async () => {
+    mockGetAuthUser.mockResolvedValue({
+      session: { user: { id: "stranger" } },
     });
-    mockDb.query.participations.findFirst.mockResolvedValue(null);
-    const res = await app.request("/api/lists/abc");
-    expect(res.status).toBe(200);
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "11111111-1111-1111-1111-111111111111",
+      ownerId: "owner-1",
+      collaborative: true,
+      public: false,
+      name: "secret",
+      slug: "secret",
+    });
+    mockDb.query.participations.findFirst.mockResolvedValue(undefined);
+    mockDb.query.listPurchases.findFirst.mockResolvedValue(undefined);
+    const res = await app.request(
+      "/api/lists/11111111-1111-1111-1111-111111111111"
+    );
+    expect(res.status).toBe(404);
+  });
+
+  it("returns 404 to anonymous on a private collaborative list", async () => {
+    mockGetAuthUser.mockRejectedValue(new Error("no session"));
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "11111111-1111-1111-1111-111111111111",
+      ownerId: "owner-1",
+      collaborative: true,
+      public: false,
+      name: "secret",
+      slug: "secret",
+    });
+    const res = await app.request(
+      "/api/lists/11111111-1111-1111-1111-111111111111"
+    );
+    expect(res.status).toBe(404);
   });
 });
 

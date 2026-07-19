@@ -391,18 +391,12 @@ async function canViewList(
   },
   userId: string | null
 ): Promise<boolean> {
-  if (
-    list.public ||
-    list.collaborative ||
-    (userId !== null && list.ownerId === userId)
-  )
-    return true;
-  if (userId && list.id) {
-    const participation = await getParticipation(list.id, userId);
-    if (participation) return true;
-    return hasPurchased(userId, list.id);
-  }
-  return false;
+  if (list.public) return true;
+  if (userId !== null && list.ownerId === userId) return true;
+  if (userId === null || !list.id) return false;
+  const participation = await getParticipation(list.id, userId);
+  if (participation) return true;
+  return hasPurchased(userId, list.id);
 }
 
 async function canModifyList(
