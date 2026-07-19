@@ -278,16 +278,66 @@ describe("GET /api/lists/:listId", () => {
     expect(res.status).toBe(404);
   });
 
-  it("returns 200 for private collaborative list when unauthenticated", async () => {
-    mockDb.query.lists.findFirst.mockResolvedValue({
-      id: "abc",
-      ownerId: "u1",
-      public: false,
-      collaborative: true,
+  it("hides a private collaborative list from a logged-in non-collaborator", async () => {
+    mockGetAuthUser.mockResolvedValue({
+      session: { user: { id: "stranger" } },
     });
-    mockDb.query.participations.findFirst.mockResolvedValue(null);
-    const res = await app.request("/api/lists/abc");
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "11111111-1111-1111-1111-111111111111",
+      ownerId: "owner-1",
+      collaborative: true,
+      public: false,
+      name: "secret",
+      slug: "secret",
+    });
+    mockDb.query.participations.findFirst.mockResolvedValue(undefined);
+    mockDb.query.listPurchases.findFirst.mockResolvedValue(undefined);
+    const res = await app.request(
+      "/api/lists/11111111-1111-1111-1111-111111111111"
+    );
+    expect(res.status).toBe(404);
+  });
+
+  it("returns 404 to anonymous on a private collaborative list", async () => {
+    mockGetAuthUser.mockRejectedValue(new Error("no session"));
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "11111111-1111-1111-1111-111111111111",
+      ownerId: "owner-1",
+      collaborative: true,
+      public: false,
+      name: "secret",
+      slug: "secret",
+    });
+    const res = await app.request(
+      "/api/lists/11111111-1111-1111-1111-111111111111"
+    );
+    expect(res.status).toBe(404);
+  });
+
+  it("does not auto-join a visitor as collaborator", async () => {
+    mockGetAuthUser.mockResolvedValue({
+      session: { user: { id: "collab-1" } },
+    });
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "11111111-1111-1111-1111-111111111111",
+      ownerId: "owner-1",
+      collaborative: true,
+      public: false,
+      name: "secret",
+      slug: "secret",
+    });
+    mockDb.query.participations.findFirst.mockResolvedValue({
+      id: "p1",
+      completedAt: null,
+      role: "collaborator",
+    });
+    mockDb.insert.mockReturnValue(chainableInsert());
+    const res = await app.request(
+      "/api/lists/11111111-1111-1111-1111-111111111111"
+    );
     expect(res.status).toBe(200);
+    expect(mockDb.insert).not.toHaveBeenCalledWith(participations);
+    mockGetAuthUser.mockRejectedValue(new Error("no session"));
   });
 });
 
@@ -634,6 +684,115 @@ describe("PATCH /api/lists/:listId/items/:itemId/toggle", () => {
     });
     expect(res.status).toBe(404);
   });
+
+  it("blocks anonymous edits on a private collaborative list", async () => {
+    mockGetAuthUser.mockRejectedValue(new Error("no session"));
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "11111111-1111-1111-1111-111111111111",
+      ownerId: "owner-1",
+      collaborative: true,
+      public: false,
+    });
+    mockDb.query.items.findFirst.mockResolvedValue({
+      id: "22222222-2222-2222-2222-222222222222",
+      done: false,
+    });
+    mockDb.query.participations.findFirst.mockResolvedValue(undefined);
+    const res = await app.request(
+      "/api/lists/11111111-1111-1111-1111-111111111111/items/22222222-2222-2222-2222-222222222222/toggle",
+      { method: "PATCH" }
+    );
+    expect(res.status).toBe(403);
+  });
+
+  it("allows an explicit collaborator to edit a private collaborative list", async () => {
+    mockGetAuthUser.mockResolvedValue({
+      session: { user: { id: "collab-1" } },
+    });
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "11111111-1111-1111-1111-111111111111",
+      ownerId: "owner-1",
+      collaborative: true,
+      public: false,
+    });
+    mockDb.query.items.findFirst.mockResolvedValue({
+      id: "22222222-2222-2222-2222-222222222222",
+      done: false,
+    });
+    mockDb.query.participations.findFirst.mockResolvedValue({
+      id: "p1",
+      completedAt: null,
+      role: "collaborator",
+    });
+    mockDb.update.mockReturnValue({
+      set: vi.fn().mockReturnValue({
+        where: vi.fn().mockReturnValue({
+          returning: vi
+            .fn()
+            .mockResolvedValue([
+              { id: "22222222-2222-2222-2222-222222222222", done: false },
+            ]),
+        }),
+      }),
+    });
+    const res = await app.request(
+      "/api/lists/11111111-1111-1111-1111-111111111111/items/22222222-2222-2222-2222-222222222222/toggle",
+      { method: "PATCH" }
+    );
+    expect(res.status).toBe(200);
+  });
+
+  it("blocks a logged-in non-collaborator from editing a private collaborative list", async () => {
+    mockGetAuthUser.mockResolvedValue({
+      session: { user: { id: "stranger" } },
+    });
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "11111111-1111-1111-1111-111111111111",
+      ownerId: "owner-1",
+      collaborative: true,
+      public: false,
+    });
+    mockDb.query.items.findFirst.mockResolvedValue({
+      id: "22222222-2222-2222-2222-222222222222",
+      done: false,
+    });
+    mockDb.query.participations.findFirst.mockResolvedValue(undefined);
+    const res = await app.request(
+      "/api/lists/11111111-1111-1111-1111-111111111111/items/22222222-2222-2222-2222-222222222222/toggle",
+      { method: "PATCH" }
+    );
+    expect(res.status).toBe(403);
+    mockGetAuthUser.mockRejectedValue(new Error("no session"));
+  });
+
+  it("lets anyone view a public collaborative list but not edit it", async () => {
+    mockGetAuthUser.mockRejectedValue(new Error("no session"));
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "33333333-3333-3333-3333-333333333333",
+      ownerId: "owner-1",
+      collaborative: true,
+      public: true,
+      name: "open",
+      slug: "open",
+    });
+    mockDb.query.items.findFirst.mockResolvedValue({
+      id: "44444444-4444-4444-4444-444444444444",
+      done: false,
+    });
+    mockDb.query.participations.findFirst.mockResolvedValue(undefined);
+
+    const view = await app.request(
+      "/api/lists/33333333-3333-3333-3333-333333333333"
+    );
+    expect(view.status).toBe(200);
+
+    const edit = await app.request(
+      "/api/lists/33333333-3333-3333-3333-333333333333/items/44444444-4444-4444-4444-444444444444/toggle",
+      { method: "PATCH" }
+    );
+    expect(edit.status).toBe(403);
+    mockGetAuthUser.mockRejectedValue(new Error("no session"));
+  });
 });
 
 describe("DELETE /api/lists/:listId/items/:itemId", () => {
@@ -825,6 +984,9 @@ describe("Collaborative lists", () => {
   beforeEach(() => vi.clearAllMocks());
 
   it("non-owner can add item to collaborative list (200)", async () => {
+    mockGetAuthUser.mockResolvedValue({
+      session: { user: { id: "collab-user" } },
+    });
     const item = {
       id: "i1",
       listId: "abc",
@@ -836,6 +998,10 @@ describe("Collaborative lists", () => {
       id: "abc",
       ownerId: "owner-id",
       collaborative: true,
+    });
+    mockDb.query.participations.findFirst.mockResolvedValue({
+      id: "p1",
+      role: "collaborator",
     });
     mockDb.select.mockReturnValue({
       from: vi.fn().mockReturnValue({
@@ -855,6 +1021,7 @@ describe("Collaborative lists", () => {
     });
 
     expect(res.status).toBe(201);
+    mockGetAuthUser.mockRejectedValue(new Error("no session"));
   });
 
   it("non-owner gets 403 on non-collaborative list", async () => {
@@ -4017,6 +4184,7 @@ describe("OG share routes", () => {
       name: "Pueblos de España",
       slug: "pueblos",
       description: "Los más bonitos",
+      public: true,
     });
     mockDb.select.mockReturnValue(ogChain([{ ownerName: "Ana" }]));
 
@@ -4051,12 +4219,38 @@ describe("OG share routes", () => {
       name: "Cine",
       slug: "cine",
       description: null,
+      public: true,
     });
     mockDb.select.mockReturnValue(ogChain([{ ownerName: "Ana" }]));
 
     const res = await app.request("/api/og/cine");
     expect(res.status).toBe(200);
     expect(res.headers.get("content-type")).toContain("image/png");
+  });
+
+  it("GET /api/og/:listId returns 404 for a private list", async () => {
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "l1",
+      name: "Secreta",
+      slug: "secreta",
+      description: null,
+      public: false,
+    });
+    const res = await app.request("/api/og/secreta");
+    expect(res.status).toBe(404);
+  });
+
+  it("GET /api/share/:listId redirects to /explore for a private list", async () => {
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "l1",
+      name: "Secreta",
+      slug: "secreta",
+      description: null,
+      public: false,
+    });
+    const res = await app.request("/api/share/secreta");
+    expect(res.status).toBe(302);
+    expect(res.headers.get("location")).toContain("/explore");
   });
 });
 

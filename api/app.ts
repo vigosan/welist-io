@@ -391,25 +391,23 @@ async function canViewList(
   },
   userId: string | null
 ): Promise<boolean> {
-  if (
-    list.public ||
-    list.collaborative ||
-    (userId !== null && list.ownerId === userId)
-  )
-    return true;
-  if (userId && list.id) {
-    const participation = await getParticipation(list.id, userId);
-    if (participation) return true;
-    return hasPurchased(userId, list.id);
-  }
-  return false;
+  if (list.public) return true;
+  if (userId !== null && list.ownerId === userId) return true;
+  if (userId === null || !list.id) return false;
+  const participation = await getParticipation(list.id, userId);
+  if (participation) return true;
+  return hasPurchased(userId, list.id);
 }
 
-function canModifyList(
-  list: { ownerId: string | null; collaborative: boolean },
+async function canModifyList(
+  list: { id: string; ownerId: string | null; collaborative: boolean },
   userId: string | null
-): boolean {
-  return list.ownerId === null || list.ownerId === userId || list.collaborative;
+): Promise<boolean> {
+  if (list.ownerId === null) return true;
+  if (list.ownerId === userId) return true;
+  if (!list.collaborative || userId === null) return false;
+  const participation = await getParticipation(list.id, userId);
+  return participation?.role === "collaborator";
 }
 
 const UUID_RE =
@@ -429,9 +427,15 @@ function listWhere(param: string) {
 async function getOgData(param: string) {
   const list = await db.query.lists.findFirst({
     where: listWhere(param),
-    columns: { id: true, name: true, slug: true, description: true },
+    columns: {
+      id: true,
+      name: true,
+      slug: true,
+      description: true,
+      public: true,
+    },
   });
-  if (!list) return null;
+  if (!list?.public) return null;
   const [stats] = await db
     .select({ ownerName: users.name })
     .from(lists)
@@ -906,16 +910,6 @@ app.get("/lists/:listId", async (c) => {
   const userId = authUser?.session?.user?.id ?? null;
   if (!(await canViewList(list, userId)))
     return c.json({ error: "Not found" }, 404);
-  if (userId && list.collaborative && list.ownerId !== userId) {
-    await db
-      .insert(participations)
-      .values({
-        sourceListId: list.id,
-        userId,
-        role: "collaborator",
-      })
-      .onConflictDoNothing();
-  }
   const participation = userId ? await getParticipation(list.id, userId) : null;
   return c.json({
     ...list,
@@ -1037,7 +1031,7 @@ app.post(
     if (!list) return c.json({ error: "Not found" }, 404);
     const authUser = getOptionalUser(c);
     const userId = authUser?.session?.user?.id ?? null;
-    if (!canModifyList(list, userId))
+    if (!(await canModifyList(list, userId)))
       return c.json({ error: "Forbidden" }, 403);
     const { text, latitude, longitude, placeName } = c.req.valid("json");
     const [maxRow] = await db
@@ -1077,7 +1071,7 @@ app.patch(
     if (!list) return c.json({ error: "Not found" }, 404);
     const authUser = getOptionalUser(c);
     const userId = authUser?.session?.user?.id ?? null;
-    if (!canModifyList(list, userId))
+    if (!(await canModifyList(list, userId)))
       return c.json({ error: "Forbidden" }, 403);
     const { ids } = c.req.valid("json");
     await Promise.all(
@@ -1110,7 +1104,7 @@ app.patch(
     if (!list) return c.json({ error: "Not found" }, 404);
     const authUser = getOptionalUser(c);
     const userId = authUser?.session?.user?.id ?? null;
-    if (!canModifyList(list, userId))
+    if (!(await canModifyList(list, userId)))
       return c.json({ error: "Forbidden" }, 403);
     const itemId = c.req.param("itemId");
     const body = c.req.valid("json");
@@ -1237,7 +1231,10 @@ app.patch("/lists/:listId/items/:itemId/toggle", async (c) => {
     return c.json({ ...item, done: newDone });
   }
 
-  if (participation?.role !== "collaborator" && !canModifyList(list, userId)) {
+  if (
+    participation?.role !== "collaborator" &&
+    !(await canModifyList(list, userId))
+  ) {
     return c.json({ error: "Forbidden" }, 403);
   }
 
@@ -1360,7 +1357,8 @@ app.delete("/lists/:listId/items/:itemId", async (c) => {
   if (!list) return c.json({ error: "Not found" }, 404);
   const authUser = getOptionalUser(c);
   const userId = authUser?.session?.user?.id ?? null;
-  if (!canModifyList(list, userId)) return c.json({ error: "Forbidden" }, 403);
+  if (!(await canModifyList(list, userId)))
+    return c.json({ error: "Forbidden" }, 403);
   const itemId = c.req.param("itemId");
   const previous =
     list.public && list.collaborative && userId
@@ -1394,7 +1392,7 @@ app.delete(
     if (!list) return c.json({ error: "Not found" }, 404);
     const authUser = getOptionalUser(c);
     const userId = authUser?.session?.user?.id ?? null;
-    if (!canModifyList(list, userId))
+    if (!(await canModifyList(list, userId)))
       return c.json({ error: "Forbidden" }, 403);
     const { ids } = c.req.valid("json");
     await db
@@ -1423,7 +1421,7 @@ app.post(
     if (!list) return c.json({ error: "Not found" }, 404);
     const authUser = getOptionalUser(c);
     const userId = authUser?.session?.user?.id ?? null;
-    if (!canModifyList(list, userId))
+    if (!(await canModifyList(list, userId)))
       return c.json({ error: "Forbidden" }, 403);
     const { texts } = c.req.valid("json");
     const [maxRow] = await db
