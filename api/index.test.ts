@@ -742,6 +742,29 @@ describe("PATCH /api/lists/:listId/items/:itemId/toggle", () => {
     expect(res.status).toBe(200);
   });
 
+  it("blocks a logged-in non-collaborator from editing a private collaborative list", async () => {
+    mockGetAuthUser.mockResolvedValue({
+      session: { user: { id: "stranger" } },
+    });
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "11111111-1111-1111-1111-111111111111",
+      ownerId: "owner-1",
+      collaborative: true,
+      public: false,
+    });
+    mockDb.query.items.findFirst.mockResolvedValue({
+      id: "22222222-2222-2222-2222-222222222222",
+      done: false,
+    });
+    mockDb.query.participations.findFirst.mockResolvedValue(undefined);
+    const res = await app.request(
+      "/api/lists/11111111-1111-1111-1111-111111111111/items/22222222-2222-2222-2222-222222222222/toggle",
+      { method: "PATCH" }
+    );
+    expect(res.status).toBe(403);
+    mockGetAuthUser.mockRejectedValue(new Error("no session"));
+  });
+
   it("lets anyone view a public collaborative list but not edit it", async () => {
     mockGetAuthUser.mockRejectedValue(new Error("no session"));
     mockDb.query.lists.findFirst.mockResolvedValue({
