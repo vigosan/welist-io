@@ -634,6 +634,63 @@ describe("PATCH /api/lists/:listId/items/:itemId/toggle", () => {
     });
     expect(res.status).toBe(404);
   });
+
+  it("blocks anonymous edits on a private collaborative list", async () => {
+    mockGetAuthUser.mockRejectedValue(new Error("no session"));
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "11111111-1111-1111-1111-111111111111",
+      ownerId: "owner-1",
+      collaborative: true,
+      public: false,
+    });
+    mockDb.query.items.findFirst.mockResolvedValue({
+      id: "22222222-2222-2222-2222-222222222222",
+      done: false,
+    });
+    mockDb.query.participations.findFirst.mockResolvedValue(undefined);
+    const res = await app.request(
+      "/api/lists/11111111-1111-1111-1111-111111111111/items/22222222-2222-2222-2222-222222222222/toggle",
+      { method: "PATCH" }
+    );
+    expect(res.status).toBe(403);
+  });
+
+  it("allows an explicit collaborator to edit a private collaborative list", async () => {
+    mockGetAuthUser.mockResolvedValue({
+      session: { user: { id: "collab-1" } },
+    });
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "11111111-1111-1111-1111-111111111111",
+      ownerId: "owner-1",
+      collaborative: true,
+      public: false,
+    });
+    mockDb.query.items.findFirst.mockResolvedValue({
+      id: "22222222-2222-2222-2222-222222222222",
+      done: false,
+    });
+    mockDb.query.participations.findFirst.mockResolvedValue({
+      id: "p1",
+      completedAt: null,
+      role: "collaborator",
+    });
+    mockDb.update.mockReturnValue({
+      set: vi.fn().mockReturnValue({
+        where: vi.fn().mockReturnValue({
+          returning: vi
+            .fn()
+            .mockResolvedValue([
+              { id: "22222222-2222-2222-2222-222222222222", done: false },
+            ]),
+        }),
+      }),
+    });
+    const res = await app.request(
+      "/api/lists/11111111-1111-1111-1111-111111111111/items/22222222-2222-2222-2222-222222222222/toggle",
+      { method: "PATCH" }
+    );
+    expect(res.status).toBe(200);
+  });
 });
 
 describe("DELETE /api/lists/:listId/items/:itemId", () => {
