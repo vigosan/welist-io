@@ -435,7 +435,7 @@ async function getOgData(param: string) {
       public: true,
     },
   });
-  if (!list || !list.public) return null;
+  if (!list?.public) return null;
   const [stats] = await db
     .select({ ownerName: users.name })
     .from(lists)
