@@ -904,16 +904,6 @@ app.get("/lists/:listId", async (c) => {
   const userId = authUser?.session?.user?.id ?? null;
   if (!(await canViewList(list, userId)))
     return c.json({ error: "Not found" }, 404);
-  if (userId && list.collaborative && list.ownerId !== userId) {
-    await db
-      .insert(participations)
-      .values({
-        sourceListId: list.id,
-        userId,
-        role: "collaborator",
-      })
-      .onConflictDoNothing();
-  }
   const participation = userId ? await getParticipation(list.id, userId) : null;
   return c.json({
     ...list,

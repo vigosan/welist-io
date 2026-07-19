@@ -313,6 +313,32 @@ describe("GET /api/lists/:listId", () => {
     );
     expect(res.status).toBe(404);
   });
+
+  it("does not auto-join a visitor as collaborator", async () => {
+    mockGetAuthUser.mockResolvedValue({
+      session: { user: { id: "collab-1" } },
+    });
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "11111111-1111-1111-1111-111111111111",
+      ownerId: "owner-1",
+      collaborative: true,
+      public: false,
+      name: "secret",
+      slug: "secret",
+    });
+    mockDb.query.participations.findFirst.mockResolvedValue({
+      id: "p1",
+      completedAt: null,
+      role: "collaborator",
+    });
+    mockDb.insert.mockReturnValue(chainableInsert());
+    const res = await app.request(
+      "/api/lists/11111111-1111-1111-1111-111111111111"
+    );
+    expect(res.status).toBe(200);
+    expect(mockDb.insert).not.toHaveBeenCalledWith(participations);
+    mockGetAuthUser.mockRejectedValue(new Error("no session"));
+  });
 });
 
 describe("GET /api/lists/:listId/items", () => {
