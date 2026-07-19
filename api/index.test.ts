@@ -4184,6 +4184,7 @@ describe("OG share routes", () => {
       name: "Pueblos de España",
       slug: "pueblos",
       description: "Los más bonitos",
+      public: true,
     });
     mockDb.select.mockReturnValue(ogChain([{ ownerName: "Ana" }]));
 
@@ -4218,12 +4219,38 @@ describe("OG share routes", () => {
       name: "Cine",
       slug: "cine",
       description: null,
+      public: true,
     });
     mockDb.select.mockReturnValue(ogChain([{ ownerName: "Ana" }]));
 
     const res = await app.request("/api/og/cine");
     expect(res.status).toBe(200);
     expect(res.headers.get("content-type")).toContain("image/png");
+  });
+
+  it("GET /api/og/:listId returns 404 for a private list", async () => {
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "l1",
+      name: "Secreta",
+      slug: "secreta",
+      description: null,
+      public: false,
+    });
+    const res = await app.request("/api/og/secreta");
+    expect(res.status).toBe(404);
+  });
+
+  it("GET /api/share/:listId redirects to /explore for a private list", async () => {
+    mockDb.query.lists.findFirst.mockResolvedValue({
+      id: "l1",
+      name: "Secreta",
+      slug: "secreta",
+      description: null,
+      public: false,
+    });
+    const res = await app.request("/api/share/secreta");
+    expect(res.status).toBe(302);
+    expect(res.headers.get("location")).toContain("/explore");
   });
 });
 

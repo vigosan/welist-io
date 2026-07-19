@@ -427,9 +427,15 @@ function listWhere(param: string) {
 async function getOgData(param: string) {
   const list = await db.query.lists.findFirst({
     where: listWhere(param),
-    columns: { id: true, name: true, slug: true, description: true },
+    columns: {
+      id: true,
+      name: true,
+      slug: true,
+      description: true,
+      public: true,
+    },
   });
-  if (!list) return null;
+  if (!list || !list.public) return null;
   const [stats] = await db
     .select({ ownerName: users.name })
     .from(lists)
